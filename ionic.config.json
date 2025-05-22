@@ -1,0 +1,7 @@
+{
+  "name": "mes",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
