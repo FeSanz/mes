@@ -1,0 +1,84 @@
+<ion-header [translucent]="true" xmlns="http://www.w3.org/1999/html">
+  <ion-toolbar>
+    <ion-title>Organizaciones</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="regions-wrapper">
+    <!-------------------------- Region FUSION ------------------------------------>
+    <div class="region-container">
+      <div class="region-header" style="background-color: #fd5d93">
+        <ion-icon name="cloud-outline"></ion-icon>
+        <span>Organizaciones Fusion</span>
+        <ion-button size="small" color="primary" (click)="UploadOrganization()">CARGAR
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+      </div>
+          <p-table [value]="fusionData.items" [(selection)]="selectedItemsFusion" dataKey="OrganizationCode"
+                   [tableStyle]="{ 'min-width': '50rem' }" [size]="'small'">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 4rem">
+                  <p-tableHeaderCheckbox/>
+                </th>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Ubicación</th>
+                <th>Manufactura</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+              <tr>
+                <td>
+                  <p-tableCheckbox [value]="item"/>
+                </td>
+                <td>{{ item.OrganizationCode }}</td>
+                <td>{{ item.OrganizationName }}</td>
+                <td>{{ item.LocationCode }}</td>
+                <td>{{ item.plantParameters.items[0].DefaultWorkMethod }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+    </div>
+
+    <!-------------------------- Region DB ------------------------------------>
+    <div class="region-container">
+      <div class="region-header" style="background-color: #00bf9a">
+        <ion-icon name="server-outline"></ion-icon>
+        <span>Organizaciones DB</span>
+        <ion-button size="small" color="danger" (click)="DeleteOrganizations()">ELIMINAR
+          <ion-icon slot="end" name="trash"></ion-icon>
+        </ion-button>
+      </div>
+      <p-table [value]="dbData.items" [(selection)]="selectedItemsDB" dataKey="Code"
+               [tableStyle]="{ 'min-width': '50rem' }" [size]="'small'">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox/>
+            </th>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Ubicación</th>
+            <th>Manufactura</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="item"/>
+            </td>
+            <td>{{ item.Code }}</td>
+            <td>{{ item.Name }}</td>
+            <td>{{ item.Location }}</td>
+            <td>{{ item.WorkMethod }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</ion-content>

@@ -1,3 +1,130 @@
 <ion-app>
+  <ion-menu contentId="main-content" side="start">
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Menú</ion-title>
+      </ion-toolbar>
+      <ion-item color="primary" lines="none">
+        <ion-icon aria-hidden="true" slot="start" name="person" color="secundary"></ion-icon>
+        <ion-label></ion-label>
+        <ion-buttons slot="end">
+          <ion-button shape="round" id="popover-button-user"><ion-icon name="ellipsis-vertical-outline"></ion-icon></ion-button>
+        </ion-buttons>
+        <ion-popover trigger="popover-button-user" [dismissOnSelect]="true">
+          <ng-template>
+            <ion-content>
+              <ion-list>
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item [routerLink]="['/profile']" lines="none" detail="false" routerLinkActive="selected">
+                    <ion-icon aria-hidden="true" slot="start" name="person-outline" color="primary"></ion-icon>
+                    <ion-label>Perfil</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item [routerLink]="['/settings']" lines="none" detail="false" routerLinkActive="selected">
+                    <ion-icon aria-hidden="true" slot="start" name="settings-outline" color="primary"></ion-icon>
+                    <ion-label>Ajustes</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item [routerLink]="['/login']"  lines="none" detail="false" routerLinkActive="selected">
+                    <ion-icon aria-hidden="true" slot="start" name="power-outline" color="primary"></ion-icon>
+                    <ion-label>Salir</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+              </ion-list>
+            </ion-content>
+          </ng-template>
+        </ion-popover>
+      </ion-item>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        <ion-item-group>
+          <ion-menu-toggle auto-hide="false" >
+            <ion-item [routerLink]="['/login']" lines="none" detail="false" routerLinkActive="selected">
+              <ion-icon aria-hidden="true" slot="start" name="home-outline" color="primary"></ion-icon>
+              <ion-label>Home</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-item-group>
+      </ion-list>
+      <ion-accordion-group>
+        <ion-accordion value="mfg">
+          <ion-item slot="header" color="light">
+            <ion-label>Producción</ion-label><ion-icon slot="start" color="primary" name="cube-outline"></ion-icon>
+          </ion-item>
+          <div slot="content">
+            <ion-list>
+              <ion-menu-toggle auto-hide="false">
+                <ion-item [routerLink]="['/receipts']" lines="none" detail="false" routerLinkActive="selected">
+                  <ion-icon aria-hidden="true" slot="start" name="stats-chart-outline" color="primary"></ion-icon>
+                  <ion-label>Monitoreo</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+              <ion-menu-toggle auto-hide="false">
+                <ion-item [routerLink]="['/expected-shipments']" lines="none" detail="false" routerLinkActive="selected">
+                  <ion-icon aria-hidden="true" slot="start" name="hardware-chip-outline" color="primary"></ion-icon>
+                  <ion-label>Dispositivos</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+            </ion-list>
+          </div>
+        </ion-accordion>
+        <ion-accordion value="mtto">
+          <ion-item slot="header" color="light">
+            <ion-label>Mantenimiento</ion-label><ion-icon slot="start" color="primary" name="hammer-outline"></ion-icon>
+          </ion-item>
+          <div slot="content">
+            <ion-list>
+              <ion-menu-toggle auto-hide="false">
+                <ion-item [routerLink]="['/sales']" lines="none" detail="false" routerLinkActive="selected">
+                  <ion-icon aria-hidden="true" slot="start" name="warning-outline" color="primary"></ion-icon>
+                  <ion-label>Alertas</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+              <ion-menu-toggle auto-hide="false">
+                <ion-item >
+                  <ion-icon aria-hidden="true" slot="start" name="time-outline" color="primary"></ion-icon>
+                  <ion-label>Scada</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+            </ion-list>
+          </div>
+        </ion-accordion>
+        <ion-accordion value="settings">
+          <ion-item slot="header" color="light">
+            <ion-label>Configuraciones</ion-label><ion-icon slot="start" color="primary" name="settings-outline"></ion-icon>
+          </ion-item>
+          <div slot="content">
+            <ion-list>
+              <ion-menu-toggle auto-hide="false">
+                <ion-item [routerLink]="['/home']" lines="none" detail="false" routerLinkActive="selected">
+                  <ion-icon aria-hidden="true" slot="start" name="people-outline" color="primary"></ion-icon>
+                  <ion-label>Usuarios</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+              <ion-menu-toggle auto-hide="false">
+                <ion-item [routerLink]="['/fusion_connection']" lines="none" detail="false" routerLinkActive="selected">
+                  <ion-icon aria-hidden="true" slot="start" name="git-network-outline" color="primary"></ion-icon>
+                  <ion-label>Integraciones</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+            </ion-list>
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
+
+    </ion-content>
+    <ion-footer class="no-shadow">
+      <ion-toolbar>
+        <ion-item lines="none">
+          <ion-note color="medium" slot="end" class="ion-text-center" slot="end">Versión:</ion-note>
+        </ion-item>
+      </ion-toolbar>
+    </ion-footer>
+  </ion-menu>
+  <div class="ion-page" id="main-content">
+  </div>
   <ion-router-outlet></ion-router-outlet>
 </ion-app>

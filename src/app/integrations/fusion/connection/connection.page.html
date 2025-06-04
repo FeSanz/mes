@@ -1,0 +1,88 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Integraciones</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Interface para conexion con Oracle Fusion -->
+  <div class="form-container">
+    <div class="form-header">
+      <ion-icon name="cloud-outline"></ion-icon>
+      <span>Conexión Oracle Manufacturing Cloud</span>
+    </div>
+
+    <div class="form-content">
+      <div class="form-row">
+        <div class="form-group full-width">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="server-outline" slot="start"></ion-icon>
+            <ion-label position="floating">Servidor</ion-label>
+            <ion-input type="text" placeholder="example.fa.ocs.oraclecloud.com" [(ngModel)]="host"></ion-input>
+          </ion-item>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+            <ion-label position="floating">Usuario</ion-label>
+            <ion-input type="email" placeholder="mes.iot@example.com" [(ngModel)]="user"></ion-input>
+          </ion-item>
+        </div>
+
+        <div class="form-group">
+          <ion-item class="custom-input" lines="none">
+            <ion-icon name="key-outline" slot="start"></ion-icon>
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input type="password" placeholder="••••••••••" [(ngModel)]="pwd"></ion-input>
+          </ion-item>
+        </div>
+      </div>
+
+      <div class="connection-actions">
+        <div class="left-actions">
+          <ion-button fill="outline" size="small" (click)="VerifyConnection()">
+            <ion-icon name="link-outline" slot="start"></ion-icon>
+            Verificar Conectividad
+          </ion-button>
+          <div class="auth-status">
+            <ion-icon [name]="statusIcon" [color]="statusColor"></ion-icon>
+            <ion-text [color]="statusColor">{{ statusMessage }}</ion-text>
+          </div>
+        </div>
+        <div class="right-actions">
+          <ion-button color="success" (click)="SaveConnection()" [disabled]="!canSave">
+            Guardar
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interface para Cards módulos Fusion -->
+  <div class="stats-container">
+    <ion-card class="stats-card" *ngFor="let card of fusionCards; let i = index">
+      <div class="icon-container" [ngClass]="card.iconClass">
+        <ion-icon [name]="card.icon"></ion-icon>
+      </div>
+      <div class="stats-content">
+        <p class="stats-label">Sincronizar</p>
+        <h2 class="stats-value">{{ card.moduleName }}</h2>
+        <div class="stats-footer">
+          <ion-icon name="time-outline"></ion-icon>
+          <span>{{ card.updateDate }}</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <ion-button fill="clear" size="large" (click)="navigateToModule(card.idModule)">
+          <ion-icon slot="icon-only" name="sync-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-card>
+  </div>
+</ion-content>
