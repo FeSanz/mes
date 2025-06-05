@@ -376,7 +376,7 @@
   --ion-color-tint: var(--ion-color-card-tint);
 }
 
-/** Alertify **/
+/******************************* Alertify *******************************/
 .alertify-toast {
   font-weight: 500;
   font-size: 1rem;
@@ -458,5 +458,80 @@
   --width: 290px;
   --min-width: 250px;
   --max-width: 90vw; // Para que sea responsive en pantallas pequeñas
+}
+/******************************* Table PrimeNG Header Search *******************************/
+.table-caption {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  min-height: 40px;
+}
+
+/******************************* Color Table PrimeNG  *******************************/
+.card-table-primeng {
+  // Contenedor principal
+  background-color: var(--ion-color-card) !important;
+
+  // Caption/Header de la tabla
+  .p-datatable-header {
+    background-color: var(--ion-color-card) !important;
+    color: var(--ion-color-card-contrast) !important;
+    border-color: var(--ion-color-card-tint) !important;
+  }
+
+  // Encabezados de columna
+  .p-datatable-thead > tr > th {
+    background-color: var(--ion-color-card-shade) !important;
+    color: var(--ion-color-card-contrast) !important;
+    border-color: var(--ion-color-card-tint) !important;
+  }
+
+  // Filas del cuerpo
+  .p-datatable-tbody > tr {
+    background-color: var(--ion-color-card) !important;
+    color: var(--ion-color-card-contrast) !important;
+
+    &:nth-child(even) {
+      background-color: var(--ion-color-card-shade) !important;
+    }
+  }
+
+  // Paginación
+  .p-paginator {
+    background-color: var(--ion-color-card) !important;
+    color: var(--ion-color-card-contrast) !important;
+    border-color: var(--ion-color-card-tint) !important;
+
+    .p-paginator-pages .p-paginator-page {
+      background-color: transparent !important;
+      color: var(--ion-color-card-contrast) !important;
+
+      &.p-highlight {
+        background-color: var(--ion-color-card-tint) !important;
+      }
+
+      &:hover {
+        background-color: var(--ion-color-card-shade) !important;
+      }
+    }
+
+    .p-paginator-first,
+    .p-paginator-prev,
+    .p-paginator-next,
+    .p-paginator-last {
+      color: var(--ion-color-card-contrast) !important;
+
+      &:hover {
+        background-color: var(--ion-color-card-tint) !important;
+      }
+    }
+
+    .p-dropdown {
+      background-color: var(--ion-color-card-shade) !important;
+      color: var(--ion-color-card-contrast) !important;
+      border-color: var(--ion-color-card-tint) !important;
+    }
+  }
 }
 

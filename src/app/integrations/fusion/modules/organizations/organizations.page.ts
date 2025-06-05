@@ -8,54 +8,49 @@ import {AlertsService} from "../../../../services/alerts.service";
 import {addIcons} from "ionicons";
 
 import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 import {
-  IonAvatar, IonButton,
-  IonButtons,
-  IonCheckbox,
-  IonContent,
-  IonHeader, IonIcon,
-  IonMenuButton, IonProgressBar,
-  IonTitle,
-  IonToolbar
+  IonAvatar, IonButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonIcon, IonMenuButton, IonProgressBar,
+  IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
 
 import {
-  closeOutline,
-  cloudOutline,
-  chevronDownOutline,
-  arrowForward,
-  trash,
-  serverOutline
+  closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
 } from 'ionicons/icons';
+import {dt} from "@primeng/themes";
 
 @Component({
   selector: 'app-organizations',
   templateUrl: './organizations.page.html',
   styleUrls: ['./organizations.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton, IonCheckbox, IonAvatar, IonProgressBar, IonButton, IonIcon, TableModule]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
+            IonCheckbox, IonAvatar, IonProgressBar, IonButton, IonIcon,
+            TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,DropdownModule,
+            MultiSelectModule  ]
 })
 export class OrganizationsPage implements OnInit {
   fusionData: any = {};
   dbData: any = {};
 
-  fusionAllSelected = false;
-  dbAllSelected = false;
-
   selectedItemsFusion: any[] = [];
   selectedItemsDB: any[] = [];
+
+  searchValueFusion: string = '';
+  searchValueDB: string = '';
 
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
               private alerts: AlertsService,) {
     addIcons({
-      closeOutline,
-      cloudOutline,
-      chevronDownOutline,
-      arrowForward,
-      trash,
-      serverOutline
+      closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
     });
   }
 
@@ -102,40 +97,15 @@ export class OrganizationsPage implements OnInit {
     });
   }
 
-  // Métodos para FUSION
-  toggleFusionAll() {
-    if (this.fusionData.items) {
-      this.fusionData.items.forEach((item: any) => {
-        item.selected = this.fusionAllSelected;
-      });
-    }
+  //Metodo para manejar el filtro global
+  onFilterGlobal(event: Event, table: any) {
+    const target = event.target as HTMLInputElement;
+    table.filterGlobal(target.value, 'contains');
   }
 
-  updateAllSelectedFusionState() {
-    if (this.fusionData.items && this.fusionData.items.length > 0) {
-      this.fusionAllSelected = this.fusionData.items.every((item: any) => item.selected);
-    }
-  }
-
-  // Métodos para DB
-  toggleDbAll() {
-    if (this.dbData.items) {
-      this.dbData.items.forEach((item: any) => {
-        item.selected = this.dbAllSelected;
-      });
-    }
-  }
-
-  updateAllSelectedDbState() {
-    if (this.dbData.items && this.dbData.items.length > 0) {
-      this.dbAllSelected = this.dbData.items.every((item: any) => item.selected);
-    }
-  }
-
-  // Método para cargar organizaciones seleccionadas de FUSION
+  //Metodo para cargar organizaciones seleccionadas de FUSION
   UploadOrganization() {
     if (this.fusionData.items) {
-      //const selectedItems = this.fusionData.items.filter((item: any) => item.selected);
 
       if (this.selectedItemsFusion.length === 0) {
         this.alerts.Warning("Seleccione algún elemento para cargar");
@@ -173,10 +143,9 @@ export class OrganizationsPage implements OnInit {
     }
   }
 
-// Método para eliminar organizaciones seleccionadas de DB
+  //Metodo para eliminar organizaciones seleccionadas de DB
   async DeleteOrganizations() {
     if (this.dbData.items) {
-      //const selectedItems = this.dbData.items.filter((item: any) => item.selected);
 
       if (this.selectedItemsDB.length === 0) {
         this.alerts.Warning("Seleccione algún elemento para eliminar");
@@ -214,4 +183,17 @@ export class OrganizationsPage implements OnInit {
       }
     }
   }
+
+  clearFusion(table: any) {
+    table.clear();
+    this.searchValueFusion = '';
+  }
+
+  clearDB(table: any) {
+    table.clear();
+    this.searchValueDB = '';
+  }
+
+  protected readonly trash = trash;
+  protected readonly dt = dt;
 }
