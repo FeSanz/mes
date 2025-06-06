@@ -32,7 +32,7 @@ import {dt} from "@primeng/themes";
   styleUrls: ['./organizations.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
-            IonCheckbox, IonAvatar, IonProgressBar, IonButton, IonIcon,
+            IonButton, IonIcon,
             TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,DropdownModule,
             MultiSelectModule  ]
 })
