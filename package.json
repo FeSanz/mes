@@ -33,6 +33,7 @@
     "apexcharts": "^4.7.0",
     "cors": "^2.8.5",
     "ionicons": "^8.0.8",
+    "primeicons": "^7.0.0",
     "ng-apexcharts": "^1.15.0",
     "ngx-colors": "^3.6.0",
     "primeng": "^19.1.3",

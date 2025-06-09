@@ -18,99 +18,99 @@
           <ion-icon slot="end" name="arrow-forward"></ion-icon>
         </ion-button>
       </div>
-          <p-table #dtFusion
-                   [value]="fusionData.items"
-                   [(selection)]="selectedItemsFusion"
-                   dataKey="OrganizationCode"
-                   styleClass="card-table-primeng"
-                   [tableStyle]="{ 'min-width': '50rem' }"
-                   [size]="'small'"
-                   [rowHover]="true"
-                   [rows]="25"
-                   [showCurrentPageReport]="true"
-                   [rowsPerPageOptions]="[10, 25, 50]"
-                   [paginator]="true"
-                   currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
-                   [filterDelay]="0"
-                   [globalFilterFields]="['OrganizationCode', 'OrganizationName', 'LocationCode']"
-                   stripedRows
-                   [scrollable]="true"
-                   scrollHeight="550px"
-          >
-            <ng-template #caption>
-              <div class="table-caption">
-                <p-button
-                  [outlined]="true"
-                  icon="pi pi-filter-slash"
-                  label="Limpiar"
-                  (click)="ClearFusion(dtFusion)" />
+      <p-table #dtFusion
+               [value]="fusionData.items"
+               [(selection)]="selectedItemsFusion"
+               dataKey="OrganizationCode"
+               styleClass="card-table-primeng"
+               [tableStyle]="{ 'min-width': '50rem' }"
+               [size]="'small'"
+               [rowHover]="true"
+               [rows]="25"
+               [showCurrentPageReport]="true"
+               [rowsPerPageOptions]="[10, 25, 50]"
+               [paginator]="true"
+               currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+               [filterDelay]="0"
+               [globalFilterFields]="['OrganizationCode', 'OrganizationName', 'LocationCode']"
+               stripedRows
+               [scrollable]="true"
+               scrollHeight="550px"
+      >
+        <ng-template #caption>
+          <div class="table-caption">
+            <p-button
+              [outlined]="true"
+              icon="pi pi-filter-slash"
+              label="Limpiar"
+              (click)="ClearFusion(dtFusion)" />
 
-                <div></div> <!-- Spacer -->
+            <div></div> <!-- Spacer -->
 
-                <p-iconField iconPosition="left">
-                  <p-inputIcon>
-                    <i class="pi pi-search"></i>
-                  </p-inputIcon>
-                  <input pInputText type="text"
-                         [(ngModel)]="searchValueFusion"
-                         (input)="OnFilterGlobal($event, dtFusion)"
-                         placeholder="Buscar" />
-                </p-iconField>
+            <p-iconField iconPosition="left">
+              <p-inputIcon>
+                <i class="pi pi-search"></i>
+              </p-inputIcon>
+              <input pInputText type="text"
+                     [(ngModel)]="searchValueFusion"
+                     (input)="OnFilterGlobal($event, dtFusion)"
+                     placeholder="Buscar" />
+            </p-iconField>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox/>
+            </th>
+            <th pSortableColumn="OrganizationCode" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Código
+                <p-sortIcon field="OrganizationCode" />
+                <p-columnFilter type="text" field="OrganizationCode" display="menu" class="ml-auto" />
               </div>
-            </ng-template>
-
-            <ng-template pTemplate="header">
-              <tr>
-                <th style="width: 4rem">
-                  <p-tableHeaderCheckbox/>
-                </th>
-                <th pSortableColumn="OrganizationCode" style="min-width: 10rem">
-                  <div class="flex justify-between items-center">
-                    Código
-                    <p-sortIcon field="OrganizationCode" />
-                    <p-columnFilter type="text" field="OrganizationCode" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th pSortableColumn="OrganizationName" style="min-width: 14rem">
-                  <div class="flex justify-between items-center">
-                    Nombre
-                    <p-sortIcon field="OrganizationName" />
-                    <p-columnFilter type="text" field="OrganizationName" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th pSortableColumn="LocationCode" style="min-width: 10rem">
-                  <div class="flex justify-between items-center">
-                    Ubicación
-                    <p-sortIcon field="LocationCode" />
-                    <p-columnFilter field="LocationCode" matchMode="equals" display="menu" class="ml-auto"/>
-                  </div>
-                </th>
-                <th style="min-width: 12rem">
-                  <div class="flex justify-between items-center">
-                    Manufactura
-                    <p-sortIcon field="DefaultWorkMethod" />
-                    <p-columnFilter field="DefaultWorkMethod" matchMode="equals" display="menu" class="ml-auto"/>
-                  </div>
-                </th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-item>
-              <tr>
-                <td>
-                  <p-tableCheckbox [value]="item"/>
-                </td>
-                <td>{{ item.OrganizationCode }}</td>
-                <td>{{ item.OrganizationName }}</td>
-                <td>{{ item.LocationCode }}</td>
-                <td>{{ item.plantParameters?.items?.[0]?.DefaultWorkMethod || 'N/A' }}</td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="5">No se encontraron organizaciones.</td>
-              </tr>
-            </ng-template>
-          </p-table>
+            </th>
+            <th pSortableColumn="OrganizationName" style="min-width: 14rem">
+              <div class="flex justify-between items-center">
+                Nombre
+                <p-sortIcon field="OrganizationName" />
+                <p-columnFilter type="text" field="OrganizationName" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="LocationCode" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Ubicación
+                <p-sortIcon field="LocationCode" />
+                <p-columnFilter field="LocationCode" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th style="min-width: 12rem">
+              <div class="flex justify-between items-center">
+                Manufactura
+                <p-sortIcon field="DefaultWorkMethod" />
+                <p-columnFilter field="DefaultWorkMethod" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="item"/>
+            </td>
+            <td>{{ item.OrganizationCode }}</td>
+            <td>{{ item.OrganizationName }}</td>
+            <td>{{ item.LocationCode }}</td>
+            <td>{{ item.plantParameters?.items?.[0]?.DefaultWorkMethod || 'N/A' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">No se encontraron organizaciones.</td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
 
 

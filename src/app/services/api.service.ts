@@ -125,7 +125,7 @@ export class ApiService {
     await this.alerts.ShowLoading();
     try {
       const options = {
-        url: "http://localhost:3000/api"+endPoint,
+        url: endPoint,
         headers: {'Content-Type': 'application/json'}
       };
       const response: HttpResponse = await CapacitorHttp.get(options);
@@ -145,7 +145,7 @@ export class ApiService {
     await this.alerts.ShowLoading();
     try {
       const options = {
-        url: "http://localhost:3000/api"+endPoint,
+        url: endPoint,
         headers: {'Content-Type': 'application/json'},
         data: payload
       };
@@ -173,7 +173,6 @@ export class ApiService {
       const response: HttpResponse = await CapacitorHttp.post(options);
       this.RequestStatusCode(response.status);
       return response.data;
-
     } catch (error: any) {
       console.log('Error (PG):', error);
       await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
@@ -187,7 +186,7 @@ export class ApiService {
     await this.alerts.ShowLoading();
     try {
       const options = {
-        url: "http://localhost:3000/api"+endPoint,
+        url: endPoint,
         headers: {'Content-Type': 'application/json'}
       };
       const response: HttpResponse = await CapacitorHttp.delete(options);
