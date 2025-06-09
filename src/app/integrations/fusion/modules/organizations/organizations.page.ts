@@ -10,12 +10,11 @@ import {addIcons} from "ionicons";
 import { TableModule } from 'primeng/table';
 
 import {
-  IonAvatar, IonButton,
+  IonButton,
   IonButtons,
-  IonCheckbox,
   IonContent,
   IonHeader, IonIcon,
-  IonMenuButton, IonProgressBar,
+  IonMenuButton,
   IonTitle,
   IonToolbar
 } from '@ionic/angular/standalone';
@@ -34,7 +33,7 @@ import {
   templateUrl: './organizations.page.html',
   styleUrls: ['./organizations.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton, IonCheckbox, IonAvatar, IonProgressBar, IonButton, IonIcon, TableModule]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton, IonButton, IonIcon, TableModule]
 })
 export class OrganizationsPage implements OnInit {
   fusionData: any = {};

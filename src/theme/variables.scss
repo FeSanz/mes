@@ -21,18 +21,18 @@
   --ion-color-secondary-tint: #55b0f2;
 
   /** back main **/
-  --ion-color-back: #1e1e2f;
-  --ion-color-back-rgb: 30,30,47;
-  --ion-color-back-contrast: #ffffff;
-  --ion-color-back-contrast-rgb: 255,255,255;
-  --ion-color-back-shade: #1a1a29;
-  --ion-color-back-tint: #353544;
+  --ion-color-back: #f4f5f8;
+  --ion-color-back-rgb: 244, 245, 248;
+  --ion-color-back-contrast: #000000;
+  --ion-color-back-contrast-rgb: 0, 0, 0;
+  --ion-color-back-shade: #fff;
+  --ion-color-back-tint: #f5f6f9;
 
   /** cards **/
   --ion-color-card: #27293d;
-  --ion-color-card-rgb: 39,41,61;
+  --ion-color-card-rgb: 39, 41, 61;
   --ion-color-card-contrast: #ffffff;
-  --ion-color-card-contrast-rgb: 255,255,255;
+  --ion-color-card-contrast-rgb: 255, 255, 255;
   --ion-color-card-shade: #222436;
   --ion-color-card-tint: #3d3e50;
 
@@ -121,9 +121,16 @@
     --transition: none;
   }
 
+  ion-content {
+    --background: var(--ion-color-back);
+  }
 }
 
 @media (prefers-color-scheme: dark) {
+  
+  ion-content {
+    --background: var(--ion-color-back);
+  }
   /*
    * Dark Colors
    * -------------------------------------------
@@ -148,17 +155,17 @@
 
     /** back main **/
     --ion-color-back: #1e1e2f;
-    --ion-color-back-rgb: 30,30,47;
+    --ion-color-back-rgb: 30, 30, 47;
     --ion-color-back-contrast: #ffffff;
-    --ion-color-back-contrast-rgb: 255,255,255;
+    --ion-color-back-contrast-rgb: 255, 255, 255;
     --ion-color-back-shade: #1a1a29;
     --ion-color-back-tint: #353544;
 
     /** cards **/
     --ion-color-card: #27293d;
-    --ion-color-card-rgb: 39,41,61;
+    --ion-color-card-rgb: 39, 41, 61;
     --ion-color-card-contrast: #ffffff;
-    --ion-color-card-contrast-rgb: 255,255,255;
+    --ion-color-card-contrast-rgb: 255, 255, 255;
     --ion-color-card-shade: #222436;
     --ion-color-card-tint: #3d3e50;
 
@@ -228,6 +235,7 @@
     --ion-color-orange-tint: #ff9735;
 
   }
+
 
   /*
    * iOS Dark Theme
@@ -459,4 +467,3 @@
   --min-width: 250px;
   --max-width: 90vw; // Para que sea responsive en pantallas pequeñas
 }
-

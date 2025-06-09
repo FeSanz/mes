@@ -51,19 +51,19 @@
       </ion-list>
       <ion-accordion-group>
         <ion-accordion value="mfg">
-          <ion-item slot="header" color="light">
+          <ion-item slot="header">
             <ion-label>Producción</ion-label><ion-icon slot="start" color="primary" name="cube-outline"></ion-icon>
           </ion-item>
           <div slot="content">
             <ion-list>
               <ion-menu-toggle auto-hide="false">
-                <ion-item [routerLink]="['/receipts']" lines="none" detail="false" routerLinkActive="selected">
+                <ion-item [routerLink]="['/monitoring']" lines="none" detail="false" routerLinkActive="selected" button>
                   <ion-icon aria-hidden="true" slot="start" name="stats-chart-outline" color="primary"></ion-icon>
                   <ion-label>Monitoreo</ion-label>
                 </ion-item>
               </ion-menu-toggle>
               <ion-menu-toggle auto-hide="false">
-                <ion-item [routerLink]="['/expected-shipments']" lines="none" detail="false" routerLinkActive="selected">
+                <ion-item [routerLink]="['/devices']" lines="none" detail="false" routerLinkActive="selected" button>
                   <ion-icon aria-hidden="true" slot="start" name="hardware-chip-outline" color="primary"></ion-icon>
                   <ion-label>Dispositivos</ion-label>
                 </ion-item>
@@ -72,7 +72,7 @@
           </div>
         </ion-accordion>
         <ion-accordion value="mtto">
-          <ion-item slot="header" color="light">
+          <ion-item slot="header">
             <ion-label>Mantenimiento</ion-label><ion-icon slot="start" color="primary" name="hammer-outline"></ion-icon>
           </ion-item>
           <div slot="content">
@@ -93,19 +93,19 @@
           </div>
         </ion-accordion>
         <ion-accordion value="settings">
-          <ion-item slot="header" color="light">
+          <ion-item slot="header">
             <ion-label>Configuraciones</ion-label><ion-icon slot="start" color="primary" name="settings-outline"></ion-icon>
           </ion-item>
           <div slot="content">
             <ion-list>
               <ion-menu-toggle auto-hide="false">
-                <ion-item [routerLink]="['/home']" lines="none" detail="false" routerLinkActive="selected">
+                <ion-item [routerLink]="['/users']" lines="none" detail="false" routerLinkActive="selected" button>
                   <ion-icon aria-hidden="true" slot="start" name="people-outline" color="primary"></ion-icon>
                   <ion-label>Usuarios</ion-label>
                 </ion-item>
               </ion-menu-toggle>
               <ion-menu-toggle auto-hide="false">
-                <ion-item [routerLink]="['/fusion_connection']" lines="none" detail="false" routerLinkActive="selected">
+                <ion-item [routerLink]="['/fusion_connection']" lines="none" detail="false" routerLinkActive="selected" button>
                   <ion-icon aria-hidden="true" slot="start" name="git-network-outline" color="primary"></ion-icon>
                   <ion-label>Integraciones</ion-label>
                 </ion-item>
@@ -118,6 +118,9 @@
     </ion-content>
     <ion-footer class="no-shadow">
       <ion-toolbar>
+        <ion-item lines="none">
+          <ion-toggle [(ngModel)]="darkMode" (ionChange)="ChangeColorMode()" color="primary">Modo oscuro</ion-toggle>
+        </ion-item>
         <ion-item lines="none">
           <ion-note color="medium" slot="end" class="ion-text-center" slot="end">Versión:</ion-note>
         </ion-item>

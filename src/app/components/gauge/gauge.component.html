@@ -1,0 +1,180 @@
+<ion-card class="humidity-card large-gauge">
+  <ion-card-header>
+    <ion-card-title class="card-title">
+      <ion-icon name="water-outline"></ion-icon>
+      {{ processedConfig.title }}
+      <!-- ✅ BOTÓN DE CONFIGURACIÓN -->
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        color="light"
+        (click)="toggleConfigPanel()"
+        class="config-button">
+        <ion-icon [name]="showConfigPanel ? 'close' : 'settings-outline'" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-card-title>
+    <ion-card-subtitle class="humidity-subtitle">
+      <ion-icon name="analytics-outline"></ion-icon>
+      Rango: {{ processedConfig.minValue }}% - {{ processedConfig.maxValue }}%
+    </ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    
+    <!-- ✅ PANEL DE CONFIGURACIÓN INTERNO -->
+    <div class="config-panel" *ngIf="showConfigPanel" [@slideInOut]>
+      <div class="config-content">
+        <h4>⚙️ Configuración de Humedad</h4>
+        
+        <div class="config-row">
+          <ion-item>
+            <ion-label>Valor Mínimo (%)</ion-label>
+            <ion-input 
+              type="number" 
+              [value]="tempConfig.minValue"
+              (ionChange)="updateTempConfig('minValue', $event)"
+              slot="end"
+              style="max-width: 80px;">
+            </ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label>Valor Máximo (%)</ion-label>
+            <ion-input 
+              type="number" 
+              [value]="tempConfig.maxValue"
+              (ionChange)="updateTempConfig('maxValue', $event)"
+              slot="end"
+              style="max-width: 80px;">
+            </ion-input>
+          </ion-item>
+        </div>
+        
+        <div class="config-row">
+          <ion-item>
+            <ion-label>Color Seco</ion-label>
+            <input 
+              type="color" 
+              [value]="tempConfig.minColor"
+              (change)="updateTempConfig('minColor', $event)"
+              slot="end"
+              class="color-input">
+          </ion-item>
+          
+          <ion-item>
+            <ion-label>Color Húmedo</ion-label>
+            <input 
+              type="color" 
+              [value]="tempConfig.maxColor"
+              (change)="updateTempConfig('maxColor', $event)"
+              slot="end"
+              class="color-input">
+          </ion-item>
+        </div>
+        
+        <div class="config-actions">
+          <ion-button 
+            expand="block" 
+            fill="outline" 
+            color="medium"
+            (click)="resetToDefaults()">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Resetear
+          </ion-button>
+          
+          <ion-button 
+            expand="block" 
+            fill="solid" 
+            color="primary"
+            (click)="applyConfig()">
+            <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+            Aplicar
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ LAYOUT PRINCIPAL CENTRADO -->
+    <div class="humidity-container" [class.compact]="processedConfig.compactMode" [class.config-open]="showConfigPanel">
+      
+      <!-- Sección del gauge -->
+      <div class="gauge-section">
+        <div class="gauge-wrapper large">
+          <svg width="360" height="200" viewBox="0 0 360 200" class="humidity-svg-gauge large">
+            <!-- Arco de fondo -->
+            <path d="M 60 160 A 120 120 0 0 1 300 160" 
+                  fill="none" 
+                  stroke="#333" 
+                  stroke-width="18" 
+                  stroke-linecap="round"
+                  class="background-arc"/>
+            
+            <!-- Arco de progreso -->
+            <path d="M 60 160 A 120 120 0 0 1 300 160" 
+                  fill="none" 
+                  [attr.stroke]="currentColor" 
+                  stroke-width="18" 
+                  stroke-linecap="round"
+                  [attr.stroke-dasharray]="getProgressDashArray((humidity$ | async) ?? 0)"
+                  [attr.stroke-dashoffset]="0"
+                  class="progress-path"/>
+            
+            <!-- ✅ MARCAS DE ESCALA PERFECTAMENTE ALINEADAS CON EL ARCO AMPLIADO -->
+            <g class="scale-marks">
+              <!-- Mín (izquierda) - 0% en 180° -->
+              <line x1="60" y1="160" x2="35" y2="160" stroke="#888" stroke-width="2"/>
+              <text x="30" y="165" fill="#aaa" font-size="10" text-anchor="end" font-weight="bold">
+                {{ processedConfig.minValue }}%
+              </text>
+              
+              <!-- 25% en 135° -->
+              <line x1="95" y1="75" x2="82" y2="62" stroke="#888" stroke-width="1.5"/>
+              <text x="78" y="58" fill="#999" font-size="9" text-anchor="end">
+                {{ getScaleValue(0.25) }}%
+              </text>
+              
+              <!-- 50% en 90° (arriba) -->
+              <line x1="180" y1="40" x2="180" y2="15" stroke="#888" stroke-width="2"/>
+              <text x="180" y="10" fill="#aaa" font-size="10" text-anchor="middle" font-weight="bold">
+                {{ getScaleValue(0.5) }}%
+              </text>
+              
+              <!-- 75% en 45° -->
+              <line x1="265" y1="75" x2="278" y2="62" stroke="#888" stroke-width="1.5"/>
+              <text x="282" y="58" fill="#999" font-size="9" text-anchor="start">
+                {{ getScaleValue(0.75) }}%
+              </text>
+              
+              <!-- Máx (derecha) - 100% en 0° -->
+              <line x1="300" y1="160" x2="325" y2="160" stroke="#888" stroke-width="2"/>
+              <text x="330" y="165" fill="#aaa" font-size="10" text-anchor="start" font-weight="bold">
+                {{ processedConfig.maxValue }}%
+              </text>
+            </g>
+            
+            <!-- ✅ ETIQUETA "HUMEDAD" CENTRADA -->
+            <text x="180" y="115" 
+                  text-anchor="middle" 
+                  fill="#ccc" 
+                  font-size="12"
+                  font-weight="600"
+                  opacity="0.8">
+              HUMEDAD
+            </text>
+            
+            <!-- ✅ VALOR PORCENTUAL CENTRADO -->
+            <text x="180" y="165" 
+                  text-anchor="middle" 
+                  [attr.fill]="currentColor" 
+                  font-size="28" 
+                  font-weight="bold"
+                  class="gauge-value">
+              {{ (humidity$ | async) ?? 0 | number:'1.1-1' }}%
+            </text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </ion-card-content>
+</ion-card>

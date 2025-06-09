@@ -1,0 +1,45 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Usuarios</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <p-table [value]="users.items" stripedRows selectionMode="multiple" [(selection)]="selectedItems" dataKey="user_id"
+    [tableStyle]="{ 'min-width': '30rem' }">
+    <ng-template #header>
+      <tr>
+        <th style="width: 4rem">
+          <p-tableHeaderCheckbox />
+        </th>
+        <th pSortableColumn="name"> Nombre <p-sortIcon field="name" /> </th>
+        <th pSortableColumn="role"> Rol <p-sortIcon field="role" /> </th>
+        <th pSortableColumn="email"> Email <p-sortIcon field="email" /> </th>
+        <th pSortableColumn="type"> Tipo <p-sortIcon field="type" /> </th>
+        <th style="width: 4rem">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-item let-rowIndex="rowIndex">
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="item" />
+        </td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.role }}</td>
+        <td>{{ item.email }}</td>
+        <td>{{ item.type }}</td>
+        <td>
+          <ion-buttons>
+            <ion-button>
+              <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</ion-content>

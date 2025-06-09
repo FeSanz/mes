@@ -1,0 +1,94 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" *ngFor="let widget of widgets">
+        <ng-container [ngSwitch]="widget.jsonParams.widgetType">
+          <app-charts *ngSwitchCase="'chart'" [data]="widget.jsonParams" [refreshData]="widget.refreshData"
+            (remove)="removeWidget(widget.id)">
+          </app-charts>
+          <app-heatmap *ngSwitchCase="'heatmap'" [data]="widget.jsonParams" [refreshData]="refreshData"
+            (remove)="removeWidget(widget.id)">
+          </app-heatmap>
+        </ng-container>
+      </ion-col>
+      <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4">
+        <app-thermometer></app-thermometer>
+      </ion-col>
+      <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4">
+        <app-gauge></app-gauge>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="setOpen(true)">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Agregar nuevo widget</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpen(false)">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-item>
+          <ion-input type="text" placeholder="" [(ngModel)]="newWidgetData.name" style="text-align: right;">
+            <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Tipo de widget:" color="primary" [(ngModel)]="newWidgetData.widgetType">
+            <ion-select-option value="chart">Chart</ion-select-option>
+            <ion-select-option value="heatmap">Mapa de calor</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item *ngIf="newWidgetData.widgetType == 'chart'">
+          <ion-select label="Estilo:" color="primary" [(ngModel)]="newWidgetData.chartType">
+            <ion-select-option value="area">Area</ion-select-option>
+            <ion-select-option value="line">Lineas</ion-select-option>
+            <ion-select-option value="bar">Barras</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item *ngFor="let sensor of newWidgetData.sensors; let i = index">
+          <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.machine" label-placement="floating">
+            <ion-select-option *ngFor="let mach of machines" [value]="mach.machineId">
+              {{ mach.machineName }}
+            </ion-select-option>
+          </ion-select>
+          <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.id" label-placement="floating">
+            <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine)" [value]="s.id">
+              {{ s.name }}
+            </ion-select-option>
+          </ion-select>
+          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+            [(ngModel)]="sensor.color"></ngx-colors>
+        </ion-item>
+        <ion-item lines="none">
+        </ion-item>
+        <div class="ion-text-center">
+          <ion-button fill="outline" (click)="addNewSensor()">Agregar sensor</ion-button>
+        </div>
+        <ion-item lines="none">
+        </ion-item>
+        <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+          <ion-fab-button (click)="addNewWidget()">
+            <ion-icon name="checkmark"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

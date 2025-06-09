@@ -1,0 +1,88 @@
+<ion-card>
+  <ion-card-header>
+    <ion-toolbar>
+      <ion-buttons slot="end">
+        <ion-button id="popover-spline-${{data['id']}}">
+          <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <ion-card-title class="card-title">{{widgetData.name}} </ion-card-title>
+    </ion-toolbar>
+  </ion-card-header>
+  <ion-card-content>
+    <apx-chart #splineChart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis" *ngIf="showChart"
+      [stroke]="chartOptions.stroke" [tooltip]="chartOptions.tooltip"
+      [dataLabels]="chartOptions.dataLabels"></apx-chart>
+  </ion-card-content>
+</ion-card>
+<ion-popover trigger="popover-spline-${{data['id']}}" [dismissOnSelect]="true" showBackdrop="false">
+  <ng-template>
+    <ion-content>
+      <ion-list>
+        <ion-item [button]="true" [detail]="false" (click)="editChart()">Editar <ion-icon slot="start" name="pencil"
+            color="success"></ion-icon></ion-item>
+        <ion-item [button]="true" [detail]="false" (click)="deleteChart()">Eliminar <ion-icon slot="start" name="trash"
+            color="danger"></ion-icon></ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
+
+<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Editar widget</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="isModalOpen = false">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <ion-item>
+        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.name" style="text-align: right;">
+          <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-select disabled="true" label="Tipo de widget:" color="primary" [(ngModel)]="copyWidgetData.widgetType">
+          <ion-select-option value="chart">Chart</ion-select-option>
+          <ion-select-option value="heatmap">Mapa de calor</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-select label="Estilo:" color="primary" [(ngModel)]="copyWidgetData.chartType">
+          <ion-select-option value="area">Area</ion-select-option>
+          <ion-select-option value="line">Lineas</ion-select-option>
+          <ion-select-option value="bar">Barras</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item *ngFor="let sensor of copyWidgetData.sensors; let i = index">
+        <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.device" label-placement="floating">
+          <ion-select-option *ngFor="let dev of devices" [value]="dev.deviceId">
+            {{ dev.deviceName }}
+          </ion-select-option>
+        </ion-select>
+        <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.id" label-placement="floating">
+          <ion-select-option *ngFor="let s of getSensorsForDevice(sensor.device)" [value]="s.id">
+            {{ s.name }}
+          </ion-select-option>
+        </ion-select>
+        <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+          [(ngModel)]="sensor.color"></ngx-colors>
+      </ion-item>
+      <ion-item lines="none">
+      </ion-item>
+      <div class="ion-text-center">
+        <ion-button fill="outline" (click)="addNewSensor()">Agregar sensor</ion-button>
+      </div>
+      <ion-item lines="none">
+      </ion-item>
+      <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab-button (click)="updateChartDB()">
+          <ion-icon name="checkmark"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-content>
+  </ng-template>
+</ion-modal>

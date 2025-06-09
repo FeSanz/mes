@@ -18,4 +18,17 @@ export const routes: Routes = [
     path: 'organizations',
     loadComponent: () => import('./integrations/fusion/modules/organizations/organizations.page').then( m => m.OrganizationsPage)
   },
+  {
+    path: 'monitoring',
+    loadComponent: () => import('./production/monitoring/monitoring.page').then( m => m.MonitoringPage)
+  },
+  {
+    path: 'devices',
+    loadComponent: () => import('./production/devices/devices.page').then( m => m.DevicesPage)
+  },
+  {
+    path: 'users',
+    loadComponent: () => import('./settings/users/users.page').then( m => m.UsersPage)
+  },
+
 ];

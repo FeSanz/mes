@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LoadingController, AlertController, ToastController } from '@ionic/angular';
-import {addIcons} from "ionicons";
+import { addIcons } from "ionicons";
 import {
   checkmarkCircle,
   closeCircle,
@@ -15,17 +15,16 @@ export class AlertsService {
 
 
   constructor(public loadController: LoadingController,
-              private alerControlller: AlertController,
-              private toastController: ToastController) {
+    private alertController: AlertController,
+    private toastController: ToastController) {
 
-      addIcons({checkmarkCircle, closeCircle, warning, informationCircle})
+    addIcons({ checkmarkCircle, closeCircle, warning, informationCircle })
   }
 
   private loader: HTMLIonLoadingElement | null = null;
 
   async ShowLoading(message: string = 'Por favor espere...') {
     await this.HideLoading(); // Asegurarse de que cualquier loader previo sea cerrado
-
     this.loader = await this.loadController.create({
       message: message,
       spinner: 'crescent',
@@ -109,5 +108,27 @@ export class AlertsService {
       ]
     });
     await toast.present();
+  }
+
+
+  async ShowAlert(message: string, title: string = "Alerta", cancel: string = "Cancelar", confirm: string = "Aceptar") {//Alerta genérica para toma de desiciones
+    const alert = await this.alertController.create({
+      header: title,
+      message: message,
+      cssClass: "custom-alert",
+      buttons: [
+        {
+          text: cancel,
+          role: 'cancel',
+        },
+        {
+          text: confirm,
+          role: 'confirm',
+        }
+      ],
+    });
+    await alert.present();
+    const { role } = await alert.onDidDismiss()
+    return role
   }
 }
