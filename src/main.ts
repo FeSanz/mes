@@ -5,12 +5,19 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 //Para PrimeNG
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
+import 'primeicons/primeicons.css';
+
+//Temas PrimeNG
 import Aura from '@primeng/themes/aura';
+//import Material from '@primeng/themes/material';
+//import Lara from '@primeng/themes/lara';
+//import Nora from '@primeng/themes/nora';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 
 import { provideHttpClient } from '@angular/common/http';
+
 
 bootstrapApplication(AppComponent, {
   providers: [

@@ -11,20 +11,47 @@ export class EndpointsService {
 
   private endPoints: { [key: string]: string } = {
     'organizations': '/inventoryOrganizations?' + this._params +
-      '&fields=OrganizationId,OrganizationCode,OrganizationName,LocationCode,ManagementBusinessUnitId,Status;plantParameters:DefaultWorkMethod' +
-      '&q=ManufacturingPlantFlag=true',
+                     '&fields=OrganizationId,OrganizationCode,OrganizationName,LocationCode,ManagementBusinessUnitId,Status;plantParameters:DefaultWorkMethod' +
+                     '&q=ManufacturingPlantFlag=true',
 
     'auth': '{0}/inventoryOrganizations?limit=1&totalResults=true&onlyData=true&links=canonical' +
-      '&fields=OrganizationId',
+            '&fields=OrganizationId',
 
-    'machines': '/machines?' + this._params +
-      '&fields=ResourceId,ResourceCode,ResourceName,ResourceClassCode' +
-      '&finder=findByWorkCenterId;WorkCenterId={0}' +
-      '&q=OrganizationId={1} and ResourceType=\'EQUIPMENT\' and Status=\'Active\'',
+    'shifts': '/shifts?' + this._params +
+              '&fields=ShiftId,Name,StartTime,EndTime,Duration',
 
-    'items': '/itemsV2?' + this._params +
-      '&fields=ItemNumber' +
-      '&q=OrganizationCode=\'OI_PL1\' and ItemStatusValue=\'Active\' and UserItemTypeValue=\'Finished Good\' and ItemNumber!=\'null\'',
+    'work_centers': '/workCenters?' + this._params +
+                    '&fields=WorkCenterId,WorkCenterName' +
+                    '&q=OrganizationId={0}',
+
+    'machines': '/productionResources?' + this._params +
+                '&fields=ResourceId,ResourceCode,ResourceName,ResourceClassCode' +
+                '&finder=findByWorkCenterId;WorkCenterId={0}' +
+                '&q=OrganizationId={1} and ResourceType=\'EQUIPMENT\' and Status=\'Active\'',
+
+    'lookups': '/standardLookups?' + this._params +
+                '&fields=Meaning,Description;lookupCodes:LookupCode,Meaning' +
+                '&q=LookupType=\'{0}\'',
+
+    'items':  '/itemsV2?' + this._params +
+              '&fields=ItemId,ItemNumber,ItemDescription,PrimaryUOMValue,LotControlValue' +
+              '&q=OrganizationId={0} and ItemStatusValue=\'Active\' and UserItemTypeValue=\'{1}\' and ItemNumber!=\'null\'',
+
+    'wo_process_released': '/processWorkOrders?' + this._params +
+                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceId' +
+                            '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and (CompletedQuantity=0 or CompletedQuantity is null)',
+
+    'wo_process_dispatched': '/processWorkOrders?' + this._params +
+                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceId' +
+                            '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and CompletedQuantity>0',
+
+    'wo_discrete_released': '/workOrders?' + this._params +
+                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceId' +
+                            '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and (CompletedQuantity=0 or CompletedQuantity is null)',
+
+    'wo_discrete_dispatched': '/workOrders?' + this._params +
+                              '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceId' +
+                              '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and CompletedQuantity>0',
   };
 
   constructor() { }

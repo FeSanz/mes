@@ -1,0 +1,81 @@
+/********** Region *********+*/
+.regions-wrapper {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  height: calc(100vh - 120px); /* Ajusta según la altura del header */
+  overflow: hidden;
+}
+
+.region-container {
+  background-color: var(--ion-color-card);
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  flex: 1; /* Cada región ocupa el 50% del ancho disponible */
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.region-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  flex-shrink: 0; /* El header no se encoge */
+
+  ion-icon {
+    margin: 0 10px;
+    font-size: 18px;
+  }
+
+  span {
+    flex: 1;
+  }
+}
+
+/********** Responsividad *********+*/
+@media (max-width: 1024px) {
+  .regions-wrapper {
+    flex-direction: column; /* En tablets, las regiones se apilan verticalmente */
+    height: auto;
+    overflow: visible;
+  }
+
+  .region-container {
+    flex: none;
+    margin: 8px 0;
+  }
+}
+
+/* Responsive: en móvil que ocupen el ancho completo */
+@media (max-width: 768px) {
+  .regions-wrapper {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .card p-floatlabel {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
+
+.card-select {
+  //border: var(--ion-color-card);
+  padding: 10px;
+  border-radius: 5px;
+  margin-left: 1em;
+  margin-right: 1rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0;
+
+  /* Agregar estas propiedades para alineación */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end; /* Alinea a la derecha */
+  align-items: flex-end;
+  gap: 1rem;
+}
+
