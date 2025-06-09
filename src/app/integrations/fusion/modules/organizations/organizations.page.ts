@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import {
+  IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar
+} from '@ionic/angular/standalone';
+
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
@@ -17,14 +21,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 
 import {
-  IonAvatar, IonButton, IonButtons, IonCheckbox, IonContent, IonHeader, IonIcon, IonMenuButton, IonProgressBar,
-  IonTitle, IonToolbar
-} from '@ionic/angular/standalone';
-
-import {
   closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
 } from 'ionicons/icons';
-import {dt} from "@primeng/themes";
+
 
 @Component({
   selector: 'app-organizations',
@@ -34,7 +33,7 @@ import {dt} from "@primeng/themes";
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
             IonButton, IonIcon,
             TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,DropdownModule,
-            MultiSelectModule  ]
+            MultiSelectModule ]
 })
 export class OrganizationsPage implements OnInit {
   fusionData: any = {};
@@ -48,7 +47,7 @@ export class OrganizationsPage implements OnInit {
 
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
-              private alerts: AlertsService,) {
+              private alerts: AlertsService) {
     addIcons({
       closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
     });
@@ -98,7 +97,7 @@ export class OrganizationsPage implements OnInit {
   }
 
   //Metodo para manejar el filtro global
-  onFilterGlobal(event: Event, table: any) {
+  OnFilterGlobal(event: Event, table: any) {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
   }
@@ -184,16 +183,13 @@ export class OrganizationsPage implements OnInit {
     }
   }
 
-  clearFusion(table: any) {
+  ClearFusion(table: any) {
     table.clear();
     this.searchValueFusion = '';
   }
 
-  clearDB(table: any) {
+  ClearDB(table: any) {
     table.clear();
     this.searchValueDB = '';
   }
-
-  protected readonly trash = trash;
-  protected readonly dt = dt;
 }

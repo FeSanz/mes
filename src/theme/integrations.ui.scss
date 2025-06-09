@@ -49,9 +49,33 @@
   }
 }
 
+/* Responsive: en móvil que ocupen el ancho completo */
 @media (max-width: 768px) {
   .regions-wrapper {
     padding: 8px;
     gap: 8px;
   }
+
+  .card p-floatlabel {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
 }
+
+.card-select {
+  //border: var(--ion-color-card);
+  padding: 10px;
+  border-radius: 5px;
+  margin-left: 1em;
+  margin-right: 1rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0;
+
+  /* Agregar estas propiedades para alineación */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end; /* Alinea a la derecha */
+  align-items: flex-end;
+  gap: 1rem;
+}
+

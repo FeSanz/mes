@@ -26,7 +26,7 @@
                    [tableStyle]="{ 'min-width': '50rem' }"
                    [size]="'small'"
                    [rowHover]="true"
-                   [rows]="10"
+                   [rows]="25"
                    [showCurrentPageReport]="true"
                    [rowsPerPageOptions]="[10, 25, 50]"
                    [paginator]="true"
@@ -35,7 +35,7 @@
                    [globalFilterFields]="['OrganizationCode', 'OrganizationName', 'LocationCode']"
                    stripedRows
                    [scrollable]="true"
-                   scrollHeight="400px"
+                   scrollHeight="550px"
           >
             <ng-template #caption>
               <div class="table-caption">
@@ -43,7 +43,7 @@
                   [outlined]="true"
                   icon="pi pi-filter-slash"
                   label="Limpiar"
-                  (click)="clearFusion(dtFusion)" />
+                  (click)="ClearFusion(dtFusion)" />
 
                 <div></div> <!-- Spacer -->
 
@@ -53,7 +53,7 @@
                   </p-inputIcon>
                   <input pInputText type="text"
                          [(ngModel)]="searchValueFusion"
-                         (input)="onFilterGlobal($event, dtFusion)"
+                         (input)="OnFilterGlobal($event, dtFusion)"
                          placeholder="Buscar" />
                 </p-iconField>
               </div>
@@ -131,7 +131,7 @@
                [tableStyle]="{ 'min-width': '50rem'}"
                [size]="'small'"
                [rowHover]="true"
-               [rows]="10"
+               [rows]="25"
                [showCurrentPageReport]="true"
                [rowsPerPageOptions]="[10, 25, 50]"
                [paginator]="true"
@@ -140,7 +140,7 @@
                [globalFilterFields]="['Code', 'Name', 'Location']"
                stripedRows
                [scrollable]="true"
-               scrollHeight="400px"
+               scrollHeight="550px"
       >
         <ng-template pTemplate="caption">
           <div class="table-caption">
@@ -148,7 +148,7 @@
               [outlined]="true"
               icon="pi pi-filter-slash"
               label="Limpiar"
-              (click)="clearDB(dtDB)"/>
+              (click)="ClearDB(dtDB)"/>
 
             <div></div> <!-- Spacer -->
 
@@ -160,7 +160,7 @@
                 pInputText
                 type="text"
                 [(ngModel)]="searchValueDB"
-                (input)="onFilterGlobal($event, dtDB)"
+                (input)="OnFilterGlobal($event, dtDB)"
                 placeholder="Buscar"
                 style="width: 250px;" />
             </p-iconField>
