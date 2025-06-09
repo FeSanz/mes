@@ -166,11 +166,11 @@ export class ApiService {
     await this.alerts.ShowLoading();
     try {
       const options = {
-        url: "http://localhost:3000/api"+endPoint,
+        url: endPoint,
         headers: {'Content-Type': 'application/json'},
         data: payload
       };
-      const response: HttpResponse = await CapacitorHttp.post(options);
+      const response: HttpResponse = await CapacitorHttp.put(options);
       this.RequestStatusCode(response.status);
       return response.data;
     } catch (error: any) {
