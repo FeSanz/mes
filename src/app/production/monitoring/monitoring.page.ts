@@ -13,6 +13,7 @@ import { HeatmapComponent } from 'src/app/components/heatmap/heatmap.component';
 import { ThermometerComponent } from 'src/app/components/thermometer/thermometer.component';
 import { addIcons } from 'ionicons';
 import { addOutline, checkmark } from 'ionicons/icons';
+import { EndpointsService } from 'src/app/services/endpoints.service';
 
 export interface SensorData {
   [key: string]: any;
@@ -33,7 +34,7 @@ export type ChartOptions = {
   styleUrls: ['./monitoring.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonicModule, CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent]
+  imports: [IonicModule, CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent, NgxColorsModule]
 })
 export class MonitoringPage implements OnInit {
   sensorData: SensorData[] = [];
@@ -192,6 +193,7 @@ export class MonitoringPage implements OnInit {
   constructor(
     private wsService: WebSocketService,
     private api: ApiService,
+    private endPoints: EndpointsService,
     private alerts: AlertsService,
     private changeDetector: ChangeDetectorRef) {
     addIcons({ checkmark, addOutline })
@@ -202,22 +204,7 @@ export class MonitoringPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    this.api.GetRequestRender("/dashboards/1").then((response: any) => {
-      console.log(response);
-
-      this.widgets = response.items.map((item: any, index: number) => ({
-        index: index,
-        id: item.id,
-        name: item.name,
-        jsonParams: { ...item.parameters, id: item.id, name: item.name }
-      }));
-      this.api.GetRequestRender("/machinesAndSensors/1").then((response: any) => {
-        console.log(response);
-        this.machines = response.items
-        this.newWidgetData.machine = response.items[0].machineId + ""
-        //console.log(response.data[0].machineId);
-      })
-    })
+    this.GetDasboards()
     /*this.api.GetTEST().then((response: any) => {
       console.log(response);
       
@@ -233,7 +220,24 @@ export class MonitoringPage implements OnInit {
       console.error('No se pudo conectar:', err);
     });*/
   }
+  GetDasboards() {
+    this.api.GetRequestRender(this.endPoints.Render('dashboards/1')).then((response: any) => {
+      console.log(response);
 
+      this.widgets = response.items.map((item: any, index: number) => ({
+        index: index,
+        id: item.id,
+        name: item.name,
+        jsonParams: { ...item.parameters, dashboard_id: item.dashboard_id, name: item.name }
+      }));
+      this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
+        //console.log(response);
+        this.machines = response.items
+        this.newWidgetData.machine = response.items[0].machineId + ""
+        //console.log(response.data[0].machineId);
+      })
+    })
+  }
   ShowChartData(data: any) {
     //this.chartData = data
   }
@@ -284,17 +288,18 @@ export class MonitoringPage implements OnInit {
     this.newWidgetData.widgetType = "chart"
     this.newWidgetData.chartType = "area"
   }
-  async addNewSensor() {
-    this.newWidgetData.sensors.push({ machine: "", id: "", color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0') })
 
+  async addNewSensor() {
+    this.newWidgetData.sensors.push({ machine_id: "", color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0') })
   }
-  getSensorsForMachine(machineId: number) {
-    const machine = this.machines.find((d: any) => d.machineId === machineId);
+
+  getSensorsForMachine(machine_id: number) {
+    const machine = this.machines.find((d: any) => d.machine_id === machine_id);
     return machine ? machine.sensors : [];
   }
+
   async addNewWidget() {
     console.log(this.newWidgetData);
-
     //if (await this.ui.ShowAlert("¿Deseas agregar el nuevo widget?", "Alerta", "Atrás", "Agregar")) {
     let body: any = {}
     if (this.newWidgetData.widgetType == 'chart') {
@@ -323,14 +328,9 @@ export class MonitoringPage implements OnInit {
       }
     }
     console.log(body);
-    this.api.PostRequestRender("/dashboards", body).then((response: any) => {
+    this.api.PostRequestRender(this.endPoints.Render('dashboards'), body).then((response: any) => {
       this.setOpen(false)
-      console.log(response);
-      body.parameters.index = response.data.id
-      body.parameters.id = response.data.id
-      body.parameters.name = response.data.name
-      body.jsonParams = body.parameters
-      this.widgets.push(body)
+    this.GetDasboards()
       this.newWidgetData = {
         name: "",
         machine: "",
