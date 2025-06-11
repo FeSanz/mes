@@ -8,6 +8,7 @@ import { addCircleOutline, checkmarkOutline, copyOutline, documentOutline, flash
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { Clipboard } from '@capacitor/clipboard';
+import { EndpointsService } from 'src/app/services/endpoints.service';
 
 @Component({
   selector: 'app-devices',
@@ -34,6 +35,7 @@ export class DevicesPage implements OnInit {
   constructor(
     private api: ApiService,
     private alerts: AlertsService,
+    private endPoints: EndpointsService,
     private changeDetector: ChangeDetectorRef) {
     addIcons({
       hardwareChipOutline,
@@ -56,7 +58,7 @@ export class DevicesPage implements OnInit {
     this.getMachines()
   }
   getMachines() {
-    this.api.GetRequestRender("/machinesAndSensors/1").then((response: any) => {
+    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
       console.log(response);
       this.machines = response.items
       console.log(response.items);
@@ -64,9 +66,9 @@ export class DevicesPage implements OnInit {
   }
   addNewSensor() {
     this.machine.sensors.push({
-      icon: "thermometer-outline",
-      var: "",
-      name: ""
+      sensor_icon: "thermometer-outline",
+      sensor_var: "",
+      sensor_name: ""
     })
     this.changeDetector.detectChanges()
   }
@@ -94,7 +96,7 @@ export class DevicesPage implements OnInit {
     this.machine = {
       isNew: true,
       machine_name: "",
-      code: "",
+      machine_code: "",
       token: this.generateToken(),
       sensors: []
     }
@@ -109,7 +111,7 @@ export class DevicesPage implements OnInit {
     const machineBody = {
       user_id: "1",
       organization_id: 300000003173662,
-      code: this.machine.code,
+      code: this.machine.machine_code,
       token: this.machine.token,
       name: this.machine.machine_name,
       work_center_id: 5,
@@ -120,9 +122,9 @@ export class DevicesPage implements OnInit {
       sensor.created_by = '1';
       sensor.updated_by = '1';
     });
-    this.api.PostRequestRender("/machines", machineBody).then((response: any) => {
+    this.api.PostRequestRender(this.endPoints.Render('machines'), machineBody).then((response: any) => {
       const machineId = response.result.machine_id;
-      this.api.PostRequestRender("/sensors/" + machineId, { "items": this.machine.sensors }).then((response: any) => {
+      this.api.PostRequestRender(this.endPoints.Render('sensors/') + machineId, { "items": this.machine.sensors }).then((response: any) => {
         console.log(response);
         this.getMachines()
         this.isModalOpen = false;
@@ -134,13 +136,13 @@ export class DevicesPage implements OnInit {
       name: this.machine.machine_name
     };
     //console.log(this.machine.sensors);
-    this.api.UpdateRequestRender("/machines/" + this.machine.machine_id, machineBody).then((response: any) => {
+    this.api.UpdateRequestRender(this.endPoints.Render('machines') + this.machine.machine_id, machineBody).then((response: any) => {
       const newSensorsPromises = this.machine.sensors
         .filter((sensor: any) => !sensor.id)
         .map((sensor: any) => {
           const sensorBody = {
-            name: sensor.name,
-            var: "temp",
+            sensor_name: sensor.name,
+            sensor_var: "temp",
             machine_id: this.machine.machine_id,
             icon: sensor.icon,
             created_by: 1,
@@ -157,7 +159,7 @@ export class DevicesPage implements OnInit {
             name: sensor.name,
             icon: sensor.icon,
           };
-          return this.api.UpdateRequestRender(`/sensors/${sensor.id}`, sensorBody);//actualizar sensores existentes
+          return this.api.UpdateRequestRender(this.endPoints.Render('sensors') + sensor.id, sensorBody);//actualizar sensores existentes
         });
       Promise.all([...newSensorsPromises, ...updateSensorPromises]).then((sensorResponses: any[]) => {
         this.getMachines()
@@ -167,7 +169,7 @@ export class DevicesPage implements OnInit {
   }
 
   selectIcon(sensor: any, icon: string) {
-    sensor.icon = icon
+    sensor.sensor_icon = icon
   }
 
   async pasteOnInputName() {
@@ -192,7 +194,7 @@ export class DevicesPage implements OnInit {
     console.log(this.machine);
 
     if (await this.alerts.ShowAlert("¿Deseas eliminar esta máquina?", "Alerta", "Atrás", "Eliminar")) {
-      this.api.DeleteRequestRender("/machines/" + this.machine.machine_id).then((response: any) => {
+      this.api.DeleteRequestRender(this.endPoints.Render('machines') + this.machine.machine_id).then((response: any) => {
         //console.log(response.data);
         this.getMachines()
         this.isModalOpen = false
@@ -206,7 +208,7 @@ export class DevicesPage implements OnInit {
       this.changeDetector.detectChanges();
     } else
       if (await this.alerts.ShowAlert("¿Deseas eliminar este sensor?", "Alerta", "Atrás", "Eliminar")) {
-        this.api.DeleteRequestRender("/sensors/" + sensor.sensor_id).then((response: any) => {
+        this.api.DeleteRequestRender(this.endPoints.Render('sensors') + sensor.sensor_id).then((response: any) => {
           console.log(response);
           this.machine.sensors = this.machine.sensors.filter((se: any) => se !== sensor);
           this.changeDetector.detectChanges()

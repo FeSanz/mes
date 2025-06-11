@@ -9,6 +9,9 @@ import { ApiService } from 'src/app/services/api.service';
 //import { WebSocketService } from 'src/app/services/web-socket.service';
 import { IonicModule } from '@ionic/angular';
 import { WebSocketService } from 'src/app/services/web-socket.service';
+import { EndpointsService } from 'src/app/services/endpoints.service';
+import { addIcons } from 'ionicons';
+import { ellipsisVertical, pencilOutline, trashOutline } from 'ionicons/icons';
 export interface SplineData {
   [key: string]: any;
 }
@@ -28,7 +31,7 @@ export type ChartOptions = {
   templateUrl: './charts.component.html',
   styleUrls: ['./charts.component.scss'],
   standalone: true,
-  imports: [ FormsModule, CommonModule, NgApexchartsModule, IonicModule/*, IonText, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal*/],
+  imports: [FormsModule, CommonModule, NgApexchartsModule, IonicModule, NgxColorsModule/*, IonText, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal*/],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ChartsComponent implements OnInit {
@@ -38,20 +41,22 @@ export class ChartsComponent implements OnInit {
   @Output() remove = new EventEmitter<number>();
   public chartOptions: ChartOptions;
   title = "Spline"
-  sensors = [
-    { id: 1, color: '#C00FFC' },
-    { id: 2, color: '#336eff' }
-  ];
   widgetData: any = {}
   copyWidgetData: any = {}
-  devices: any
+  machines: any
   isModalOpen = false;
   showChart: boolean = true;
   private conexionesLocales: { [sensorId: string]: WebSocket } = {};
   isPaused = false;
   constructor(private changeDetector: ChangeDetectorRef,
     private ws: WebSocketService,
+    private endPoints: EndpointsService,
     private api: ApiService) {
+    addIcons({
+      ellipsisVertical,
+      pencilOutline,
+      trashOutline
+    })
     this.chartOptions = {
       series: [],
       chart: {
@@ -122,9 +127,9 @@ export class ChartsComponent implements OnInit {
       this.chartOptions.chart.type = this.widgetData.chartType;
       this.chart?.updateOptions(this.chartOptions);
     }
-    this.loadSensorData().then(() => {
-      this.startSubscriptions();
-    });
+    this.loadSensorData()/*.then(() => {
+      //this.startSubscriptions();
+    });*/
   }
 
   async loadSensorData() {
@@ -133,29 +138,50 @@ export class ChartsComponent implements OnInit {
     const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     midnight.setDate(midnight.getDate() - 3);
     const result = midnight.toISOString().slice(0, 19);
-    const sensores = this.widgetData.sensors;
+    const sensors = this.widgetData.sensors;
+    console.log(this.widgetData);
+
+    const sensorIDsString = sensors.map((sensor: any) => sensor.sensor_id).join(',');//IDs separados por coma (,)
+    this.api.GetRequestRender(this.endPoints.Render('sensorsData/?sensors=') + sensorIDsString + '&start=' + result + '&end=' + nowDate, false).then((response: any) => {
+      const data = response.items.map((sensor: any) => {
+        const colorObj = sensors.find((s: any) => s.sensor_id == sensor.sensor_id);
+        return {
+          color: colorObj.color,
+          group: sensor.sensor_id,
+          name: sensor.sensor_name,
+          data: sensor.data.map((data: any) => ({
+            x: new Date(data.time).getTime(),
+            y: Number(data.value)
+          }))
+        }
+      })
+      console.log(data);
+      this.chartOptions.series = data;
+    })
+    /*
     const seriesData = await Promise.all(
       sensores.map((sensor: any) =>
-        this.api.GetRequestRender('/sensorData/' + sensor.id + '?start=' + result + '&end=' + nowDate).then((response: any) => ({
+        this.api.GetRequestRender(this.endPoints.Render('sensorData/') + sensor.sensor_id + '?start=' + result + '&end=' + nowDate).then((response: any) => (
+          console.log(response),{
           color: sensor.color,
-          group: sensor.id, // ID único
-          name: response.data.sensor,
-          data: response.data.data.map((item: any) => ({
+          group: sensor.sensor_id, // ID único
+          name: response.sensor_name,
+          data: response.items.map((item: any) => ({
             x: new Date(item.time).getTime(),
             y: Number(item.value)
           }))
         }))
       )
     );
-    this.chartOptions.series = seriesData;
-    this.ajustarYaxis(); // ⬅️ aquí
+    this.chartOptions.series = seriesData;*/
+    this.ajustarYaxis();
     if (this.chart && this.chart.updateOptions) {
       this.chart.updateOptions(this.chartOptions);
     }
   }
   startSubscriptions() {
     const sensores = this.widgetData.sensors;
-    sensores.forEach((sensor: any) => {
+    /*sensores.forEach((sensor: any) => {
       const sensor_id = sensor.id;
       this.ws.Suscribe(sensor_id, (data) => {
         if (this.isPaused) return;
@@ -177,7 +203,7 @@ export class ChartsComponent implements OnInit {
       }).catch(err => {
         console.error('Error suscribiendo a sensor', sensor_id, err);
       });
-    });
+    });*/
   }
   stopSubscriptions() {
     for (const sensorId in this.conexionesLocales) {
@@ -227,7 +253,7 @@ export class ChartsComponent implements OnInit {
     this.stopSubscriptions()
   }
   async addNewSensor() {
-    this.copyWidgetData.sensors.push({ device: "", id: "", color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0') })
+    this.copyWidgetData.sensors.push({ machine: "", color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0') })
   }
   updateChartDB() {
     const body = {
@@ -239,7 +265,8 @@ export class ChartsComponent implements OnInit {
       }
     }
     this.showChart = false;
-    this.api.UpdateRequestRender("/widgets/" + this.widgetData.id, body).then((response: any) => {
+    console.log(this.widgetData);
+    this.api.UpdateRequestRender(this.endPoints.Render('dashboards/') + this.widgetData.dashboard_id, body).then((response: any) => {
       console.log(response);
       this.widgetData = JSON.parse(JSON.stringify(this.copyWidgetData))
       this.data = this.widgetData
@@ -254,15 +281,17 @@ export class ChartsComponent implements OnInit {
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
-    this.api.GetRequestRender("/devices/1221").then((response: any) => {
-      this.devices = response.data
+    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
+      console.log(this.copyWidgetData);
+      console.log(response.items);
+      this.machines = response.items
       this.isModalOpen = true;
-      //this.newWidgetData.device = response.data[0].deviceId + ""
-      //console.log(response.data[0].deviceId);
+      //this.newWidgetData.machine = response.data[0].MachineId + ""
+      //console.log(response.data[0].MachineId);
     })
   }
-  getSensorsForDevice(deviceId: number) {
-    const device: any = this.devices.find((d: any) => d.deviceId === deviceId);
-    return device ? device.sensors : [];
+  getSensorsForMachine(MachineId: number) {
+    const machine: any = this.machines.find((m: any) => m.machine_id == MachineId);
+    return machine ? machine.sensors : [];
   }
 }

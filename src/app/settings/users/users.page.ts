@@ -32,7 +32,7 @@ export class UsersPage implements OnInit {
   }
 
   GetOrganizations() {
-    this.apiService.GetRequestRender('/users/300000003173662').then((response: any) => {
+    this.apiService.GetRequestRender(this.endPoints.Render('users/300000003173662')).then((response: any) => {
       //const data = response;
       console.log(response);
       this.users = { ...response };

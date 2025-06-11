@@ -121,8 +121,8 @@ export class ApiService {
 
   /******************* HttpRequest RENDER Capacitor *******************/
 
-  async GetRequestRender(endPoint: string) {
-    await this.alerts.ShowLoading();
+  async GetRequestRender(endPoint: string, show : boolean = true) {
+    !show || await this.alerts.ShowLoading();
     try {
       const options = {
         url: endPoint,
@@ -137,7 +137,7 @@ export class ApiService {
       await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
       return null;
     } finally {
-      await this.alerts.HideLoading();
+      !show || await this.alerts.HideLoading();
     }
   }
 

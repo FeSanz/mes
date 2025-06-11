@@ -20,12 +20,12 @@
           </app-heatmap>
         </ng-container>
       </ion-col>
-      <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4">
+      <!--ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4">
         <app-thermometer></app-thermometer>
       </ion-col>
       <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4">
         <app-gauge></app-gauge>
-      </ion-col>
+      </ion-col-->
     </ion-row>
   </ion-grid>
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
@@ -63,14 +63,14 @@
           </ion-select>
         </ion-item>
         <ion-item *ngFor="let sensor of newWidgetData.sensors; let i = index">
-          <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.machine" label-placement="floating">
-            <ion-select-option *ngFor="let mach of machines" [value]="mach.machineId">
-              {{ mach.machineName }}
+          <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating">
+            <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
+              {{ mach.machine_name }}
             </ion-select-option>
           </ion-select>
-          <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.id" label-placement="floating">
-            <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine)" [value]="s.id">
-              {{ s.name }}
+          <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating">
+            <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
+              {{ s.sensor_name }}
             </ion-select-option>
           </ion-select>
           <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"

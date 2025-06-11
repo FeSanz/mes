@@ -2,7 +2,7 @@
   <ion-card-header>
     <ion-toolbar>
       <ion-buttons slot="end">
-        <ion-button id="popover-spline-${{data['id']}}">
+        <ion-button id="popover-spline-${{data['dashboard_id']}}">
           <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
         </ion-button>
       </ion-buttons>
@@ -15,13 +15,13 @@
       [dataLabels]="chartOptions.dataLabels"></apx-chart>
   </ion-card-content>
 </ion-card>
-<ion-popover trigger="popover-spline-${{data['id']}}" [dismissOnSelect]="true" showBackdrop="false">
+<ion-popover trigger="popover-spline-${{data['dashboard_id']}}" [dismissOnSelect]="true" showBackdrop="false">
   <ng-template>
     <ion-content>
       <ion-list>
-        <ion-item [button]="true" [detail]="false" (click)="editChart()">Editar <ion-icon slot="start" name="pencil"
+        <ion-item [button]="true" [detail]="false" (click)="editChart()">Editar <ion-icon slot="start" name="pencil-outline"
             color="success"></ion-icon></ion-item>
-        <ion-item [button]="true" [detail]="false" (click)="deleteChart()">Eliminar <ion-icon slot="start" name="trash"
+        <ion-item [button]="true" [detail]="false" (click)="deleteChart()">Eliminar <ion-icon slot="start" name="trash-outline"
             color="danger"></ion-icon></ion-item>
       </ion-list>
     </ion-content>
@@ -58,14 +58,14 @@
         </ion-select>
       </ion-item>
       <ion-item *ngFor="let sensor of copyWidgetData.sensors; let i = index">
-        <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.device" label-placement="floating">
-          <ion-select-option *ngFor="let dev of devices" [value]="dev.deviceId">
-            {{ dev.deviceName }}
+        <ion-select label="Máquina:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating">
+          <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
+            {{ mach.machine_name }}
           </ion-select-option>
         </ion-select>
-        <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.id" label-placement="floating">
-          <ion-select-option *ngFor="let s of getSensorsForDevice(sensor.device)" [value]="s.id">
-            {{ s.name }}
+        <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating">
+          <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
+            {{ s.sensor_name }}
           </ion-select-option>
         </ion-select>
         <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
