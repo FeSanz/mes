@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,6 +9,7 @@ import {
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
+import {HeightTable} from "../../../../models/tables.prime";
 import {addIcons} from "ionicons";
 
 import { TableModule } from 'primeng/table';
@@ -35,7 +36,14 @@ import {
     TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,DropdownModule,
     MultiSelectModule ]
 })
-export class OrganizationsPage implements OnInit {
+export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
+  private resizeObserver!: ResizeObserver;
+  scrollHeight: string = '550px';
+  rowsPerPage: number = 50;
+  rowsPerPageOptions: number[] = [10, 25, 50];
+
   fusionData: any = {};
   dbData: any = {};
 
@@ -55,6 +63,32 @@ export class OrganizationsPage implements OnInit {
 
   ngOnInit() {
     this.GetOrganizations();
+  }
+
+  ngAfterViewInit() {
+    this.ObserveResize();
+  }
+
+  ngOnDestroy() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
+
+  ObserveResize() {
+    if (this.regionContainer) {
+      this.resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          this.scrollHeight = HeightTable(entry.contentRect.height);
+        }
+      });
+
+      this.resizeObserver.observe(this.regionContainer.nativeElement);
+    }
+  }
+
+  getScrollHeight(): string {
+    return this.scrollHeight;
   }
 
   GetOrganizations(){

@@ -39,7 +39,7 @@
   </div>
   <div class="regions-wrapper">
     <!-------------------------- Region FUSION ------------------------------------>
-    <div class="region-container">
+    <div class="region-container" #regionContainer>
       <div class="region-header" style="background-color: #fd5d93">
         <ion-icon name="cloud-outline"></ion-icon>
         <span>Recursos Fusion</span>
@@ -52,19 +52,20 @@
                [(selection)]="selectedItemsFusion"
                dataKey="ResourceCode"
                styleClass="card-table-primeng"
-               [tableStyle]="{ 'min-width': '50rem' }"
+               [tableStyle]="{ 'min-width': '50rem','height': '100%'}"
                [size]="'small'"
                [rowHover]="true"
-               [rows]="25"
+               [rows]="rowsPerPage"
                [showCurrentPageReport]="true"
-               [rowsPerPageOptions]="[10, 25, 50]"
+               [rowsPerPageOptions]="rowsPerPageOptions"
                [paginator]="true"
                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
                [filterDelay]="0"
                [globalFilterFields]="['ResourceCode', 'ResourceName', 'ResourceClassCode']"
                stripedRows
                [scrollable]="true"
-               scrollHeight="550px"
+               [scrollHeight]="getScrollHeight()"
+               [alwaysShowPaginator]="true"
       >
         <ng-template #caption>
           <div class="table-caption">
@@ -152,16 +153,17 @@
                [tableStyle]="{ 'min-width': '50rem'}"
                [size]="'small'"
                [rowHover]="true"
-               [rows]="25"
+               [rows]="rowsPerPage"
                [showCurrentPageReport]="true"
-               [rowsPerPageOptions]="[10, 25, 50]"
+               [rowsPerPageOptions]="rowsPerPageOptions"
                [paginator]="true"
                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
                [filterDelay]="0"
                [globalFilterFields]="['Code', 'Name', 'Location']"
                stripedRows
                [scrollable]="true"
-               scrollHeight="550px"
+               [scrollHeight]="getScrollHeight()"
+               [alwaysShowPaginator]="true"
       >
         <ng-template pTemplate="caption">
           <div class="table-caption">

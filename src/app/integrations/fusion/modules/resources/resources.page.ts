@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -14,6 +14,7 @@ import {
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
+import {HeightTable} from "../../../../models/tables.prime";
 import {addIcons} from "ionicons";
 
 import { TableModule } from 'primeng/table';
@@ -32,6 +33,7 @@ import {
   closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
 } from 'ionicons/icons';
 
+
 @Component({
   selector: 'app-resources',
   templateUrl: './resources.page.html',
@@ -42,7 +44,14 @@ import {
     TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,DropdownModule,
     MultiSelectModule, Select, FloatLabel]
 })
-export class ResourcesPage implements OnInit {
+export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
+  private resizeObserver!: ResizeObserver;
+  scrollHeight: string = '550px';
+  rowsPerPage: number = 50;
+  rowsPerPageOptions: number[] = [10, 25, 50];
+
   fusionData: any = {};
   dbData: any = {};
 
@@ -58,6 +67,7 @@ export class ResourcesPage implements OnInit {
   searchValueFusion: string = '';
   searchValueDB: string = '';
 
+
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
               private alerts: AlertsService) {
@@ -66,8 +76,35 @@ export class ResourcesPage implements OnInit {
     });
   }
 
+
   ngOnInit() {
     this.GetOrganizationsRender();
+  }
+
+  ngAfterViewInit() {
+    this.ObserveResize();
+  }
+
+  ngOnDestroy() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
+
+  ObserveResize() {
+    if (this.regionContainer) {
+      this.resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          this.scrollHeight = HeightTable(entry.contentRect.height);
+        }
+      });
+
+      this.resizeObserver.observe(this.regionContainer.nativeElement);
+    }
+  }
+
+  getScrollHeight(): string {
+    return this.scrollHeight;
   }
 
   GetOrganizationsRender(){
@@ -112,13 +149,11 @@ export class ResourcesPage implements OnInit {
     }
   }
 
-  //Metodo para manejar el filtro global
   OnFilterGlobal(event: Event, table: any) {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
   }
 
-  //Metodo para cargar organizaciones seleccionadas de FUSION
   UploadResources() {
     if (this.fusionData.items) {
 
@@ -154,11 +189,9 @@ export class ResourcesPage implements OnInit {
 
         }
       });
-
     }
   }
 
-  //Metodo para eliminar organizaciones seleccionadas de DB
   async DeleteResources() {
     if (this.dbData.items) {
 
