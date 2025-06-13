@@ -1,17 +1,17 @@
-<ion-card>
-  <ion-card-header>
-    <ion-toolbar>
+<ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
+  <ion-card-header [ngStyle]="{'background': widgetData.color}">
+    <ion-toolbar style="--background: transparent;">
       <ion-buttons slot="end">
-        <ion-button id="popover-spline-${{data['dashboard_id']}}">
-          <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+        <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
+          <ion-icon color="light" slot="icon-only" name="ellipsis-vertical"></ion-icon>
         </ion-button>
       </ion-buttons>
-      <ion-card-title class="card-title">{{widgetData.name}} </ion-card-title>
+      <ion-card-title color="light">{{widgetData.name}} </ion-card-title>
     </ion-toolbar>
   </ion-card-header>
   <ion-card-content>
-    <apx-chart #splineChart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis" *ngIf="showChart"
-      [stroke]="chartOptions.stroke" [tooltip]="chartOptions.tooltip"
+    <apx-chart #splineChart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
+      *ngIf="showChart" [stroke]="chartOptions.stroke" [tooltip]="chartOptions.tooltip"
       [dataLabels]="chartOptions.dataLabels"></apx-chart>
   </ion-card-content>
 </ion-card>
@@ -19,10 +19,10 @@
   <ng-template>
     <ion-content>
       <ion-list>
-        <ion-item [button]="true" [detail]="false" (click)="editChart()">Editar <ion-icon slot="start" name="pencil-outline"
-            color="success"></ion-icon></ion-item>
-        <ion-item [button]="true" [detail]="false" (click)="deleteChart()">Eliminar <ion-icon slot="start" name="trash-outline"
-            color="danger"></ion-icon></ion-item>
+        <ion-item [button]="true" [detail]="false" (click)="editChart()">Editar <ion-icon slot="start"
+            name="pencil-outline" color="success"></ion-icon></ion-item>
+        <ion-item [button]="true" [detail]="false" (click)="deleteChart()">Eliminar <ion-icon slot="start"
+            name="trash-outline" color="danger"></ion-icon></ion-item>
       </ion-list>
     </ion-content>
   </ng-template>
@@ -34,6 +34,8 @@
       <ion-toolbar color="primary">
         <ion-title>Editar widget</ion-title>
         <ion-buttons slot="end">
+          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+            [(ngModel)]="copyWidgetData.color"></ngx-colors>
           <ion-button (click)="isModalOpen = false">Cerrar</ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -57,20 +59,27 @@
           <ion-select-option value="bar">Barras</ion-select-option>
         </ion-select>
       </ion-item>
-      <ion-item *ngFor="let sensor of copyWidgetData.sensors; let i = index">
-        <ion-select label="Máquina:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating">
-          <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
-            {{ mach.machine_name }}
-          </ion-select-option>
-        </ion-select>
-        <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating">
-          <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
-            {{ s.sensor_name }}
-          </ion-select-option>
-        </ion-select>
-        <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
-          [(ngModel)]="sensor.color"></ngx-colors>
-      </ion-item>
+      <ion-item-sliding *ngFor="let sensor of copyWidgetData.sensors; let i = index">
+        <ion-item>
+          <ion-select label="Máquina:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating">
+            <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
+              {{ mach.machine_name }}
+            </ion-select-option>
+          </ion-select>
+          <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating">
+            <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
+              {{ s.sensor_name }}
+            </ion-select-option>
+          </ion-select>
+          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+            [(ngModel)]="sensor.color"></ngx-colors>
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="removeSensor(sensor)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
       <ion-item lines="none">
       </ion-item>
       <div class="ion-text-center">

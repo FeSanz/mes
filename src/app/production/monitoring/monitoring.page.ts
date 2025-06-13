@@ -41,126 +41,21 @@ export class MonitoringPage implements OnInit {
   isModalOpen = false;
   newWidgetData: any = {
     name: "",
-    machine: "",
+    color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
     sensors: [
       {
-        machine: "",
-        id: "",
-        color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+        machine_id: "",
+        sensor_name: "",
+        sensor_id: "",
+        color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
+        min: 0,
+        max: 100,
+        minColor: '#ff8300',
+        maxColor: '#198bfd'
       }
     ],
     widgetType: "",
     chartType: ""
-  }
-  miData = {
-    series: [
-      {
-        name: "W1",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W2",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W3",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W4",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W5",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W6",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W7",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W8",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W9",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W10",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W11",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W12",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W13",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W14",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      },
-      {
-        name: "W15",
-        data: this.generateData(8, {
-          min: 0,
-          max: 90
-        })
-      }
-    ],
-    title: "Mapa de calor",
   }
   refreshData = false
   splineData: any = {
@@ -198,43 +93,25 @@ export class MonitoringPage implements OnInit {
     private changeDetector: ChangeDetectorRef) {
     addIcons({ checkmark, addOutline })
   }
-
   ngOnInit() {
     this.sensorData.push();
   }
-
   ionViewDidEnter() {
     this.GetDasboards()
-    /*this.api.GetTEST().then((response: any) => {
-      console.log(response);
-      
-      //console.log(response.data[0].machineId);
-    })*/
-
-    /*const sensor_id = '1';
-    this.wsService.suscribe(sensor_id, (data) => {
-      console.log(data.value);
-    }).then(ws => {
-      //console.log('Conectado al socket');
-    }).catch(err => {
-      console.error('No se pudo conectar:', err);
-    });*/
   }
   GetDasboards() {
     this.api.GetRequestRender(this.endPoints.Render('dashboards/1')).then((response: any) => {
-      console.log(response);
 
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
-        id: item.id,
+        id: item.dashboard_id,
         name: item.name,
-        jsonParams: { ...item.parameters, dashboard_id: item.dashboard_id, name: item.name }
+        jsonParams: { ...item.parameters, dashboard_id: item.dashboard_id, name: item.name, color: item.color, }
       }));
+
       this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
-        //console.log(response);
         this.machines = response.items
         this.newWidgetData.machine = response.items[0].machineId + ""
-        //console.log(response.data[0].machineId);
       })
     })
   }
@@ -254,58 +131,30 @@ export class MonitoringPage implements OnInit {
       console.error('No se pudo conectar:', err);
     });*/
   }
-  public generateData(count: any, yrange: any) {
-    var i = 0;
-    var series = [];
-    while (i < count) {
-      var y =
-        Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
-
-      series.push(y);
-      i++;
-    }
-    return series;
-  }
-  changeData() {
-    this.splineData.type = this.splineData.type == "bar" ? "area" : "bar"
-    this.miData.series.push({
-      name: "AQ",
-      data: this.generateData(8, {
-        min: 0,
-        max: 90
-      })
-    })
-    this.refreshData = true
-    setTimeout(() => {
-      this.refreshData = false;
-    }, 100);
-    this.changeDetector.detectChanges()
-  }
-
   setOpen(isOpen: boolean) {
     this.isModalOpen = isOpen;
     this.newWidgetData.name = "Widget " + (this.widgets.length + 1)
     this.newWidgetData.widgetType = "chart"
     this.newWidgetData.chartType = "area"
   }
-
   async addNewSensor() {
-    this.newWidgetData.sensors.push({ machine_id: "", color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0') })
+    this.newWidgetData.sensors.push({
+      machine_id: "",
+      sensor_name: "",
+      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+    })
   }
-
   getSensorsForMachine(machine_id: number) {
     const machine = this.machines.find((d: any) => d.machine_id === machine_id);
     return machine ? machine.sensors : [];
   }
-
   async addNewWidget() {
-    console.log(this.newWidgetData);
     //if (await this.ui.ShowAlert("¿Deseas agregar el nuevo widget?", "Alerta", "Atrás", "Agregar")) {
     let body: any = {}
-    if (this.newWidgetData.widgetType == 'chart') {
+    if (this.newWidgetData.widgetType == 'chart' || this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo') {
       body = {
         "user_id": this.user,
-        "color": "#FF5733",
+        "color": this.newWidgetData.color,
         "name": this.newWidgetData.name,
         "parameters": {
           "widgetType": this.newWidgetData.widgetType,
@@ -327,18 +176,22 @@ export class MonitoringPage implements OnInit {
         "updated_by": "1"
       }
     }
-    console.log(body);
     this.api.PostRequestRender(this.endPoints.Render('dashboards'), body).then((response: any) => {
       this.setOpen(false)
-    this.GetDasboards()
+      this.GetDasboards()
       this.newWidgetData = {
         name: "",
-        machine: "",
+        color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
         sensors: [
           {
-            machine: "",
-            id: "",
-            color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+            machine_id: null,
+            sensor_id: null,
+            sensor_name: "",
+            color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
+            min: 0,
+            max: 100,
+            minColor: '#ff8300',
+            maxColor: '#198bfd'
           }
         ],
         widgetType: "",
@@ -348,12 +201,30 @@ export class MonitoringPage implements OnInit {
     })
     //}
   }
+  ChangeSensor(sensor: any) {
+    const selectedSensor = this.getSensorsForMachine(sensor.machine_id).find(
+      (s: any) => s.sensor_id === sensor.sensor_id
+    );
+    sensor.sensor_name = selectedSensor?.sensor_name || '';
+    console.log(sensor);
+  }
   async removeWidget(id: number) {
+    console.log(id);
     if (await this.alerts.ShowAlert("¿Deseas eliminar este dashboard?", "Alerta", "Atrás", "Eliminar")) {
-      /*this.api.Delete("/widgets/" + id).then((response: any) => {
-        this.widgets = this.widgets.filter((w: any) => w.id !== id);
-        this.changeDetector.detectChanges()
-      })*/
+      this.api.DeleteRequestRender(this.endPoints.Render('dashboards/') + id).then((response: any) => {
+        console.log(response);
+        if (!response.errorsExistFlag) {
+          this.widgets = this.widgets.filter((w: any) => w.jsonParams.dashboard_id !== id);
+          this.changeDetector.detectChanges()
+          this.alerts.Success("Dashboard eliminado")
+        } else {
+          this.alerts.Error(response.error)
+        }
+      })
     }
+  }
+  async removeSensor(sensor: any) {
+    this.newWidgetData.sensors = this.newWidgetData.sensors.filter((se: any) => se !== sensor);
+    this.changeDetector.detectChanges()
   }
 }

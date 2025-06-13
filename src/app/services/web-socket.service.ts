@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class WebSocketService {
-  server = "wss://sensores-api.onrender.com";
+  server = "ws://localhost:3000";
 
   constructor() { }
 
@@ -13,7 +13,7 @@ export class WebSocketService {
       const ws = new WebSocket(this.server);
 
       ws.onopen = () => {
-        ws.send(JSON.stringify({ type: 'suscribe', sensor_id }));
+        ws.send(JSON.stringify({ sensor_id }));
         resolve(ws);
       };
 
@@ -25,9 +25,7 @@ export class WebSocketService {
       ws.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data);
-          if (msg.type === 'new_sensor_data') {
-            onMessage(msg);
-          }
+          onMessage(msg);
         } catch (e) {
           console.error('Error al procesar mensaje:', e);
         }

@@ -123,7 +123,7 @@ export class ThermometerComponent implements OnInit, OnDestroy, OnChanges {
     this.initializeConfig();
     this.initializeTemperature();
     this.startSimulation();
-    console.log('🌡️ Termómetro con configuración integrada inicializado');
+    //console.log('🌡️ Termómetro con configuración integrada inicializado');
   }
 
   ngOnDestroy() {
@@ -132,7 +132,7 @@ export class ThermometerComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['externalConfig'] && !changes['externalConfig'].firstChange) {
-      console.log('🔄 Configuración externa actualizada');
+      ////console.log('🔄 Configuración externa actualizada');
       this.initializeConfig();
 
       // Validar que el valor actual esté dentro del nuevo rango
@@ -193,7 +193,7 @@ export class ThermometerComponent implements OnInit, OnDestroy, OnChanges {
       this.tempConfig.range.max = value;
     }
 
-    console.log(`🌡️ Rango temporal actualizado: ${this.tempConfig.range.min}°C - ${this.tempConfig.range.max}°C`);
+    //console.log(`🌡️ Rango temporal actualizado: ${this.tempConfig.range.min}°C - ${this.tempConfig.range.max}°C`);
   }
 
   public updateTempConfig(key: string, event: any) {
@@ -215,7 +215,7 @@ export class ThermometerComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     (this.tempConfig as any)[key] = value;
-    console.log(`⚙️ Configuración temporal actualizada: ${key} = ${value}`);
+    //console.log(`⚙️ Configuración temporal actualizada: ${key} = ${value}`);
   }
 
   public updateDisplayConfig(key: string, event: any) {
@@ -226,7 +226,7 @@ export class ThermometerComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     (this.tempConfig.display as any)[key] = value;
-    console.log(`👁️ Display config actualizado: ${key} = ${value}`);
+    //console.log(`👁️ Display config actualizado: ${key} = ${value}`);
   }
 
   public applyConfig() {
@@ -256,14 +256,14 @@ export class ThermometerComponent implements OnInit, OnDestroy, OnChanges {
     // Cerrar panel
     this.showConfigPanel = false;
 
-    console.log('✅ Configuración aplicada exitosamente');
-    console.log('🌡️ Nuevo rango:', this.config.range);
-    console.log('🌡️ Nuevos umbrales:', this.config.thresholds);
+    //console.log('✅ Configuración aplicada exitosamente');
+    //console.log('🌡️ Nuevo rango:', this.config.range);
+    //console.log('🌡️ Nuevos umbrales:', this.config.thresholds);
   }
 
   public resetToDefaults() {
     this.tempConfig = JSON.parse(JSON.stringify(this.defaultConfig));
-    console.log('🔄 Configuración temporal reseteada');
+    //console.log('🔄 Configuración temporal reseteada');
   }
 
   // ===== MÉTODOS ORIGINALES MEJORADOS =====
@@ -293,7 +293,7 @@ export class ThermometerComponent implements OnInit, OnDestroy, OnChanges {
     // Ajustar umbrales basados en el nuevo rango
     this.adjustThresholds();
 
-    console.log('⚙️ Configuración procesada:', this.config);
+    //console.log('⚙️ Configuración procesada:', this.config);
   }
 
   private adjustThresholds() {
@@ -311,7 +311,7 @@ export class ThermometerComponent implements OnInit, OnDestroy, OnChanges {
       hot: Math.round((minValue + (range * 0.85)) * 10) / 10
     };
 
-    console.log('🌡️ Umbrales recalculados:', this.config.thresholds);
+    //console.log('🌡️ Umbrales recalculados:', this.config.thresholds);
   }
 
   private initializeTemperature() {

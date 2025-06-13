@@ -12,20 +12,18 @@
     <ion-row>
       <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" *ngFor="let widget of widgets">
         <ng-container [ngSwitch]="widget.jsonParams.widgetType">
-          <app-charts *ngSwitchCase="'chart'" [data]="widget.jsonParams" [refreshData]="widget.refreshData"
-            (remove)="removeWidget(widget.id)">
+          <app-charts *ngSwitchCase="'chart'" [data]="widget.jsonParams"
+            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
           </app-charts>
-          <app-heatmap *ngSwitchCase="'heatmap'" [data]="widget.jsonParams" [refreshData]="refreshData"
-            (remove)="removeWidget(widget.id)">
+          <app-heatmap *ngSwitchCase="'heatmap'" [data]="widget.jsonParams"
+            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
           </app-heatmap>
+          <app-thermometer *ngSwitchCase="'thermo'" [data]="widget.jsonParams"
+            (remove)="removeWidget(widget.jsonParams.dashboard_id)"></app-thermometer>
+          <app-gauge *ngSwitchCase="'gauge'" [data]="widget.jsonParams"
+            (remove)="removeWidget(widget.jsonParams.dashboard_id)"></app-gauge>
         </ng-container>
       </ion-col>
-      <!--ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4">
-        <app-thermometer></app-thermometer>
-      </ion-col>
-      <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4">
-        <app-gauge></app-gauge>
-      </ion-col-->
     </ion-row>
   </ion-grid>
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
@@ -39,6 +37,8 @@
         <ion-toolbar color="primary">
           <ion-title>Agregar nuevo widget</ion-title>
           <ion-buttons slot="end">
+            <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+              [(ngModel)]="newWidgetData.color"></ngx-colors>
             <ion-button (click)="setOpen(false)">Cerrar</ion-button>
           </ion-buttons>
         </ion-toolbar>
@@ -53,6 +53,8 @@
           <ion-select label="Tipo de widget:" color="primary" [(ngModel)]="newWidgetData.widgetType">
             <ion-select-option value="chart">Chart</ion-select-option>
             <ion-select-option value="heatmap">Mapa de calor</ion-select-option>
+            <ion-select-option value="thermo">Termómetro</ion-select-option>
+            <ion-select-option value="gauge">Gauge</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item *ngIf="newWidgetData.widgetType == 'chart'">
@@ -62,23 +64,42 @@
             <ion-select-option value="bar">Barras</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item *ngFor="let sensor of newWidgetData.sensors; let i = index">
-          <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating">
-            <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
-              {{ mach.machine_name }}
-            </ion-select-option>
-          </ion-select>
-          <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating">
-            <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
-              {{ s.sensor_name }}
-            </ion-select-option>
-          </ion-select>
-          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
-            [(ngModel)]="sensor.color"></ngx-colors>
-        </ion-item>
+        <ion-item-sliding *ngFor="let sensor of newWidgetData.sensors; let i = index" lines="full">
+          <ion-item>
+            <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating">
+              <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
+                {{ mach.machine_name }}
+              </ion-select-option>
+            </ion-select>
+            <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating" (ionChange)="ChangeSensor(sensor)">
+              <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
+                {{ s.sensor_name }}
+              </ion-select-option>
+            </ion-select>
+            <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge'"
+              [(ngModel)]="sensor.color"></ngx-colors>
+          </ion-item>
+          <ion-item-options side="end"
+            *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge'">
+            <ion-item-option color="danger" (click)="removeSensor(sensor)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+          <ion-item *ngIf="newWidgetData.widgetType == 'thermo' || newWidgetData.widgetType == 'gauge'">
+            <ion-input type="text" placeholder="" [(ngModel)]="sensor.min" style="text-align: right;">
+              <div slot="label"><ion-text color="primary">Mínimo:</ion-text></div>
+            </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+              [(ngModel)]="sensor.minColor"></ngx-colors>
+            <ion-input type="text" placeholder="" [(ngModel)]="sensor.max" style="text-align: right;">
+              <div slot="label"><ion-text color="primary">Máximo:</ion-text></div>
+            </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+              [(ngModel)]="sensor.maxColor"></ngx-colors>
+          </ion-item>
+        </ion-item-sliding>
         <ion-item lines="none">
         </ion-item>
-        <div class="ion-text-center">
+        <div class="ion-text-center"
+          *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge'">
           <ion-button fill="outline" (click)="addNewSensor()">Agregar sensor</ion-button>
         </div>
         <ion-item lines="none">
