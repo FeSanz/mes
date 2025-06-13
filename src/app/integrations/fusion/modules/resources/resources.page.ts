@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -28,10 +28,12 @@ import { MultiSelectModule } from 'primeng/multiselect';
 
 import { Select } from 'primeng/select';
 import { FloatLabel } from "primeng/floatlabel"
+import {IftaLabel} from "primeng/iftalabel";
 
 import {
   closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
 } from 'ionicons/icons';
+
 
 
 @Component({
@@ -41,8 +43,8 @@ import {
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
     IonButton, IonIcon,
-    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,DropdownModule,
-    MultiSelectModule, Select, FloatLabel]
+    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, DropdownModule,
+    MultiSelectModule, Select, FloatLabel, IftaLabel]
 })
 export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
@@ -52,6 +54,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   rowsPerPage: number = 50;
   rowsPerPageOptions: number[] = [10, 25, 50];
 
+  fusionOriginalData: any = {};
   fusionData: any = {};
   dbData: any = {};
 
@@ -59,7 +62,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   organizationSelected: string = '';
 
   workCenters: any = {};
-  workCenterSelected: string = '';
+  workCenterSelected: string | any = '';
 
   selectedItemsFusion: any[] = [];
   selectedItemsDB: any[] = [];
@@ -103,48 +106,37 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  getScrollHeight(): string {
+  GetScrollHeight(): string {
     return this.scrollHeight;
   }
 
   GetOrganizationsRender(){
     this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
-      console.log(response);
-      this.dbOrganizations = { ...response };
+      this.dbOrganizations = response;
     });
   }
 
   OnOrganizationSelected() {
     if(this.organizationSelected) {
       this.apiService.GetRequestFusion(this.endPoints.Path('work_centers', this.organizationSelected)).then((response: any) => {
-        const data = JSON.parse(response);
-        this.workCenters = { ...data };
+        this.workCenters = JSON.parse(response);
       });
     }
   }
 
   OnWorkCenterSelected() {
     if(this.workCenterSelected) {
-      this.apiService.GetRequestFusion(this.endPoints.Path('machines', this.workCenterSelected, this.organizationSelected)).then((response: any) => {
-        const data = JSON.parse(response);
-        this.fusionData = { ...data };
+      let clause = `resourceMachines/${this.organizationSelected}/${this.workCenterSelected.WorkCenterId}`;
+      this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+        response.totalResults == 0 && this.alerts.Warning(response.message);
+        this.dbData = response;
 
-        /*if (this.fusionData.items && this.dbData.items) {
-          // Set de ID's para filtrar posteriormente
-          const dbOrganizationIds = new Set(this.dbData.items.map((item: any) => String(item.OrganizationId)));
-          // Filtrar items de fusion que no estén en DB
-          this.fusionData.items = this.fusionData.items.filter((fusionItem: any) => {
-            return !dbOrganizationIds.has(String(fusionItem.OrganizationId));
-          });
-        }*/
+        this.apiService.GetRequestFusion(this.endPoints.Path('machines', this.workCenterSelected.WorkCenterId, this.organizationSelected)).then((response: any) => {
+          this.fusionData = JSON.parse(response);
+          this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
 
-        // Inicializar propiedad selected para FUSION (solo items filtrados)
-        if (this.fusionData.items) {
-          this.fusionData.items = this.fusionData.items.map((item: any) => ({
-            ...item,
-            selected: false
-          }));
-        }
+         this.FilterRegisteredItems();
+        });
       });
     }
   }
@@ -152,6 +144,17 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   OnFilterGlobal(event: Event, table: any) {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
+  }
+
+  FilterRegisteredItems() {
+    if (this.fusionOriginalData.items && this.dbData.items) {
+      // Set de ID's para filtrar posteriormente
+      const dbResourcesIds = new Set(this.dbData.items.map((item: any) => String(item.MachineId)));
+      // Filtrar items de fusion que no estén en DB
+      this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
+        return !dbResourcesIds.has(String(fusionItem.ResourceId));
+      });
+    }
   }
 
   UploadResources() {
@@ -162,30 +165,30 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      console.log('Fusion:', this.selectedItemsFusion);
-
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        OrganizationId: item.OrganizationId,
-        Code: item.OrganizationCode,
-        Name: item.OrganizationName,
-        Location: item.LocationCode,
-        WorkMethod: item.plantParameters.items[0].DefaultWorkMethod,
-        BUId: item.ManagementBusinessUnitId
+        MachineId: item.ResourceId,
+        OrganizationId: this.organizationSelected,
+        Code: item.ResourceCode,
+        Name: item.ResourceName,
+        WorkCenterId: this.workCenterSelected.WorkCenterId,
+        WorkCenter: this.workCenterSelected.WorkCenterName,
+        Class: item.ResourceClassCode,
+        Token: null
       }));
 
       const payload = {
         items: itemsData
       };
 
-      this.apiService.PostRequestRender(this.endPoints.Render('organizations'), payload).then(async (response: any) => {
+      this.apiService.PostRequestRender(this.endPoints.Render('resourceMachines'), payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
           this.alerts.Info(response.message);
         }else {
           this.alerts.Success(response.message);
 
           setTimeout(() => {
-            window.location.reload();
-          }, 3000);
+            this.RefreshTables();
+          }, 1500);
 
         }
       });
@@ -221,8 +224,8 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
         // Recargar la página solo si hubo eliminaciones exitosas
         if (successCount > 0) {
           setTimeout(() => {
-            window.location.reload();
-          }, 3000);
+            this.RefreshTables();
+          }, 1500);
         }
 
       } catch (error) {
@@ -240,5 +243,24 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   ClearDB(table: any) {
     table.clear();
     this.searchValueDB = '';
+  }
+
+  RefreshTables() {
+    let clause = `resourceMachines/${this.organizationSelected}/${this.workCenterSelected.WorkCenterId}`;
+    this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+      response.totalResults == 0 && this.alerts.Warning(response.message);
+      this.dbData = response;
+
+      this.FilterRegisteredItems();
+    });
+
+    // Limpiar valores de búsqueda
+    this.searchValueFusion = '';
+    this.searchValueDB = '';
+
+    // Limpiar selecciones
+    this.selectedItemsFusion = [];
+    this.selectedItemsDB = [];
+
   }
 }

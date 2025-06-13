@@ -11,7 +11,7 @@
   <div class="card-select flex flex-wrap justify-center items-end gap-4">
     <p-floatlabel class="w-full md:w-56" variant="on">
       <p-select [(ngModel)]="organizationSelected"
-                inputId="on_label"
+                inputId="organization_select"
                 [options]="dbOrganizations.items"
                 optionLabel="Name"
                 optionValue="OrganizationId"
@@ -20,21 +20,20 @@
                 [virtualScroll]="true"
                 [virtualScrollItemSize]="38"
                 (onChange)="OnOrganizationSelected()" />
-      <label for="on_label">Organización</label>
+      <label for="organization_select">Organización</label>
     </p-floatlabel>
 
     <p-floatlabel class="w-full md:w-56" variant="on">
       <p-select [(ngModel)]="workCenterSelected"
-                inputId="on_label"
+                inputId="workcenter_select"
                 [options]="workCenters.items"
                 optionLabel="WorkCenterName"
-                optionValue="WorkCenterId"
                 placeholder="Seleccione centro de trabajo"
                 styleClass="w-full"
                 [virtualScroll]="true"
                 [virtualScrollItemSize]="38"
                 (onChange)="OnWorkCenterSelected()"/>
-      <label for="on_label">Centro de trabajo</label>
+      <label for="workcenter_select">Centro de trabajo</label>
     </p-floatlabel>
   </div>
   <div class="regions-wrapper">
@@ -64,7 +63,7 @@
                [globalFilterFields]="['ResourceCode', 'ResourceName', 'ResourceClassCode']"
                stripedRows
                [scrollable]="true"
-               [scrollHeight]="getScrollHeight()"
+               [scrollHeight]="GetScrollHeight()"
                [alwaysShowPaginator]="true"
       >
         <ng-template #caption>
@@ -162,7 +161,7 @@
                [globalFilterFields]="['Code', 'Name', 'Location']"
                stripedRows
                [scrollable]="true"
-               [scrollHeight]="getScrollHeight()"
+               [scrollHeight]="GetScrollHeight()"
                [alwaysShowPaginator]="true"
       >
         <ng-template pTemplate="caption">
@@ -209,18 +208,11 @@
                 <p-columnFilter type="text" field="Name" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="Location" style="min-width: 10rem">
+            <th pSortableColumn="Class" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Ubicación
-                <p-sortIcon field="Location" />
-                <p-columnFilter field="Location" matchMode="equals" display="menu" class="ml-auto"/>
-              </div>
-            </th>
-            <th style="min-width: 12rem">
-              <div class="flex justify-between items-center">
-                Manufactura
-                <p-sortIcon field="WorkMethod" />
-                <p-columnFilter field="WorkMethod" matchMode="equals" display="menu" class="ml-auto"/>
+                Clase
+                <p-sortIcon field="Class" />
+                <p-columnFilter field="Class" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
           </tr>
@@ -232,8 +224,7 @@
             </td>
             <td>{{ item.Code }}</td>
             <td>{{ item.Name }}</td>
-            <td>{{ item.Location }}</td>
-            <td>{{ item.WorkMethod || 'N/A' }}</td>
+            <td>{{ item.Class }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

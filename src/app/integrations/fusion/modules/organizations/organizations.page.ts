@@ -44,6 +44,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   rowsPerPage: number = 50;
   rowsPerPageOptions: number[] = [10, 25, 50];
 
+  fusionOriginalData: any = {};
   fusionData: any = {};
   dbData: any = {};
 
@@ -87,45 +88,19 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  getScrollHeight(): string {
+  GetScrollHeight(): string {
     return this.scrollHeight;
   }
 
   GetOrganizations(){
     this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
-      //const data = response;
-      console.log(response);
-      this.dbData = { ...response };
-
-      // Inicializar propiedad selected para DB
-      if (this.dbData.items) {
-        this.dbData.items = this.dbData.items.map((item: any) => ({
-          ...item,
-          selected: false
-        }));
-      }
+      this.dbData = response;
 
       this.apiService.GetRequestFusion(this.endPoints.Path('organizations')).then((response: any) => {
-        const data = JSON.parse(response);
-        this.fusionData = { ...data };
+        this.fusionData = JSON.parse(response);
+        this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
 
-        if (this.fusionData.items && this.dbData.items) {
-          // Set de ID's para filtrar posteriormente
-          const dbOrganizationIds = new Set(this.dbData.items.map((item: any) => String(item.OrganizationId)));
-          // Filtrar items de fusion que no estén en DB
-          this.fusionData.items = this.fusionData.items.filter((fusionItem: any) => {
-            return !dbOrganizationIds.has(String(fusionItem.OrganizationId));
-          });
-        }
-
-        // Inicializar propiedad selected para FUSION (solo items filtrados)
-        if (this.fusionData.items) {
-          this.fusionData.items = this.fusionData.items.map((item: any) => ({
-            ...item,
-            selected: false
-          }));
-        }
-
+        this.FilterRegisteredItems();
       });
     });
   }
@@ -136,16 +111,24 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     table.filterGlobal(target.value, 'contains');
   }
 
+  FilterRegisteredItems() {
+    if (this.fusionOriginalData.items && this.dbData.items) {
+      // Set de ID's para filtrar posteriormente
+      const dbOrganizationIds = new Set(this.dbData.items.map((item: any) => String(item.OrganizationId)));
+      // Filtrar items de fusion que no estén en DB
+      this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
+        return !dbOrganizationIds.has(String(fusionItem.OrganizationId));
+      });
+    }
+  }
+
   //Metodo para cargar organizaciones seleccionadas de FUSION
   UploadOrganization() {
     if (this.fusionData.items) {
-
       if (this.selectedItemsFusion.length === 0) {
         this.alerts.Warning("Seleccione algún elemento para cargar");
         return;
       }
-
-      console.log('Fusion:', this.selectedItemsFusion);
 
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
         OrganizationId: item.OrganizationId,
@@ -167,25 +150,20 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
           this.alerts.Success(response.message);
 
           setTimeout(() => {
-            window.location.reload();
-          }, 3000);
-
+            this.RefreshTables();
+          }, 1500);
         }
       });
-
     }
   }
 
   //Metodo para eliminar organizaciones seleccionadas de DB
   async DeleteOrganizations() {
     if (this.dbData.items) {
-
       if (this.selectedItemsDB.length === 0) {
         this.alerts.Warning("Seleccione algún elemento para eliminar");
         return;
       }
-
-      console.log('DB:', this.selectedItemsDB);
 
       try {
         let successCount = 0;
@@ -206,8 +184,8 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
         // Recargar la página solo si hubo eliminaciones exitosas
         if (successCount > 0) {
           setTimeout(() => {
-            window.location.reload();
-          }, 3000);
+            this.RefreshTables();
+          }, 1500);
         }
 
       } catch (error) {
@@ -225,5 +203,22 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   ClearDB(table: any) {
     table.clear();
     this.searchValueDB = '';
+  }
+
+  RefreshTables() {
+    this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
+      this.dbData = response;
+
+     this.FilterRegisteredItems();
+    });
+
+    // Limpiar valores de búsqueda
+    this.searchValueFusion = '';
+    this.searchValueDB = '';
+
+    // Limpiar selecciones
+    this.selectedItemsFusion = [];
+    this.selectedItemsDB = [];
+
   }
 }

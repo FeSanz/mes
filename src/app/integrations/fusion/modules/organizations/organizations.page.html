@@ -25,8 +25,8 @@
                styleClass="card-table-primeng"
                [tableStyle]="{ 'min-width': '50rem' }"
                [size]="'small'"
-               [rowHover]="rowsPerPage"
-               [rows]="25"
+               [rowHover]="true"
+               [rows]="rowsPerPage"
                [showCurrentPageReport]="true"
                [rowsPerPageOptions]="rowsPerPageOptions"
                [paginator]="true"
@@ -35,7 +35,7 @@
                [globalFilterFields]="['OrganizationCode', 'OrganizationName', 'LocationCode']"
                stripedRows
                [scrollable]="true"
-               [scrollHeight]="getScrollHeight()"
+               [scrollHeight]="GetScrollHeight()"
                [alwaysShowPaginator]="true"
       >
         <ng-template #caption>
@@ -141,7 +141,7 @@
                [globalFilterFields]="['Code', 'Name', 'Location']"
                stripedRows
                [scrollable]="true"
-               [scrollHeight]="getScrollHeight()"
+               [scrollHeight]="GetScrollHeight()"
                [alwaysShowPaginator]="true"
       >
         <ng-template pTemplate="caption">
