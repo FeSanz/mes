@@ -1,5 +1,5 @@
 // src/app/components/gauge/humidity-gauge.component.ts
-import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges, EventEmitter, Output, ChangeDetectorRef, LOCALE_ID } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges, EventEmitter, Output, ChangeDetectorRef, LOCALE_ID, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BehaviorSubject, Observable, interval, Subscription } from 'rxjs';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
@@ -9,19 +9,10 @@ import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
 import { addIcons } from 'ionicons';
 import { ellipsisVertical, pencilOutline, trashOutline } from 'ionicons/icons';
+import { FormsModule } from '@angular/forms';
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { NgxColorsModule } from 'ngx-colors';
 
-export interface GaugeConfig {
-  title: string;
-  minColor: string;
-  maxColor: string;
-  min: number;
-  max: number;
-  currentValue: number;
-  //autoUpdate: boolean;
-  //updateInterval: number;
-  //showStats: boolean;
-  //compactMode: boolean;
-}
 export interface GaugeData {
   [key: string]: any;
 }
@@ -31,7 +22,9 @@ export interface GaugeData {
   templateUrl: './gauge.component.html',
   styleUrls: ['./gauge.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule], providers: [
+  imports: [FormsModule, CommonModule, NgApexchartsModule, IonicModule, NgxColorsModule/*, IonText, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal*/],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  providers: [
     { provide: LOCALE_ID, useValue: 'en-US' }
   ],
   animations: [
@@ -48,17 +41,16 @@ export interface GaugeData {
 })
 export class GaugeComponent implements OnInit {
 
-  @Input() config: Partial<GaugeConfig> = {};
   @Output() remove = new EventEmitter<number>();
   widgetData: any = {}
-  private humiditySubject = new BehaviorSubject<number>(10.00);
+  private humiditySubject = new BehaviorSubject<number>(0);
   public currentValue$ = this.humiditySubject.asObservable();
   copyWidgetData: any = {}
   isModalOpen = false;
   lastDate: any = ""
   showChart: boolean = true;
   machines: any = []
-
+  public currentColor = '#4A90E2';
   @Input() data: GaugeData = {};
 
   constructor(private changeDetector: ChangeDetectorRef,
@@ -70,18 +62,7 @@ export class GaugeComponent implements OnInit {
       pencilOutline,
       trashOutline
     })
-
   }
-  // Estadísticas
-  public minRecorded = 100;
-  public maxRecorded = 0;
-  public averageHumidity = 50;
-  private readings: number[] = [];
-
-  // Control de simulación
-  public lastUpdate = new Date();
-  public currentColor = '#4A90E2';
-
   ngOnInit() {
     this.initializeConfig();
   }
@@ -103,28 +84,52 @@ export class GaugeComponent implements OnInit {
     }).then((ws) => {
     }).catch(err => {
       console.log(err);
-
     });
   }
   deleteChart() {
     this.remove.emit(this.widgetData.id);
   }
   editChart() {
+
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
+    console.log(this.copyWidgetData.widgetType);
     this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
       this.machines = response.items
       this.isModalOpen = true;
     })
   }
+  updateChartDB() {
+    const body = {
+      name: this.copyWidgetData.name,
+      user_id: 1,
+      color: this.copyWidgetData.color,
+      updated_by: 1,
+      parameters: {
+        widgetType: this.copyWidgetData.widgetType,
+        chartType: this.copyWidgetData.chartType,
+        sensors: this.copyWidgetData.sensors,
+      }
+    }
+    console.log(body);
+    this.showChart = false;
+    this.api.UpdateRequestRender(this.endPoints.Render('dashboards/') + this.widgetData.dashboard_id, body).then((response: any) => {
+      //console.log(response);
+      this.widgetData = JSON.parse(JSON.stringify(this.copyWidgetData))
+      this.data = this.widgetData
+      this.showChart = true;
+      this.initializeConfig()
+      this.isModalOpen = false
+      this.changeDetector.detectChanges()
+    })
+  }
+  getSensorsForMachine(MachineId: number) {
+    const machine: any = this.machines.find((m: any) => m.machine_id == MachineId);
+    return machine ? machine.sensors : [];
+  }
   private initializeConfig() {
     this.widgetData = this.data
     this.GetSensorValue()
   }
-  public updateHumidity(value: number) {
-    this.updateCurrentColor();
-    this.lastUpdate = new Date();
-  }
-
   // ✅ MÉTODO MEJORADO PARA ACTUALIZACIÓN DE COLOR
   private updateCurrentColor() {
     const current = this.humiditySubject.value;
@@ -132,7 +137,6 @@ export class GaugeComponent implements OnInit {
       (this.widgetData.sensors[0].max - this.widgetData.sensors[0].min);
 
     const clampedPercentage = Math.max(0, Math.min(1, percentage));
-    console.log(current);
 
     const newColor = this.interpolateColor(
       this.widgetData.sensors[0].minColor,

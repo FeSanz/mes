@@ -5,6 +5,9 @@
   height: 100%;
 }
 
+ion-select::part(label) {
+    color: var(--ion-color-primary);
+}
 canvas {
   width: 100% !important;
   height: 100% !important;

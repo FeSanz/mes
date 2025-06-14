@@ -15,7 +15,7 @@
       <div class="gauge-section">
         <div>
           <svg width="360" height="200" viewBox="0 0 360 200" class="humidity-svg-gauge large">
-            <path d="M 60 160 A 120 120 0 0 1 300 160" fill="none" stroke="#333" stroke-width="18"
+            <path d="M 60 160 A 120 120 0 0 1 300 160" fill="none" stroke="#d7dadc" stroke-width="18"
               stroke-linecap="round" class="background-arc" />
             <path d="M 60 160 A 120 120 0 0 1 300 160" fill="none" [attr.stroke]="currentColor" stroke-width="18"
               stroke-linecap="round" [attr.stroke-dasharray]="getProgressDashArray((currentValue$ | async) ?? 0)"
@@ -53,7 +53,7 @@
           </svg>
         </div>
       </div>
-    </div> 
+    </div>
     <ion-item lines="none" style="align-self: stretch" class="ion-text-center">
       <ion-label color="medium">
         Última actualización: {{ lastDate | date: "d 'de' MMMM 'a las' h:mm a" }}
@@ -73,3 +73,61 @@
     </ion-content>
   </ng-template>
 </ion-popover>
+
+<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Editar widget</ion-title>
+        <ion-buttons slot="end">
+          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+            [(ngModel)]="copyWidgetData.color"></ngx-colors>
+          <ion-button (click)="isModalOpen = false">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <ion-item>
+        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.name" style="text-align: right;">
+          <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label color="primary" slot="start">Tipo:</ion-label>
+        <ion-label slot="end"><strong>Gauge</strong></ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id"
+          label-placement="floating">
+          <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
+            {{ mach.machine_name }}
+          </ion-select-option>
+        </ion-select>
+        <ion-select label="Sensor:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].sensor_id"
+          label-placement="floating">
+          <ion-select-option *ngFor="let s of getSensorsForMachine(copyWidgetData.sensors[0].machine_id)"
+            [value]="s.sensor_id">
+            {{ s.sensor_name }}
+          </ion-select-option>
+        </ion-select>
+        <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+          [(ngModel)]="copyWidgetData.sensors[0].color"></ngx-colors>
+      </ion-item>
+      <ion-item>
+        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].min" style="text-align: right;">
+          <div slot="label"><ion-text color="primary">Mínimo:</ion-text></div>
+        </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+          [(ngModel)]="copyWidgetData.sensors[0].minColor"></ngx-colors>
+        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].max" style="text-align: right;">
+          <div slot="label"><ion-text color="primary">Máximo:</ion-text></div>
+        </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+          [(ngModel)]="copyWidgetData.sensors[0].maxColor"></ngx-colors>
+      </ion-item>
+      <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab-button (click)="updateChartDB()">
+          <ion-icon name="checkmark"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-content>
+  </ng-template>
+</ion-modal>

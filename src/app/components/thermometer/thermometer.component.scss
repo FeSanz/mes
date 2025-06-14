@@ -1,6 +1,44 @@
+ion-card {
+  min-height: 450.5px;
+  --background: var(--ion-color-back-shade, #fff);
+  border-radius: 12px;
+
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+  }
+}
+
+ion-select::part(label) {
+    color: var(--ion-color-primary);
+}
+ion-card-header {
+  padding: 0.5rem;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+
+ion-card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+
+  ion-icon {
+    font-size: 1.3rem;
+  }
+}
+
 :host {
   --thermometer-primary: #DAA520;
   --thermometer-secondary: #1a1a1a;
+  --thermometer-dark: #ffffff;
   --thermometer-accent: #4A90E2;
   --thermometer-bg: rgba(255, 255, 255, 0.02);
   --thermometer-border: rgba(218, 165, 32, 0.2);
@@ -17,7 +55,7 @@
   margin: 0;
   background: var(--thermometer-secondary);
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 32px rgba(190, 29, 29, 0.4);
   border: 1px solid var(--thermometer-border);
   overflow: hidden;
   transition: all 0.3s ease;
@@ -50,58 +88,6 @@
   }
 }
 
-.card-title {
-  color: #000;
-  font-weight: 600;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  justify-content: space-between;
-  margin-bottom: var(--spacing-xs);
-
-  ion-icon {
-    font-size: 1.3rem;
-  }
-}
-
-.config-button {
-  --padding-start: 6px;
-  --padding-end: 6px;
-  --color: rgba(0, 0, 0, 0.7);
-  
-  &:hover {
-    --color: #000;
-  }
-}
-
-.connection-status {
-  color: rgba(0, 0, 0, 0.7);
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  margin: 0 0 var(--spacing-xs) 0;
-  transition: all 0.3s ease;
-
-  &.connected {
-    color: #006400;
-    font-weight: 600;
-  }
-
-  ion-icon {
-    font-size: 1rem;
-  }
-}
-
-.range-display {
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 0.8rem;
-  text-align: center;
-  margin: 0;
-  font-weight: 500;
-}
 
 // ✅ PANEL DE CONFIGURACIÓN OPTIMIZADO PARA DESKTOP
 .config-panel {
@@ -112,21 +98,21 @@
   overflow: hidden;
   max-height: 350px;
   overflow-y: auto;
-  
+
   @media (min-width: 769px) {
     max-height: 400px;
   }
-  
+
   // ✅ SCROLLBAR PERSONALIZADO
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: var(--thermometer-primary);
     border-radius: 3px;
@@ -135,7 +121,7 @@
 
 .config-content {
   padding: var(--spacing-md);
-  
+
   h4 {
     color: var(--thermometer-primary);
     margin: 0 0 var(--spacing-md) 0;
@@ -148,31 +134,32 @@
   display: flex;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     gap: var(--spacing-xs);
   }
-  
+
   ion-item {
     flex: 1;
     --background: rgba(255, 255, 255, 0.05);
     --color: #fff;
     border-radius: 8px;
     min-height: 48px;
-    
+
     ion-label {
       font-size: 0.9rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      
+
       @media (max-width: 768px) {
         font-size: 0.85rem;
       }
     }
-    
-    ion-input, ion-select {
+
+    ion-input,
+    ion-select {
       --color: #fff;
       --placeholder-color: #ccc;
       font-size: 0.9rem;
@@ -180,44 +167,7 @@
   }
 }
 
-.config-toggles {
-  margin-bottom: var(--spacing-md);
-  
-  ion-item {
-    --background: rgba(255, 255, 255, 0.05);
-    --color: #fff;
-    border-radius: 8px;
-    margin-bottom: var(--spacing-xs);
-    min-height: 48px;
-    
-    ion-checkbox {
-      --color: var(--thermometer-primary);
-      --color-checked: var(--thermometer-primary);
-    }
-    
-    ion-label {
-      font-size: 0.9rem;
-    }
-  }
-}
 
-.config-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
-  padding-top: var(--spacing-sm);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  
-  ion-button {
-    flex: 1;
-    --border-radius: 8px;
-    font-size: 0.9rem;
-    
-    ion-icon {
-      font-size: 1rem;
-    }
-  }
-}
 
 // ✅ CONTENEDOR PRINCIPAL CENTRADO HORIZONTALMENTE - CORREGIDO
 .modern-thermometer-container {
@@ -231,21 +181,21 @@
   &.centered {
     flex-direction: row;
     justify-content: center;
-    
+
     @media (max-width: 768px) {
       flex-direction: column;
       gap: var(--spacing-lg);
     }
   }
-  
+
   &.config-open {
     flex-direction: column;
     gap: var(--spacing-lg);
-    
+
     .thermometer-section {
       flex: 0 0 auto;
     }
-    
+
     .temperature-display-section {
       flex: 0 0 auto;
     }
@@ -263,7 +213,6 @@
 .modern-thermometer {
   background: var(--thermometer-bg);
   border-radius: 15px;
-  padding: 10px;
   transition: transform 0.3s ease;
 
   &:hover {
@@ -287,7 +236,7 @@
   flex: 1;
   min-width: 200px;
   min-height: 0;
-  
+
   @media (max-width: 768px) {
     min-width: auto;
     width: 100%;
@@ -333,7 +282,7 @@
   justify-content: space-around;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) var(--spacing-md);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   transition: background 0.3s ease;
   width: 100%;
@@ -347,7 +296,7 @@
   &:hover {
     background: rgba(255, 255, 255, 0.12);
   }
-  
+
   @media (max-width: 480px) {
     flex-direction: column;
     gap: var(--spacing-xs);
@@ -445,7 +394,7 @@
   --knob-background: var(--thermometer-primary);
   --knob-size: 20px;
   --bar-height: 6px;
-  
+
   margin: var(--spacing-sm) 0;
 
   &.compact {
@@ -472,7 +421,7 @@
   ion-button {
     --padding-start: 6px;
     --padding-end: 6px;
-    
+
     ion-icon {
       font-size: 1rem;
     }
@@ -498,7 +447,7 @@
   .temperature-display-section {
     gap: var(--spacing-sm);
   }
-  
+
   .config-panel {
     max-height: 250px;
   }
@@ -517,7 +466,7 @@
   .temperature-stats.compact {
     max-width: 280px;
   }
-  
+
   .config-panel {
     max-height: 200px;
   }
@@ -527,24 +476,26 @@
 @media (min-width: 769px) {
   .modern-thermometer-container.centered:not(.config-open) {
     align-items: center;
-    
+
     .thermometer-section {
+      height: 360px;
+      /* o cualquier valor deseado */
       flex: 0 0 auto;
     }
-    
+
     .temperature-display-section {
       flex: 1;
       justify-content: center;
       align-items: center;
       text-align: center;
-      max-width: 350px;
-      
+      max-width: 300px;
+
       .temperature-value,
       .temperature-label {
         text-align: center;
         align-self: center;
       }
-      
+
       .temperature-stats,
       .sensor-info,
       .temperature-control {
@@ -564,10 +515,10 @@
   }
 
   .temperature-display-section {
-    min-width: 280px;
+    min-width: 120px;
     gap: var(--spacing-lg);
   }
-  
+
   .config-panel {
     max-height: 450px;
   }
@@ -575,8 +526,15 @@
 
 // ✅ ANIMACIONES
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .connection-status:not(.connected) {
@@ -585,7 +543,7 @@
 
 // ✅ DARK THEME
 @media (prefers-color-scheme: dark) {
-  :host {
-    --thermometer-bg: rgba(255, 255, 255, 0.05);
+  body.dark { 
+    --thermometer-dark: #000000;
   }
 }
