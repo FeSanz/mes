@@ -2,29 +2,42 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { IonContent, IonHeader, IonTitle, IonToolbar, } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TableModule } from 'primeng/table';
 import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline,chevronForwardOutline } from 'ionicons/icons';
+import { ellipsisVerticalOutline, chevronForwardOutline } from 'ionicons/icons';
 import { CardModule } from 'primeng/card';
+import { TagModule } from 'primeng/tag';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({
   selector: 'app-users',
   templateUrl: './users.page.html',
   styleUrls: ['./users.page.scss'],
   standalone: true,
-  imports: [/*IonContent, IonHeader, IonTitle, IonToolbar,*/IonicModule, CommonModule, FormsModule, TableModule, CardModule]
+  imports: [ CommonModule, FormsModule, TableModule, CardModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
+    IonButton, IonIcon,
+    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, DropdownModule,
+    MultiSelectModule]
 })
 export class UsersPage implements OnInit {
   users: any = []
+  rowsPerPage: number = 50;
+  rowsPerPageOptions: number[] = [10, 25, 50];
   selectedItems: any = []
+  searchValueUsers: string = '';
   constructor(private apiService: ApiService,
     private endPoints: EndpointsService,
     private alerts: AlertsService) {
-    addIcons({ ellipsisVerticalOutline,chevronForwardOutline })
+    addIcons({ ellipsisVerticalOutline, chevronForwardOutline })
   }
 
   ngOnInit() {
@@ -34,7 +47,6 @@ export class UsersPage implements OnInit {
   GetOrganizations() {
     this.apiService.GetRequestRender(this.endPoints.Render('users/300000003173662')).then((response: any) => {
       //const data = response;
-      console.log(response);
       this.users = { ...response };
 
       // Inicializar propiedad selected para DB
@@ -44,7 +56,6 @@ export class UsersPage implements OnInit {
           selected: false
         }));
       }
-      console.log(this.users);
       /*
             this.apiService.GetRequestFusion(this.endPoints.Path('organizations')).then((response: any) => {
               const data = JSON.parse(response);
@@ -69,5 +80,16 @@ export class UsersPage implements OnInit {
       
             });*/
     });
+  }
+
+  //Metodo para manejar el filtro global
+  OnFilterGlobal(event: Event, table: any) {
+    const target = event.target as HTMLInputElement;
+    table.filterGlobal(target.value, 'contains');
+  }
+
+  ClearFilter(table: any) {
+    table.clear();
+    this.searchValueUsers = '';
   }
 }

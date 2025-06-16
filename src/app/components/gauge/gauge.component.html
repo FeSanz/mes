@@ -117,10 +117,10 @@
         <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].min" style="text-align: right;">
           <div slot="label"><ion-text color="primary">Mínimo:</ion-text></div>
         </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
-          [(ngModel)]="copyWidgetData.sensors[0].minColor"></ngx-colors>
-        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].max" style="text-align: right;">
+          [(ngModel)]="copyWidgetData.sensors[0].minColor" style="margin-left: 10px;"></ngx-colors>
+        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].max" style="text-align: right; margin-left: 10px;">
           <div slot="label"><ion-text color="primary">Máximo:</ion-text></div>
-        </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+        </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" style="margin-left: 10px;"
           [(ngModel)]="copyWidgetData.sensors[0].maxColor"></ngx-colors>
       </ion-item>
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">

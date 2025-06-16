@@ -9,37 +9,88 @@
 
 
 <ion-content>
-  <p-table [value]="users.items" stripedRows selectionMode="multiple" [(selection)]="selectedItems" dataKey="user_id"
-    [tableStyle]="{ 'min-width': '30rem' }">
-    <ng-template #header>
-      <tr>
-        <th style="width: 4rem">
-          <p-tableHeaderCheckbox />
-        </th>
-        <th pSortableColumn="name"> Nombre <p-sortIcon field="name" /> </th>
-        <th pSortableColumn="role"> Rol <p-sortIcon field="role" /> </th>
-        <th pSortableColumn="email"> Email <p-sortIcon field="email" /> </th>
-        <th pSortableColumn="type"> Tipo <p-sortIcon field="type" /> </th>
-        <th style="width: 4rem">Acciones</th>
-      </tr>
-    </ng-template>
-    <ng-template #body let-item let-rowIndex="rowIndex">
-      <tr>
-        <td>
-          <p-tableCheckbox [value]="item" />
-        </td>
-        <td>{{ item.name }}</td>
-        <td>{{ item.role }}</td>
-        <td>{{ item.email }}</td>
-        <td>{{ item.type }}</td>
-        <td>
-          <ion-buttons>
-            <ion-button>
-              <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+
+  <div class="regions-wrapper">
+    <!-------------------------- Region FUSION ------------------------------------>
+    <div class="region-container">
+      <div class="region-header" style="background-color: var(--ion-color-primary)">
+        <ion-icon name="people-outline"></ion-icon>
+        <span>Tabla de usuarios</span>
+        <!--ion-button size="small" color="primary" (click)="UploadOrganization()">CARGAR
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button-->
+      </div>
+      <p-table #dtUsers [value]="users.items" stripedRows selectionMode="multiple" [(selection)]="selectedItems"
+        dataKey="user_id" [tableStyle]="{ 'min-width': '30rem' }" styleClass="card-table-primeng" [size]="'small'"
+        [rowHover]="true" [rows]="rowsPerPage" [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions"
+        [paginator]="true" [filterDelay]="0" [alwaysShowPaginator]="true"
+        [globalFilterFields]="['name', 'role', 'email']"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos">
+        <ng-template pTemplate="caption">
+          <div class="table-caption">
+            <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearFilter(dtUsers)" />
+
+            <div></div> <!-- Spacer -->
+            <p-iconField iconPosition="left">
+              <p-inputIcon>
+                <i class="pi pi-search"></i>
+              </p-inputIcon>
+              <input pInputText type="text" [(ngModel)]="searchValueUsers" (input)="OnFilterGlobal($event, dtUsers)"
+                placeholder="Buscar" />
+            </p-iconField>
+          </div>
+        </ng-template>
+        <ng-template #header>
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox />
+            </th>
+            <th pSortableColumn="name">
+              <div class="flex justify-between items-center">Nombre <p-sortIcon field="name" />
+                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="role">
+              <div class="flex justify-between items-center">Rol <p-sortIcon field="role" />
+                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="email">
+              <div class="flex justify-between items-center">Email <p-sortIcon field="email" />
+                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="type">
+              <div class="flex justify-between items-center">Tipo <p-sortIcon field="type" />
+                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th style="width: 4rem">
+              <div class="flex justify-between items-center">Acciones
+                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-item let-rowIndex="rowIndex">
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="item" />
+            </td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.role }}</td>
+            <td>{{ item.email }}</td>
+            <td>{{ item.type }}</td>
+            <td>
+              <ion-buttons>
+                <ion-button>
+                  <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
 </ion-content>

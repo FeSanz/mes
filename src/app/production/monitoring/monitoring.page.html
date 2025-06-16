@@ -71,12 +71,14 @@
                 {{ mach.machine_name }}
               </ion-select-option>
             </ion-select>
-            <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating" (ionChange)="ChangeSensor(sensor)">
+            <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating"
+              (ionChange)="ChangeSensor(sensor)">
               <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
                 {{ s.sensor_name }}
               </ion-select-option>
             </ion-select>
-            <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge'"
+            <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+              *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge'"
               [(ngModel)]="sensor.color"></ngx-colors>
           </ion-item>
           <ion-item-options side="end"
@@ -89,11 +91,12 @@
             <ion-input type="text" placeholder="" [(ngModel)]="sensor.min" style="text-align: right;">
               <div slot="label"><ion-text color="primary">Mínimo:</ion-text></div>
             </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
-              [(ngModel)]="sensor.minColor"></ngx-colors>
-            <ion-input type="text" placeholder="" [(ngModel)]="sensor.max" style="text-align: right;">
+              [(ngModel)]="sensor.minColor" style="margin-left: 10px;"></ngx-colors>
+            <ion-input type="text" placeholder="" [(ngModel)]="sensor.max"
+              style="text-align: right; margin-left: 10px;">
               <div slot="label"><ion-text color="primary">Máximo:</ion-text></div>
             </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
-              [(ngModel)]="sensor.maxColor"></ngx-colors>
+              [(ngModel)]="sensor.maxColor" style="margin-left: 10px;"></ngx-colors>
           </ion-item>
         </ion-item-sliding>
         <ion-item lines="none">
