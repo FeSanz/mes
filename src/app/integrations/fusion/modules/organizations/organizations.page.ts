@@ -119,6 +119,10 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
         return !dbOrganizationIds.has(String(fusionItem.OrganizationId));
       });
+    }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
+      if(this.fusionOriginalData.items) {
+        this.fusionData = JSON.parse(JSON.stringify(this.fusionOriginalData));
+      }
     }
   }
 

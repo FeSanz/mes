@@ -1,6 +1,6 @@
 <ion-header [translucent]="true" xmlns="http://www.w3.org/1999/html">
   <ion-toolbar>
-    <ion-title>Turnos</ion-title>
+    <ion-title>Máquinas</ion-title>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -9,26 +9,28 @@
 
 <ion-content>
   <div class="card-select flex flex-wrap justify-center items-end gap-4">
-  <p-floatlabel class="w-full md:w-56" variant="on">
-    <p-select [(ngModel)]="organizationSelected"
-              inputId="on_label"
-              [options]="dbOrganizations.items"
-              optionLabel="Name"
-              optionValue="OrganizationId"
-              placeholder="Seleccione una organización"
-              styleClass="w-full"
-              [virtualScroll]="true"
-              [virtualScrollItemSize]="38"
-              (onChange)="OnOrganizationSelected()" />
-    <label for="on_label">Organización</label>
-  </p-floatlabel>
+    <p-floatlabel class="w-full md:w-56" variant="on">
+      <p-select [(ngModel)]="organizationSelected"
+                inputId="organization_select"
+                [options]="dbOrganizations.items"
+                optionLabel="Name"
+                [filter]="true"
+                filterBy="Name"
+                optionValue="OrganizationId"
+                placeholder="Seleccione una organización"
+                styleClass="w-full"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="38"
+                (onChange)="OnOrganizationSelected()" />
+      <label for="organization_select">Organización</label>
+    </p-floatlabel>
   </div>
   <div class="regions-wrapper">
     <!-------------------------- Region FUSION ------------------------------------>
-    <div class="region-container">
+    <div class="region-container" #regionContainer>
       <div class="region-header" style="background-color: #fd5d93">
         <ion-icon name="cloud-outline"></ion-icon>
-        <span>Turnos Fusion</span>
+        <span>Recursos Fusion</span>
         <ion-button size="small" color="primary" (click)="UploadShifts()">CARGAR
           <ion-icon slot="end" name="arrow-forward"></ion-icon>
         </ion-button>
@@ -38,19 +40,20 @@
                [(selection)]="selectedItemsFusion"
                dataKey="Name"
                styleClass="card-table-primeng"
-               [tableStyle]="{ 'min-width': '50rem' }"
+               [tableStyle]="{ 'min-width': '50rem','height': '100%'}"
                [size]="'small'"
                [rowHover]="true"
-               [rows]="25"
+               [rows]="rowsPerPage"
                [showCurrentPageReport]="true"
-               [rowsPerPageOptions]="[10, 25, 50]"
+               [rowsPerPageOptions]="rowsPerPageOptions"
                [paginator]="true"
                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
                [filterDelay]="0"
                [globalFilterFields]="['Name', 'StartTime', 'EndTime', 'Duration']"
                stripedRows
                [scrollable]="true"
-               scrollHeight="550px"
+               [scrollHeight]="GetScrollHeight()"
+               [alwaysShowPaginator]="true"
       >
         <ng-template #caption>
           <div class="table-caption">
@@ -81,26 +84,26 @@
             </th>
             <th pSortableColumn="Name" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Turno
+                Nombre
                 <p-sortIcon field="Name" />
                 <p-columnFilter type="text" field="Name" display="menu" class="ml-auto" />
               </div>
             </th>
             <th pSortableColumn="StartTime" style="min-width: 6rem">
               <div class="flex justify-between items-center">
-                Hora Inicio
+                Inicio
                 <p-sortIcon field="StartTime" />
                 <p-columnFilter type="text" field="StartTime" display="menu" class="ml-auto" />
               </div>
             </th>
             <th pSortableColumn="EndTime" style="min-width: 6rem">
               <div class="flex justify-between items-center">
-                Hora Fin
+                Fin
                 <p-sortIcon field="EndTime" />
                 <p-columnFilter field="EndTime" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
-            <th pSortableColumn="Duration" style="min-width: 4rem">
+            <th pSortableColumn="Duration" style="min-width: 6rem">
               <div class="flex justify-between items-center">
                 Duración
                 <p-sortIcon field="Duration" />
@@ -122,7 +125,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="5">No se encontraron turnos.</td>
+            <td colspan="5">No se encontraron recursos.</td>
           </tr>
         </ng-template>
       </p-table>
@@ -133,8 +136,8 @@
     <div class="region-container">
       <div class="region-header" style="background-color: #00bf9a">
         <ion-icon name="server-outline"></ion-icon>
-        <span>Turnos DB</span>
-        <ion-button size="small" color="danger" (click)="DeleteShifts()">ELIMINAR
+        <span>Recursos DB</span>
+        <ion-button size="small" color="danger" (click)="DeleteShits()">ELIMINAR
           <ion-icon slot="end" name="trash"></ion-icon>
         </ion-button>
       </div>
@@ -146,16 +149,17 @@
                [tableStyle]="{ 'min-width': '50rem'}"
                [size]="'small'"
                [rowHover]="true"
-               [rows]="25"
+               [rows]="rowsPerPage"
                [showCurrentPageReport]="true"
-               [rowsPerPageOptions]="[10, 25, 50]"
+               [rowsPerPageOptions]="rowsPerPageOptions"
                [paginator]="true"
                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
                [filterDelay]="0"
                [globalFilterFields]="['Code', 'Name', 'Location']"
                stripedRows
                [scrollable]="true"
-               scrollHeight="550px"
+               [scrollHeight]="GetScrollHeight()"
+               [alwaysShowPaginator]="true"
       >
         <ng-template pTemplate="caption">
           <div class="table-caption">
@@ -201,18 +205,11 @@
                 <p-columnFilter type="text" field="Name" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="Location" style="min-width: 10rem">
+            <th pSortableColumn="Class" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Ubicación
-                <p-sortIcon field="Location" />
-                <p-columnFilter field="Location" matchMode="equals" display="menu" class="ml-auto"/>
-              </div>
-            </th>
-            <th style="min-width: 12rem">
-              <div class="flex justify-between items-center">
-                Manufactura
-                <p-sortIcon field="WorkMethod" />
-                <p-columnFilter field="WorkMethod" matchMode="equals" display="menu" class="ml-auto"/>
+                Clase
+                <p-sortIcon field="Class" />
+                <p-columnFilter field="Class" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
           </tr>
@@ -224,8 +221,7 @@
             </td>
             <td>{{ item.Code }}</td>
             <td>{{ item.Name }}</td>
-            <td>{{ item.Location }}</td>
-            <td>{{ item.WorkMethod || 'N/A' }}</td>
+            <td>{{ item.Class }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

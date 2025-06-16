@@ -1,15 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, ChangeDetectorRef  } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader, IonIcon,
-  IonMenuButton,
-  IonTitle,
-  IonToolbar
-} from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle,
+         IonToolbar } from '@ionic/angular/standalone';
 
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
@@ -25,16 +18,10 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
-
 import { Select } from 'primeng/select';
 import { FloatLabel } from "primeng/floatlabel"
-import {IftaLabel} from "primeng/iftalabel";
 
-import {
-  closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
-} from 'ionicons/icons';
-
-
+import { closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-resources',
@@ -44,7 +31,7 @@ import {
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
     IonButton, IonIcon,
     TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, DropdownModule,
-    MultiSelectModule, Select, FloatLabel, IftaLabel]
+    MultiSelectModule, Select, FloatLabel]
 })
 export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
@@ -135,7 +122,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
           this.fusionData = JSON.parse(response);
           this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
 
-         this.FilterRegisteredItems();
+          this.FilterRegisteredItems();
         });
       });
     }
@@ -154,6 +141,10 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
         return !dbResourcesIds.has(String(fusionItem.ResourceId));
       });
+    }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
+      if(this.fusionOriginalData.items) {
+        this.fusionData = JSON.parse(JSON.stringify(this.fusionOriginalData));
+      }
     }
   }
 
@@ -211,7 +202,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
           const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('organizations/' + item.OrganizationId)
+            this.endPoints.Render('resourceMachines/' + item.MachineId),
           );
 
           if (!response.errorsExistFlag) {
@@ -219,7 +210,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
           }
         }
 
-        this.alerts.Success(`Organizaciones eliminadas [${successCount}/ ${this.selectedItemsDB.length}]`);
+        this.alerts.Success(`Eliminados exitosamente [${successCount}/ ${this.selectedItemsDB.length}]`);
 
         // Recargar la página solo si hubo eliminaciones exitosas
         if (successCount > 0) {
@@ -229,8 +220,8 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
       } catch (error) {
-        console.error('Error al eliminar organizaciones:', error);
-        this.alerts.Error('Error al eliminar las organizaciones');
+        console.error('Error al eliminar:', error);
+        this.alerts.Error('Error al eliminar');
       }
     }
   }

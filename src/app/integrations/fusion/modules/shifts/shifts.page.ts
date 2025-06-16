@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef,  AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar
-} from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle,
+  IonToolbar } from '@ionic/angular/standalone';
 
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
+import {HeightTable} from "../../../../models/tables.prime";
 import {addIcons} from "ionicons";
 
 import { TableModule } from 'primeng/table';
@@ -18,13 +18,11 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
-
 import { Select } from 'primeng/select';
 import { FloatLabel } from "primeng/floatlabel"
 
-import {
-  closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
-} from 'ionicons/icons';
+import { closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline } from 'ionicons/icons';
+
 
 @Component({
   selector: 'app-shifts',
@@ -36,18 +34,30 @@ import {
   TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,DropdownModule,
   MultiSelectModule, Select, FloatLabel ]
 })
-export class ShiftsPage implements OnInit {
+export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
+  private resizeObserver!: ResizeObserver;
+  scrollHeight: string = '550px';
+  rowsPerPage: number = 50;
+  rowsPerPageOptions: number[] = [10, 25, 50];
+
+  fusionOriginalData: any = {};
   fusionData: any = {};
   dbData: any = {};
 
   dbOrganizations: any = {};
   organizationSelected: string = '';
 
+  workCenters: any = {};
+  workCenterSelected: string | any = '';
+
   selectedItemsFusion: any[] = [];
   selectedItemsDB: any[] = [];
 
   searchValueFusion: string = '';
   searchValueDB: string = '';
+
 
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
@@ -57,45 +67,80 @@ export class ShiftsPage implements OnInit {
     });
   }
 
+
   ngOnInit() {
     this.GetOrganizationsRender();
   }
 
+  ngAfterViewInit() {
+    this.ObserveResize();
+  }
+
+  ngOnDestroy() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+  }
+
+  ObserveResize() {
+    if (this.regionContainer) {
+      this.resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          this.scrollHeight = HeightTable(entry.contentRect.height);
+        }
+      });
+
+      this.resizeObserver.observe(this.regionContainer.nativeElement);
+    }
+  }
+
+  GetScrollHeight(): string {
+    return this.scrollHeight;
+  }
+
   GetOrganizationsRender(){
     this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
-      console.log(response);
-      this.dbOrganizations = { ...response };
+      this.dbOrganizations = response;
     });
   }
 
   OnOrganizationSelected() {
     if(this.organizationSelected) {
-      this.GetShifts();
+      let clause = `shifts/${this.organizationSelected}`;
+      this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+        response.totalResults == 0 && this.alerts.Warning(response.message);
+        this.dbData = response;
+
+        this.apiService.GetRequestFusion(this.endPoints.Path('shifts')).then((response: any) => {
+          this.fusionData = JSON.parse(response);
+          this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
+
+          this.FilterRegisteredItems();
+        });
+      });
     }
   }
 
-  GetShifts(){
-    this.apiService.GetRequestFusion(this.endPoints.Path('shifts')).then((response: any) => {
-      const data = JSON.parse(response);
-      this.fusionData = { ...data };
-
-      // Inicializar propiedad selected para FUSION (solo items filtrados)
-      if (this.fusionData.items) {
-        this.fusionData.items = this.fusionData.items.map((item: any) => ({
-          ...item,
-          selected: false
-        }));
-      }
-    });
-  }
-
-  //Metodo para manejar el filtro global
   OnFilterGlobal(event: Event, table: any) {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
   }
 
-  //Metodo para cargar organizaciones seleccionadas de FUSION
+  FilterRegisteredItems() {
+    if (this.fusionOriginalData.items && this.dbData.items) {
+      // Set de ID's para filtrar posteriormente
+      const dbResourcesIds = new Set(this.dbData.items.map((item: any) => String(item.MachineId)));
+      // Filtrar items de fusion que no estén en DB
+      this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
+        return !dbResourcesIds.has(String(fusionItem.ResourceId));
+      });
+    }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
+      if(this.fusionOriginalData.items) {
+        this.fusionData = JSON.parse(JSON.stringify(this.fusionOriginalData));
+      }
+    }
+  }
+
   UploadShifts() {
     if (this.fusionData.items) {
 
@@ -104,39 +149,37 @@ export class ShiftsPage implements OnInit {
         return;
       }
 
-      console.log('Fusion:', this.selectedItemsFusion);
-
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        OrganizationId: item.OrganizationId,
-        Code: item.OrganizationCode,
-        Name: item.OrganizationName,
-        Location: item.LocationCode,
-        WorkMethod: item.plantParameters.items[0].DefaultWorkMethod,
-        BUId: item.ManagementBusinessUnitId
+        MachineId: item.ResourceId,
+        OrganizationId: this.organizationSelected,
+        Code: item.ResourceCode,
+        Name: item.ResourceName,
+        WorkCenterId: this.workCenterSelected.WorkCenterId,
+        WorkCenter: this.workCenterSelected.WorkCenterName,
+        Class: item.ResourceClassCode,
+        Token: null
       }));
 
       const payload = {
         items: itemsData
       };
 
-      this.apiService.PostRequestRender(this.endPoints.Render('organizations'), payload).then(async (response: any) => {
+      this.apiService.PostRequestRender(this.endPoints.Render('resourceMachines'), payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
           this.alerts.Info(response.message);
         }else {
           this.alerts.Success(response.message);
 
           setTimeout(() => {
-            window.location.reload();
-          }, 3000);
+            this.RefreshTables();
+          }, 1500);
 
         }
       });
-
     }
   }
 
-  //Metodo para eliminar organizaciones seleccionadas de DB
-  async DeleteShifts() {
+  async DeleteShits() {
     if (this.dbData.items) {
 
       if (this.selectedItemsDB.length === 0) {
@@ -152,7 +195,7 @@ export class ShiftsPage implements OnInit {
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
           const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('organizations/' + item.OrganizationId)
+            this.endPoints.Render('resourceMachines/' + item.MachineId),
           );
 
           if (!response.errorsExistFlag) {
@@ -160,18 +203,18 @@ export class ShiftsPage implements OnInit {
           }
         }
 
-        this.alerts.Success(`Organizaciones eliminadas [${successCount}/ ${this.selectedItemsDB.length}]`);
+        this.alerts.Success(`Eliminados exitosamente [${successCount}/ ${this.selectedItemsDB.length}]`);
 
         // Recargar la página solo si hubo eliminaciones exitosas
         if (successCount > 0) {
           setTimeout(() => {
-            window.location.reload();
-          }, 3000);
+            this.RefreshTables();
+          }, 1500);
         }
 
       } catch (error) {
-        console.error('Error al eliminar organizaciones:', error);
-        this.alerts.Error('Error al eliminar las organizaciones');
+        console.error('Error al eliminar:', error);
+        this.alerts.Error('Error al eliminar');
       }
     }
   }
@@ -186,4 +229,22 @@ export class ShiftsPage implements OnInit {
     this.searchValueDB = '';
   }
 
+  RefreshTables() {
+    let clause = `resourceMachines/${this.organizationSelected}/${this.workCenterSelected.WorkCenterId}`;
+    this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+      response.totalResults == 0 && this.alerts.Warning(response.message);
+      this.dbData = response;
+
+      this.FilterRegisteredItems();
+    });
+
+    // Limpiar valores de búsqueda
+    this.searchValueFusion = '';
+    this.searchValueDB = '';
+
+    // Limpiar selecciones
+    this.selectedItemsFusion = [];
+    this.selectedItemsDB = [];
+
+  }
 }

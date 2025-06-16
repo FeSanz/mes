@@ -1,13 +1,258 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" xmlns="http://www.w3.org/1999/html">
   <ion-toolbar>
-    <ion-title>items</ion-title>
+    <ion-title>Artículos Producción</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">items</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <div class="card-select flex flex-wrap justify-center items-end gap-4">
+    <p-floatlabel class="w-full md:w-56" variant="on">
+      <p-select [(ngModel)]="organizationSelected"
+                inputId="organization_select"
+                [options]="dbOrganizations.items"
+                optionLabel="Name"
+                [filter]="true"
+                filterBy="Name"
+                optionValue="OrganizationId"
+                placeholder="Seleccione una organización"
+                styleClass="w-full"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="38"
+                (onChange)="OnOrganizationSelected()" />
+      <label for="organization_select">Organización</label>
+    </p-floatlabel>
+
+    <p-floatlabel class="w-full md:w-56" variant="on">
+      <p-select [(ngModel)]="itemTypeSelected"
+                inputId="itemtype_select"
+                [options]="itemType.items"
+                optionLabel="Meaning"
+                [filter]="true"
+                filterBy="Meaning"
+                placeholder="Seleccione un tipo de artículo"
+                styleClass="w-full"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="38"
+                (onChange)="OnItemTypeSelected()"/>
+      <label for="itemtype_select">Tipo de artículo</label>
+    </p-floatlabel>
+  </div>
+  <div class="regions-wrapper">
+    <!-------------------------- Region FUSION ------------------------------------>
+    <div class="region-container" #regionContainer>
+      <div class="region-header" style="background-color: #fd5d93">
+        <ion-icon name="cloud-outline"></ion-icon>
+        <span>Artículos Fusion</span>
+        <ion-button size="small" color="primary" (click)="UploadItems()">CARGAR
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+      </div>
+      <p-table #dtFusion
+               [value]="fusionData.items"
+               [(selection)]="selectedItemsFusion"
+               dataKey="ItemNumber"
+               styleClass="card-table-primeng"
+               [tableStyle]="{ 'min-width': '50rem','height': '100%'}"
+               [size]="'small'"
+               [rowHover]="true"
+               [rows]="rowsPerPage"
+               [showCurrentPageReport]="true"
+               [rowsPerPageOptions]="rowsPerPageOptions"
+               [paginator]="true"
+               currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+               [filterDelay]="0"
+               [globalFilterFields]="['ItemNumber', 'ItemDescription', 'PrimaryUOMValue', 'LotControlValue']"
+               stripedRows
+               [scrollable]="true"
+               [scrollHeight]="GetScrollHeight()"
+               [alwaysShowPaginator]="true"
+      >
+        <ng-template #caption>
+          <div class="table-caption">
+            <p-button
+              [outlined]="true"
+              icon="pi pi-filter-slash"
+              label="Limpiar"
+              (click)="ClearFusion(dtFusion)" />
+
+            <div></div> <!-- Spacer -->
+
+            <p-iconField iconPosition="left">
+              <p-inputIcon>
+                <i class="pi pi-search"></i>
+              </p-inputIcon>
+              <input pInputText type="text"
+                     [(ngModel)]="searchValueFusion"
+                     (input)="OnFilterGlobal($event, dtFusion)"
+                     placeholder="Buscar" />
+            </p-iconField>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox/>
+            </th>
+            <th pSortableColumn="ItemNumber" style="min-width: 6rem">
+              <div class="flex justify-between items-center">
+                Producto
+                <p-sortIcon field="ItemNumber" />
+                <p-columnFilter type="text" field="ItemNumber" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="ItemDescription" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Descripción
+                <p-sortIcon field="ItemDescription" />
+                <p-columnFilter type="text" field="ItemDescription" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="PrimaryUOMValue" style="min-width: 6rem">
+              <div class="flex justify-between items-center">
+                UoM
+                <p-sortIcon field="PrimaryUOMValue" />
+                <p-columnFilter field="PrimaryUOMValue" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="LotControlValue" style="min-width: 6rem">
+              <div class="flex justify-between items-center">
+                Lote
+                <p-sortIcon field="LotControlValue" />
+                <p-columnFilter field="LotControlValue" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="item"/>
+            </td>
+            <td>{{ item.ItemNumber }}</td>
+            <td>{{ item.ItemDescription }}</td>
+            <td>{{ item.PrimaryUOMValue }}</td>
+            <td>{{ LotControlDisplay(item.LotControlValue) }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">No se encontraron recursos.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+
+    <!-------------------------- Region DB ------------------------------------>
+    <div class="region-container">
+      <div class="region-header" style="background-color: #00bf9a">
+        <ion-icon name="server-outline"></ion-icon>
+        <span>Artículos DB</span>
+        <ion-button size="small" color="danger" (click)="DeleteItems()">ELIMINAR
+          <ion-icon slot="end" name="trash"></ion-icon>
+        </ion-button>
+      </div>
+      <p-table #dtDB
+               [value]="dbData.items"
+               [(selection)]="selectedItemsDB"
+               dataKey="Number"
+               styleClass="card-table-primeng"
+               [tableStyle]="{ 'min-width': '50rem'}"
+               [size]="'small'"
+               [rowHover]="true"
+               [rows]="rowsPerPage"
+               [showCurrentPageReport]="true"
+               [rowsPerPageOptions]="rowsPerPageOptions"
+               [paginator]="true"
+               currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+               [filterDelay]="0"
+               [globalFilterFields]="['Number', 'Description', 'UoM', 'LotControl']"
+               stripedRows
+               [scrollable]="true"
+               [scrollHeight]="GetScrollHeight()"
+               [alwaysShowPaginator]="true"
+      >
+        <ng-template pTemplate="caption">
+          <div class="table-caption">
+            <p-button
+              [outlined]="true"
+              icon="pi pi-filter-slash"
+              label="Limpiar"
+              (click)="ClearDB(dtDB)"/>
+
+            <div></div> <!-- Spacer -->
+
+            <p-iconField iconPosition="left">
+              <p-inputIcon>
+                <i class="pi pi-search"></i>
+              </p-inputIcon>
+              <input
+                pInputText
+                type="text"
+                [(ngModel)]="searchValueDB"
+                (input)="OnFilterGlobal($event, dtDB)"
+                placeholder="Buscar"
+                style="width: 250px;" />
+            </p-iconField>
+          </div>
+        </ng-template >
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox/>
+            </th>
+            <th pSortableColumn="Number" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Producto
+                <p-sortIcon field="Number" />
+                <p-columnFilter type="text" field="Number" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="Description" style="min-width: 14rem">
+              <div class="flex justify-between items-center">
+                Descripción
+                <p-sortIcon field="Description" />
+                <p-columnFilter type="text" field="Description" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="UoM" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                UoM
+                <p-sortIcon field="UoM" />
+                <p-columnFilter field="UoM" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="LotControl" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Lote
+                <p-sortIcon field="LotControl" />
+                <p-columnFilter field="LotControl" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="item"/>
+            </td>
+            <td>{{ item.Number }}</td>
+            <td>{{ item.Description }}</td>
+            <td>{{ item.UoM }}</td>
+            <td>{{ item.LotControl }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">No se encontraron organizaciones.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
 </ion-content>
