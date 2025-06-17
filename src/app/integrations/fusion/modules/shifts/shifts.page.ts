@@ -49,9 +49,6 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
   dbOrganizations: any = {};
   organizationSelected: string = '';
 
-  workCenters: any = {};
-  workCenterSelected: string | any = '';
-
   selectedItemsFusion: any[] = [];
   selectedItemsDB: any[] = [];
 
@@ -114,8 +111,6 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
         this.apiService.GetRequestFusion(this.endPoints.Path('shifts')).then((response: any) => {
           this.fusionData = JSON.parse(response);
           this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
-
-          this.FilterRegisteredItems();
         });
       });
     }
@@ -124,21 +119,6 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
   OnFilterGlobal(event: Event, table: any) {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
-  }
-
-  FilterRegisteredItems() {
-    if (this.fusionOriginalData.items && this.dbData.items) {
-      // Set de ID's para filtrar posteriormente
-      const dbResourcesIds = new Set(this.dbData.items.map((item: any) => String(item.MachineId)));
-      // Filtrar items de fusion que no estén en DB
-      this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
-        return !dbResourcesIds.has(String(fusionItem.ResourceId));
-      });
-    }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
-      if(this.fusionOriginalData.items) {
-        this.fusionData = JSON.parse(JSON.stringify(this.fusionOriginalData));
-      }
-    }
   }
 
   UploadShifts() {
@@ -150,21 +130,20 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        MachineId: item.ResourceId,
-        OrganizationId: this.organizationSelected,
-        Code: item.ResourceCode,
-        Name: item.ResourceName,
-        WorkCenterId: this.workCenterSelected.WorkCenterId,
-        WorkCenter: this.workCenterSelected.WorkCenterName,
-        Class: item.ResourceClassCode,
-        Token: null
+        ShiftId: item.ShiftId,
+        Name: item.Name,
+        StartTime: item.StartTime,
+        EndTime: item.EndTime,
+        Duration: item.Duration,
+        EnabledFlag: 'Y'
       }));
 
       const payload = {
+        OrganizationId: this.organizationSelected,
         items: itemsData
       };
 
-      this.apiService.PostRequestRender(this.endPoints.Render('resourceMachines'), payload).then(async (response: any) => {
+      this.apiService.PostRequestRender(this.endPoints.Render('shifts'), payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
           this.alerts.Info(response.message);
         }else {
@@ -194,8 +173,9 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
 
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
+          console.log('Deleting...', item.OrgShiftId);
           const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('resourceMachines/' + item.MachineId),
+            this.endPoints.Render('shifts/' + item.OrgShiftId),
           );
 
           if (!response.errorsExistFlag) {
@@ -230,12 +210,11 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   RefreshTables() {
-    let clause = `resourceMachines/${this.organizationSelected}/${this.workCenterSelected.WorkCenterId}`;
+    let clause = `shifts/${this.organizationSelected}`;
     this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
 
-      this.FilterRegisteredItems();
     });
 
     // Limpiar valores de búsqueda
