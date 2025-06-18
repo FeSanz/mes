@@ -137,7 +137,7 @@ export class ChartsComponent implements OnInit {
     const now = new Date();
     const nowDate = now.toISOString().slice(0, 19); // "YYYY-MM-DDTHH:mm:ss"
     const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    midnight.setDate(midnight.getDate() - 3);
+    midnight.setDate(midnight.getDate() - 5);
     const result = midnight.toISOString().slice(0, 19);
     const sensors = this.widgetData.sensors;
     const sensorIDsString = sensors.map((sensor: any) => sensor.sensor_id).join(',');//IDs separados por coma (,)

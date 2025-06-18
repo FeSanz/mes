@@ -53,7 +53,6 @@ export class AppComponent {
       statsChartOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline,
       gitNetworkOutline
     })
-    this.platform.ready().then(() => {
       const theme = localStorage.getItem('theme');
       if (theme == null) {
         const prefersDark = window.matchMedia('(prefers-color-scheme: light)');
@@ -63,7 +62,6 @@ export class AppComponent {
         this.darkMode = theme == 'true' ? true : false;
         document.body.classList.toggle('dark', this.darkMode);
       }
-    })
   }
 
 
