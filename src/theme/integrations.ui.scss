@@ -48,6 +48,10 @@
   flex-shrink: 0;
 }
 
+.mfg-label {
+  margin-right: auto; /* Esto empuja el elemento a la izquierda */
+}
+
 /***********************+* Responsividad ***********************+*/
 
 @media (max-width: 1024px) {
