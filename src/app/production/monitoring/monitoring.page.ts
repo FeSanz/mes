@@ -57,30 +57,6 @@ export class MonitoringPage implements OnInit {
     widgetType: "",
     chartType: ""
   }
-  refreshData = false
-  splineData: any = {
-    series: [
-      {
-        name: "Ventas",
-        data: [31, 40, 1, 51, 42, 7, 79]
-      },
-      {
-        name: "Ventas 2",
-        data: [31, 40, 28, 47, 42, 109, 100]
-      }
-    ],
-    //title: "Mi gráfico de líneas",
-    categories: [//Solo formato de fechas
-      "2018-09-19T00:00:00.000Z",
-      "2018-09-19T01:30:00.000Z",
-      "2018-09-19T02:30:00.000Z",
-      "2018-09-19T03:30:00.000Z",
-      "2018-09-19T04:30:00.000Z",
-      "2018-09-19T05:30:00.000Z",
-      "2018-09-19T06:30:00.000Z"],
-    type: "area"
-    //tooltipFormat: "MMM yyyy"
-  };
   user = "1"
   widgets: any = []
   machines: any = []
@@ -101,7 +77,7 @@ export class MonitoringPage implements OnInit {
   }
   GetDasboards() {
     this.api.GetRequestRender(this.endPoints.Render('dashboards/1')).then((response: any) => {
-
+      console.log(response);
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
         id: item.dashboard_id,

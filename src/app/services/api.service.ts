@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {Capacitor, CapacitorHttp, HttpResponse} from '@capacitor/core';
-import {AlertsService} from "./alerts.service";
+import { Injectable } from '@angular/core';
+import { Capacitor, CapacitorHttp, HttpResponse } from '@capacitor/core';
+import { AlertsService } from "./alerts.service";
 
 
 @Injectable({
@@ -11,7 +11,7 @@ export class ApiService {
   credentials: string = '';
   offset: number = 0;
 
-  constructor(public alerts:AlertsService) {
+  constructor(public alerts: AlertsService) {
     this.credentials = String(localStorage.getItem('credentials'));
   }
   /******************* HttpRequest FUSION Capacitor *******************/
@@ -103,7 +103,7 @@ export class ApiService {
       const response: HttpResponse = await CapacitorHttp.get(options);
       return response.status;
     }
-    catch (error:any) {
+    catch (error: any) {
       console.log('Error:', error);
       if (error?.status) {
         return error.status;
@@ -121,23 +121,28 @@ export class ApiService {
 
   /******************* HttpRequest RENDER Capacitor *******************/
 
-  async GetRequestRender(endPoint: string, show : boolean = true) {
-    !show || await this.alerts.ShowLoading();
+  async GetRequestRender(endPoint: string, show: boolean = true) {
+    console.log(1);
     try {
+      //console.log(2);
+      //if (show) await this.alerts.ShowLoading();
+      console.log(3);
       const options = {
         url: endPoint,
-        headers: {'Content-Type': 'application/json'}
+        headers: { 'Content-Type': 'application/json' }
       };
       const response: HttpResponse = await CapacitorHttp.get(options);
       this.RequestStatusCode(response.status);
+      console.log(4);
       return response.data;
-
     } catch (error: any) {
+      console.log(5);
       console.log('Error (PG):', error);
       await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
       return null;
     } finally {
-      !show || await this.alerts.HideLoading();
+      console.log(6);
+      //show ? await this.alerts.HideLoading() : null
     }
   }
 
@@ -146,7 +151,7 @@ export class ApiService {
     try {
       const options = {
         url: endPoint,
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         data: payload
       };
       const response: HttpResponse = await CapacitorHttp.post(options);
@@ -167,7 +172,7 @@ export class ApiService {
     try {
       const options = {
         url: endPoint,
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         data: payload
       };
       const response: HttpResponse = await CapacitorHttp.put(options);
@@ -187,7 +192,7 @@ export class ApiService {
     try {
       const options = {
         url: endPoint,
-        headers: {'Content-Type': 'application/json'}
+        headers: { 'Content-Type': 'application/json' }
       };
       const response: HttpResponse = await CapacitorHttp.delete(options);
       this.RequestStatusCode(response.status);
@@ -202,7 +207,7 @@ export class ApiService {
     }
   }
 
-  RequestStatusCode(statusCode: number){
+  RequestStatusCode(statusCode: number) {
     if (statusCode >= 200 && statusCode <= 202) {
       return;
     }
