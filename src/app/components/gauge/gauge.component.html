@@ -1,14 +1,12 @@
 <ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
-  <ion-card-header [ngStyle]="{'background': widgetData.color}">
-    <ion-toolbar style="--background: transparent;">
-      <ion-buttons slot="end">
-        <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
-          <ion-icon color="light" slot="icon-only" name="ellipsis-vertical"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-card-title color="light">{{widgetData.name}} </ion-card-title>
-    </ion-toolbar>
-  </ion-card-header>
+  <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
+    <ion-buttons slot="end">
+      <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
+        <ion-icon slot="icon-only" name="ellipsis-vertical" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-card-title [ngStyle]="{'color': widgetTextColor}">{{widgetData.name}} </ion-card-title>
+  </ion-toolbar>
 
   <ion-card-content>
     <div class="humidity-container">
@@ -116,10 +114,11 @@
           <div slot="label"><ion-text color="primary">Mínimo:</ion-text></div>
         </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
           [(ngModel)]="copyWidgetData.sensors[0].minColor" style="margin-left: 10px;"></ngx-colors>
-        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].max" style="text-align: right; margin-left: 10px;">
+        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].max"
+          style="text-align: right; margin-left: 10px;">
           <div slot="label"><ion-text color="primary">Máximo:</ion-text></div>
-        </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" style="margin-left: 10px;"
-          [(ngModel)]="copyWidgetData.sensors[0].maxColor"></ngx-colors>
+        </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+          style="margin-left: 10px;" [(ngModel)]="copyWidgetData.sensors[0].maxColor"></ngx-colors>
       </ion-item>
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
         <ion-fab-button (click)="updateChartDB()">

@@ -6,8 +6,9 @@
 }
 
 ion-select::part(label) {
-    color: var(--ion-color-primary);
+  color: var(--ion-color-primary);
 }
+
 canvas {
   width: 100% !important;
   height: 100% !important;
@@ -88,6 +89,7 @@ ion-select::part(label) {
   align-items: center;
   justify-content: space-between;
 }
+
 ion-card {
   min-height: 450.5px;
   --background: var(--ion-color-back-shade, #fff);
@@ -101,11 +103,23 @@ ion-card {
   }
 }
 
-ion-card-header {
-  padding: 0.5rem;
-  transition: background 0.3s ease;
+ion-toolbar {
+  padding-left: 0.5rem;
   flex-shrink: 0;
   position: relative;
+}
+
+.custom-toolbar {
+  color: white !important;
+  --color: white !important;
+
+  ion-icon {
+    color: white !important;
+  }
+
+  ion-button {
+    --color: white !important;
+  }
 }
 
 ion-card-title {

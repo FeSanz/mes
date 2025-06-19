@@ -1,14 +1,12 @@
 <ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
-  <ion-card-header [ngStyle]="{'background': widgetData.color}">
-    <ion-toolbar style="--background: transparent;">
-      <ion-buttons slot="end">
-        <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
-          <ion-icon color="light" slot="icon-only" name="ellipsis-vertical"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-card-title color="light">{{widgetData.name}} </ion-card-title>
-    </ion-toolbar>
-  </ion-card-header>
+  <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
+    <ion-buttons slot="end">
+      <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
+        <ion-icon slot="icon-only" name="ellipsis-vertical" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-card-title [ngStyle]="{'color': widgetTextColor}">{{widgetData.name}} </ion-card-title>
+  </ion-toolbar>
 
   <ion-card-content>
     <!-- ✅ LAYOUT CENTRADO CON TERMÓMETRO Y DISPLAY -->
@@ -31,17 +29,17 @@
           <g class="scale-marks">
 
             <!-- ✅ MARCA DE CERO (SOLO SI ESTÁ EN RANGO Y NO COINCIDE CON OTRAS) -->
-              <ng-container *ngIf="getZeroPosition() as zeroY">
-                <line x1="50" [attr.y1]="zeroY" x2="25" [attr.y2]="zeroY" stroke="#00BFFF" stroke-width="3" />
-                <text x="22" [attr.y]="zeroY + 5" fill="#00BFFF" font-size="12" text-anchor="end" font-weight="bold">
-                  0°C
-                </text>
+            <ng-container *ngIf="getZeroPosition() as zeroY">
+              <line x1="50" [attr.y1]="zeroY" x2="25" [attr.y2]="zeroY" stroke="#00BFFF" stroke-width="3" />
+              <text x="22" [attr.y]="zeroY + 5" fill="#00BFFF" font-size="12" text-anchor="end" font-weight="bold">
+                0°C
+              </text>
 
-                <line x1="90" [attr.y1]="zeroY" x2="115" [attr.y2]="zeroY" stroke="#00BFFF" stroke-width="3" />
-                <text x="118" [attr.y]="zeroY + 5" fill="#00BFFF" font-size="12" text-anchor="start" font-weight="bold">
-                  0°C
-                </text>
-              </ng-container>
+              <line x1="90" [attr.y1]="zeroY" x2="115" [attr.y2]="zeroY" stroke="#00BFFF" stroke-width="3" />
+              <text x="118" [attr.y]="zeroY + 5" fill="#00BFFF" font-size="12" text-anchor="start" font-weight="bold">
+                0°C
+              </text>
+            </ng-container>
 
             <!-- ✅ MARCA 1: MÁXIMO (100%) -->
             <ng-container>
@@ -133,12 +131,12 @@
                 [attr.fill]="getInterpolatedColor()" rx="12"></rect>
 
               <!-- Línea indicadora prominente -->
-              <line x1="25" [attr.y1]="indicatorY" x2="115" [attr.y2]="indicatorY"
-                [attr.stroke]="'#f02a03'" stroke-width="5"></line>
+              <line x1="25" [attr.y1]="indicatorY" x2="115" [attr.y2]="indicatorY" [attr.stroke]="'#f02a03'"
+                stroke-width="5"></line>
 
               <!-- Círculo indicador -->
-              <circle cx="70" [attr.cy]="indicatorY" r="7" [attr.fill]="'#f02a03'" stroke="white"
-                stroke-width="2"></circle>
+              <circle cx="70" [attr.cy]="indicatorY" r="7" [attr.fill]="'#f02a03'" stroke="white" stroke-width="2">
+              </circle>
             </ng-container>
           </ng-container>
 
@@ -226,10 +224,11 @@
           <div slot="label"><ion-text color="primary">Mínimo:</ion-text></div>
         </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
           [(ngModel)]="copyWidgetData.sensors[0].minColor" style="margin-left: 10px;"></ngx-colors>
-        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].max" style="text-align: right; margin-left: 10px;">
+        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].max"
+          style="text-align: right; margin-left: 10px;">
           <div slot="label"><ion-text color="primary">Máximo:</ion-text></div>
-        </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" style="margin-left: 10px;"
-          [(ngModel)]="copyWidgetData.sensors[0].maxColor"></ngx-colors>
+        </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+          style="margin-left: 10px;" [(ngModel)]="copyWidgetData.sensors[0].maxColor"></ngx-colors>
       </ion-item>
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
         <ion-fab-button (click)="updateChartDB()">

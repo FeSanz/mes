@@ -122,27 +122,21 @@ export class ApiService {
   /******************* HttpRequest RENDER Capacitor *******************/
 
   async GetRequestRender(endPoint: string, show: boolean = true) {
-    console.log(1);
     try {
-      //console.log(2);
-      //if (show) await this.alerts.ShowLoading();
-      console.log(3);
+      !show || await this.alerts.ShowLoading()
       const options = {
         url: endPoint,
         headers: { 'Content-Type': 'application/json' }
       };
       const response: HttpResponse = await CapacitorHttp.get(options);
       this.RequestStatusCode(response.status);
-      console.log(4);
       return response.data;
     } catch (error: any) {
-      console.log(5);
       console.log('Error (PG):', error);
       await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
       return null;
     } finally {
-      console.log(6);
-      //show ? await this.alerts.HideLoading() : null
+      !show || await this.alerts.HideLoading()
     }
   }
 

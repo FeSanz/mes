@@ -1,14 +1,12 @@
 <ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
-  <ion-card-header [ngStyle]="{'background': widgetData.color}">
-    <ion-toolbar style="--background: transparent;">
-      <ion-buttons slot="end">
-        <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
-          <ion-icon color="light" slot="icon-only" name="ellipsis-vertical"></ion-icon>
-        </ion-button>
-      </ion-buttons>
-      <ion-card-title color="light">{{widgetData.name}} </ion-card-title>
-    </ion-toolbar>
-  </ion-card-header>
+  <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
+    <ion-buttons slot="end">
+      <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
+        <ion-icon slot="icon-only" name="ellipsis-vertical" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-card-title [ngStyle]="{'color': widgetTextColor}">{{widgetData.name}} </ion-card-title>
+  </ion-toolbar>
   <ion-card-content>
     <apx-chart #splineChart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
       *ngIf="showChart" [stroke]="chartOptions.stroke" [tooltip]="chartOptions.tooltip"
@@ -69,7 +67,7 @@
               {{ s.sensor_name }}
             </ion-select-option>
           </ion-select>
-          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" style="margin-left: 10px;"
             [(ngModel)]="sensor.color"></ngx-colors>
         </ion-item>
         <ion-item-options side="end">

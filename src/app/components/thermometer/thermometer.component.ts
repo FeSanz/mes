@@ -1,15 +1,14 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges, EventEmitter, Output, ChangeDetectorRef, LOCALE_ID, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { BehaviorSubject, Observable, interval, Subscription } from 'rxjs';
-import { trigger, state, style, transition, animate } from '@angular/animations';
-import { IonicModule } from '@ionic/angular';
+import { Component, OnInit, Input, EventEmitter, Output, ChangeDetectorRef, LOCALE_ID, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { trigger, style, transition, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
 import { ellipsisVertical, pencilOutline, trashOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { FormsModule } from '@angular/forms';
-import { NgApexchartsModule } from 'ng-apexcharts';
 import { NgxColorsModule } from 'ngx-colors';
 
 export interface ThermoData {
@@ -20,21 +19,10 @@ export interface ThermoData {
   templateUrl: './thermometer.component.html',
   styleUrls: ['./thermometer.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule, NgApexchartsModule, IonicModule, NgxColorsModule/*, IonText, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal*/],
+  imports: [FormsModule, CommonModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
     { provide: LOCALE_ID, useValue: 'en-US' }
-  ],
-  animations: [
-    trigger('slideInOut', [
-      transition(':enter', [
-        style({ height: '0px', opacity: 0, overflow: 'hidden' }),
-        animate('300ms ease-in-out', style({ height: '*', opacity: 1 }))
-      ]),
-      transition(':leave', [
-        animate('300ms ease-in-out', style({ height: '0px', opacity: 0, overflow: 'hidden' }))
-      ])
-    ])
   ]
 })
 export class ThermometerComponent implements OnInit {
@@ -67,7 +55,7 @@ export class ThermometerComponent implements OnInit {
     this.remove.emit(this.widgetData.id);
   }
   editChart() {
-    
+
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
     console.log(this.copyWidgetData.widgetType);
     this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
@@ -270,5 +258,16 @@ export class ThermometerComponent implements OnInit {
     const indicatorY = bottomY - (clampedPercentage * (bottomY - topY));
 
     return Math.max(topY, Math.min(bottomY, indicatorY));
+  }
+  isDarkColor(hexColor: string): boolean {
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return luma < 128;
+  }
+  get widgetTextColor(): string {
+    return this.isDarkColor(this.widgetData.color) ? 'white' : 'black';
   }
 }

@@ -12,11 +12,11 @@ ion-card {
 }
 
 ion-select::part(label) {
-    color: var(--ion-color-primary);
+  color: var(--ion-color-primary);
 }
-ion-card-header {
-  padding: 0.5rem;
-  transition: background 0.3s ease;
+
+ion-toolbar {
+  padding-left: 0.5rem;
   flex-shrink: 0;
   position: relative;
 }
@@ -543,7 +543,7 @@ ion-card-title {
 
 // ✅ DARK THEME
 @media (prefers-color-scheme: dark) {
-  body.dark { 
+  body.dark {
     --thermometer-dark: #000000;
   }
 }

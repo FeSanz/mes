@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addCircleOutline, checkmarkOutline, copyOutline, documentOutline, flashOutline, hardwareChipOutline, speedometerOutline, sunnyOutline, thermometerOutline, trashOutline, waterOutline } from 'ionicons/icons';
+import { addCircleOutline, checkmarkOutline, copyOutline, documentOutline, flashOutline, hardwareChipOutline, speedometerOutline, sunnyOutline, thermometerOutline, trashOutline, waterOutline, ellipsisVertical, pencilOutline} from 'ionicons/icons';
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { Clipboard } from '@capacitor/clipboard';
@@ -15,7 +15,8 @@ import { EndpointsService } from 'src/app/services/endpoints.service';
   templateUrl: './devices.page.html',
   styleUrls: ['./devices.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule/*, IonContent, IonHeader, IonTitle, IonToolbar*/]
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class DevicesPage implements OnInit {
   machines: any = []
@@ -40,8 +41,10 @@ export class DevicesPage implements OnInit {
     addIcons({
       hardwareChipOutline,
       addCircleOutline,
+      pencilOutline,
       documentOutline,
       copyOutline,
+      ellipsisVertical,
       thermometerOutline,
       waterOutline,
       speedometerOutline,
@@ -190,11 +193,11 @@ export class DevicesPage implements OnInit {
       string: this.machine.token
     });
   }
-  async deleteMachine() {
+  async deleteMachine(machine_id: number = 0) {
     console.log(this.machine);
 
     if (await this.alerts.ShowAlert("¿Deseas eliminar esta máquina?", "Alerta", "Atrás", "Eliminar")) {
-      this.api.DeleteRequestRender(this.endPoints.Render('machines') + this.machine.machine_id).then((response: any) => {
+      this.api.DeleteRequestRender(this.endPoints.Render('machines') + machine_id ? machine_id : this.machine.machine_id).then((response: any) => {
         //console.log(response.data);
         this.getMachines()
         this.isModalOpen = false
@@ -214,5 +217,18 @@ export class DevicesPage implements OnInit {
           this.changeDetector.detectChanges()
         })
       }
+  }
+
+  isDarkColor(hexColor: string): boolean {
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return luma < 128;
+  }
+  get widgetTextColor(): string {
+    const color = "#42a7f0"
+    return this.isDarkColor(color) ? 'white' : 'black';
   }
 }
