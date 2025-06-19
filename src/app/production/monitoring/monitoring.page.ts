@@ -11,6 +11,7 @@ import { NgxColorsModule } from 'ngx-colors';
 import { GaugeComponent } from 'src/app/components/gauge/gauge.component';
 import { HeatmapComponent } from 'src/app/components/heatmap/heatmap.component';
 import { ThermometerComponent } from 'src/app/components/thermometer/thermometer.component';
+import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
 import { addOutline, checkmark } from 'ionicons/icons';
 import { EndpointsService } from 'src/app/services/endpoints.service';
@@ -34,7 +35,7 @@ export type ChartOptions = {
   styleUrls: ['./monitoring.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect]
+  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent, OnoffComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect]
 })
 export class MonitoringPage implements OnInit {
   sensorData: SensorData[] = [];
@@ -127,7 +128,7 @@ export class MonitoringPage implements OnInit {
   async addNewWidget() {
     //if (await this.ui.ShowAlert("¿Deseas agregar el nuevo widget?", "Alerta", "Atrás", "Agregar")) {
     let body: any = {}
-    if (this.newWidgetData.widgetType == 'chart' || this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo') {
+    if (this.newWidgetData.widgetType == 'chart' || this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo' || this.newWidgetData.widgetType == 'onoff') {
       body = {
         "user_id": this.user,
         "color": this.newWidgetData.color,

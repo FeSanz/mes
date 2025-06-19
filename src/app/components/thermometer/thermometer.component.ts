@@ -93,6 +93,8 @@ export class ThermometerComponent implements OnInit {
   }
   private initializeConfig() {
     this.widgetData = this.data
+    console.log(this.widgetData);
+    
     this.GetSensorValue()
   }
 

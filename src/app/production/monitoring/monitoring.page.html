@@ -19,9 +19,14 @@
             (remove)="removeWidget(widget.jsonParams.dashboard_id)">
           </app-heatmap>
           <app-thermometer *ngSwitchCase="'thermo'" [data]="widget.jsonParams"
-            (remove)="removeWidget(widget.jsonParams.dashboard_id)"></app-thermometer>
+            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
+          </app-thermometer>
           <app-gauge *ngSwitchCase="'gauge'" [data]="widget.jsonParams"
-            (remove)="removeWidget(widget.jsonParams.dashboard_id)"></app-gauge>
+            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
+          </app-gauge>
+          <app-onoff *ngSwitchCase="'onoff'" [data]="widget.jsonParams"
+            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
+          </app-onoff>
         </ng-container>
       </ion-col>
     </ion-row>
@@ -54,6 +59,7 @@
             <ion-select-option value="chart">Chart</ion-select-option>
             <ion-select-option value="heatmap">Mapa de calor</ion-select-option>
             <ion-select-option value="thermo">Termómetro</ion-select-option>
+            <ion-select-option value="onoff">On Off</ion-select-option>
             <ion-select-option value="gauge">Gauge</ion-select-option>
           </ion-select>
         </ion-item>

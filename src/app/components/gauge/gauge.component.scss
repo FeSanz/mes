@@ -517,7 +517,9 @@ ion-card-title {
 .progress-path {
   animation: glow-effect 4s ease-in-out infinite;
 }
-
+.progress-path:hover {
+  stroke-width: 20;
+}
 .gauge-value {
   animation: pulse-humidity 3s ease-in-out infinite;
 }

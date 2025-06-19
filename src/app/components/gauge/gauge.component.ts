@@ -39,10 +39,11 @@ export class GaugeComponent implements OnInit {
   lastDate: any = ""
   showChart: boolean = true;
   machines: any = []
-  public currentColor = '#4A90E2';
   @Input() data: GaugeData = {};
+  public currentColor = '#4A90E2';
 
-  constructor(private changeDetector: ChangeDetectorRef,
+  constructor(
+    private changeDetector: ChangeDetectorRef,
     private ws: WebSocketService,
     private endPoints: EndpointsService,
     private api: ApiService) {

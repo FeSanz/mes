@@ -1,0 +1,66 @@
+.circle-indicator {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: inset 0 0 0 4px white;
+
+  &:hover {
+    box-shadow: 0 12px 48px rgba(128, 128, 128, 0.6);
+    transform: translateY(-2px);
+  }
+}
+
+.circle-indicator span {
+  font-size: clamp(0.8rem, 2.5vw, 1.5rem);
+  font-weight: bold;
+}
+
+.indicator-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.circle-indicator.on {
+  background-color: #3c4be3;
+  /* Color ON */
+  color: white;
+}
+
+.circle-indicator.off {
+  background-color: white;
+  /* Color OFF */
+  color: #3c4be3;
+}
+
+ion-card {
+  min-height: 450.5px;
+  --background: var(--ion-color-back-shade, #fff);
+  border-radius: 12px;
+
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+  }
+}
+
+ion-toolbar {
+  padding-left: 0.5rem;
+  flex-shrink: 0;
+  position: relative;
+}
+
+
+ion-select::part(label) {
+  color: var(--ion-color-primary);
+}

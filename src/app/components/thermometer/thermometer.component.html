@@ -11,30 +11,24 @@
   <ion-card-content>
     <!-- ✅ LAYOUT CENTRADO CON TERMÓMETRO Y DISPLAY -->
     <div class="modern-thermometer-container centered">
-
       <!-- Sección del termómetro -->
       <div class="thermometer-section">
         <svg width="100%" height="100%" viewBox="0 0 140 400" class="modern-thermometer">
           <!-- Fondo exterior del termómetro -->
           <rect x="52" y="40" width="35" height="350" rx="20" ry="20" fill="#d7dadc" stroke="#d7dadc"
             stroke-width="2" />
-
           <!-- Tubo del termómetro -->
           <rect x="58" y="50" width="24" height="300" rx="12" ry="12" [attr.fill]="'var(--ion-color-light)'" />
-
           <!-- Bulbo del termómetro -->
           <circle cx="70" cy="370" r="25" fill="#d7dadc" stroke="#d7dadc" stroke-width="2" />
-
           <!-- ✅ SISTEMA DE 6 MARCAS SIN DUPLICAR CERO -->
           <g class="scale-marks">
-
             <!-- ✅ MARCA DE CERO (SOLO SI ESTÁ EN RANGO Y NO COINCIDE CON OTRAS) -->
             <ng-container *ngIf="getZeroPosition() as zeroY">
               <line x1="50" [attr.y1]="zeroY" x2="25" [attr.y2]="zeroY" stroke="#00BFFF" stroke-width="3" />
               <text x="22" [attr.y]="zeroY + 5" fill="#00BFFF" font-size="12" text-anchor="end" font-weight="bold">
                 0°C
               </text>
-
               <line x1="90" [attr.y1]="zeroY" x2="115" [attr.y2]="zeroY" stroke="#00BFFF" stroke-width="3" />
               <text x="118" [attr.y]="zeroY + 5" fill="#00BFFF" font-size="12" text-anchor="start" font-weight="bold">
                 0°C
@@ -141,12 +135,6 @@
           </ng-container>
 
           <text x="45" y="380" width="50" height="18" rx="4" ry="4" fill="#222" stroke="#444" stroke-width="1"> </text>
-          <!-- Display digital en el termómetro -->
-          <!--rect x="45" y="380" width="50" height="18" rx="4" ry="4" fill="#222" stroke="#444" stroke-width="1" />
-          <text x="70" y="392" fill="#DAA520" font-size="12" text-anchor="middle" font-family="monospace"
-            font-weight="bold">
-            {{ temperature$ | async | number : "1.1-1" }}
-          </text-->
         </svg>
       </div>
       <!-- ✅ DISPLAY CENTRADO CON EL TERMÓMETRO -->

@@ -40,13 +40,13 @@ ion-card-title {
   --thermometer-secondary: #1a1a1a;
   --thermometer-dark: #ffffff;
   --thermometer-accent: #4A90E2;
-  --thermometer-bg: rgba(255, 255, 255, 0.02);
+  --thermometer-bg: rgba(193, 185, 185, 0.1);
   --thermometer-border: rgba(218, 165, 32, 0.2);
   --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
+  --spacing-sm: 0.25rem;
+  --spacing-md: 0.25rem;
+  --spacing-lg: 0.25rem;
+  --spacing-xl: 0.25rem;
 }
 
 // ✅ CARD PRINCIPAL CON ALTURA CONSISTENTE
@@ -515,13 +515,10 @@ ion-card-title {
   }
 
   .temperature-display-section {
-    min-width: 120px;
+    min-width: 100px;
     gap: var(--spacing-lg);
   }
 
-  .config-panel {
-    max-height: 450px;
-  }
 }
 
 // ✅ ANIMACIONES
