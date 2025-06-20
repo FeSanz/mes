@@ -147,16 +147,6 @@ ion-content {
 }
 
 /********** Cards Fusion *********+*/
-.stats-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
-  gap: 16px;
-  padding-top: 24px;
-  background-color: transparent;
-  border-radius: 8px;
-  margin: 16px;
-}
-
 .stats-card {
   display: flex;
   align-items: center;

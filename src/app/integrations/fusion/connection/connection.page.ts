@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   IonButton,
-  IonButtons, IonCard,
-  IonContent,
+  IonButtons, IonCard, IonCol,
+  IonContent, IonGrid,
   IonHeader,
   IonIcon, IonInput, IonItem, IonLabel,
-  IonMenuButton, IonText,
+  IonMenuButton, IonRow, IonText,
   IonTitle,
   IonToolbar
 } from '@ionic/angular/standalone';
@@ -38,7 +38,7 @@ import {
   styleUrls: ['./connection.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
-    IonIcon, IonItem, IonLabel, IonInput, IonButton, IonCard, IonText]
+    IonIcon, IonItem, IonLabel, IonInput, IonButton, IonCard, IonText, IonGrid, IonRow, IonCol]
 })
 export class ConnectionPage implements OnInit {
   host: string = "";

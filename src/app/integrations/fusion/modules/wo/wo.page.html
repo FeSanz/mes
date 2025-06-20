@@ -54,7 +54,7 @@
       <p-table #dtFusion
                [value]="fusionData.items"
                [(selection)]="selectedItemsFusion"
-               dataKey="ResourceCode"
+               dataKey="WorkOrderNumber"
                styleClass="card-table-primeng"
                [tableStyle]="{ 'min-width': '50rem','height': '100%'}"
                [size]="'small'"
@@ -65,7 +65,7 @@
                [paginator]="true"
                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
                [filterDelay]="0"
-               [globalFilterFields]="['ResourceCode', 'ResourceName', 'ResourceClassCode']"
+               [globalFilterFields]="['WorkOrderNumber', 'ItemNumber', 'StartDate']"
                stripedRows
                [scrollable]="true"
                [scrollHeight]="GetScrollHeight()"
@@ -98,25 +98,53 @@
             <th style="width: 4rem">
               <p-tableHeaderCheckbox/>
             </th>
+            <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem">
+              <div class="flex justify-between items-center">
+                OT
+                <p-sortIcon field="WorkOrderNumber" />
+                <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="ItemNumber" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Producto
+                <p-sortIcon field="ItemNumber" />
+                <p-columnFilter type="text" field="ItemNumber" display="menu" class="ml-auto" />
+              </div>
+            </th>
             <th pSortableColumn="ResourceCode" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Código
+                Máquina
                 <p-sortIcon field="ResourceCode" />
-                <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto" />
+                <p-columnFilter field="ResourceCode" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
-            <th pSortableColumn="ResourceName" style="min-width: 6rem">
+            <th pSortableColumn="PlannedQuantity" style="min-width: 8rem">
               <div class="flex justify-between items-center">
-                Nombre
-                <p-sortIcon field="ResourceName" />
-                <p-columnFilter type="text" field="ResourceName" display="menu" class="ml-auto" />
+                Meta
+                <p-sortIcon field="PlannedQuantity" />
+                <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
-            <th pSortableColumn="ResourceClassCode" style="min-width: 6rem">
+            <th pSortableColumn="CompletedQuantity" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Clase
-                <p-sortIcon field="ResourceClassCode" />
-                <p-columnFilter field="ResourceClassCode" matchMode="equals" display="menu" class="ml-auto"/>
+                Completado
+                <p-sortIcon field="CompletedQuantity" />
+                <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="StartDate" style="min-width: 12rem">
+              <div class="flex justify-between items-center">
+                Fecha Inicio
+                <p-sortIcon field="StartDate" />
+                <p-columnFilter field="StartDate" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="CompletionDate" style="min-width: 12rem">
+              <div class="flex justify-between items-center">
+                Fecha Fin
+                <p-sortIcon field="CompletionDate" />
+                <p-columnFilter field="CompletionDate" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
           </tr>
@@ -126,9 +154,13 @@
             <td>
               <p-tableCheckbox [value]="item"/>
             </td>
-            <td>{{ item.ResourceCode }}</td>
-            <td>{{ item.ResourceName }}</td>
-            <td>{{ item.ResourceClassCode }}</td>
+            <td>{{ item.WorkOrderNumber }}</td>
+            <td>{{ item.ItemNumber }}</td>
+            <td>{{ item.WorkOrderId }}</td>
+            <td>{{ item.PlannedQuantity }}</td>
+            <td>{{ item.CompletedQuantity }}</td>
+            <td>{{ item.StartDate }}</td>
+            <td>{{ item.CompletionDate }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -152,7 +184,7 @@
       <p-table #dtDB
                [value]="dbData.items"
                [(selection)]="selectedItemsDB"
-               dataKey="Code"
+               dataKey="WorkOrderNumber"
                styleClass="card-table-primeng"
                [tableStyle]="{ 'min-width': '50rem'}"
                [size]="'small'"
@@ -163,7 +195,7 @@
                [paginator]="true"
                currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
                [filterDelay]="0"
-               [globalFilterFields]="['Code', 'Name', 'Location']"
+               [globalFilterFields]="['WorkOrderNumber', 'ItemNumber', 'StartDate']"
                stripedRows
                [scrollable]="true"
                [scrollHeight]="GetScrollHeight()"
@@ -199,25 +231,53 @@
             <th style="width: 4rem">
               <p-tableHeaderCheckbox/>
             </th>
-            <th pSortableColumn="Code" style="min-width: 10rem">
+            <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem">
               <div class="flex justify-between items-center">
-                Código
-                <p-sortIcon field="Code" />
-                <p-columnFilter type="text" field="Code" display="menu" class="ml-auto" />
+                OT
+                <p-sortIcon field="WorkOrderNumber" />
+                <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="Name" style="min-width: 14rem">
+            <th pSortableColumn="ItemNumber" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Nombre
-                <p-sortIcon field="Name" />
-                <p-columnFilter type="text" field="Name" display="menu" class="ml-auto" />
+                Producto
+                <p-sortIcon field="ItemNumber" />
+                <p-columnFilter type="text" field="ItemNumber" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="Class" style="min-width: 10rem">
+            <th pSortableColumn="ResourceCode" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Clase
-                <p-sortIcon field="Class" />
-                <p-columnFilter field="Class" matchMode="equals" display="menu" class="ml-auto"/>
+                Máquina
+                <p-sortIcon field="ResourceCode" />
+                <p-columnFilter field="ResourceCode" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="PlannedQuantity" style="min-width: 8rem">
+              <div class="flex justify-between items-center">
+                Meta
+                <p-sortIcon field="PlannedQuantity" />
+                <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="CompletedQuantity" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Completado
+                <p-sortIcon field="CompletedQuantity" />
+                <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="StartDate" style="min-width: 12rem">
+              <div class="flex justify-between items-center">
+                Fecha Inicio
+                <p-sortIcon field="StartDate" />
+                <p-columnFilter field="StartDate" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="CompletionDate" style="min-width: 12rem">
+              <div class="flex justify-between items-center">
+                Fecha Fin
+                <p-sortIcon field="CompletionDate" />
+                <p-columnFilter field="CompletionDate" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
           </tr>
@@ -227,9 +287,13 @@
             <td>
               <p-tableCheckbox [value]="item"/>
             </td>
-            <td>{{ item.Code }}</td>
-            <td>{{ item.Name }}</td>
-            <td>{{ item.Class }}</td>
+            <td>{{ item.WorkOrderNumber }}</td>
+            <td>{{ item.ItemNumber }}</td>
+            <td>{{ item.WorkOrderId }}</td>
+            <td>{{ item.PlannedQuantity }}</td>
+            <td>{{ item.CompletedQuantity }}</td>
+            <td>{{ item.StartDate }}</td>
+            <td>{{ item.CompletionDate }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
