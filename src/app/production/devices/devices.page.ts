@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnI
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addCircleOutline, checkmarkOutline, copyOutline, documentOutline, flashOutline, hardwareChipOutline, speedometerOutline, sunnyOutline, thermometerOutline, trashOutline, waterOutline, ellipsisVertical, pencilOutline} from 'ionicons/icons';
 import { ApiService } from 'src/app/services/api.service';
@@ -15,7 +15,7 @@ import { EndpointsService } from 'src/app/services/endpoints.service';
   templateUrl: './devices.page.html',
   styleUrls: ['./devices.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput],
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class DevicesPage implements OnInit {

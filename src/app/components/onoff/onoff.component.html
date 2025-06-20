@@ -16,8 +16,8 @@
       'color': isOn ? 'white' : widgetData.sensors[0].maxColor
     }">
         <div class="onoff-text">
-          <span class="main-state" [ngStyle]="{'color': widgetOnOffTextColor}">{{ isOn ? 'ON' : 'OFF' }}</span>
-          <ion-text [ngStyle]="{'color': widgetOnOffTextColor}">{{widgetData.sensors[0].sensor_name + ': '
+          <span class="main-state" [ngStyle]="{'color': isOn ? widgetOnOffTextColor : 'var(--ion-color-dark)'}">{{ isOn ? 'ON' : 'OFF' }}</span>
+          <ion-text [ngStyle]="{'color': isOn ? widgetOnOffTextColor : 'var(--ion-color-dark)'}">{{widgetData.sensors[0].sensor_name + ': '
             +lastValue}}</ion-text>
         </div>
       </div>
