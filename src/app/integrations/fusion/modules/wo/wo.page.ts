@@ -8,6 +8,7 @@ import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
 import {HeightTable} from "../../../../models/tables.prime";
+import {FromISO8601} from "../../../../models/date.format";
 import {addIcons} from "ionicons";
 
 import { TableModule } from 'primeng/table';
@@ -51,9 +52,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
 
   workMethod: string = 'DESCONOCIDO';
   private readonly workMethodMap = {
-    'PROCESS_MANUFACTURING': 'PROCESOS',
-    'DISCRETE_MANUFACTURING': 'DISCRETA',
-    'MIXED_MANUFACTURING': 'MIXTA'
+    'PROCESS_MANUFACTURING': 'PROCESOS', 'DISCRETE_MANUFACTURING': 'DISCRETA', 'MIXED_MANUFACTURING': 'MIXTA'
   } as const;
 
   private paths: any = {
@@ -63,16 +62,11 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
 
   orderTypes: any = {
     items:[
-      {
-        Code:'RELEASED',
-        Name:'LIBERADAS'
-      },
-      {
-        Code:'IN_PROCESS',
-        Name:'EN PROCESO'
-      }
+      { Code:'RELEASED', Name:'LIBERADAS' },
+      { Code:'IN_PROCESS', Name:'EN PROCESO' }
     ]
   };
+
   orderTypeSelected: string | any = '';
 
   selectedItemsFusion: any[] = [];
@@ -80,6 +74,34 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
 
   searchValueFusion: string = '';
   searchValueDB: string = '';
+
+  private dataTransformers: { [key: string]: (data: any) => any } = {
+    'PROCESS_MANUFACTURING': (data: any) => ({
+      WorkOrderId: data.WorkOrderId,
+      WorkOrderNumber: data.WorkOrderNumber,
+      WorkDefinitionId: data.WorkDefinitionId,
+      ItemId: data.PrimaryProductId,
+      ItemNumber:data.ItemNumber,
+      ProcessWorkOrderResource: data.ProcessWorkOrderResource,
+      PlannedQuantity: data.PrimaryProductQuantity,
+      CompletedQuantity: data.CompletedQuantity,
+      StartDate: FromISO8601(data.PlannedStartDate),
+      CompletionDate: FromISO8601(data.PlannedCompletionDate)
+    }),
+
+    'DISCRETE_MANUFACTURING': (data: any) => ({
+      WorkOrderId: data.WorkOrderId,
+      WorkOrderNumber: data.WorkOrderNumber,
+      WorkDefinitionId: data.WorkDefinitionId,
+      ItemId: data.InventoryItemId,
+      ItemNumber:data.ItemNumber,
+      ProcessWorkOrderResource: data.ProcessWorkOrderResource,
+      PlannedQuantity: data.PlannedStartQuantity,
+      CompletedQuantity: data.CompletedQuantity,
+      StartDate: FromISO8601(data.PlannedStartDate),
+      CompletionDate: FromISO8601(data.PlannedCompletionDate)
+    })
+  };
 
 
   constructor(private apiService: ApiService,
@@ -137,21 +159,96 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
 
 
   OnWoTypeSelected() {
-    if(this.orderTypeSelected) {
-      let clause = `wo/${this.organizationSelected}/${this.orderTypeSelected.Code}`;
-      this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
-        response.totalResults == 0 && this.alerts.Warning(response.message);
-        this.dbData = response;
+    if (!this.orderTypeSelected) return;
 
-        const path = this.paths[this.organizationSelected.WorkMethod]?.[this.orderTypeSelected.Code] || 'wo_process_released';
+    let clause = `workOrders/${this.organizationSelected.OrganizationId}/${this.orderTypeSelected.Code}`;
+    this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+      response.totalResults == 0 && this.alerts.Warning(response.message);
+      this.dbData = response;
 
-        this.apiService.GetRequestFusion(this.endPoints.Path(path, this.orderTypes.Code, this.organizationSelected)).then((response: any) => {
-          this.fusionData = JSON.parse(response);
-          this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
+      const path = this.paths[this.organizationSelected.WorkMethod]?.[this.orderTypeSelected.Code] || 'wo_process_released';
+      this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.OrganizationId)).then((response: any) => {
+        const data = JSON.parse(response);
 
-          this.FilterRegisteredItems();
-        });
+        if (this.organizationSelected.WorkMethod === 'MIXED_MANUFACTURING') {
+          this.mixedManufacturingCase();
+        }
+
+        //Para manufactura por PROCESOS O DISCRETA
+        const transformer = this.dataTransformers[this.organizationSelected.WorkMethod];
+        if (!transformer) {
+          this.alerts.Warning('Tipo de manufactura no identificado');
+          return;
+        }
+
+
+        // Transformar y asignar datos
+        const restructuredData = data.items.map((item: any) => transformer(item));
+        this.fusionData = {
+          items: restructuredData,
+          totalResults: data.totalResults,
+          count: data.count,
+          hasMore: false,
+        };
+
+        console.log(this.fusionData);
+        this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
+
+        this.FilterRegisteredItems();
       });
+    });
+  }
+
+  async mixedManufacturingCase()
+  {
+    let paths: string[] = [];
+    let method: string[] = ['PROCESS_MANUFACTURING', 'DISCRETE_MANUFACTURING'];
+    if(this.orderTypeSelected.Code === 'RELEASED'){
+      paths = ['wo_process_released', 'wo_discrete_released'];
+    }else if(this.orderTypeSelected.Code === 'IN_PROCESS'){
+      paths = ['wo_process_dispatched', 'wo_process_dispatched'];
+    }
+
+    try {
+      // Ejecutar todas las peticiones en paralelo
+      const promises = paths.map(path =>
+        this.apiService.GetRequestFusion(this.endPoints.Path(path, this.orderTypes.Code, this.organizationSelected))
+      );
+
+      const responses = await Promise.all(promises);
+
+      // Inicializar el objeto para acumular datos
+      this.fusionData = {
+        items: [],
+        totalResults: 0,
+        count: 0,
+        hasMore: false,
+      };
+
+      // Procesar cada respuesta
+      responses.forEach((response: any, index) => {
+        const data = JSON.parse(response);
+
+        const transformer = this.dataTransformers[method[index]];
+        if (!transformer) {
+          this.alerts.Warning('Tipo de manufactura no identificado');
+          return;
+        }
+
+        const restructuredData = data.items.map((item: any) => transformer(item));
+
+        // Acumular los datos
+        this.fusionData.items = [...this.fusionData.items, ...restructuredData];
+        this.fusionData.totalResults += data.totalResults || 0;
+        this.fusionData.count += data.count || 0;
+      });
+
+      this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
+      this.FilterRegisteredItems();
+
+    } catch (error) {
+      console.error('Error al procesar manufactura mixta:', error);
+      this.alerts.Warning('Error al obtener los datos');
     }
   }
 

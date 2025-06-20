@@ -7,8 +7,8 @@ export class EndpointsService {
 
   private _urlFusion = `https://${String(localStorage.getItem('server'))}/fscmRestApi/resources/latest`;
   private _params = `limit=500&totalResults=true&onlyData=true&links=canonical`;
-  public _urlRender = 'https://iot-services-rd.onrender.com/api';
-  //public _urlRender = 'http://localhost:3000/api';
+  //public _urlRender = 'https://iot-services-rd.onrender.com/api';
+  public _urlRender = 'http://localhost:3000/api';
 
   private endPoints: { [key: string]: string } = {
     'organizations': '/inventoryOrganizations?' + this._params +
@@ -39,19 +39,19 @@ export class EndpointsService {
               '&q=OrganizationId={0} and ItemStatusValue=\'Active\' and UserItemTypeValue=\'{1}\' and ItemNumber!=\'null\'',
 
     'wo_process_released': '/processWorkOrders?' + this._params +
-                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceId' +
+                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceId' +
                             '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and (CompletedQuantity=0 or CompletedQuantity is null)',
 
     'wo_process_dispatched': '/processWorkOrders?' + this._params +
-                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceId' +
+                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceId' +
                             '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and CompletedQuantity>0',
 
     'wo_discrete_released': '/workOrders?' + this._params +
-                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceId' +
+                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceId' +
                             '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and (CompletedQuantity=0 or CompletedQuantity is null)',
 
     'wo_discrete_dispatched': '/workOrders?' + this._params +
-                              '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceId' +
+                              '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceId' +
                               '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and CompletedQuantity>0',
   };
 
