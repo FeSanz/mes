@@ -1,0 +1,10 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "mes",
+	"webDir": "www",
+	"plugins": {
+		"CapacitorHttp": {
+			"enabled": true
+		}
+	}
+}

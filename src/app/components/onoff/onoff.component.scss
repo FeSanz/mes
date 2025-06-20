@@ -1,27 +1,3 @@
-.circle-indicator {
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  text-align: center;
-  box-shadow: inset 0 0 0 4px white;
-
-  &:hover {
-    box-shadow: 0 12px 48px rgba(128, 128, 128, 0.6);
-    transform: translateY(-2px);
-  }
-}
-
-.circle-indicator span {
-  font-size: clamp(0.8rem, 2.5vw, 1.5rem);
-  font-weight: bold;
-}
-
 .indicator-container {
   display: flex;
   justify-content: center;
@@ -29,16 +5,48 @@
   margin: 1rem 0;
 }
 
+.circle-indicator {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  transition: all 0.4s ease;
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.4),
+              0 6px 20px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+}
+
+.circle-indicator:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+}
+
 .circle-indicator.on {
   background-color: #3c4be3;
-  /* Color ON */
   color: white;
 }
 
 .circle-indicator.off {
-  background-color: white;
-  /* Color OFF */
+  background-color: var(--ion-color-light);
   color: #3c4be3;
+}
+
+.onoff-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-shadow: 0 0 10px currentColor;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.main-state {
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 ion-card {
@@ -60,6 +68,19 @@ ion-toolbar {
   position: relative;
 }
 
+ion-card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+
+  ion-icon {
+    font-size: 1.3rem;
+  }
+}
 
 ion-select::part(label) {
   color: var(--ion-color-primary);

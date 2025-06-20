@@ -10,8 +10,16 @@
 
   <ion-card-content>
     <div class="indicator-container">
-      <div class="circle-indicator" [ngClass]="isOn ? 'on' : 'off'" [ngStyle]="{'border': '2px solid ' + widgetData.sensors[0].maxColor, 'color': isOn ? 'white' : widgetData.sensors[0].maxColor, 'background': isOn ? widgetData.sensors[0].maxColor : 'white' }">
-        <span>{{ isOn ? 'ON' : 'OFF' }}</span>
+      <div class="circle-indicator" [ngClass]="isOn ? 'on' : 'off'" [ngStyle]="{
+      'border': '4px solid ' + widgetData.sensors[0].maxColor,
+      'background': isOn ? widgetData.sensors[0].maxColor : 'var(--ion-color-light)',
+      'color': isOn ? 'white' : widgetData.sensors[0].maxColor
+    }">
+        <div class="onoff-text">
+          <span class="main-state" [ngStyle]="{'color': widgetOnOffTextColor}">{{ isOn ? 'ON' : 'OFF' }}</span>
+          <ion-text [ngStyle]="{'color': widgetOnOffTextColor}">{{widgetData.sensors[0].sensor_name + ': '
+            +lastValue}}</ion-text>
+        </div>
       </div>
     </div>
     <ion-item lines="none" style="align-self: stretch" class="ion-text-center">
@@ -54,7 +62,7 @@
       </ion-item>
       <ion-item>
         <ion-label color="primary" slot="start">Tipo:</ion-label>
-        <ion-label slot="end"><strong>Gauge</strong></ion-label>
+        <ion-label slot="end"><strong>On Off</strong></ion-label>
       </ion-item>
       <ion-item>
         <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id"
@@ -64,7 +72,7 @@
           </ion-select-option>
         </ion-select>
         <ion-select label="Sensor:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].sensor_id"
-          label-placement="floating">
+          (ionChange)="onSensorChange($event)" label-placement="floating">
           <ion-select-option *ngFor="let s of getSensorsForMachine(copyWidgetData.sensors[0].machine_id)"
             [value]="s.sensor_id">
             {{ s.sensor_name }}
@@ -73,12 +81,14 @@
       </ion-item>
       <ion-item>
         <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].max">
-          <div slot="label"><ion-text color="primary">Apagado menor a: </ion-text></div>
+          <div slot="label"><ion-text color="primary">Apagado menor a:</ion-text></div>
         </ion-input>
-        <ion-label color="primary">Color encendido:</ion-label>
-        <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" style="margin-left: 10px;"
-          [(ngModel)]="copyWidgetData.sensors[0].maxColor">
-        </ngx-colors>
+        <div slot="end" style="display: flex; align-items: center; gap: 10px; width: 42%;">
+          <ion-label color="primary" style="white-space: nowrap; margin: 0;">Color encendido:</ion-label>
+          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+            [(ngModel)]="copyWidgetData.sensors[0].maxColor">
+          </ngx-colors>
+        </div>
       </ion-item>
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
         <ion-fab-button (click)="updateChartDB()">

@@ -275,7 +275,7 @@ export class ChartsComponent implements OnInit {
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
+    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1'), false).then((response: any) => {
       this.machines = response.items
       this.isModalOpen = true;
       //this.newWidgetData.machine = response.data[0].MachineId + ""

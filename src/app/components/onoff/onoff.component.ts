@@ -29,6 +29,7 @@ export class OnoffComponent implements OnInit {
   lastDate: any = ""
   showChart: boolean = true;
   machines: any = []
+  lastValue = 0
   @Input() data: GaugeData = {};
   @Output() remove = new EventEmitter<number>();
   constructor(
@@ -53,18 +54,18 @@ export class OnoffComponent implements OnInit {
   }
   GetSensorValue() {
     this.api.GetRequestRender(this.endPoints.Render('sensorData/' + this.widgetData.sensors[0].sensor_id + '?limit=1'), false).then((response: any) => {
-      const lastValue = response.items.data[0].value
+      this.lastValue = response.items.data[0].value
       this.lastDate = response.items.data[0].time
-      this.isOn = Number(lastValue) < Number(this.widgetData.sensors[0].max) ? false : true
+      this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true
       //this.updateCurrentColor();
       this.startSubscriptions()
     })
   }
   startSubscriptions() {
     this.ws.Suscribe(this.widgetData.sensors[0].sensor_id, (response) => {
-      const lastValue = response.data.value
+      this.lastValue = response.data.value
       this.lastDate = response.data.time
-      this.isOn = Number(lastValue) < Number(this.widgetData.sensors[0].max) ? false : true//false
+      this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true//false
       //this.updateCurrentColor();
     }).then((ws) => {
     }).catch(err => {
@@ -76,8 +77,7 @@ export class OnoffComponent implements OnInit {
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
-    console.log(this.copyWidgetData.widgetType);
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
+    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1'), false).then((response: any) => {
       console.log(response);
       this.machines = response.items
       this.isModalOpen = true;
@@ -95,11 +95,15 @@ export class OnoffComponent implements OnInit {
   get widgetTextColor(): string {
     return this.isDarkColor(this.widgetData.color) ? 'white' : 'black';
   }
+  get widgetOnOffTextColor(): string {
+    return this.isDarkColor(this.widgetData.sensors[0].maxColor) ? 'white' : 'black';
+  }
   getSensorsForMachine(MachineId: number) {
     const machine: any = this.machines.find((m: any) => m.machine_id == MachineId);
     return machine ? machine.sensors : [];
   }
   updateChartDB() {
+    console.log(this.copyWidgetData);
     const body = {
       name: this.copyWidgetData.name,
       user_id: 1,
@@ -122,5 +126,15 @@ export class OnoffComponent implements OnInit {
       this.isModalOpen = false
       this.changeDetector.detectChanges()
     })
+  }
+  onSensorChange(event: any) {
+    const selectedValue = event.detail.value;
+    const sensor = this.getSensorsForMachine(this.widgetData.sensors[0].machine_id).find((s: any) => s.sensor_id == selectedValue)
+    this.copyWidgetData.sensors[0].sensor_name = sensor.sensor_name
+    console.log(this.copyWidgetData.sensors[0].sensor_name);
+
+  }
+  get borderColor(): string {
+    return this.isOn ? this.widgetData.sensors[0].maxColor: 'var(--ion-color-light)'
   }
 }

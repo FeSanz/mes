@@ -18,7 +18,7 @@
             <path class="progress-path" d="M 60 160 A 120 120 0 0 1 300 160" fill="none" [attr.stroke]="currentColor"
               stroke-width="18" stroke-linecap="round"
               [attr.stroke-dasharray]="getProgressDashArray((currentValue$ | async) ?? 0)" [attr.stroke-dashoffset]="0">
-              <title>{{ (currentValue$ | async) ?? 0 | number:'1.1-1' }}% de {{widgetData.sensors[0].max}}%</title>
+              <title>{{ (currentValue$ | async) ?? 0 | number:'1.1-1' }}% de {{widgetData.sensors[0].max}}</title>
             </path>
             <g class="scale-marks">
               <line x1="60" y1="160" x2="35" y2="160" stroke="#888" stroke-width="2" />
@@ -104,7 +104,7 @@
           </ion-select-option>
         </ion-select>
         <ion-select label="Sensor:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].sensor_id"
-          label-placement="floating">
+          (ionChange)="onSensorChange($event)" label-placement="floating">
           <ion-select-option *ngFor="let s of getSensorsForMachine(copyWidgetData.sensors[0].machine_id)"
             [value]="s.sensor_id">
             {{ s.sensor_name }}

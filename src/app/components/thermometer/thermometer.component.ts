@@ -55,10 +55,9 @@ export class ThermometerComponent implements OnInit {
     this.remove.emit(this.widgetData.id);
   }
   editChart() {
-
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
     console.log(this.copyWidgetData.widgetType);
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
+    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1'), false).then((response: any) => {
       this.machines = response.items
       this.isModalOpen = true;
     })
@@ -271,5 +270,10 @@ export class ThermometerComponent implements OnInit {
   }
   get widgetTextColor(): string {
     return this.isDarkColor(this.widgetData.color) ? 'white' : 'black';
+  }
+  onSensorChange(event: any) {
+    const selectedValue = event.detail.value;
+    const sensor = this.getSensorsForMachine(this.copyWidgetData.sensors[0].machine_id).find((s: any) => s.sensor_id == selectedValue)
+    this.copyWidgetData.sensors[0].sensor_name = sensor.sensor_name
   }
 }

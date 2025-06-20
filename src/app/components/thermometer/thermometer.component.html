@@ -198,14 +198,12 @@
           </ion-select-option>
         </ion-select>
         <ion-select label="Sensor:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].sensor_id"
-          label-placement="floating">
+          (ionChange)="onSensorChange($event)" label-placement="floating">
           <ion-select-option *ngFor="let s of getSensorsForMachine(copyWidgetData.sensors[0].machine_id)"
             [value]="s.sensor_id">
             {{ s.sensor_name }}
           </ion-select-option>
         </ion-select>
-        <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
-          [(ngModel)]="copyWidgetData.sensors[0].color"></ngx-colors>
       </ion-item>
       <ion-item>
         <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].min" style="text-align: right;">

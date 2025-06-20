@@ -123,7 +123,7 @@ export class ApiService {
 
   async GetRequestRender(endPoint: string, show: boolean = true) {
     try {
-      //if (show) await this.alerts.ShowLoading()
+      if (show) await this.alerts.ShowLoading()
       const options = {
         url: endPoint,
         headers: { 'Content-Type': 'application/json' }
@@ -136,7 +136,7 @@ export class ApiService {
       await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
       return null;
     } finally {
-      //if (show) await this.alerts.HideLoading()
+      if (show) await this.alerts.HideLoading()
     }
   }
 
