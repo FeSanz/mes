@@ -13,7 +13,7 @@
         </ion-toolbar>
         <ion-toolbar color="primary">
           <ion-menu-toggle auto-hide="false">
-            <ion-item lines="none" button [routerLink]="['/profile']" class="user-card" color="primary">
+            <ion-item lines="none" button [routerLink]="['/settings/user']" class="user-card" color="primary">
               <ion-avatar slot="start" style="width: 60px; height: 60px;">
                 <img src="../assets/images/avatar.png" alt="usuario" />
               </ion-avatar>
@@ -30,19 +30,21 @@
                   <ion-content>
                     <ion-list>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/profile']" lines="none" detail="false" routerLinkActive="selected">
+                        <ion-item [routerLink]="['/profile']" lines="none" detail="false" routerLinkActive="selected"
+                          button>
                           <ion-icon aria-hidden="true" slot="start" name="person-outline" color="primary"></ion-icon>
                           <ion-label>Perfil</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/settings']" lines="none" detail="false" routerLinkActive="selected">
+                        <ion-item [routerLink]="['/settings']" lines="none" detail="false" routerLinkActive="selected"
+                          button>
                           <ion-icon aria-hidden="true" slot="start" name="settings-outline" color="primary"></ion-icon>
                           <ion-label>Ajustes</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/login']" lines="none" detail="false" routerLinkActive="selected">
+                        <ion-item (click)="LogOut()" lines="none" detail="false" routerLinkActive="selected" button>
                           <ion-icon aria-hidden="true" slot="start" name="power-outline" color="primary"></ion-icon>
                           <ion-label>Salir</ion-label>
                         </ion-item>
@@ -125,7 +127,8 @@
           <div slot="content" style="padding-left: 16px;">
             <ion-list lines="none">
               <ion-menu-toggle auto-hide="false">
-                <ion-item [routerLink]="['/users']" routerLinkActive="selected" detail="false" button color="light">
+                <ion-item [routerLink]="['/settings/users']" routerLinkActive="selected" detail="false" button
+                  color="light">
                   <ion-icon slot="start" name="people-outline" color="secondary"></ion-icon>
                   <ion-label>Usuarios</ion-label>
                 </ion-item>

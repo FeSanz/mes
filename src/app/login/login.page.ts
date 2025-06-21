@@ -10,6 +10,7 @@ import { ApiService } from '../services/api.service';
 import { NavController } from '@ionic/angular';
 import { EndpointsService } from '../services/endpoints.service';
 import { AlertsService } from '../services/alerts.service';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-login',
@@ -24,28 +25,27 @@ export class LoginPage implements OnInit {
   password: string = ""
   authRemember: boolean = false
 
-  constructor(private api: ApiService, private navCtrl: NavController, private endPoints: EndpointsService, private alerts: AlertsService
+  constructor(private api: ApiService, private navCtrl: NavController, private endPoints: EndpointsService, private alerts: AlertsService, private app: AppComponent
   ) {
     addIcons({ businessOutline, personOutline, lockClosedOutline });
     this.authRemember = localStorage.getItem("authRemember") == "true" ? true : false
+    api.isAuthenticated() ? this.navCtrl.navigateRoot('/monitoring') : null
+    console.log(localStorage.getItem("isLogged"));
+    
     const credentials: any = this.authRemember ? api.GetCredentials() : {}
     this.username = credentials.user
     this.password = credentials.password
   }
 
   ngOnInit() {
-    addIcons({
-      personOutline,
-      lockClosedOutline,
-      businessOutline
-    })
   }
 
   LogIn() {
     this.api.AuthRequestDatabase(this.endPoints.Render('login'), this.username, this.password).then((response: any) => {
       console.log(response);
-      if (!response.errorsExistFlag) {
+      if (response.errorsExistFlag == false) {
         localStorage.setItem("isLogged", "true")
+        //this.app.username = this.username
         if (this.authRemember) this.api.SaveCredentials(this.username, this.password, this.authRemember);
         this.alerts.Success("Bienvenido")
         this.navCtrl.navigateRoot('/monitoring');

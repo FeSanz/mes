@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { addIcons } from 'ionicons';
 import { Platform } from '@ionic/angular';
 
@@ -34,6 +34,7 @@ import {
   gitNetworkOutline
 } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from './services/api.service';
 
 @Component({
   selector: 'app-root',
@@ -45,12 +46,11 @@ import { FormsModule } from '@angular/forms';
 })
 export class AppComponent {
   darkMode = false
-  username = ""
-  constructor(private navCtrl: NavController
+  username = "Inicie sesión"
+  constructor(private navCtrl: NavController, private api: ApiService, private changeDetector: ChangeDetectorRef
   ) {
     addIcons({ person, ellipsisVerticalOutline, personOutline, settingsOutline, powerOutline, homeOutline, cubeOutline, statsChartOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline, gitNetworkOutline });
-    this.username = String(localStorage.getItem('user'))
-
+    api.isAuthenticated() ? this.username = String(localStorage.getItem('user') || "No user") : "Inicie sesión"
     const theme = localStorage.getItem('theme');
     if (theme == null) {
       const prefersDark = window.matchMedia('(prefers-color-scheme: light)');
@@ -68,10 +68,12 @@ export class AppComponent {
   }
 
   LogOut() {
-    this.username = ""
+    this.username = "Inicie sesión"
     localStorage.setItem("isLogged", "false")
     this.navCtrl.navigateRoot('/login');
+    this.changeDetector.detectChanges()
   }
+
   HandleClick(event: Event) {
     event.stopPropagation();
   }
