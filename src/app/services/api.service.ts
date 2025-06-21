@@ -7,7 +7,8 @@ import { AlertsService } from "./alerts.service";
   providedIn: 'root'
 })
 export class ApiService {
-
+  user: string = ""
+  password: string = ""
   credentials: string = '';
   offset: number = 0;
 
@@ -226,5 +227,49 @@ export class ApiService {
     else {
       this.alerts.Error(`Error al procesar la solicitud (${statusCode})`);
     }
+  }
+
+  /*******************************Authentication************************** */
+  async AuthRequestDatabase(url: string, user: string, password: string) {
+    await this.alerts.ShowLoading("Autenticando...");
+    try {
+      const options = {
+        url: url,
+        headers: { 'Content-Type': 'application/json' },
+        data: {
+          "email": user,
+          "password": password
+        }
+      };
+      const response: HttpResponse = await CapacitorHttp.post(options);
+      this.RequestStatusCode(response.status);
+      return response.data;
+
+    } catch (error: any) {
+      console.log('Error (PG):', error);
+      await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
+      return null;
+    } finally {
+      await this.alerts.HideLoading();
+    }
+  }
+
+  GetCredentials() {
+    const credentials = {
+      user: localStorage.getItem("user"),
+      password: localStorage.getItem("pwd")
+    }
+    return credentials
+  }
+  isAuthenticated(): boolean {
+    const isLogged = localStorage.getItem('isLogged') == "true" ? true : false
+    return isLogged
+  }
+  SaveCredentials(user: string, password: string, authRemember: boolean) {
+    this.user = user
+    this.password = password
+    localStorage.setItem("user", user)
+    localStorage.setItem("pwd", password)
+    localStorage.setItem("authRemember", String(authRemember))
   }
 }

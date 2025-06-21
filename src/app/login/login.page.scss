@@ -1,0 +1,108 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.login-card {
+    width: 90%;
+    max-width: 450px;
+    min-width: 350px;
+    min-height: 700px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+ion-input {
+    --background: transparent;
+    margin-bottom: 16px;
+    --background: rgba(255, 255, 255, 0.1);
+}
+
+.login-btn {
+    --background: linear-gradient(90deg, var(--ion-color-secondary), var(--ion-color-primary)); // Degradado cálido
+    --border-radius: 999px; // Redondeado completo
+    --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    --padding-top: 14px;
+    --padding-bottom: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: none; // Evita mayúsculas automáticas
+    transition: transform 0.2s ease-in-out;
+}
+
+.login-btn:hover {
+    transform: scale(1.03); // efecto suave al pasar el cursor
+}
+
+.login-title {
+    font-size: 35px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: var(--ion-color-white); // o el color que combine con tu branding
+    letter-spacing: 1px;
+}
+
+ion-input {
+    --color: white;
+    --placeholder-color: rgba(255, 255, 255, 0.5);
+
+}
+
+ion-content {
+    --background: none; // Evita el fondo blanco por defecto
+
+    background-image: url('/assets/images/desktop.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+ion-content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5); // overlay oscuro
+    z-index: 0;
+}
+
+.login-container {
+    position: relative;
+    z-index: 1; // por encima del overlay
+    width: 100%;
+    padding: 16px;
+}
+
+.forgot-password {
+    margin-top: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.signup {
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.signup-link {
+    color: var(--ion-color-primary);
+    cursor: pointer;
+}
+
+.invisible {
+    background: transparent !important;
+    --background: transparent;
+    --ion-item-background: transparent;
+    --background-focused: transparent;
+    --background-activated: transparent;
+    --ripple-color: transparent;
+}

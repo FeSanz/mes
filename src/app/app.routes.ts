@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -7,47 +8,62 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login',
     pathMatch: 'full',
   },
   {
     path: 'fusion_connection',
-    loadComponent: () => import('./integrations/fusion/connection/connection.page').then( m => m.ConnectionPage)
+    loadComponent: () => import('./integrations/fusion/connection/connection.page').then( m => m.ConnectionPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'organizations',
-    loadComponent: () => import('./integrations/fusion/modules/organizations/organizations.page').then( m => m.OrganizationsPage)
+    loadComponent: () => import('./integrations/fusion/modules/organizations/organizations.page').then( m => m.OrganizationsPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'shifts',
-    loadComponent: () => import('./integrations/fusion/modules/shifts/shifts.page').then( m => m.ShiftsPage)
+    loadComponent: () => import('./integrations/fusion/modules/shifts/shifts.page').then( m => m.ShiftsPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'resources',
-    loadComponent: () => import('./integrations/fusion/modules/resources/resources.page').then( m => m.ResourcesPage)
+    loadComponent: () => import('./integrations/fusion/modules/resources/resources.page').then( m => m.ResourcesPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'items',
-    loadComponent: () => import('./integrations/fusion/modules/items/items.page').then( m => m.ItemsPage)
+    loadComponent: () => import('./integrations/fusion/modules/items/items.page').then( m => m.ItemsPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'wo',
-    loadComponent: () => import('./integrations/fusion/modules/wo/wo.page').then( m => m.WoPage)
+    loadComponent: () => import('./integrations/fusion/modules/wo/wo.page').then( m => m.WoPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'monitoring',
-    loadComponent: () => import('./production/monitoring/monitoring.page').then( m => m.MonitoringPage)
+    loadComponent: () => import('./production/monitoring/monitoring.page').then( m => m.MonitoringPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'devices',
-    loadComponent: () => import('./production/devices/devices.page').then( m => m.DevicesPage)
+    loadComponent: () => import('./production/devices/devices.page').then( m => m.DevicesPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'users',
-    loadComponent: () => import('./settings/users/users.page').then( m => m.UsersPage)
-  },  {
+    loadComponent: () => import('./settings/users/users.page').then( m => m.UsersPage),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'test',
-    loadComponent: () => import('./test/test.page').then( m => m.TestPage)
+    loadComponent: () => import('./test/test.page').then( m => m.TestPage),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./login/login.page').then( m => m.LoginPage)
   },
 
 

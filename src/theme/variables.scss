@@ -114,11 +114,11 @@
   --ion-color-orange-shade: #e07a1b;
   --ion-color-orange-tint: #ff9735;
 
+  --ion-color-white: #FFF;
+
   ion-list ion-item {
-    border-radius: 15px;
-    border-radius: 15px;
+    border-radius: 10px;
     margin-bottom: 5px;
-    --transition: none;
   }
 
   ion-content {
@@ -127,10 +127,11 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  
+
   ion-content {
     --background: var(--ion-color-back);
   }
+
   /*
    * Dark Colors
    * -------------------------------------------
@@ -234,6 +235,8 @@
     --ion-color-orange-shade: #e07a1b;
     --ion-color-orange-tint: #ff9735;
 
+
+    --ion-color-white: #FFF;
   }
 
 
@@ -324,12 +327,8 @@
   }
 
   ion-list ion-item {
-    border-radius: 15px;
-    /* El valor 10px determina el radio de las esquinas */
-    border-radius: 15px;
-    /* El valor 10px determina el radio de las esquinas */
+    border-radius: 10px;
     margin-bottom: 5px;
-    /* Agrega un espacio entre los elementos de la lista */
   }
 
   ion-list {
@@ -348,6 +347,10 @@
   --ion-color-contrast-rgb: var(--ion-color-blue-contrast-rgb);
   --ion-color-shade: var(--ion-color-blue-shade);
   --ion-color-tint: var(--ion-color-blue-tint);
+}
+
+.ion-color-white {
+  --ion-color-base: var(--ion-color-white);
 }
 
 .ion-color-orange {

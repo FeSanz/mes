@@ -1,5 +1,12 @@
+.user-card {
+  padding: 10px;
+  margin: 10px;
+  border-radius: 12px;
+  background: var(--ion-color-light);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
 
-ion-accordion {
-  margin: 0 auto;
-  background-color: #00000000
+  &:hover {
+    transform: scale(1.02);
+  }
 }
