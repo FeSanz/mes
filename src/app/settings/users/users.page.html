@@ -20,11 +20,11 @@
           <ion-icon slot="end" name="arrow-forward"></ion-icon>
         </ion-button-->
       </div>
-      <p-table #dtUsers [value]="users.items" stripedRows selectionMode="multiple" [(selection)]="selectedItems" *ngIf="users.length !=0"
-        dataKey="user_id" [tableStyle]="{ 'min-width': '30rem' }" styleClass="card-table-primeng" [size]="'small'"
-        [rowHover]="true" [rows]="rowsPerPage" [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions"
-        [paginator]="true" [filterDelay]="0" [alwaysShowPaginator]="true"
-        [globalFilterFields]="['name', 'role', 'email']"
+      <p-table #dtUsers [value]="users.items" stripedRows selectionMode="multiple" [(selection)]="selectedItems"
+        *ngIf="users.length !=0" dataKey="user_id" [tableStyle]="{ 'min-width': '30rem' }"
+        styleClass="card-table-primeng" [size]="'small'" [rowHover]="true" [rows]="rowsPerPage"
+        [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions" [paginator]="true" [filterDelay]="0"
+        [alwaysShowPaginator]="true" [globalFilterFields]="['name', 'role', 'email']"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos">
         <ng-template pTemplate="caption">
           <div class="table-caption">
@@ -70,7 +70,7 @@
                 <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th style="width: 4rem">
+            <th style="width: 5rem">
               <div class="flex justify-between items-center">Acciones
                 <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
               </div>
@@ -86,11 +86,20 @@
             <td>{{ item.role }}</td>
             <td>{{ item.email }}</td>
             <td>{{ item.type }}</td>
-            <td>{{ item.organizations }}</td>
+            <td>
+              <ng-container *ngIf="item.organizations?.length; else noOrgs">
+                <span *ngFor="let org of item.organizations; let last = last">
+                  {{ org.org_name }}<span *ngIf="!last">, </span>
+                </span>
+              </ng-container>
+              <ng-template #noOrgs>Sin organizaciones</ng-template>
+            </td>
             <td>
               <ion-buttons>
-                <ion-button>
-                  <ion-icon slot="icon-only" name="chevron-forward-outline"></ion-icon>
+                <ion-toggle [checked]="item.enabled_flag == 'Y'" (ionChange)="ChangeUserStatus($event, item)">
+                </ion-toggle>
+                <ion-button (click)="OpenEditUser(item)">
+                  <ion-icon color="success" slot="icon-only" name="pencil-outline"></ion-icon>
                 </ion-button>
               </ion-buttons>
             </td>
@@ -104,18 +113,24 @@
     <ng-template>
       <ion-header>
         <ion-toolbar color="primary">
-          <ion-title>Agregar nuevo usuario</ion-title>
+          <ion-title>{{isNewFlag ? 'Agregar nuevo usuario' : 'Editar usuario' }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="setOpen(false)">Cerrar</ion-button>
+            <ion-button (click)="isModalOpen = false;">Cerrar</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
       <ion-content>
         <ion-item>
-          <ion-select label="Rol" [(ngModel)]="user.role" name="role" required interface="popover">
+          <ion-select label="Tipo" [(ngModel)]="user.type" required interface="popover">
+            <ion-select-option value="USER">USER</ion-select-option>
+            <ion-select-option value="ANDON">ANDON</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Rol" [(ngModel)]="user.role" required interface="popover">
+            <ion-select-option value="Admin">Admin</ion-select-option>
+            <ion-select-option value="SuperAdmin">SuperAdmin</ion-select-option>
             <ion-select-option value="Supervisor">Supervisor</ion-select-option>
-            <ion-select-option value="Operador">Operador</ion-select-option>
-            <ion-select-option value="Administrador">Administrador</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
@@ -135,7 +150,9 @@
         </ion-item>
         <ion-item>
           <ion-input placeholder="Contraseña" [(ngModel)]="user.password" name="password" type="password" required>
-            <div slot="label"><ion-text color="primary">Contraseña:</ion-text></div>
+            <div slot="label"><ion-text color="primary">Contraseña:</ion-text>
+            </div>
+            <ion-input-password-toggle slot="end"></ion-input-password-toggle>
           </ion-input>
         </ion-item>
         <ion-item>
@@ -144,13 +161,12 @@
           </ion-input>
         </ion-item>
         <ion-item>
-          <ion-toggle [(ngModel)]="user.enabled_flag" name="enabled_flag" [checked]="true"
-            (ionChange)="user.enabled_flag = $event.detail.checked ? 'Y' : 'N'"> Activo</ion-toggle>
+          <ion-toggle [checked]="user.enabled_flag == 'Y'" (ionChange)="user.enabled_flag = $event.detail.checked ? 'Y' : 'N'">
+            Activo</ion-toggle>
         </ion-item>
         <ion-item-sliding *ngFor="let org of user.organizations; let i = index" lines="full">
           <ion-item>
-            <ion-select label="Organización:" [(ngModel)]="org.org_id" required
-              interface="popover">
+            <ion-select label="Organización:" [(ngModel)]="org.org_id" required interface="popover">
               <ion-select-option *ngFor="let orgAv of getAvailableOrganizations(org.org_id)"
                 [value]="orgAv.OrganizationId">
                 {{ orgAv.Name }} ({{ orgAv.Code }})
@@ -170,8 +186,13 @@
           </ion-button>
         </div>
         <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-          <ion-fab-button (click)="AddNewUser()">
+          <ion-fab-button (click)="isNewFlag ? AddNewUser() : UpdateUser()" color="success">
             <ion-icon name="checkmark-outline"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+        <ion-fab slot="fixed" vertical="bottom" horizontal="start" *ngIf="!isNewFlag">
+          <ion-fab-button (click)="DeleteUser()" color="danger">
+            <ion-icon name="trash-outline"></ion-icon>
           </ion-fab-button>
         </ion-fab>
       </ion-content>

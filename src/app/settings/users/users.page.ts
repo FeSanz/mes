@@ -8,7 +8,7 @@ import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TableModule } from 'primeng/table';
 import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline } from 'ionicons/icons';
+import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pauseSharp, pencilOutline } from 'ionicons/icons';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -46,28 +46,26 @@ export class UsersPage implements OnInit {
     rfid: null,
     enabled_flag: 'Y'
   };
+  isNewFlag = true
   organizations: any = []
   availableOrganizations: any[] = [];
+  company: any = {}
   constructor(private apiService: ApiService,
     private endPoints: EndpointsService,
     private api: ApiService,
     private changeDetector: ChangeDetectorRef,
     private alerts: AlertsService) {
-    addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline })
+    addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline })
+    const user = JSON.parse(String(localStorage.getItem("userData")))
+    this.company = user.company
   }
 
   ngOnInit() {
     this.GetUsers();
   }
 
-  GetOrganizations() {
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
-      console.log(response);
-    })
-  }
-
   GetUsers() {
-    this.apiService.GetRequestRender(this.endPoints.Render('users?companyId=2')).then((response: any) => {
+    this.apiService.GetRequestRender(this.endPoints.Render('users?companyId=' + this.company.CompanyId)).then((response: any) => {
       console.log(response)
       this.users = { ...response };
       if (this.users.items) {
@@ -89,6 +87,18 @@ export class UsersPage implements OnInit {
     this.searchValueUsers = '';
   }
   setOpen(isOpen: boolean) {
+    this.user = {
+      role: '',
+      organizations: [],
+      name: '',
+      type: 'Empleado',
+      password: '',
+      email: '',
+      level: null,
+      rfid: null,
+      enabled_flag: 'Y'
+    };
+    this.isNewFlag = true
     this.apiService.GetRequestRender(this.endPoints.Render('organizations/1')).then((response: any) => {
       this.organizations = response.items
       this.user.organizations = [{ org_id: response.items[0].OrganizationId }]
@@ -99,36 +109,56 @@ export class UsersPage implements OnInit {
     })
   }
   AddNewUser() {
-    console.log('Usuario creado:', this.user);
+    this.user.password = btoa(this.user.password)
     this.api.PostRequestRender(this.endPoints.Render('users'), this.user).then((response: any) => {
       console.log(response);
-        this.users = []
       this.setOpen(false)
       this.user = {
         role: '',
         name: '',
+        organizations: [],
         type: 'Empleado',
         password: '',
         email: '',
         level: null,
         rfid: null,
-        enabled_flag: 'Y',
-        company_id : 1
+        enabled_flag: 'Y'
       };
       this.changeDetector.detectChanges()
-      this.GetUsers()
+
+    })
+  }
+  UpdateUser() {
+    this.user.password = btoa(this.user.password)
+    this.api.UpdateRequestRender(this.endPoints.Render('users/' + this.user.user_id), this.user).then((response: any) => {
+      console.log(response);
+      if (response.errorsExistFlag && response.errorsExistFlag == true) {
+        this.alerts.Error("Error al actualizar el usuario")
+      } else if (response.errorsExistFlag == false) {
+        this.alerts.Success("Usuario actualizado")
+        this.setOpen(false)
+        this.user = {
+          role: '',
+          name: '',
+          organizations: [],
+          type: 'Empleado',
+          password: '',
+          email: '',
+          level: null,
+          rfid: null,
+          enabled_flag: 'Y'
+        };
+        this.changeDetector.detectChanges()
+      }
     })
   }
 
   addNewOrganization() {
-    // Obtener organizaciones ya seleccionadas
     const selectedOrgIds = this.user.organizations.map((org: any) => org.org_id);
-
     const availableOrg = this.organizations.find((org: any) =>
       !selectedOrgIds.includes(org.OrganizationId)
     );
     this.user.organizations.push({ org_id: availableOrg.OrganizationId });
-
   }
   removeOrganization(org: any): void {
     const index = this.user.organizations.indexOf(org);
@@ -141,14 +171,46 @@ export class UsersPage implements OnInit {
     return this.organizations.some((org: any) => !selectedOrgIds.includes(org.OrganizationId));
   }
   getAvailableOrganizations(currentOrgId?: string): any[] {
-    // Obtener los IDs de organizaciones ya seleccionadas
-    const selectedOrgIds = this.user.organizations
-      .map((org: any) => org.org_id)
-      .filter((id: string) => id !== currentOrgId); // Excluir la organización actual
-
-    // Filtrar organizaciones disponibles
+    const selectedOrgIds = this.user.organizations.map((org: any) => org.org_id).filter((id: string) => id !== currentOrgId);
     return this.organizations.filter((org: any) =>
       !selectedOrgIds.includes(org.OrganizationId)
     );
+  }
+  OpenEditUser(user: any) {
+    this.user = JSON.parse(JSON.stringify(user))
+    this.user.password = atob(user.password)
+    this.isNewFlag = false
+    this.apiService.GetRequestRender(this.endPoints.Render('organizations/1')).then((response: any) => {
+      this.organizations = response.items
+      this.user.organizations = [{ org_id: response.items[0].OrganizationId }]
+      this.user.role = "Operador"
+      this.user.level = '1'
+      console.log(this.organizations);
+      this.isModalOpen = true;
+    })
+  }
+
+  ChangeUserStatus(event: any, user: any) {
+    this.api.UpdateRequestRender(this.endPoints.Render('users/' + user.user_id + "/status"), { enabled_flag: event.detail.checked ? 'Y' : 'N' }).then((response: any) => {
+      console.log(response);
+      if (response.errorsExistFlag && response.errorsExistFlag == true) {
+        this.alerts.Error("Error al actualizar el usuario")
+      } else if (response.errorsExistFlag == false) {
+        this.alerts.Success("Usuario actualizado")
+        user.enabled_flag = event.detail.checked ? 'Y' : 'N'
+      }
+    })
+  }
+  DeleteUser() {
+    this.api.DeleteRequestRender(this.endPoints.Render('users/' + this.user.user_id)).then((response: any) => {
+      console.log(response);
+      if (response.errorsExistFlag && response.errorsExistFlag == true) {
+        this.alerts.Error("Error al eliminar el usuario")
+      } else if (response.errorsExistFlag == false) {
+        this.alerts.Success("Usuario eliminado")
+        this.users = this.users.filter((se: any) => se !== this.user);
+        this.changeDetector.detectChanges()
+      }
+    })
   }
 }
