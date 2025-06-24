@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonFab, IonFabButton, IonModal, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TableModule } from 'primeng/table';
 import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline, chevronForwardOutline } from 'ionicons/icons';
+import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline } from 'ionicons/icons';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -23,8 +23,9 @@ import { MultiSelectModule } from 'primeng/multiselect';
   templateUrl: './users.page.html',
   styleUrls: ['./users.page.scss'],
   standalone: true,
-  imports: [ CommonModule, FormsModule, TableModule, CardModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
-    IonButton, IonIcon,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [CommonModule, FormsModule, TableModule, CardModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
+    IonButton, IonIcon, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle,
     TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, DropdownModule,
     MultiSelectModule]
 })
@@ -34,54 +35,49 @@ export class UsersPage implements OnInit {
   rowsPerPageOptions: number[] = [10, 25, 50];
   selectedItems: any = []
   searchValueUsers: string = '';
+  isModalOpen = false;
+  user: any = {
+    role: '',
+    name: '',
+    type: 'Empleado',
+    password: '',
+    email: '',
+    level: null,
+    rfid: null,
+    enabled_flag: 'Y'
+  };
+  organizations: any = []
+  availableOrganizations: any[] = [];
   constructor(private apiService: ApiService,
     private endPoints: EndpointsService,
+    private api: ApiService,
+    private changeDetector: ChangeDetectorRef,
     private alerts: AlertsService) {
-    addIcons({ ellipsisVerticalOutline, chevronForwardOutline })
+    addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline })
   }
 
   ngOnInit() {
-    this.GetOrganizations();
+    this.GetUsers();
   }
 
   GetOrganizations() {
-    this.apiService.GetRequestRender(this.endPoints.Render('users/300000003173662')).then((response: any) => {
-      //const data = response;
-      this.users = { ...response };
+    this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
+      console.log(response);
+    })
+  }
 
-      // Inicializar propiedad selected para DB
+  GetUsers() {
+    this.apiService.GetRequestRender(this.endPoints.Render('users/2')).then((response: any) => {
+      console.log(response)
+      this.users = { ...response };
       if (this.users.items) {
         this.users.items = this.users.items.map((item: any) => ({
           ...item,
           selected: false
         }));
       }
-      /*
-            this.apiService.GetRequestFusion(this.endPoints.Path('organizations')).then((response: any) => {
-              const data = JSON.parse(response);
-              this.fusionData = { ...data };
-      
-              if (this.fusionData.items && this.dbData.items) {
-                // Set de ID's para filtrar posteriormente
-                const dbOrganizationIds = new Set(this.dbData.items.map((item: any) => String(item.OrganizationId)));
-                // Filtrar items de fusion que no estén en DB
-                this.fusionData.items = this.fusionData.items.filter((fusionItem: any) => {
-                  return !dbOrganizationIds.has(String(fusionItem.OrganizationId));
-                });
-              }
-      
-              // Inicializar propiedad selected para FUSION (solo items filtrados)
-              if (this.fusionData.items) {
-                this.fusionData.items = this.fusionData.items.map((item: any) => ({
-                  ...item,
-                  selected: false
-                }));
-              }
-      
-            });*/
     });
   }
-
   //Metodo para manejar el filtro global
   OnFilterGlobal(event: Event, table: any) {
     const target = event.target as HTMLInputElement;
@@ -91,5 +87,68 @@ export class UsersPage implements OnInit {
   ClearFilter(table: any) {
     table.clear();
     this.searchValueUsers = '';
+  }
+  setOpen(isOpen: boolean) {
+    this.apiService.GetRequestRender(this.endPoints.Render('organizations/1')).then((response: any) => {
+      this.organizations = response.items
+      this.user.organizations = [{ org_id: response.items[0].OrganizationId }]
+      this.user.role = "Operador"
+      this.user.level = '1'
+      console.log(this.organizations);
+      this.isModalOpen = isOpen;
+    })
+  }
+  AddNewUser() {
+    console.log('Usuario creado:', this.user);
+    this.api.PostRequestRender(this.endPoints.Render('users'), this.user).then((response: any) => {
+      console.log(response);
+        this.users = []
+      this.setOpen(false)
+      this.user = {
+        role: '',
+        name: '',
+        type: 'Empleado',
+        password: '',
+        email: '',
+        level: null,
+        rfid: null,
+        enabled_flag: 'Y',
+        company_id : 1
+      };
+      this.changeDetector.detectChanges()
+      this.GetUsers()
+    })
+  }
+
+  addNewOrganization() {
+    // Obtener organizaciones ya seleccionadas
+    const selectedOrgIds = this.user.organizations.map((org: any) => org.org_id);
+
+    const availableOrg = this.organizations.find((org: any) =>
+      !selectedOrgIds.includes(org.OrganizationId)
+    );
+    this.user.organizations.push({ org_id: availableOrg.OrganizationId });
+
+  }
+  removeOrganization(org: any): void {
+    const index = this.user.organizations.indexOf(org);
+    if (index > -1) {
+      this.user.organizations.splice(index, 1);
+    }
+  }
+  get hasAvailableOrganizations(): boolean {
+    const selectedOrgIds = this.user.organizations.map((org: any) => org.org_id);
+    return this.organizations.some((org: any) => !selectedOrgIds.includes(org.OrganizationId));
+  }
+  getAvailableOrganizations(currentOrgId?: string): any[] {
+    // Obtener los IDs de organizaciones ya seleccionadas
+    const selectedOrgIds = this.user.organizations
+      .map((org: any) => org.org_id)
+      .filter((id: string) => id !== currentOrgId); // Excluir la organización actual
+
+    // Filtrar organizaciones disponibles
+    return this.organizations.filter((org: any) =>
+      !selectedOrgIds.includes(org.OrganizationId)
+    );
   }
 }

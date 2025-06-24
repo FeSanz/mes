@@ -20,7 +20,7 @@
           <ion-icon slot="end" name="arrow-forward"></ion-icon>
         </ion-button-->
       </div>
-      <p-table #dtUsers [value]="users.items" stripedRows selectionMode="multiple" [(selection)]="selectedItems"
+      <p-table #dtUsers [value]="users.items" stripedRows selectionMode="multiple" [(selection)]="selectedItems" *ngIf="users.length !=0"
         dataKey="user_id" [tableStyle]="{ 'min-width': '30rem' }" styleClass="card-table-primeng" [size]="'small'"
         [rowHover]="true" [rows]="rowsPerPage" [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions"
         [paginator]="true" [filterDelay]="0" [alwaysShowPaginator]="true"
@@ -93,4 +93,87 @@
       </p-table>
     </div>
   </div>
+
+  <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Agregar nuevo usuario</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpen(false)">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-item>
+          <ion-select label="Rol" [(ngModel)]="user.role" name="role" required interface="popover">
+            <ion-select-option value="Supervisor">Supervisor</ion-select-option>
+            <ion-select-option value="Operador">Operador</ion-select-option>
+            <ion-select-option value="Administrador">Administrador</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Nivel" [(ngModel)]="user.level" name="level" required interface="popover">
+            <ion-select-option *ngFor="let lvl of [1, 2, 3, 4]">{{ lvl }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-input placeholder="Nombre" [(ngModel)]="user.name" name="name" required>
+            <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input placeholder="Email" [(ngModel)]="user.email" name="email" type="email" required>
+            <div slot="label"><ion-text color="primary">E-mail:</ion-text></div>
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input placeholder="Contraseña" [(ngModel)]="user.password" name="password" type="password" required>
+            <div slot="label"><ion-text color="primary">Contraseña:</ion-text></div>
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input placeholder="RFID" [(ngModel)]="user.rfid" name="rfid" type="number">
+            <div slot="label"><ion-text color="primary">RFID:</ion-text></div>
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-toggle [(ngModel)]="user.enabled_flag" name="enabled_flag" [checked]="true"
+            (ionChange)="user.enabled_flag = $event.detail.checked ? 'Y' : 'N'"> Activo</ion-toggle>
+        </ion-item>
+        <ion-item-sliding *ngFor="let org of user.organizations; let i = index" lines="full">
+          <ion-item>
+            <ion-select label="Organización:" [(ngModel)]="org.org_id" required
+              interface="popover">
+              <ion-select-option *ngFor="let orgAv of getAvailableOrganizations(org.org_id)"
+                [value]="orgAv.OrganizationId">
+                {{ orgAv.Name }} ({{ orgAv.Code }})
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="removeOrganization(org)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+        <div class="ion-text-center">
+          <ion-button fill="outline" (click)="addNewOrganization()" [disabled]="!hasAvailableOrganizations"
+            [disabled]="organizations.length === 0">
+            Agregar organización
+          </ion-button>
+        </div>
+        <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+          <ion-fab-button (click)="AddNewUser()">
+            <ion-icon name="checkmark-outline"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="setOpen(true)">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

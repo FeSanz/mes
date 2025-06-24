@@ -30,8 +30,6 @@ export class LoginPage implements OnInit {
     addIcons({ businessOutline, personOutline, lockClosedOutline });
     this.authRemember = localStorage.getItem("authRemember") == "true" ? true : false
     api.isAuthenticated() ? this.navCtrl.navigateRoot('/monitoring') : null
-    console.log(localStorage.getItem("isLogged"));
-    
     const credentials: any = this.authRemember ? api.GetCredentials() : {}
     this.username = credentials.user
     this.password = credentials.password
