@@ -67,7 +67,7 @@ export class UsersPage implements OnInit {
   }
 
   GetUsers() {
-    this.apiService.GetRequestRender(this.endPoints.Render('users/2')).then((response: any) => {
+    this.apiService.GetRequestRender(this.endPoints.Render('users?companyId=2')).then((response: any) => {
       console.log(response)
       this.users = { ...response };
       if (this.users.items) {

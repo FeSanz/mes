@@ -232,10 +232,13 @@ export class ApiService {
   /*******************************Authentication************************** */
   async AuthRequestDatabase(url: string, user: string, password: string) {
     await this.alerts.ShowLoading("Autenticando...");
+    password = btoa(password)
     try {
       const options = {
         url: url,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json'
+        },
         data: {
           "email": user,
           "password": password

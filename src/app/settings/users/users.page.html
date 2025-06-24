@@ -65,6 +65,11 @@
                 <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
               </div>
             </th>
+            <th pSortableColumn="organizations">
+              <div class="flex justify-between items-center">Organizaciones <p-sortIcon field="type" />
+                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+              </div>
+            </th>
             <th style="width: 4rem">
               <div class="flex justify-between items-center">Acciones
                 <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
@@ -81,6 +86,7 @@
             <td>{{ item.role }}</td>
             <td>{{ item.email }}</td>
             <td>{{ item.type }}</td>
+            <td>{{ item.organizations }}</td>
             <td>
               <ion-buttons>
                 <ion-button>

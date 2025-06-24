@@ -40,10 +40,9 @@ export class LoginPage implements OnInit {
 
   LogIn() {
     this.api.AuthRequestDatabase(this.endPoints.Render('login'), this.username, this.password).then((response: any) => {
-      console.log(response);
       if (response.errorsExistFlag == false) {
         localStorage.setItem("isLogged", "true")
-        //this.app.username = this.username
+        localStorage.setItem("userData", JSON.stringify(response.data))
         if (this.authRemember) this.api.SaveCredentials(this.username, this.password, this.authRemember);
         this.alerts.Success("Bienvenido")
         this.navCtrl.navigateRoot('/monitoring');

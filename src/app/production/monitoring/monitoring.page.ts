@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@a
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading} from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading } from '@ionic/angular/standalone';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
@@ -69,6 +69,8 @@ export class MonitoringPage implements OnInit {
     private alerts: AlertsService,
     private changeDetector: ChangeDetectorRef) {
     addIcons({ checkmark, addOutline })
+    const user = JSON.parse(String(localStorage.getItem("userData")))
+    console.log(user.company);    
   }
   ngOnInit() {
     this.sensorData.push();
@@ -78,7 +80,6 @@ export class MonitoringPage implements OnInit {
   }
   GetDasboards() {
     this.api.GetRequestRender(this.endPoints.Render('dashboards/1')).then((response: any) => {
-      console.log(response);
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
         id: item.dashboard_id,
@@ -91,22 +92,6 @@ export class MonitoringPage implements OnInit {
         this.newWidgetData.machine = response.items[0].machineId + ""
       })
     })
-  }
-  ShowChartData(data: any) {
-    //this.chartData = data
-  }
-  onResetZoom() {
-    //this.chartWidget.resetZoom();
-  }
-  Suscribe() {
-    /*this.wsService.Suscribe("F0:00:TEST", (data) => {
-      console.log(data);
-      this.changeDetector.detectChanges();
-    }).then(ws => {
-      console.log('Conectado al socket 2');
-    }).catch(err => {
-      console.error('No se pudo conectar:', err);
-    });*/
   }
   setOpen(isOpen: boolean) {
     this.isModalOpen = isOpen;
