@@ -70,7 +70,7 @@ export class MonitoringPage implements OnInit {
     private changeDetector: ChangeDetectorRef) {
     addIcons({ checkmark, addOutline })
     const user = JSON.parse(String(localStorage.getItem("userData")))
-    console.log(user.company);    
+    console.log(user);    
   }
   ngOnInit() {
     this.sensorData.push();
