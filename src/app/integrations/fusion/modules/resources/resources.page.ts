@@ -46,7 +46,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   dbData: any = {};
 
   dbOrganizations: any = {};
-  organizationSelected: string = '';
+  organizationSelected: string | any = '';
 
   workCenters: any = {};
   workCenterSelected: string | any = '';
@@ -98,14 +98,14 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   GetOrganizationsRender(){
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
+    this.apiService.GetRequestRender(this.endPoints.Render('organizations/1')).then((response: any) => {
       this.dbOrganizations = response;
     });
   }
 
   OnOrganizationSelected() {
     if(this.organizationSelected) {
-      this.apiService.GetRequestFusion(this.endPoints.Path('work_centers', this.organizationSelected)).then((response: any) => {
+      this.apiService.GetRequestFusion(this.endPoints.Path('work_centers', this.organizationSelected.Code)).then((response: any) => {
         this.workCenters = JSON.parse(response);
       });
     }
@@ -113,12 +113,12 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
   OnWorkCenterSelected() {
     if(this.workCenterSelected) {
-      let clause = `resourceMachines/${this.organizationSelected}/${this.workCenterSelected.WorkCenterId}`;
+      let clause = `resourceMachines/${this.organizationSelected.OrganizationId}/${this.workCenterSelected.WorkCenterId}`;
       this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
         this.dbData = response;
 
-        this.apiService.GetRequestFusion(this.endPoints.Path('machines', this.workCenterSelected.WorkCenterId, this.organizationSelected)).then((response: any) => {
+        this.apiService.GetRequestFusion(this.endPoints.Path('machines', this.workCenterSelected.WorkCenterId, this.organizationSelected.Code)).then((response: any) => {
           this.fusionData = JSON.parse(response);
           this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
 
@@ -136,10 +136,10 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   FilterRegisteredItems() {
     if (this.fusionOriginalData.items && this.dbData.items) {
       // Set de ID's para filtrar posteriormente
-      const dbResourcesIds = new Set(this.dbData.items.map((item: any) => String(item.MachineId)));
+      const dbResourcesCodes = new Set(this.dbData.items.map((item: any) => String(item.Code)));
       // Filtrar items de fusion que no estén en DB
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
-        return !dbResourcesIds.has(String(fusionItem.ResourceId));
+        return !dbResourcesCodes.has(String(fusionItem.ResourceCode));
       });
     }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
       if(this.fusionOriginalData.items) {
@@ -157,8 +157,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        MachineId: item.ResourceId,
-        OrganizationId: this.organizationSelected,
+        OrganizationId: this.organizationSelected.OrganizationId,
         Code: item.ResourceCode,
         Name: item.ResourceName,
         WorkCenterId: this.workCenterSelected.WorkCenterId,
@@ -193,8 +192,6 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
         this.alerts.Warning("Seleccione algún elemento para eliminar");
         return;
       }
-
-      console.log('DB:', this.selectedItemsDB);
 
       try {
         let successCount = 0;
@@ -237,7 +234,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   RefreshTables() {
-    let clause = `resourceMachines/${this.organizationSelected}/${this.workCenterSelected.WorkCenterId}`;
+    let clause = `resourceMachines/${this.organizationSelected.OrganizationId}/${this.workCenterSelected.WorkCenterId}`;
     this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;

@@ -23,12 +23,12 @@ export class EndpointsService {
 
     'work_centers': '/workCenters?' + this._params +
                     '&fields=WorkCenterId,WorkCenterName' +
-                    '&q=OrganizationId={0}',
+                    '&q=OrganizationCode=\'{0}\'',
 
     'machines': '/productionResources?' + this._params +
                 '&fields=ResourceId,ResourceCode,ResourceName,ResourceClassCode' +
                 '&finder=findByWorkCenterId;WorkCenterId={0}' +
-                '&q=OrganizationId={1} and ResourceType=\'EQUIPMENT\' and Status=\'Active\'',
+                '&q=OrganizationCode=\'{1}\' and ResourceType=\'EQUIPMENT\' and Status=\'Active\'',
 
     'lookups': '/standardLookups?' + this._params +
                 '&fields=Meaning,Description;lookupCodes:LookupCode,Meaning' +

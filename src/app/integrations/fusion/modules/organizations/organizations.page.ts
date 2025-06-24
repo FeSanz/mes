@@ -93,7 +93,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   GetOrganizations(){
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
+    this.apiService.GetRequestRender(this.endPoints.Render('organizations/1')).then((response: any) => {
       this.dbData = response;
 
       this.apiService.GetRequestFusion(this.endPoints.Path('organizations')).then((response: any) => {
@@ -114,10 +114,10 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   FilterRegisteredItems() {
     if (this.fusionOriginalData.items && this.dbData.items) {
       // Set de ID's para filtrar posteriormente
-      const dbOrganizationIds = new Set(this.dbData.items.map((item: any) => String(item.OrganizationId)));
+      const dbOrganizationCodes = new Set(this.dbData.items.map((item: any) => String(item.Code)));
       // Filtrar items de fusion que no estén en DB
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
-        return !dbOrganizationIds.has(String(fusionItem.OrganizationId));
+        return !dbOrganizationCodes.has(String(fusionItem.OrganizationCode));
       });
     }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
       if(this.fusionOriginalData.items) {
@@ -135,12 +135,13 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        OrganizationId: item.OrganizationId,
+        CompanyId: 1,
         Code: item.OrganizationCode,
         Name: item.OrganizationName,
         Location: item.LocationCode,
         WorkMethod: item.plantParameters.items[0].DefaultWorkMethod,
-        BUId: item.ManagementBusinessUnitId
+        BUId: item.ManagementBusinessUnitId,
+        Coordinates: null
       }));
 
       const payload = {
