@@ -44,6 +44,8 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   rowsPerPage: number = 50;
   rowsPerPageOptions: number[] = [10, 25, 50];
 
+  userData: any = {};
+
   fusionOriginalData: any = {};
   fusionData: any = {};
   dbData: any = {};
@@ -63,6 +65,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.GetOrganizations();
   }
 
@@ -93,7 +96,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   GetOrganizations(){
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations/1')).then((response: any) => {
+    this.apiService.GetRequestRender(this.endPoints.Render(`organizations/${this.userData.Company.CompanyId}`)).then((response: any) => {
       this.dbData = response;
 
       this.apiService.GetRequestFusion(this.endPoints.Path('organizations')).then((response: any) => {

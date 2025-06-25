@@ -47,7 +47,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
   dbData: any = {};
 
   dbOrganizations: any = {};
-  organizationSelected: string = '';
+  organizationSelected: string | any = '';
 
   selectedItemsFusion: any[] = [];
   selectedItemsDB: any[] = [];
@@ -66,7 +66,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
 
 
   ngOnInit() {
-    this.GetOrganizationsRender();
+    this.dbOrganizations = JSON.parse(String(localStorage.getItem("userData")));
   }
 
   ngAfterViewInit() {
@@ -103,7 +103,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
 
   OnOrganizationSelected() {
     if(this.organizationSelected) {
-      let clause = `shifts/${this.organizationSelected}`;
+      let clause = `shifts/${this.organizationSelected.OrganizationId}`;
       this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
         this.dbData = response;
@@ -130,7 +130,6 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        ShiftId: item.ShiftId,
         Name: item.Name,
         StartTime: item.StartTime,
         EndTime: item.EndTime,
@@ -139,7 +138,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
       }));
 
       const payload = {
-        OrganizationId: this.organizationSelected,
+        OrganizationId: this.organizationSelected.OrganizationId,
         items: itemsData
       };
 
@@ -166,16 +165,13 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      console.log('DB:', this.selectedItemsDB);
-
       try {
         let successCount = 0;
 
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
-          console.log('Deleting...', item.OrgShiftId);
           const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('shifts/' + item.OrgShiftId),
+            this.endPoints.Render('shifts/' + item.ShiftId),
           );
 
           if (!response.errorsExistFlag) {
@@ -210,7 +206,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   RefreshTables() {
-    let clause = `shifts/${this.organizationSelected}`;
+    let clause = `shifts/${this.organizationSelected.OrganizationId}`;
     this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;

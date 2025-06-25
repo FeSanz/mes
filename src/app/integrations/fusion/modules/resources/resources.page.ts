@@ -68,7 +68,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
 
   ngOnInit() {
-    this.GetOrganizationsRender();
+    this.dbOrganizations = JSON.parse(String(localStorage.getItem("userData")));
   }
 
   ngAfterViewInit() {
