@@ -36,23 +36,19 @@ export class EndpointsService {
 
     'items':  '/itemsV2?' + this._params +
               '&fields=ItemId,ItemNumber,ItemDescription,PrimaryUOMValue,LotControlValue' +
-              '&q=OrganizationId={0} and ItemStatusValue=\'Active\' and UserItemTypeValue=\'{1}\' and ItemNumber!=\'null\'',
+              '&q=OrganizationCode=\'{0}\' and ItemStatusValue=\'Active\' and UserItemTypeValue=\'{1}\' and ItemNumber!=\'null\'',
 
-    'wo_process_released': '/processWorkOrders?' + this._params +
-                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceId' +
-                            '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and (CompletedQuantity=0 or CompletedQuantity is null)',
+    'items_all': '/itemsV2?' + this._params +
+                    '&fields=ItemId,ItemNumber,ItemDescription,PrimaryUOMValue,LotControlValue,UserItemTypeValue' +
+                    '&q=OrganizationCode=\'{0}\' and ItemStatusValue=\'Active\' and ItemNumber!=\'null\'',
 
-    'wo_process_dispatched': '/processWorkOrders?' + this._params +
-                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceId' +
-                            '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and CompletedQuantity>0',
+    'wo_process': '/processWorkOrders?' + this._params +
+                    '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceId' +
+                    '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\'',
 
-    'wo_discrete_released': '/workOrders?' + this._params +
-                            '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceId' +
-                            '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and (CompletedQuantity=0 or CompletedQuantity is null)',
-
-    'wo_discrete_dispatched': '/workOrders?' + this._params +
-                              '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceId' +
-                              '&q=OrganizationId={0} and WorkOrderSystemStatusCode=\'RELEASED\' and CompletedQuantity>0',
+    'wo_discrete': '/workOrders?' + this._params +
+                    '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceId' +
+                    '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\'',
   };
 
   constructor() { }
@@ -72,7 +68,7 @@ export class EndpointsService {
     return this.FormatString(pathBase, ...args);
   }
 
-  // Método para formatear strings con marcadores de posición estilo C#
+  //Formatear strings con marcadores de posición estilo C#
   private FormatString(pathBase: string, ...args: any[]): string {
     return pathBase.replace(/{(\d+)}/g, (match, index) => {
       return typeof args[index] !== 'undefined' ? String(args[index]) : match;

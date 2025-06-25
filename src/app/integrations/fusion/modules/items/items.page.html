@@ -1,6 +1,6 @@
 <ion-header [translucent]="true" xmlns="http://www.w3.org/1999/html">
   <ion-toolbar>
-    <ion-title>Artículos Producción</ion-title>
+    <ion-title>Artículos Producción {{dbOrganizations.Company.Name}}</ion-title>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -12,11 +12,10 @@
     <p-floatlabel class="w-full md:w-56" variant="on">
       <p-select [(ngModel)]="organizationSelected"
                 inputId="organization_select"
-                [options]="dbOrganizations.items"
+                [options]="dbOrganizations.Company.Organizations"
                 optionLabel="Name"
                 [filter]="true"
                 filterBy="Name"
-                optionValue="OrganizationId"
                 placeholder="Seleccione una organización"
                 styleClass="w-full"
                 [virtualScroll]="true"

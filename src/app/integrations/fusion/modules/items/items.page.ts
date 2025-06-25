@@ -46,7 +46,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
   dbData: any = {};
 
   dbOrganizations: any = {};
-  organizationSelected: string = '';
+  organizationSelected: string | any = '';
 
   itemType: any = {};
   itemTypeSelected: string | any = '';
@@ -68,7 +68,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
 
 
   ngOnInit() {
-    this.GetOrganizationsRender();
+    this.dbOrganizations = JSON.parse(String(localStorage.getItem("userData")));
   }
 
   ngAfterViewInit() {
@@ -110,6 +110,13 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
 
         if (data.items && data.items.length > 0 && data.items[0].lookupCodes && data.items[0].lookupCodes.items) {
           this.itemType = data.items[0].lookupCodes;
+
+          const additionalType = {
+            LookupCode: 'all',
+            Meaning: "Todos"
+          };
+
+          this.itemType.items.push(additionalType);
         } else {
           this.alerts.Warning('No se encontraron tipos de articulos');
           this.itemType = [];
@@ -121,12 +128,16 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
 
   OnItemTypeSelected() {
     if(this.itemTypeSelected) {
-      let clause = `items/${this.itemTypeSelected.Meaning}`;
+      let clause = `items/${this.dbOrganizations.Company.CompanyId}/${this.itemTypeSelected.Meaning}`;
       this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
         this.dbData = response;
 
-        this.apiService.GetRequestFusion(this.endPoints.Path('items', this.organizationSelected, this.itemTypeSelected.Meaning)).then((response: any) => {
+        const path = this.itemTypeSelected.LookupCode === 'all'
+          ? this.endPoints.Path('items_all', this.organizationSelected.Code)
+          : this.endPoints.Path('items', this.organizationSelected.Code, this.itemTypeSelected.Meaning);
+
+        this.apiService.GetRequestFusion(path).then((response: any) => {
           this.fusionData = JSON.parse(response);
           this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
 
@@ -144,10 +155,10 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
   FilterRegisteredItems() {
     if (this.fusionOriginalData.items && this.dbData.items) {
       // Set de ID's para filtrar posteriormente
-      const dbItemsIds = new Set(this.dbData.items.map((item: any) => String(item.ItemId)));
+      const dbItemsNumbers = new Set(this.dbData.items.map((item: any) => String(item.Number)));
       // Filtrar items de fusion que no estén en DB
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
-        return !dbItemsIds.has(String(fusionItem.ItemId));
+        return !dbItemsNumbers.has(String(fusionItem.ItemNumber));
       });
     }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
       if(this.fusionOriginalData.items) {
@@ -165,15 +176,15 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        ItemId: item.ItemId,
         Number: item.ItemNumber,
         Description: item.ItemDescription,
         UoM: item.PrimaryUOMValue,
-        Type: this.itemTypeSelected.Meaning,
+        Type: this.itemTypeSelected.LookupCode === 'all' ? item.UserItemTypeValue : this.itemTypeSelected.Meaning,
         LotControl: this.LotControlDisplay(item.LotControlValue)
       }));
 
       const payload = {
+        CompanyId: this.dbOrganizations.Company.CompanyId,
         items: itemsData
       };
 
@@ -199,8 +210,6 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
         this.alerts.Warning("Seleccione algún elemento para eliminar");
         return;
       }
-
-      console.log('DB:', this.selectedItemsDB);
 
       try {
         let successCount = 0;
@@ -255,7 +264,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   RefreshTables() {
-    let clause = `items/${this.itemTypeSelected.Meaning}`;
+    let clause = `items/${this.dbOrganizations.Company.CompanyId}/${this.itemTypeSelected.Meaning}`;
     this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
