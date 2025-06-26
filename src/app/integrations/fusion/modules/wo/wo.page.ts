@@ -50,25 +50,6 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
   dbOrganizations: any = {};
   organizationSelected: string | any = '';
 
-  workMethod: string = 'DESCONOCIDO';
-  private readonly workMethodMap = {
-    'PROCESS_MANUFACTURING': 'PROCESOS', 'DISCRETE_MANUFACTURING': 'DISCRETA', 'MIXED_MANUFACTURING': 'MIXTA'
-  } as const;
-
-  private paths: any = {
-    'PROCESS_MANUFACTURING': { 'RELEASED': 'wo_process_released', 'IN_PROCESS': 'wo_process_dispatched' },
-    'DISCRETE_MANUFACTURING': { 'RELEASED': 'wo_discrete_released', 'IN_PROCESS': 'wo_discrete_dispatched' }
-  };
-
-  orderTypes: any = {
-    items:[
-      { Code:'RELEASED', Name:'LIBERADAS' },
-      { Code:'IN_PROCESS', Name:'EN PROCESO' }
-    ]
-  };
-
-  orderTypeSelected: string | any = '';
-
   selectedItemsFusion: any[] = [];
   selectedItemsDB: any[] = [];
 
@@ -76,7 +57,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
   searchValueDB: string = '';
 
   private dataTransformers: { [key: string]: (data: any) => any } = {
-    'PROCESS_MANUFACTURING': (data: any) => ({
+    'PROCESOS': (data: any) => ({
       WorkOrderId: data.WorkOrderId,
       WorkOrderNumber: data.WorkOrderNumber,
       WorkDefinitionId: data.WorkDefinitionId,
@@ -89,7 +70,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
       CompletionDate: FromISO8601(data.PlannedCompletionDate)
     }),
 
-    'DISCRETE_MANUFACTURING': (data: any) => ({
+    'DISCRETA': (data: any) => ({
       WorkOrderId: data.WorkOrderId,
       WorkOrderNumber: data.WorkOrderNumber,
       WorkDefinitionId: data.WorkDefinitionId,
@@ -114,7 +95,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
 
 
   ngOnInit() {
-    this.GetOrganizationsRender();
+    this.dbOrganizations = JSON.parse(String(localStorage.getItem("userData")));
   }
 
   ngAfterViewInit() {
@@ -151,68 +132,53 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
 
   OnOrganizationSelected() {
     if(this.organizationSelected) {
-      if (this.organizationSelected?.WorkMethod) {
-        this.workMethod = this.workMethodMap[this.organizationSelected.WorkMethod as keyof typeof this.workMethodMap]  || this.organizationSelected.WorkMethod;
-      }
+      let clause = `workOrders/${this.organizationSelected.OrganizationId}`;
+      this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+        response.totalResults == 0 && this.alerts.Warning(response.message);
+        this.dbData = response;
+
+        const path = this.organizationSelected.WorkMethod === 'PROCESOS' ? 'wo_process' : 'wo_discrete';
+        this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code)).then((response: any) => {
+          const data = JSON.parse(response);
+
+          if (this.organizationSelected.WorkMethod === 'MIXTA') {
+            this.mixedManufacturingCase();
+          }
+
+          //Para manufactura por PROCESOS O DISCRETA
+          const transformer = this.dataTransformers[this.organizationSelected.WorkMethod];
+          if (!transformer) {
+            this.alerts.Warning('Tipo de manufactura no identificado');
+            return;
+          }
+
+          // Transformar y asignar datos
+          const restructuredData = data.items.map((item: any) => transformer(item));
+          this.fusionData = {
+            items: restructuredData,
+            totalResults: data.totalResults,
+            count: data.count,
+            hasMore: false,
+          };
+
+          console.log(this.fusionData);
+          this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
+
+          this.FilterRegisteredItems();
+        });
+      });
     }
   }
 
-
-  OnWoTypeSelected() {
-    if (!this.orderTypeSelected) return;
-
-    let clause = `workOrders/${this.organizationSelected.OrganizationId}/${this.orderTypeSelected.Code}`;
-    this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
-      response.totalResults == 0 && this.alerts.Warning(response.message);
-      this.dbData = response;
-
-      const path = this.paths[this.organizationSelected.WorkMethod]?.[this.orderTypeSelected.Code] || 'wo_process_released';
-      this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.OrganizationId)).then((response: any) => {
-        const data = JSON.parse(response);
-
-        if (this.organizationSelected.WorkMethod === 'MIXED_MANUFACTURING') {
-          this.mixedManufacturingCase();
-        }
-
-        //Para manufactura por PROCESOS O DISCRETA
-        const transformer = this.dataTransformers[this.organizationSelected.WorkMethod];
-        if (!transformer) {
-          this.alerts.Warning('Tipo de manufactura no identificado');
-          return;
-        }
-
-
-        // Transformar y asignar datos
-        const restructuredData = data.items.map((item: any) => transformer(item));
-        this.fusionData = {
-          items: restructuredData,
-          totalResults: data.totalResults,
-          count: data.count,
-          hasMore: false,
-        };
-
-        console.log(this.fusionData);
-        this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
-
-        this.FilterRegisteredItems();
-      });
-    });
-  }
 
   async mixedManufacturingCase()
   {
-    let paths: string[] = [];
-    let method: string[] = ['PROCESS_MANUFACTURING', 'DISCRETE_MANUFACTURING'];
-    if(this.orderTypeSelected.Code === 'RELEASED'){
-      paths = ['wo_process_released', 'wo_discrete_released'];
-    }else if(this.orderTypeSelected.Code === 'IN_PROCESS'){
-      paths = ['wo_process_dispatched', 'wo_process_dispatched'];
-    }
-
+    let paths: string[] =  ['wo_process', 'wo_discrete'];
+    let method: string[] = ['PROCESOS', 'DISCRETA'];
     try {
       // Ejecutar todas las peticiones en paralelo
       const promises = paths.map(path =>
-        this.apiService.GetRequestFusion(this.endPoints.Path(path, this.orderTypes.Code, this.organizationSelected))
+        this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code))
       );
 
       const responses = await Promise.all(promises);
@@ -260,10 +226,10 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
   FilterRegisteredItems() {
     if (this.fusionOriginalData.items && this.dbData.items) {
       // Set de ID's para filtrar posteriormente
-      const dbResourcesIds = new Set(this.dbData.items.map((item: any) => String(item.MachineId)));
+      const dbOrdersNumbers = new Set(this.dbData.items.map((item: any) => String(item.WorkOrderNumber)));
       // Filtrar items de fusion que no estén en DB
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
-        return !dbResourcesIds.has(String(fusionItem.ResourceId));
+        return !dbOrdersNumbers.has(String(fusionItem.WorkOrderNumber));
       });
     }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
       if(this.fusionOriginalData.items) {
@@ -295,7 +261,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         items: itemsData
       };
 
-      this.apiService.PostRequestRender(this.endPoints.Render('resourceMachines'), payload).then(async (response: any) => {
+      this.apiService.PostRequestRender(this.endPoints.Render('workOrders'), payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
           this.alerts.Info(response.message);
         }else {
@@ -326,7 +292,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
           const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('resourceMachines/' + item.MachineId),
+            this.endPoints.Render('workOrders/' + item.MachineId),
           );
 
           if (!response.errorsExistFlag) {
@@ -361,7 +327,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
   }
 
   RefreshTables() {
-    let clause = `resourceMachines/${this.organizationSelected}/${this.orderTypes.WorkCenterId}`;
+    let clause = `workOrders/${this.organizationSelected.Code}`;
     this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;

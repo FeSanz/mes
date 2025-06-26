@@ -1,9 +1,16 @@
-import { Component, OnInit,ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
 import {
-  IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonMenuButton,
+  IonTitle,
+  IonToolbar
 } from '@ionic/angular/standalone';
 
 import {ApiService} from "../../../../services/api.service";
@@ -12,18 +19,16 @@ import {AlertsService} from "../../../../services/alerts.service";
 import {HeightTable} from "../../../../models/tables.prime";
 import {addIcons} from "ionicons";
 
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { DropdownModule } from 'primeng/dropdown';
-import { MultiSelectModule } from 'primeng/multiselect';
+import {TableModule} from 'primeng/table';
+import {TagModule} from 'primeng/tag';
+import {ButtonModule} from 'primeng/button';
+import {InputTextModule} from 'primeng/inputtext';
+import {IconFieldModule} from 'primeng/iconfield';
+import {InputIconModule} from 'primeng/inputicon';
+import {DropdownModule} from 'primeng/dropdown';
+import {MultiSelectModule} from 'primeng/multiselect';
 
-import {
-  closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
-} from 'ionicons/icons';
+import {arrowForward, chevronDownOutline, closeOutline, cloudOutline, serverOutline, trash} from 'ionicons/icons';
 
 
 @Component({
@@ -138,11 +143,11 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        CompanyId: 1,
+        CompanyId: this.userData.Company.CompanyId,
         Code: item.OrganizationCode,
         Name: item.OrganizationName,
         Location: item.LocationCode,
-        WorkMethod: item.plantParameters.items[0].DefaultWorkMethod,
+        WorkMethod: this.WorkMethodFormat(item.plantParameters.items[0].DefaultWorkMethod),
         BUId: item.ManagementBusinessUnitId,
         Coordinates: null
       }));
@@ -163,6 +168,10 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     }
+  }
+
+  WorkMethodFormat(mfgType: string){
+    return mfgType === 'PROCESS_MANUFACTURING' ? 'PROCESOS' : mfgType === 'DISCRETE_MANUFACTURING' ? 'DISCRETA' : 'NA';
   }
 
   //Metodo para eliminar organizaciones seleccionadas de DB

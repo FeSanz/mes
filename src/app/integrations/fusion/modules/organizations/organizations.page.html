@@ -103,7 +103,7 @@
             <td>{{ item.OrganizationCode }}</td>
             <td>{{ item.OrganizationName }}</td>
             <td>{{ item.LocationCode }}</td>
-            <td>{{ item.plantParameters?.items?.[0]?.DefaultWorkMethod || 'N/A' }}</td>
+            <td>{{ WorkMethodFormat(item.plantParameters.items[0].DefaultWorkMethod)}}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
