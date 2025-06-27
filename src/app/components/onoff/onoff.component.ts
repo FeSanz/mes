@@ -77,7 +77,7 @@ export class OnoffComponent implements OnInit {
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1'), false).then((response: any) => {
+    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id)).then((response: any) => {
       console.log(response);
       this.machines = response.items
       this.isModalOpen = true;
@@ -135,6 +135,6 @@ export class OnoffComponent implements OnInit {
 
   }
   get borderColor(): string {
-    return this.isOn ? this.widgetData.sensors[0].maxColor: 'var(--ion-color-light)'
+    return this.isOn ? this.widgetData.sensors[0].maxColor : 'var(--ion-color-light)'
   }
 }

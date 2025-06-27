@@ -28,10 +28,10 @@ export class LoginPage {
   constructor(private api: ApiService, private navCtrl: NavController, private endPoints: EndpointsService, private alerts: AlertsService, private app: AppComponent) {
     addIcons({ businessOutline, personOutline, lockClosedOutline });
     this.authRemember = localStorage.getItem("authRemember") == "true" ? true : false
-    localStorage.getItem('isLogged') === 'true' ? app.GoToDashboards(0) : null
     const credentials: any = this.authRemember ? this.GetCredentials() : {}
     this.username = credentials.user
     this.password = credentials.password
+    localStorage.getItem('isLogged') === 'true' ? this.LogIn() : null//si no ha cerrado sesión e ingresa al login se vuelve a iniciar sesión
   }
 
   LogIn() {

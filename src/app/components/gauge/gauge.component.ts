@@ -82,7 +82,7 @@ export class GaugeComponent implements OnInit {
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
     console.log(this.copyWidgetData.widgetType);
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1'), false).then((response: any) => {
+    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id)).then((response: any) => {
       console.log(response);
       this.machines = response.items
       this.isModalOpen = true;

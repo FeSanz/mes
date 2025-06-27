@@ -19,7 +19,7 @@ import { EndpointsService } from 'src/app/services/endpoints.service';
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class DevicesPage implements OnInit {
-  machines: any = []
+  organizations: any = []
   isModalOpen = false;
   machine: any = {
     isNew: true,
@@ -64,9 +64,31 @@ export class DevicesPage implements OnInit {
     this.getMachines()
   }
   getMachines() {
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByCompany/' + this.user.Company.CompanyId)).then((response: any) => {
-      this.machines = response.items
-      console.log(response.items);
+    const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
+    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + orgsIds)).then((response: any) => {
+
+      const orgMap = this.user.Company.Organizations.reduce((acc: any, org: any) => {
+        acc[org.OrganizationId] = org.Name;
+        return acc;
+      }, {});
+
+      this.organizations = Object.values(
+        response.items.reduce((acc: any, machine: any) => {
+          const orgId = parseInt(machine.organization_id); // aseguramos tipo número
+          if (!acc[orgId]) {
+            acc[orgId] = {
+              organization_id: orgId,
+              organization_name: orgMap[orgId] || `Org ${orgId}`,
+              devices: []
+            };
+          }
+          acc[orgId].devices.push(machine);
+          return acc;
+        }, {})
+      ).sort((a: any, b: any) => a.organization_name.localeCompare(b.organization_name));
+
+      console.log(this.organizations);
+
     })
   }
   addNewSensor() {
@@ -112,7 +134,6 @@ export class DevicesPage implements OnInit {
     this.machine = JSON.parse(JSON.stringify(machine))
     this.machine.isNew = false
     this.machine.organization_id = Number(this.machine.organization_id)
-    console.log(this.machine);
   }
   addNewMachine() {
     const machineBody = {
@@ -128,11 +149,9 @@ export class DevicesPage implements OnInit {
       sensor.created_by = this.user.UserId;
       sensor.updated_by = this.user.UserId;
     });
-    console.log(machineBody);
     this.api.PostRequestRender(this.endPoints.Render('machines'), machineBody).then((response: any) => {
       const machineId = response.result.machine_id;
       this.api.PostRequestRender(this.endPoints.Render('sensors/') + machineId, { "items": this.machine.sensors }).then((response: any) => {
-        console.log(response);
         this.getMachines()
         this.isModalOpen = false;
       })
@@ -151,7 +170,6 @@ export class DevicesPage implements OnInit {
         }
       })
     };
-    console.log(machineBody);
     this.api.UpdateRequestRender(this.endPoints.Render('machines/') + machineBody.machine_id, machineBody).then((response: any) => {
       console.log(response);
       if (response.errorsExistFlag) {

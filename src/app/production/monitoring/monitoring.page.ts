@@ -112,7 +112,7 @@ export class MonitoringPage implements OnInit {
       }));
 
       //const organizationIds: number[] = this.user.Company.Organizations.map((org: any) => org.OrganizationId);
-      this.api.PostRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations'), { organizationIds: [this.dashboardData.organization_id] }, false).then((response: any) => {
+      this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.dashboardData.organization_id)).then((response: any) => {
         if (response.items.length > 0) {
           this.machines = response.items
           this.newWidgetData.machine = response.items[0].machineId + ""

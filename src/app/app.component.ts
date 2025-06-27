@@ -138,11 +138,15 @@ export class AppComponent {
     })
   }
   GetDashGroup() {//extrae todos los grupos de tableros
-    this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/company/' + this.user.Company.CompanyId), false).then((response: any) => {
-      this.dashboardGroups = response.items
-      console.log(response);
-
-    })
+    if (this.user?.Company?.Organizations?.length > 0) {
+      const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
+      this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/byOrganizations/?organizations=' + orgsIds), false).then((response: any) => {
+        this.dashboardGroups = response.items
+        console.log(this.dashboardGroups);
+      })
+    } else {
+      this.alerts.Error("No hay organizaciones relacionadas con el usuario")
+    }
   }
   editDashGroup(dashGroup: any) {
     this.dashboardGroupData = JSON.parse(JSON.stringify(dashGroup))
@@ -185,15 +189,16 @@ export class AppComponent {
   SaveLogin(user: any, username: any) {//login
     this.user = user
     this.username = username
-    this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/company/' + this.user.Company.CompanyId), false).then((response: any) => {
-      console.log(response.items[0]);
+    const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
+    this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/byOrganizations/?organizations=' + orgsIds), false).then((response: any) => {
       this.dashboardGroups = response.items
-      console.log(this.dashboardGroups);
       this.router.navigate(['/monitoring/' + response.items[0].dashboard_group_id], {
         state: {
           dash: response.items[0]
         }
       });
+      setTimeout(() => {
+      }, 500);
     })
   }
 }
