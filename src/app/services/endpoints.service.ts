@@ -7,8 +7,8 @@ export class EndpointsService {
 
   private _urlFusion = `https://${String(localStorage.getItem('server'))}/fscmRestApi/resources/latest`;
   private _params = `limit=500&totalResults=true&onlyData=true&links=canonical`;
-  //public _urlRender = 'https://iot-services-rd.onrender.com/api';
-  public _urlRender = 'http://localhost:3000/api';
+  public _urlRender = 'https://iot-services-rd.onrender.com/api';
+  //public _urlRender = 'http://localhost:3000/api';
 
   private endPoints: { [key: string]: string } = {
     'organizations': '/inventoryOrganizations?' + this._params +

@@ -49,7 +49,7 @@
         <ion-label slot="end"><strong>Chart</strong></ion-label>
       </ion-item>
       <ion-item>
-        <ion-select label="Estilo:" color="primary" [(ngModel)]="copyWidgetData.chartType">
+        <ion-select label="Estilo:" color="primary" [(ngModel)]="copyWidgetData.chartType" interface="popover">
           <ion-select-option value="area">Area</ion-select-option>
           <ion-select-option value="line">Lineas</ion-select-option>
           <ion-select-option value="bar">Barras</ion-select-option>
@@ -57,12 +57,14 @@
       </ion-item>
       <ion-item-sliding *ngFor="let sensor of copyWidgetData.sensors; let i = index">
         <ion-item>
-          <ion-select label="Máquina:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating">
+          <ion-select label="Máquina:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating"
+            interface="popover">
             <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
               {{ mach.machine_name }}
             </ion-select-option>
           </ion-select>
-          <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating">
+          <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating"
+            interface="popover">
             <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
               {{ s.sensor_name }}
             </ion-select-option>

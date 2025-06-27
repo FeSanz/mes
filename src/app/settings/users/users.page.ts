@@ -18,6 +18,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { PermissionsService } from 'src/app/services/permissions.service';
 
 @Component({
   selector: 'app-users',
@@ -39,7 +40,7 @@ export class UsersPage implements OnInit {
   isModalOpen = false;
   isSmallScreen = false;
   user: any = {
-    role: 'SuperAdmin',
+    role: 'Viewer',
     name: '',
     organizations: [],
     type: 'USER',
@@ -54,6 +55,7 @@ export class UsersPage implements OnInit {
   availableOrganizations: any[] = [];
   company: any = {}
   constructor(private apiService: ApiService, private breakpointObserver: BreakpointObserver,
+    public permissions: PermissionsService,
     private endPoints: EndpointsService,
     private api: ApiService,
     private changeDetector: ChangeDetectorRef,
@@ -178,7 +180,7 @@ export class UsersPage implements OnInit {
   }
   resetUser() {//se reinician los datos del usuario nuevo o a editar
     this.user = {
-      role: 'Admin',
+      role: 'Viewer',
       name: '',
       organizations: [],
       type: 'USER',

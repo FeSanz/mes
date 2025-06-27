@@ -40,9 +40,9 @@
         </ng-template>
         <ng-template #header>
           <tr>
-            <th style="width: 4rem">
+            <!--th style="width: 4rem">
               <p-tableHeaderCheckbox />
-            </th>
+            </th-->
             <th pSortableColumn="name">
               <div class="flex justify-between items-center">Nombre <p-sortIcon field="name" />
                 <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
@@ -77,12 +77,12 @@
         </ng-template>
         <ng-template #body let-item let-rowIndex="rowIndex">
           <tr>
-            <td>
+            <!--td>
               <p-tableCheckbox [value]="item" />
-            </td>
+            </td-->
             <td>{{ item.name }}</td>
             <td>{{ item.role }}</td>
-            <td *ngIf="!isSmallScreen">{{ item.email }}</td>
+            <td *ngIf="!isSmallScreen"><span>{{ item.email }}</span> </td>
             <td *ngIf="!isSmallScreen">{{ item.type }}</td>
             <td *ngIf="!isSmallScreen">
               <ng-container *ngIf="item.organizations?.length; else noOrgs">
@@ -94,10 +94,10 @@
             </td>
             <td>
               <ion-buttons>
-                <ion-toggle *ngIf="!isSmallScreen" [checked]="item.enabled_flag == 'Y'"
-                  (ionChange)="ChangeUserStatus($event, item)">
+                <ion-toggle [checked]="item.enabled_flag == 'Y'"
+                  [disabled]="!permissions.isSuperAdmin()" (ionChange)="ChangeUserStatus($event, item)">
                 </ion-toggle>
-                <ion-button (click)="OpenAsEditUser(item)">
+                <ion-button (click)="OpenAsEditUser(item)" *ngIf="permissions.isSuperAdmin()">
                   <ion-icon color="success" slot="icon-only" name="pencil-outline"></ion-icon>
                 </ion-button>
               </ion-buttons>
@@ -127,9 +127,9 @@
         </ion-item>
         <ion-item>
           <ion-select label="Rol:" [(ngModel)]="user.role" required interface="popover">
+            <ion-select-option value="Viewer">Viewer</ion-select-option>
             <ion-select-option value="Admin">Admin</ion-select-option>
             <ion-select-option value="SuperAdmin">SuperAdmin</ion-select-option>
-            <ion-select-option value="Supervisor">Supervisor</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
@@ -190,7 +190,7 @@
       </ion-content>
     </ng-template>
   </ion-modal>
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="permissions.isSuperAdmin()">
     <ion-fab-button (click)="OpenAsNewUser()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>

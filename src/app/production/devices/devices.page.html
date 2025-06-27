@@ -59,7 +59,8 @@
               <ion-list>
                 <ion-item [button]="true" [detail]="false" (click)="openAsEditMachine(machine)">Editar <ion-icon
                     slot="start" name="pencil-outline" color="success"></ion-icon></ion-item>
-                <ion-item [button]="true" [detail]="false" (click)="deleteMachine(machine.machine_id)">Eliminar
+                <ion-item [button]="true" [detail]="false" (click)="deleteMachine(machine.machine_id)"
+                  *ngIf="permissions.isSuperAdmin()">Eliminar
                   <ion-icon slot="start" name="trash-outline" color="danger"></ion-icon></ion-item>
               </ion-list>
             </ion-content>
@@ -126,7 +127,8 @@
           </ion-buttons>
         </ion-item>
         <ion-item>
-          <ion-select label="Organización:" class="select" color="primary" [(ngModel)]="machine.organization_id">
+          <ion-select label="Organización:" class="select" color="primary" [(ngModel)]="machine.organization_id"
+            interface="popover">
             <ion-select-option [value]="org.OrganizationId"
               *ngFor="let org of user.Company.Organizations">{{org.Name}}</ion-select-option>
           </ion-select>
@@ -167,7 +169,7 @@
             </ion-grid>
           </ion-item>
           <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="removeSensor(sensor)">
+            <ion-item-option color="danger" (click)="removeSensor(sensor)" *ngIf="permissions.isSuperAdmin()">
               <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
             </ion-item-option>
           </ion-item-options>
@@ -180,12 +182,12 @@
             <ion-icon slot="start" name="add"></ion-icon>
             Agregar sensor</ion-button>
         </div>
-        <ion-fab slot="fixed" vertical="bottom" horizontal="start" *ngIf="!machine.isNew">
+        <ion-fab slot="fixed" vertical="bottom" horizontal="start" *ngIf="!machine.isNew && permissions.isSuperAdmin()">
           <ion-fab-button (click)="deleteMachine()" color="danger">
             <ion-icon name="trash-outline"></ion-icon>
           </ion-fab-button>
         </ion-fab>
-        <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="!machine.isNew && permissions.isSuperAdmin()">
           <ion-fab-button (click)="machine.isNew ? addNewMachine() : updateMachine()">
             <ion-icon name="checkmark-outline"></ion-icon>
           </ion-fab-button>
@@ -193,7 +195,7 @@
       </ion-content>
     </ng-template>
   </ion-modal>
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="permissions.isSuperAdmin()">
     <ion-fab-button (click)="openAsNewMachine()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>

@@ -6,7 +6,7 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardT
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
-import { ellipsisVertical, pencilOutline, trashOutline } from 'ionicons/icons';
+import { ellipsisVertical, pencilOutline, trashOutline, checkmark } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { FormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
@@ -40,11 +40,7 @@ export class ThermometerComponent implements OnInit {
     private ws: WebSocketService,
     private endPoints: EndpointsService,
     private api: ApiService) {
-    addIcons({
-      ellipsisVertical,
-      pencilOutline,
-      trashOutline
-    })
+    addIcons({ellipsisVertical,pencilOutline,trashOutline,checkmark});
   }
 
   ngOnInit() {

@@ -16,15 +16,18 @@
       'color': isOn ? 'white' : widgetData.sensors[0].maxColor
     }">
         <div class="onoff-text">
-          <span class="main-state" [ngStyle]="{'color': isOn ? widgetOnOffTextColor : 'var(--ion-color-dark)'}">{{ isOn ? 'ON' : 'OFF' }}</span>
-          <ion-text [ngStyle]="{'color': isOn ? widgetOnOffTextColor : 'var(--ion-color-dark)'}">{{widgetData.sensors[0].sensor_name + ': '
+          <span class="main-state" [ngStyle]="{'color': isOn ? widgetOnOffTextColor : 'var(--ion-color-dark)'}">{{ isOn
+            ? 'ON' : 'OFF' }}</span>
+          <ion-text
+            [ngStyle]="{'color': isOn ? widgetOnOffTextColor : 'var(--ion-color-dark)'}">{{widgetData.sensors[0].sensor_name
+            + ': '
             +lastValue}}</ion-text>
         </div>
       </div>
     </div>
     <ion-item lines="none" style="align-self: stretch" class="ion-text-center">
       <ion-label color="medium">
-        Última actualización: {{ lastDate | date: "d 'de' MMMM 'a las' h:mm a" }}
+        Última actualización: {{ lastDate | date: 'hh:mm a dd/MM/yyyy' }}
       </ion-label>
     </ion-item>
   </ion-card-content>
@@ -66,13 +69,13 @@
       </ion-item>
       <ion-item>
         <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id"
-          label-placement="floating">
+          label-placement="floating" interface="popover">
           <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
             {{ mach.machine_name }}
           </ion-select-option>
         </ion-select>
         <ion-select label="Sensor:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].sensor_id"
-          (ionChange)="onSensorChange($event)" label-placement="floating">
+          (ionChange)="onSensorChange($event)" label-placement="floating" interface="popover">
           <ion-select-option *ngFor="let s of getSensorsForMachine(copyWidgetData.sensors[0].machine_id)"
             [value]="s.sensor_id">
             {{ s.sensor_name }}

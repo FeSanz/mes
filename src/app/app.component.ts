@@ -35,6 +35,7 @@ import { ApiService } from './services/api.service';
 import { EndpointsService } from './services/endpoints.service';
 import { CommonModule } from '@angular/common';
 import { AlertsService } from './services/alerts.service';
+import { PermissionsService } from './services/permissions.service';
 
 @Component({
   selector: 'app-root',
@@ -59,9 +60,14 @@ export class AppComponent {
   isModalOpen = false
   user: any = {}
   showMenu = true;
-  constructor(private navCtrl: NavController, private changeDetector: ChangeDetectorRef, private router: Router, private alerts: AlertsService,
-    private endPoints: EndpointsService,
+  constructor(
+    private router: Router,
     private api: ApiService,
+    private alerts: AlertsService,
+    private navCtrl: NavController,
+    private endPoints: EndpointsService,
+    public permissions: PermissionsService,
+    private changeDetector: ChangeDetectorRef,
   ) {
     addIcons({ ellipsisVerticalOutline, personOutline, settingsOutline, powerOutline, pieChartOutline, statsChartOutline, pencilOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline, gitNetworkOutline, checkmark, barChartOutline, closeOutline, person, homeOutline });
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false
@@ -93,6 +99,7 @@ export class AppComponent {
     this.username = "Inicie sesión"
     localStorage.setItem("isLogged", "false")
     this.navCtrl.navigateRoot('/login');
+    this.permissions.reloadUserData()
     this.changeDetector.detectChanges()
   }
 
@@ -191,14 +198,18 @@ export class AppComponent {
     this.username = username
     const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/byOrganizations/?organizations=' + orgsIds), false).then((response: any) => {
-      this.dashboardGroups = response.items
-      this.router.navigate(['/monitoring/' + response.items[0].dashboard_group_id], {
-        state: {
-          dash: response.items[0]
-        }
-      });
-      setTimeout(() => {
-      }, 500);
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
+        this.permissions.reloadUserData()
+        this.dashboardGroups = response.items
+        console.log(response.items);
+        this.router.navigate(['/monitoring/' + response.items[0].dashboard_group_id], {
+          state: {
+            dash: response.items[0]
+          }
+        });
+      }
     })
   }
 }

@@ -55,7 +55,8 @@
           </ion-input>
         </ion-item>
         <ion-item>
-          <ion-select label="Tipo de widget:" color="primary" [(ngModel)]="newWidgetData.widgetType">
+          <ion-select label="Tipo de widget:" color="primary" [(ngModel)]="newWidgetData.widgetType"
+            interface="popover">
             <ion-select-option value="chart">Chart</ion-select-option>
             <ion-select-option value="heatmap">Mapa de calor</ion-select-option>
             <ion-select-option value="thermo">Termómetro</ion-select-option>
@@ -64,7 +65,7 @@
           </ion-select>
         </ion-item>
         <ion-item *ngIf="newWidgetData.widgetType == 'chart'">
-          <ion-select label="Estilo:" color="primary" [(ngModel)]="newWidgetData.chartType">
+          <ion-select label="Estilo:" color="primary" [(ngModel)]="newWidgetData.chartType" interface="popover">
             <ion-select-option value="area">Area</ion-select-option>
             <ion-select-option value="line">Lineas</ion-select-option>
             <ion-select-option value="bar">Barras</ion-select-option>
@@ -72,13 +73,14 @@
         </ion-item>
         <ion-item-sliding *ngFor="let sensor of newWidgetData.sensors; let i = index" lines="full">
           <ion-item>
-            <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating">
+            <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating"
+              interface="popover">
               <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
                 {{ mach.machine_name }}
               </ion-select-option>
             </ion-select>
             <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating"
-              (ionChange)="ChangeSensor(sensor)">
+              interface="popover" (ionChange)="ChangeSensor(sensor)">
               <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
                 {{ s.sensor_name }}
               </ion-select-option>

@@ -9,6 +9,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { Clipboard } from '@capacitor/clipboard';
 import { EndpointsService } from 'src/app/services/endpoints.service';
+import { PermissionsService } from 'src/app/services/permissions.service';
 
 @Component({
   selector: 'app-devices',
@@ -39,6 +40,7 @@ export class DevicesPage implements OnInit {
     private api: ApiService,
     private alerts: AlertsService,
     private endPoints: EndpointsService,
+    public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
     addIcons({
       hardwareChipOutline,

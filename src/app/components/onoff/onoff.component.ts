@@ -5,7 +5,7 @@ import { IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar,
 import { NgxColorsModule } from 'ngx-colors';
 import { GaugeData } from '../gauge/gauge.component';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, pencilOutline, trashOutline } from 'ionicons/icons';
+import { ellipsisVertical, pencilOutline, trashOutline, checkmark } from 'ionicons/icons';
 import { ApiService } from 'src/app/services/api.service';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
@@ -37,11 +37,7 @@ export class OnoffComponent implements OnInit {
     private ws: WebSocketService,
     private endPoints: EndpointsService,
     private api: ApiService) {
-    addIcons({
-      ellipsisVertical,
-      pencilOutline,
-      trashOutline
-    })
+    addIcons({ellipsisVertical,pencilOutline,trashOutline,checkmark});
   }
 
   ngOnInit() {
