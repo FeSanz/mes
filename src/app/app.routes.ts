@@ -42,7 +42,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'monitoring',
+    path: 'monitoring/:groupId',
     loadComponent: () => import('./production/monitoring/monitoring.page').then( m => m.MonitoringPage),
     canActivate: [AuthGuard]
   },

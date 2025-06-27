@@ -2,31 +2,33 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NavController } from '@ionic/angular';
-import { ApiService } from '../services/api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
   constructor(
-    private authService: ApiService,
     private navCtrl: NavController
-  ) {}
+  ) { }
 
-  async canActivate(
+  canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Promise<boolean> {
-    return await this.checkAuth();
+  ): boolean {
+    return this.checkAuth();
   }
 
-  async checkAuth() {
-    const authed = await this.authService.isAuthenticated();
+  checkAuth(): boolean {
+    const authed = this.isAuthenticated();
     return authed || this.routeToLogin();
   }
 
   private routeToLogin(): boolean {
     this.navCtrl.navigateRoot('/login');
-    return true;
+    return false; // <- cambia a false, porque no debe permitir el acceso
+  }
+
+  isAuthenticated(): boolean {
+    return localStorage.getItem('isLogged') === 'true';
   }
 }

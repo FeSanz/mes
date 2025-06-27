@@ -17,6 +17,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-users',
@@ -36,13 +37,15 @@ export class UsersPage implements OnInit {
   selectedItems: any = []
   searchValueUsers: string = '';
   isModalOpen = false;
+  isSmallScreen = false;
   user: any = {
-    role: '',
+    role: 'SuperAdmin',
     name: '',
-    type: 'Empleado',
+    organizations: [],
+    type: 'USER',
     password: '',
     email: '',
-    level: null,
+    level: 1,
     rfid: null,
     enabled_flag: 'Y'
   };
@@ -50,109 +53,72 @@ export class UsersPage implements OnInit {
   organizations: any = []
   availableOrganizations: any[] = [];
   company: any = {}
-  constructor(private apiService: ApiService,
+  constructor(private apiService: ApiService, private breakpointObserver: BreakpointObserver,
     private endPoints: EndpointsService,
     private api: ApiService,
     private changeDetector: ChangeDetectorRef,
     private alerts: AlertsService) {
     addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline })
     const user = JSON.parse(String(localStorage.getItem("userData")))
-    this.company = user.company
+    this.company = user.Company
+    this.breakpointObserver.observe([Breakpoints.Handset])
+      .subscribe(result => {
+        this.isSmallScreen = result.matches;
+      });
   }
-
   ngOnInit() {
     this.GetUsers();
   }
-
   GetUsers() {
     this.apiService.GetRequestRender(this.endPoints.Render('users?companyId=' + this.company.CompanyId)).then((response: any) => {
-      console.log(response)
-      this.users = { ...response };
-      if (this.users.items) {
-        this.users.items = this.users.items.map((item: any) => ({
-          ...item,
-          selected: false
+      this.users = response.items
+      this.apiService.GetRequestRender(this.endPoints.Render('organizations/' + this.company.CompanyId)).then((responseOrg: any) => {
+        this.organizations = responseOrg.items.map((org: any) => ({
+          ...org,
+          OrganizationId: Number(org.OrganizationId)
         }));
+      })
+      if (this.users) {
+        this.users = this.users.map((item: any) => ({ ...item, selected: false }));
       }
     });
   }
-  //Metodo para manejar el filtro global
   OnFilterGlobal(event: Event, table: any) {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
   }
-
+  compareOrganizations = (o1: any, o2: any): boolean => {
+    return o1?.org_id === o2?.org_id;
+  };
   ClearFilter(table: any) {
     table.clear();
     this.searchValueUsers = '';
   }
-  setOpen(isOpen: boolean) {
-    this.user = {
-      role: '',
-      organizations: [],
-      name: '',
-      type: 'Empleado',
-      password: '',
-      email: '',
-      level: null,
-      rfid: null,
-      enabled_flag: 'Y'
-    };
-    this.isNewFlag = true
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations/1')).then((response: any) => {
-      this.organizations = response.items
-      this.user.organizations = [{ org_id: response.items[0].OrganizationId }]
-      this.user.role = "Operador"
-      this.user.level = '1'
-      console.log(this.organizations);
-      this.isModalOpen = isOpen;
-    })
-  }
   AddNewUser() {
     this.user.password = btoa(this.user.password)
     this.api.PostRequestRender(this.endPoints.Render('users'), this.user).then((response: any) => {
-      console.log(response);
-      this.setOpen(false)
-      this.user = {
-        role: '',
-        name: '',
-        organizations: [],
-        type: 'Empleado',
-        password: '',
-        email: '',
-        level: null,
-        rfid: null,
-        enabled_flag: 'Y'
-      };
-      this.changeDetector.detectChanges()
+      this.user.user_id = response.user_id
+      this.isModalOpen = false
+      this.users.push(this.user)
+      this.resetUser()
 
+      this.changeDetector.detectChanges()
     })
   }
   UpdateUser() {
     this.user.password = btoa(this.user.password)
     this.api.UpdateRequestRender(this.endPoints.Render('users/' + this.user.user_id), this.user).then((response: any) => {
-      console.log(response);
-      if (response.errorsExistFlag && response.errorsExistFlag == true) {
-        this.alerts.Error("Error al actualizar el usuario")
-      } else if (response.errorsExistFlag == false) {
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
         this.alerts.Success("Usuario actualizado")
-        this.setOpen(false)
-        this.user = {
-          role: '',
-          name: '',
-          organizations: [],
-          type: 'Empleado',
-          password: '',
-          email: '',
-          level: null,
-          rfid: null,
-          enabled_flag: 'Y'
-        };
+        this.isModalOpen = false
+        this.GetUsers()
+        this.resetUser()
         this.changeDetector.detectChanges()
       }
     })
   }
-
   addNewOrganization() {
     const selectedOrgIds = this.user.organizations.map((org: any) => org.org_id);
     const availableOrg = this.organizations.find((org: any) =>
@@ -166,7 +132,7 @@ export class UsersPage implements OnInit {
       this.user.organizations.splice(index, 1);
     }
   }
-  get hasAvailableOrganizations(): boolean {
+  /*get hasAvailableOrganizations(): boolean {
     const selectedOrgIds = this.user.organizations.map((org: any) => org.org_id);
     return this.organizations.some((org: any) => !selectedOrgIds.includes(org.OrganizationId));
   }
@@ -175,42 +141,52 @@ export class UsersPage implements OnInit {
     return this.organizations.filter((org: any) =>
       !selectedOrgIds.includes(org.OrganizationId)
     );
-  }
-  OpenEditUser(user: any) {
+  }*/
+  OpenAsEditUser(user: any) {
+    this.isNewFlag = false
     this.user = JSON.parse(JSON.stringify(user))
     this.user.password = atob(user.password)
-    this.isNewFlag = false
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations/1')).then((response: any) => {
-      this.organizations = response.items
-      this.user.organizations = [{ org_id: response.items[0].OrganizationId }]
-      this.user.role = "Operador"
-      this.user.level = '1'
-      console.log(this.organizations);
-      this.isModalOpen = true;
-    })
+    this.isModalOpen = true;
   }
-
-  ChangeUserStatus(event: any, user: any) {
+  OpenAsNewUser() {
+    this.resetUser()
+    this.isNewFlag = true
+    this.user.organizations = [{ org_id: this.organizations[0].OrganizationId }]
+    this.isModalOpen = true;
+  }
+  ChangeUserStatus(event: any, user: any) {//Deshabilita al usuario
     this.api.UpdateRequestRender(this.endPoints.Render('users/' + user.user_id + "/status"), { enabled_flag: event.detail.checked ? 'Y' : 'N' }).then((response: any) => {
-      console.log(response);
-      if (response.errorsExistFlag && response.errorsExistFlag == true) {
-        this.alerts.Error("Error al actualizar el usuario")
-      } else if (response.errorsExistFlag == false) {
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
         this.alerts.Success("Usuario actualizado")
         user.enabled_flag = event.detail.checked ? 'Y' : 'N'
       }
     })
   }
-  DeleteUser() {
+  DeleteUser() {//eliminar usuario
     this.api.DeleteRequestRender(this.endPoints.Render('users/' + this.user.user_id)).then((response: any) => {
-      console.log(response);
-      if (response.errorsExistFlag && response.errorsExistFlag == true) {
-        this.alerts.Error("Error al eliminar el usuario")
-      } else if (response.errorsExistFlag == false) {
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
         this.alerts.Success("Usuario eliminado")
-        this.users = this.users.filter((se: any) => se !== this.user);
+        this.users = this.users.filter((user: any) => user.user_id !== this.user.user_id);//se filtran los usuarios que no tengan este user_id
+        this.isModalOpen = false
         this.changeDetector.detectChanges()
       }
     })
+  }
+  resetUser() {//se reinician los datos del usuario nuevo o a editar
+    this.user = {
+      role: 'Admin',
+      name: '',
+      organizations: [],
+      type: 'USER',
+      password: '',
+      email: '',
+      level: 1,
+      rfid: null,
+      enabled_flag: 'Y'
+    };
   }
 }

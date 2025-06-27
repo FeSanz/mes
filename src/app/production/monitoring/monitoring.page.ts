@@ -15,6 +15,7 @@ import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
 import { addOutline, checkmark } from 'ionicons/icons';
 import { EndpointsService } from 'src/app/services/endpoints.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 export interface SensorData {
   [key: string]: any;
@@ -58,39 +59,64 @@ export class MonitoringPage implements OnInit {
     widgetType: "",
     chartType: ""
   }
-  user = "1"
+  user: any = {}
   widgets: any = []
   machines: any = []
-
+  dashboardData: any = {}
   constructor(
-    private wsService: WebSocketService,
     private api: ApiService,
+    private router: Router,
     private endPoints: EndpointsService,
     private alerts: AlertsService,
     private changeDetector: ChangeDetectorRef) {
     addIcons({ checkmark, addOutline })
-    const user = JSON.parse(String(localStorage.getItem("userData")))
-    console.log(user);
-
+    this.user = JSON.parse(String(localStorage.getItem("userData")))
+    const nav = this.router.getCurrentNavigation();
+    const state: any = nav?.extras?.state;
+    //this.activatedRoute.snapshot.paramMap.get('id') as string;
+    if (state?.dash) {
+      this.dashboardData = state?.dash
+      localStorage.setItem('dashData', JSON.stringify(state?.dash))
+    } else {
+      this.dashboardData = JSON.parse(localStorage.getItem('dashData') || '{}');
+    }
   }
   ngOnInit() {
-    this.sensorData.push();
+    /*const dash_id = this.route.snapshot.paramMap.get('dash_id');
+    const org_id = this.route.snapshot.paramMap.get('org_id');
+ 
+    if (dash_id != null && org_id != null) {
+      this.data.dash_id = dash_id
+      this.data.org_id = org_id
+      localStorage.setItem('dash_id', dash_id)
+      localStorage.setItem('org_id', org_id)
+    } else {
+      this.data.dash_id = localStorage.getItem('dash_id')
+      this.data.org_id = localStorage.getItem('org_id')
+    }*/
   }
+
   ionViewDidEnter() {
     this.GetDasboards()
   }
   GetDasboards() {
-    this.api.GetRequestRender(this.endPoints.Render('dashboards/1')).then((response: any) => {
+    this.api.GetRequestRender(this.endPoints.Render('dashboards/group/' + this.dashboardData.dashboard_group_id), false).then((response: any) => {
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
         id: item.dashboard_id,
         name: item.name,
-        jsonParams: { ...item.parameters, dashboard_id: item.dashboard_id, name: item.name, color: item.color, }
+        jsonParams: {
+          ...item.parameters, dashboard_id: item.dashboard_id,
+          organization_id: item.organization_id, name: item.name, color: item.color,
+        }
       }));
 
-      this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
-        this.machines = response.items
-        this.newWidgetData.machine = response.items[0].machineId + ""
+      //const organizationIds: number[] = this.user.Company.Organizations.map((org: any) => org.OrganizationId);
+      this.api.PostRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations'), { organizationIds: [this.dashboardData.organization_id] }, false).then((response: any) => {
+        if (response.items.length > 0) {
+          this.machines = response.items
+          this.newWidgetData.machine = response.items[0].machineId + ""
+        }
       })
     })
   }
@@ -112,31 +138,32 @@ export class MonitoringPage implements OnInit {
     return machine ? machine.sensors : [];
   }
   async addNewWidget() {
-    //if (await this.ui.ShowAlert("¿Deseas agregar el nuevo widget?", "Alerta", "Atrás", "Agregar")) {
     let body: any = {}
     if (this.newWidgetData.widgetType == 'chart' || this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo' || this.newWidgetData.widgetType == 'onoff') {
       body = {
-        "user_id": this.user,
+        "user_id": this.user.user_id,
         "color": this.newWidgetData.color,
         "name": this.newWidgetData.name,
+        "dashboard_group_id": this.dashboardData.dashboard_group_id,
         "parameters": {
           "widgetType": this.newWidgetData.widgetType,
           "chartType": this.newWidgetData.chartType,
           "sensors": this.newWidgetData.sensors,
         },
-        "created_by": "1",
-        "updated_by": "1"
+        "created_by": this.user.user_id,
+        "updated_by": this.user.user_id
       }
     } else if (this.newWidgetData.widgetType == 'heatmap') {
       body = {
-        "user_id": this.user,
+        "user_id": this.user.user_id,
         "name": this.newWidgetData.name,
-        "color": "#FF5733",
+        "dashboard_group_id": this.dashboardData.dashboard_group_id,
+        "color": this.newWidgetData.color,
         "parameters": {
           "widgetType": this.newWidgetData.widgetType
         },
-        "created_by": "1",
-        "updated_by": "1"
+        "created_by": this.user.user_id,
+        "updated_by": this.user.user_id
       }
     }
     this.api.PostRequestRender(this.endPoints.Render('dashboards'), body).then((response: any) => {
@@ -162,20 +189,14 @@ export class MonitoringPage implements OnInit {
       }
       this.changeDetector.detectChanges()
     })
-    //}
   }
   ChangeSensor(sensor: any) {
-    const selectedSensor = this.getSensorsForMachine(sensor.machine_id).find(
-      (s: any) => s.sensor_id === sensor.sensor_id
-    );
+    const selectedSensor = this.getSensorsForMachine(sensor.machine_id).find((s: any) => s.sensor_id === sensor.sensor_id);
     sensor.sensor_name = selectedSensor?.sensor_name || '';
-    console.log(sensor);
   }
-  async removeWidget(id: number) {
-    console.log(id);
+  async removeWidget(id: number) {//Eliminar widget
     if (await this.alerts.ShowAlert("¿Deseas eliminar este dashboard?", "Alerta", "Atrás", "Eliminar")) {
       this.api.DeleteRequestRender(this.endPoints.Render('dashboards/') + id).then((response: any) => {
-        console.log(response);
         if (!response.errorsExistFlag) {
           this.widgets = this.widgets.filter((w: any) => w.jsonParams.dashboard_id !== id);
           this.changeDetector.detectChanges()

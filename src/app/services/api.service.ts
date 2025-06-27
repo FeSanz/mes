@@ -7,8 +7,6 @@ import { AlertsService } from "./alerts.service";
   providedIn: 'root'
 })
 export class ApiService {
-  user: string = ""
-  password: string = ""
   credentials: string = '';
   offset: number = 0;
 
@@ -141,9 +139,9 @@ export class ApiService {
     }
   }
 
-  async PostRequestRender(endPoint: string, payload: any) {
-    await this.alerts.ShowLoading();
+  async PostRequestRender(endPoint: string, payload: any, show: boolean = true) {
     try {
+      if (show) await this.alerts.ShowLoading()
       const options = {
         url: endPoint,
         headers: { 'Content-Type': 'application/json' },
@@ -158,7 +156,7 @@ export class ApiService {
       await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
       return null;
     } finally {
-      await this.alerts.HideLoading();
+      if (show) await this.alerts.HideLoading()
     }
   }
 
@@ -245,34 +243,15 @@ export class ApiService {
         }
       };
       const response: HttpResponse = await CapacitorHttp.post(options);
-      this.RequestStatusCode(response.status);
+      //this.RequestStatusCode(response.status);
       return response.data;
 
     } catch (error: any) {
       console.log('Error (PG):', error);
-      await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
+      //await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
       return null;
     } finally {
       await this.alerts.HideLoading();
     }
-  }
-
-  GetCredentials() {
-    const credentials = {
-      user: localStorage.getItem("user"),
-      password: localStorage.getItem("pwd")
-    }
-    return credentials
-  }
-  isAuthenticated(): boolean {
-    const isLogged = localStorage.getItem('isLogged') == "true" ? true : false
-    return isLogged
-  }
-  SaveCredentials(user: string, password: string, authRemember: boolean) {
-    this.user = user
-    this.password = password
-    localStorage.setItem("user", user)
-    localStorage.setItem("pwd", password)
-    localStorage.setItem("authRemember", String(authRemember))
   }
 }

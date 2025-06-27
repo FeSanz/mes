@@ -2,9 +2,9 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnI
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addCircleOutline, checkmarkOutline, copyOutline, documentOutline, flashOutline, hardwareChipOutline, speedometerOutline, sunnyOutline, thermometerOutline, trashOutline, waterOutline, ellipsisVertical, pencilOutline} from 'ionicons/icons';
+import { addCircleOutline, checkmarkOutline, copyOutline, documentOutline, flashOutline, hardwareChipOutline, speedometerOutline, sunnyOutline, thermometerOutline, trashOutline, waterOutline, ellipsisVertical, pencilOutline } from 'ionicons/icons';
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { Clipboard } from '@capacitor/clipboard';
@@ -15,7 +15,7 @@ import { EndpointsService } from 'src/app/services/endpoints.service';
   templateUrl: './devices.page.html',
   styleUrls: ['./devices.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow ],
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class DevicesPage implements OnInit {
@@ -24,6 +24,7 @@ export class DevicesPage implements OnInit {
   machine: any = {
     isNew: true,
     name: "",
+    organization_id: "",
     sensors: []
   }
   iconList = [
@@ -33,6 +34,7 @@ export class DevicesPage implements OnInit {
     { name: 'sunny-outline', label: 'Luz' },
     { name: 'flash-outline', label: 'Energía' },
   ];
+  user: any = {}
   constructor(
     private api: ApiService,
     private alerts: AlertsService,
@@ -53,6 +55,7 @@ export class DevicesPage implements OnInit {
       trashOutline,
       checkmarkOutline
     })
+    this.user = JSON.parse(String(localStorage.getItem("userData")))
   }
 
   ngOnInit() {
@@ -61,8 +64,7 @@ export class DevicesPage implements OnInit {
     this.getMachines()
   }
   getMachines() {
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1')).then((response: any) => {
-      console.log(response);
+    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByCompany/' + this.user.Company.CompanyId)).then((response: any) => {
       this.machines = response.items
       console.log(response.items);
     })
@@ -99,6 +101,7 @@ export class DevicesPage implements OnInit {
     this.machine = {
       isNew: true,
       machine_name: "",
+      organization_id: this.user.Company.Organizations[0].OrganizationId,
       machine_code: "",
       token: this.generateToken(),
       sensors: []
@@ -108,12 +111,12 @@ export class DevicesPage implements OnInit {
     this.isModalOpen = true
     this.machine = JSON.parse(JSON.stringify(machine))
     this.machine.isNew = false
+    this.machine.organization_id = Number(this.machine.organization_id)
     console.log(this.machine);
   }
   addNewMachine() {
     const machineBody = {
-      user_id: "1",
-      organization_id: 300000003173662,
+      organization_id: this.machine.organization_id,
       code: this.machine.machine_code,
       token: this.machine.token,
       name: this.machine.machine_name,
@@ -122,9 +125,10 @@ export class DevicesPage implements OnInit {
       machine_class: "A1"
     };
     this.machine.sensors.forEach((sensor: any) => {
-      sensor.created_by = '1';
-      sensor.updated_by = '1';
+      sensor.created_by = this.user.UserId;
+      sensor.updated_by = this.user.UserId;
     });
+    console.log(machineBody);
     this.api.PostRequestRender(this.endPoints.Render('machines'), machineBody).then((response: any) => {
       const machineId = response.result.machine_id;
       this.api.PostRequestRender(this.endPoints.Render('sensors/') + machineId, { "items": this.machine.sensors }).then((response: any) => {
@@ -136,38 +140,27 @@ export class DevicesPage implements OnInit {
   }
   updateMachine() {
     const machineBody = {
-      name: this.machine.machine_name
+      machine_id: this.machine.machine_id,
+      machine_name: this.machine.machine_name,
+      sensors: this.machine.sensors.map((sensor: any) => {
+        return {
+          ...(sensor.sensor_id ? { sensor_id: sensor.sensor_id } : {}),
+          "sensor_name": sensor.sensor_name,
+          "sensor_icon": sensor.sensor_icon,
+          "sensor_var": sensor.sensor_var,
+        }
+      })
     };
-    //console.log(this.machine.sensors);
-    this.api.UpdateRequestRender(this.endPoints.Render('machines') + this.machine.machine_id, machineBody).then((response: any) => {
-      const newSensorsPromises = this.machine.sensors
-        .filter((sensor: any) => !sensor.id)
-        .map((sensor: any) => {
-          const sensorBody = {
-            sensor_name: sensor.name,
-            sensor_var: "temp",
-            machine_id: this.machine.machine_id,
-            icon: sensor.icon,
-            created_by: 1,
-            updated_by: 1
-          };
-          console.log(sensorBody);
-
-          return /*this.api.PostRequestRender("/sensors", sensorBody);*///nuevos sensores
-        });
-      const updateSensorPromises = this.machine.sensors
-        .filter((sensor: any) => sensor.id)
-        .map((sensor: any) => {
-          const sensorBody = {
-            name: sensor.name,
-            icon: sensor.icon,
-          };
-          return this.api.UpdateRequestRender(this.endPoints.Render('sensors') + sensor.id, sensorBody);//actualizar sensores existentes
-        });
-      Promise.all([...newSensorsPromises, ...updateSensorPromises]).then((sensorResponses: any[]) => {
+    console.log(machineBody);
+    this.api.UpdateRequestRender(this.endPoints.Render('machines/') + machineBody.machine_id, machineBody).then((response: any) => {
+      console.log(response);
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
+        this.alerts.Success(response.message);
         this.getMachines()
         this.isModalOpen = false;
-      });
+      }
     })
   }
 
@@ -198,10 +191,14 @@ export class DevicesPage implements OnInit {
 
     if (await this.alerts.ShowAlert("¿Deseas eliminar esta máquina?", "Alerta", "Atrás", "Eliminar")) {
       this.api.DeleteRequestRender(this.endPoints.Render('machines') + machine_id ? machine_id : this.machine.machine_id).then((response: any) => {
-        //console.log(response.data);
-        this.getMachines()
-        this.isModalOpen = false
-        this.changeDetector.detectChanges()
+        if (response.errorsExistFlag) {
+          this.alerts.Info(response.message);
+        } else {
+          this.alerts.Success(response.message);
+          this.getMachines()
+          this.isModalOpen = false
+          this.changeDetector.detectChanges()
+        }
       })
     }
   }

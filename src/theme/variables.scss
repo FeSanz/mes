@@ -464,3 +464,11 @@
   --min-width: 250px;
   --max-width: 90vw; // Para que sea responsive en pantallas pequeñas
 }
+
+.select::part(label) {
+  color: var(--ion-color-primary);
+}
+
+ion-split-pane {
+  --side-max-width: 350px;
+}

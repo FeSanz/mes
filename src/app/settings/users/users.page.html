@@ -12,24 +12,22 @@
 
   <div class="regions-wrapper">
     <!-------------------------- Region FUSION ------------------------------------>
-    <div class="region-container">
-      <div class="region-header" style="background-color: var(--ion-color-primary)">
+    <div class="region-container full-height-container">
+      <div class="region-header " style="background-color: var(--ion-color-primary)">
         <ion-icon name="people-outline"></ion-icon>
         <span>Tabla de usuarios</span>
         <!--ion-button size="small" color="primary" (click)="UploadOrganization()">CARGAR
           <ion-icon slot="end" name="arrow-forward"></ion-icon>
         </ion-button-->
       </div>
-      <p-table #dtUsers [value]="users.items" stripedRows selectionMode="multiple" [(selection)]="selectedItems"
-        *ngIf="users.length !=0" dataKey="user_id" [tableStyle]="{ 'min-width': '30rem' }"
-        styleClass="card-table-primeng" [size]="'small'" [rowHover]="true" [rows]="rowsPerPage"
+      <p-table #dtUsers [value]="users" stripedRows selectionMode="multiple" [(selection)]="selectedItems"
+        dataKey="user_id" styleClass="card-table-primeng" [size]="'small'" [rowHover]="true" [rows]="rowsPerPage"
         [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions" [paginator]="true" [filterDelay]="0"
         [alwaysShowPaginator]="true" [globalFilterFields]="['name', 'role', 'email']"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos">
         <ng-template pTemplate="caption">
           <div class="table-caption">
             <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearFilter(dtUsers)" />
-
             <div></div> <!-- Spacer -->
             <p-iconField iconPosition="left">
               <p-inputIcon>
@@ -52,27 +50,27 @@
             </th>
             <th pSortableColumn="role">
               <div class="flex justify-between items-center">Rol <p-sortIcon field="role" />
-                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+                <p-columnFilter type="text" field="role" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="email">
+            <th pSortableColumn="email" *ngIf="!isSmallScreen">
               <div class="flex justify-between items-center">Email <p-sortIcon field="email" />
-                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+                <p-columnFilter type="text" field="email" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="type">
+            <th pSortableColumn="type" *ngIf="!isSmallScreen">
               <div class="flex justify-between items-center">Tipo <p-sortIcon field="type" />
-                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+                <p-columnFilter type="text" field="type" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="organizations">
+            <th pSortableColumn="organizations" *ngIf="!isSmallScreen">
               <div class="flex justify-between items-center">Organizaciones <p-sortIcon field="type" />
-                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+                <p-columnFilter type="text" field="organizations" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th style="width: 5rem">
-              <div class="flex justify-between items-center">Acciones
-                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+            <th pSortableColumn="enabled_flag">
+              <div class="flex justify-between items-center">
+                <p-sortIcon field="enabled_flag" />
               </div>
             </th>
           </tr>
@@ -84,9 +82,9 @@
             </td>
             <td>{{ item.name }}</td>
             <td>{{ item.role }}</td>
-            <td>{{ item.email }}</td>
-            <td>{{ item.type }}</td>
-            <td>
+            <td *ngIf="!isSmallScreen">{{ item.email }}</td>
+            <td *ngIf="!isSmallScreen">{{ item.type }}</td>
+            <td *ngIf="!isSmallScreen">
               <ng-container *ngIf="item.organizations?.length; else noOrgs">
                 <span *ngFor="let org of item.organizations; let last = last">
                   {{ org.org_name }}<span *ngIf="!last">, </span>
@@ -96,9 +94,10 @@
             </td>
             <td>
               <ion-buttons>
-                <ion-toggle [checked]="item.enabled_flag == 'Y'" (ionChange)="ChangeUserStatus($event, item)">
+                <ion-toggle *ngIf="!isSmallScreen" [checked]="item.enabled_flag == 'Y'"
+                  (ionChange)="ChangeUserStatus($event, item)">
                 </ion-toggle>
-                <ion-button (click)="OpenEditUser(item)">
+                <ion-button (click)="OpenAsEditUser(item)">
                   <ion-icon color="success" slot="icon-only" name="pencil-outline"></ion-icon>
                 </ion-button>
               </ion-buttons>
@@ -121,21 +120,25 @@
       </ion-header>
       <ion-content>
         <ion-item>
-          <ion-select label="Tipo" [(ngModel)]="user.type" required interface="popover">
+          <ion-select label="Tipo:" [(ngModel)]="user.type" required interface="popover">
             <ion-select-option value="USER">USER</ion-select-option>
             <ion-select-option value="ANDON">ANDON</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-select label="Rol" [(ngModel)]="user.role" required interface="popover">
+          <ion-select label="Rol:" [(ngModel)]="user.role" required interface="popover">
             <ion-select-option value="Admin">Admin</ion-select-option>
             <ion-select-option value="SuperAdmin">SuperAdmin</ion-select-option>
             <ion-select-option value="Supervisor">Supervisor</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-select label="Nivel" [(ngModel)]="user.level" name="level" required interface="popover">
-            <ion-select-option *ngFor="let lvl of [1, 2, 3, 4]">{{ lvl }}</ion-select-option>
+          <ion-select label="Nivel:" [(ngModel)]="user.level" required interface="popover">
+            <ion-select-option [value]="1">1</ion-select-option>
+            <ion-select-option [value]="2">2</ion-select-option>
+            <ion-select-option [value]="3">3</ion-select-option>
+            <ion-select-option [value]="4">4</ion-select-option>
+            <ion-select-option [value]="5">5</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
@@ -161,30 +164,19 @@
           </ion-input>
         </ion-item>
         <ion-item>
-          <ion-toggle [checked]="user.enabled_flag == 'Y'" (ionChange)="user.enabled_flag = $event.detail.checked ? 'Y' : 'N'">
-            Activo</ion-toggle>
+          <ion-toggle [checked]="user.enabled_flag == 'Y'"
+            (ionChange)="user.enabled_flag = $event.detail.checked ? 'Y' : 'N'">
+            Activo:</ion-toggle>
         </ion-item>
-        <ion-item-sliding *ngFor="let org of user.organizations; let i = index" lines="full">
-          <ion-item>
-            <ion-select label="Organización:" [(ngModel)]="org.org_id" required interface="popover">
-              <ion-select-option *ngFor="let orgAv of getAvailableOrganizations(org.org_id)"
-                [value]="orgAv.OrganizationId">
-                {{ orgAv.Name }} ({{ orgAv.Code }})
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
-          <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="removeOrganization(org)">
-              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-        <div class="ion-text-center">
-          <ion-button fill="outline" (click)="addNewOrganization()" [disabled]="!hasAvailableOrganizations"
-            [disabled]="organizations.length === 0">
-            Agregar organización
-          </ion-button>
-        </div>
+        <ion-item>
+          <ion-select label="Organizaciones:" placeholder="Seleccione las organizaciones"
+            [(ngModel)]="user.organizations" [multiple]="true" interface="popover" [compareWith]="compareOrganizations">
+            <ion-select-option *ngFor="let org of organizations"
+              [value]="{ org_id: org.OrganizationId, org_code: org.Code, org_name: org.Name }">
+              {{ org.Code }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
         <ion-fab slot="fixed" vertical="bottom" horizontal="end">
           <ion-fab-button (click)="isNewFlag ? AddNewUser() : UpdateUser()" color="success">
             <ion-icon name="checkmark-outline"></ion-icon>
@@ -199,7 +191,7 @@
     </ng-template>
   </ion-modal>
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="setOpen(true)">
+    <ion-fab-button (click)="OpenAsNewUser()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>

@@ -122,6 +122,13 @@
             </ion-button-->
           </ion-buttons>
         </ion-item>
+        <ion-item>
+          <ion-select label="Organización:" class="select" color="primary"
+            [(ngModel)]="machine.organization_id">
+            <ion-select-option [value]="org.OrganizationId"
+              *ngFor="let org of user.Company.Organizations">{{org.Name}}</ion-select-option>
+          </ion-select>
+        </ion-item>
         <ion-item-sliding *ngFor="let sensor of machine.sensors" lines="full">
           <!-- Contenido principal -->
           <ion-item style="--background: var(--ion-color-back-shade, #fff); --border-radius: 8px;">

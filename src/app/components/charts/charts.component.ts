@@ -12,6 +12,7 @@ import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { addIcons } from 'ionicons';
 import { ellipsisVertical, pencilOutline, trashOutline } from 'ionicons/icons';
+import { AlertsService } from 'src/app/services/alerts.service';
 export interface SplineData {
   [key: string]: any;
 }
@@ -49,6 +50,7 @@ export class ChartsComponent implements OnInit {
   private conexionesLocales: { [sensorId: string]: WebSocket } = {};
   isPaused = false;
   constructor(private changeDetector: ChangeDetectorRef,
+    private alerts: AlertsService,
     private ws: WebSocketService,
     private endPoints: EndpointsService,
     private api: ApiService) {
@@ -123,7 +125,6 @@ export class ChartsComponent implements OnInit {
   }
 
   initializeChart() {
-    //console.log(this.widgetData);    
     if (this.widgetData.chartType) {
       this.chartOptions.chart.type = this.widgetData.chartType;
       this.chart?.updateOptions(this.chartOptions);
@@ -209,7 +210,6 @@ export class ChartsComponent implements OnInit {
       const ws = this.conexionesLocales[sensorId];
       if (ws && ws.readyState === WebSocket.OPEN) {
         console.log("unsuscribed");
-
         ws.send(JSON.stringify({ type: 'unsuscribe', sensor_id: sensorId }));
         ws.close();
       }
@@ -251,8 +251,8 @@ export class ChartsComponent implements OnInit {
     const body = {
       name: this.copyWidgetData.name,
       user_id: 1,
-      color : this.copyWidgetData.color,
-      updated_by : 1,
+      color: this.copyWidgetData.color,
+      updated_by: 1,
       parameters: {
         widgetType: this.copyWidgetData.widgetType,
         chartType: this.copyWidgetData.chartType,
@@ -261,13 +261,16 @@ export class ChartsComponent implements OnInit {
     }
     this.showChart = false;
     this.api.UpdateRequestRender(this.endPoints.Render('dashboards/') + this.widgetData.dashboard_id, body).then((response: any) => {
-      //console.log(response);
-      this.widgetData = JSON.parse(JSON.stringify(this.copyWidgetData))
-      this.data = this.widgetData
-      this.showChart = true;
-      this.initializeChart()
-      this.isModalOpen = false
-      this.changeDetector.detectChanges()
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
+        this.widgetData = JSON.parse(JSON.stringify(this.copyWidgetData))
+        this.data = this.widgetData
+        this.showChart = true;
+        this.initializeChart()
+        this.isModalOpen = false
+        this.changeDetector.detectChanges()
+      }
     })
   }
   deleteChart() {
@@ -275,7 +278,7 @@ export class ChartsComponent implements OnInit {
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensors/1'), false).then((response: any) => {
+    this.api.PostRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations'), { organizationIds: [this.widgetData.organization_id] }).then((response: any) => {
       this.machines = response.items
       this.isModalOpen = true;
       //this.newWidgetData.machine = response.data[0].MachineId + ""

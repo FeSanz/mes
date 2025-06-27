@@ -19,38 +19,43 @@ import { AppComponent } from '../app.component';
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, CommonModule, FormsModule, IonText, IonButton, IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonCheckbox, IonInput, IonItem, IonIcon, IonMenuButton, IonButtons, IonToolbar, IonInputPasswordToggle]
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   entity: string = ""
   username: string = ""
   password: string = ""
   authRemember: boolean = false
 
-  constructor(private api: ApiService, private navCtrl: NavController, private endPoints: EndpointsService, private alerts: AlertsService, private app: AppComponent
-  ) {
+  constructor(private api: ApiService, private navCtrl: NavController, private endPoints: EndpointsService, private alerts: AlertsService, private app: AppComponent) {
     addIcons({ businessOutline, personOutline, lockClosedOutline });
     this.authRemember = localStorage.getItem("authRemember") == "true" ? true : false
-    api.isAuthenticated() ? this.navCtrl.navigateRoot('/monitoring') : null
-    const credentials: any = this.authRemember ? api.GetCredentials() : {}
+    localStorage.getItem('isLogged') === 'true' ? app.GoToDashboards(0) : null
+    const credentials: any = this.authRemember ? this.GetCredentials() : {}
     this.username = credentials.user
     this.password = credentials.password
   }
 
-  ngOnInit() {
-  }
-
   LogIn() {
-    this.api.AuthRequestDatabase(this.endPoints.Render('login'), this.username, this.password).then((response: any) => {
-      if (response.errorsExistFlag == false) {
+    this.api.AuthRequestDatabase(this.endPoints.Render('login'), this.username, this.password).then((response: any) => {//obtener resultado del intento de login
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
+        this.app.username = this.username
         localStorage.setItem("isLogged", "true")
-        localStorage.setItem("userData", JSON.stringify(response.items))
-
-        if (this.authRemember) {
-          this.api.SaveCredentials(this.username, this.password, this.authRemember);
-        }
-
+        localStorage.setItem("user", this.username)
+        localStorage.setItem("userData", JSON.stringify(response.items))//Se guarda la información del usuario
+        localStorage.setItem("pwd", this.password)
+        localStorage.setItem("authRemember", String(this.authRemember))//Recordar usuario
         this.alerts.Success("Bienvenido")
-        this.navCtrl.navigateRoot('/monitoring');
+        this.app.SaveLogin(response.items, this.username)
       }
     })
+  }
+
+  GetCredentials() {//Retorna el usuario y contraseña
+    const credentials = {
+      user: localStorage.getItem("user"),
+      password: localStorage.getItem("pwd")
+    }
+    return credentials
   }
 }
