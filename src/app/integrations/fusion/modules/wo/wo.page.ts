@@ -63,7 +63,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
       WorkDefinitionId: data.WorkDefinitionId,
       ItemId: data.PrimaryProductId,
       ItemNumber:data.ItemNumber,
-      ProcessWorkOrderResource: data.ProcessWorkOrderResource,
+      Resources: data.ProcessWorkOrderResource,
       PlannedQuantity: data.PrimaryProductQuantity,
       CompletedQuantity: data.CompletedQuantity,
       StartDate: FromISO8601(data.PlannedStartDate),
@@ -76,7 +76,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
       WorkDefinitionId: data.WorkDefinitionId,
       ItemId: data.InventoryItemId,
       ItemNumber:data.ItemNumber,
-      ProcessWorkOrderResource: data.ProcessWorkOrderResource,
+      Resources: data.WorkOrderResource,
       PlannedQuantity: data.PlannedStartQuantity,
       CompletedQuantity: data.CompletedQuantity,
       StartDate: FromISO8601(data.PlannedStartDate),
@@ -154,6 +154,9 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
 
           // Transformar y asignar datos
           const restructuredData = data.items.map((item: any) => transformer(item));
+
+          console.log(restructuredData.Resources);
+
           this.fusionData = {
             items: restructuredData,
             totalResults: data.totalResults,
