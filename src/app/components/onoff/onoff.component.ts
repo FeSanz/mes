@@ -5,10 +5,12 @@ import { IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar,
 import { NgxColorsModule } from 'ngx-colors';
 import { GaugeData } from '../gauge/gauge.component';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, pencilOutline, trashOutline, checkmark } from 'ionicons/icons';
+import { ellipsisVertical, pencilOutline, trashOutline, checkmark, moveOutline } from 'ionicons/icons';
 import { ApiService } from 'src/app/services/api.service';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
+
 export interface OnOffData {
   [key: string]: any;
 }
@@ -18,7 +20,8 @@ export interface OnOffData {
   templateUrl: './onoff.component.html',
   styleUrls: ['./onoff.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule, NgxColorsModule, IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput],
+  imports: [FormsModule, CommonModule, NgxColorsModule, IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption,
+    IonModal, IonInput, CdkDragHandle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class OnoffComponent implements OnInit {
@@ -37,7 +40,7 @@ export class OnoffComponent implements OnInit {
     private ws: WebSocketService,
     private endPoints: EndpointsService,
     private api: ApiService) {
-    addIcons({ellipsisVertical,pencilOutline,trashOutline,checkmark});
+    addIcons({ moveOutline, ellipsisVertical, pencilOutline, trashOutline, checkmark });
   }
 
   ngOnInit() {

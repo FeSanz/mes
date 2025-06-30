@@ -472,3 +472,7 @@
 ion-split-pane {
   --side-max-width: 350px;
 }
+
+ion-reorder.custom-reorder-icon {
+  color: var(--ion-color-secondary); /* O cualquier color CSS válido */
+}

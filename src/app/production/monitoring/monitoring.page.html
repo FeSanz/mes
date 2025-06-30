@@ -8,9 +8,11 @@
 </ion-header>
 
 <ion-content>
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4" *ngFor="let widget of widgets">
+  <ion-grid class="drag-grid">
+    <ion-row cdkDropList (cdkDropListDropped)="onDrop($event)" [cdkDropListData]="widgets"
+      cdkDropListOrientation="mixed" class="drag-row">
+      <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4"
+        *ngFor="let widget of widgets; trackBy: trackByWidget" cdkDrag>
         <ng-container [ngSwitch]="widget.jsonParams.widgetType">
           <app-charts *ngSwitchCase="'chart'" [data]="widget.jsonParams"
             (remove)="removeWidget(widget.jsonParams.dashboard_id)">
@@ -31,7 +33,7 @@
       </ion-col>
     </ion-row>
   </ion-grid>
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="!permissions.isViewer()">
     <ion-fab-button (click)="setOpen(true)">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
@@ -123,4 +125,5 @@
       </ion-content>
     </ng-template>
   </ion-modal>
-</ion-content><ion-loading></ion-loading>
+</ion-content>
+<ion-loading></ion-loading>

@@ -7,8 +7,6 @@ export class PermissionsService {
   user: any = {}
   constructor() {
     this.user = JSON.parse(String(localStorage.getItem("userData")))
-    console.log(this.user);
-
   }
 
   isAdmin(): boolean {

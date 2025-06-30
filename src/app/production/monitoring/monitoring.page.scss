@@ -1,3 +1,67 @@
 ion-select::part(label) {
     color: var(--ion-color-primary);
 }
+
+.drag-drop-row {
+    min-height: 200px;
+}
+
+.cdk-drag-preview {
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    opacity: 0.8;
+    transform: rotate(5deg);
+}
+
+.cdk-drag-placeholder {
+    opacity: 0.3;
+    background: #ddd;
+    border: 2px dashed #999;
+    border-radius: 4px;
+    min-height: 200px;
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.drag-handle {
+    position: absolute;
+    top: 8px;
+    right: 50px;
+    z-index: 1000;
+    cursor: move;
+    padding: 4px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.drag-icon {
+    color: #666;
+    font-size: 18px;
+}
+
+.drag-handle:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Para dispositivos móviles */
+@media (max-width: 768px) {
+    .drag-handle {
+        right: 40px;
+        top: 4px;
+    }
+}
+
+.widget-col {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+[cdkDrag] {
+    /* Elimina esta regla o cambia a cursor: default */
+    cursor: default;
+}

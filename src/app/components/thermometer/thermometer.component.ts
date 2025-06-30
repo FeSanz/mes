@@ -6,10 +6,12 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardT
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
-import { ellipsisVertical, pencilOutline, trashOutline, checkmark } from 'ionicons/icons';
+import { ellipsisVertical, pencilOutline, trashOutline, checkmark, moveOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { FormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
+
 
 export interface ThermoData {
   [key: string]: any;
@@ -19,7 +21,8 @@ export interface ThermoData {
   templateUrl: './thermometer.component.html',
   styleUrls: ['./thermometer.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput],
+  imports: [FormsModule, CommonModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect,
+    IonSelectOption, IonModal, IonInput, CdkDragHandle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
     { provide: LOCALE_ID, useValue: 'en-US' }
@@ -40,7 +43,7 @@ export class ThermometerComponent implements OnInit {
     private ws: WebSocketService,
     private endPoints: EndpointsService,
     private api: ApiService) {
-    addIcons({ellipsisVertical,pencilOutline,trashOutline,checkmark});
+    addIcons({ ellipsisVertical, pencilOutline, trashOutline, checkmark, moveOutline });
   }
 
   ngOnInit() {

@@ -160,9 +160,9 @@ export class ApiService {
     }
   }
 
-  async UpdateRequestRender(endPoint: string, payload: any) {
-    await this.alerts.ShowLoading();
+  async UpdateRequestRender(endPoint: string, payload: any, show: boolean = true) {
     try {
+      if (show) await this.alerts.ShowLoading()
       const options = {
         url: endPoint,
         headers: { 'Content-Type': 'application/json' },
@@ -176,7 +176,7 @@ export class ApiService {
       await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
       return null;
     } finally {
-      await this.alerts.HideLoading();
+      if (show) await this.alerts.HideLoading()
     }
   }
 

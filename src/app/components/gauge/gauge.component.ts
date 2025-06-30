@@ -7,11 +7,12 @@ import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, pencilOutline, trashOutline } from 'ionicons/icons';
+import { ellipsisVertical, moveOutline, pencilOutline, trashOutline } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { NgxColorsModule } from 'ngx-colors';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
 
 export interface GaugeData {
   [key: string]: any;
@@ -22,7 +23,8 @@ export interface GaugeData {
   templateUrl: './gauge.component.html',
   styleUrls: ['./gauge.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput],
+  imports: [FormsModule, CommonModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect,
+    IonSelectOption, IonModal, IonInput, CdkDragHandle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
     { provide: LOCALE_ID, useValue: 'en-US' }
@@ -47,11 +49,7 @@ export class GaugeComponent implements OnInit {
     private ws: WebSocketService,
     private endPoints: EndpointsService,
     private api: ApiService) {
-    addIcons({
-      ellipsisVertical,
-      pencilOutline,
-      trashOutline
-    })
+    addIcons({ ellipsisVertical, pencilOutline, trashOutline, moveOutline })
   }
   ngOnInit() {
     this.initializeConfig();

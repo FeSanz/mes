@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnChanges, SimpleChanges, ViewChild, Input, ChangeDetectorRef, EventEmitter, Output, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { NgModel } from '@angular/forms';
-//import { IonCard, IonCardHeader, IonText, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal } from '@ionic/angular/standalone';
+import { IonCard, IonCardHeader, IonText, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal } from '@ionic/angular/standalone';
 import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexDataLabels, ApexTooltip, ApexStroke, NgApexchartsModule, ChartType, ChartComponent } from "ng-apexcharts";
 import { NgxColorsModule } from 'ngx-colors';
 import { FormsModule } from '@angular/forms';
@@ -11,8 +11,10 @@ import { IonicModule } from '@ionic/angular';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, pencilOutline, trashOutline } from 'ionicons/icons';
+import { ellipsisVertical, moveOutline, pencilOutline, trashOutline } from 'ionicons/icons';
 import { AlertsService } from 'src/app/services/alerts.service';
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
+
 export interface SplineData {
   [key: string]: any;
 }
@@ -32,7 +34,8 @@ export type ChartOptions = {
   templateUrl: './charts.component.html',
   styleUrls: ['./charts.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule, NgApexchartsModule, IonicModule, NgxColorsModule/*, IonText, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal*/],
+  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton,
+    IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ChartsComponent implements OnInit {
@@ -54,11 +57,7 @@ export class ChartsComponent implements OnInit {
     private ws: WebSocketService,
     private endPoints: EndpointsService,
     private api: ApiService) {
-    addIcons({
-      ellipsisVertical,
-      pencilOutline,
-      trashOutline
-    })
+    addIcons({ ellipsisVertical, pencilOutline, trashOutline, moveOutline })
     this.chartOptions = {
       series: [],
       chart: {

@@ -21,14 +21,14 @@ import {
   IonRouterOutlet,
   IonTitle,
   IonToolbar,
-  IonToggle, IonAvatar, IonCol, IonGrid, IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonSplitPane, IonRouterLink
+  IonToggle, IonAvatar, IonCol, IonGrid, IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonSplitPane, IonRouterLink, IonReorder, IonReorderGroup, ItemReorderEventDetail
 } from '@ionic/angular/standalone';
 import { NavController } from '@ionic/angular';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from "@angular/router";
 import {
   person, ellipsisVerticalOutline, personOutline, settingsOutline, powerOutline, homeOutline, cubeOutline,
   statsChartOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline,
-  gitNetworkOutline, closeOutline, barChartOutline, pieChartOutline, addOutline, checkmark, pencilOutline, trashOutline
+  gitNetworkOutline, closeOutline, barChartOutline, pieChartOutline, addOutline, checkmark, pencilOutline, trashOutline, reorderThreeOutline, reorderTwoOutline
 } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from './services/api.service';
@@ -43,8 +43,8 @@ import { PermissionsService } from './services/permissions.service';
   templateUrl: 'app.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [IonApp, RouterLink, IonMenu, IonToolbar, IonHeader, IonTitle, IonItem, IonIcon, IonLabel,
-    IonButtons, IonButton, IonPopover, IonContent, IonList, IonMenuToggle, IonAccordionGroup, IonSplitPane,
-    IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid, IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink],
+    IonButtons, IonButton, IonPopover, IonContent, IonList, IonMenuToggle, IonAccordionGroup, IonSplitPane, IonReorder, IonReorderGroup,
+    IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid, IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink,],
 })
 export class AppComponent {
   darkMode = false
@@ -60,6 +60,7 @@ export class AppComponent {
   isModalOpen = false
   user: any = {}
   showMenu = true;
+  editDashOrder = false
   constructor(
     private router: Router,
     private api: ApiService,
@@ -69,7 +70,7 @@ export class AppComponent {
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef,
   ) {
-    addIcons({ ellipsisVerticalOutline, personOutline, settingsOutline, powerOutline, pieChartOutline, statsChartOutline, pencilOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline, gitNetworkOutline, checkmark, barChartOutline, closeOutline, person, homeOutline });
+    addIcons({ ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline, reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline, person, homeOutline });
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false
     this.user = JSON.parse(String(localStorage.getItem("userData")))
     isLogged ? this.username = String(localStorage.getItem('user') || "No user") : "Inicie sesión"
@@ -103,10 +104,47 @@ export class AppComponent {
     this.changeDetector.detectChanges()
   }
 
-  HandleClick(event: Event) {//detener la propagación de clics
-    event.stopPropagation();
+  Reorder(event: Event, state: boolean) {
+    event.stopPropagation();//detener la propagación de clicks
+    this.editDashOrder = state
+    this.changeDetector.detectChanges()
   }
 
+  HandleClick(event: Event) {
+    event.stopPropagation();//detener la propagación de clicks
+  }
+
+  handleReorder(event: CustomEvent<ItemReorderEventDetail>) {
+    const from = event.detail.from;
+    const to = event.detail.to;
+    const movedItem = this.dashboardGroups.splice(from, 1)[0];
+    this.dashboardGroups.splice(to, 0, movedItem);
+    // Actualizar índices después del reordenamiento
+    this.dashboardGroups = this.dashboardGroups.map((item: any, index: any) => ({
+      ...item,
+      index: index
+    }));
+    event.detail.complete();
+    this.saveDashboardOrder()
+  }
+  trackByGroup(index: number, item: any): number {
+    return item.dashboard_group_id;
+  }
+  saveDashboardOrder() {
+    const body = this.dashboardGroups.map((group: any) => ({
+      dashboard_group_id: group.dashboard_group_id,
+      index: group.index
+    }));
+    console.log(body);
+
+    this.api.UpdateRequestRender(this.endPoints.Render('dashboardsGroup/order'), { items: body }, false).then(response => {
+      if (!response.errorsExistFlag) {
+        //this.alerts.Success("Dashboard eliminado")
+      } else {
+        this.alerts.Error("Error al reordenar la lista, intente más tarde.")
+      }
+    });
+  }
   GoToDashboards(dash: any) {//navega hacia los tableros y manda los parámetros necesarios
     this.router.navigate(['/monitoring/' + dash.dashboard_group_id], {
       state: {
@@ -126,6 +164,7 @@ export class AppComponent {
   }
   addNewWidgetGroup() {//llamada a la api para crear el grupo de tableros
     this.dashboardGroupData.created_by = this.user.UserId
+    this.dashboardGroupData.index = Number(this.dashboardGroups.length) + 1
     this.api.PostRequestRender(this.endPoints.Render('dashboardsGroup'), this.dashboardGroupData).then((response: any) => {
       if (!response.errorsExistFlag) {
         this.alerts.Success("Dashboard creado")
@@ -149,7 +188,7 @@ export class AppComponent {
       const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
       this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/byOrganizations/?organizations=' + orgsIds), false).then((response: any) => {
         this.dashboardGroups = response.items
-        console.log(this.dashboardGroups);
+        //console.log(this.dashboardGroups);
       })
     } else {
       this.alerts.Error("No hay organizaciones relacionadas con el usuario")

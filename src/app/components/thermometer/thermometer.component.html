@@ -1,6 +1,9 @@
 <ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
   <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
     <ion-buttons slot="end">
+      <ion-button title="Mover" cdkDragHandle class="drag-handle">
+        <ion-icon slot="icon-only" name="move-outline" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
+      </ion-button>
       <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
         <ion-icon slot="icon-only" name="ellipsis-vertical" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
       </ion-button>

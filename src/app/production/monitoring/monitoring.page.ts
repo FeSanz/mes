@@ -16,6 +16,8 @@ import { addIcons } from 'ionicons';
 import { addOutline, checkmark } from 'ionicons/icons';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { PermissionsService } from 'src/app/services/permissions.service';
 
 export interface SensorData {
   [key: string]: any;
@@ -36,11 +38,13 @@ export type ChartOptions = {
   styleUrls: ['./monitoring.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent, OnoffComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading]
+  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent, OnoffComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
+    IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule]
 })
 export class MonitoringPage implements OnInit {
   sensorData: SensorData[] = [];
   isModalOpen = false;
+  isDragging = false;
   newWidgetData: any = {
     name: "",
     color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
@@ -66,8 +70,9 @@ export class MonitoringPage implements OnInit {
   constructor(
     private api: ApiService,
     private router: Router,
-    private endPoints: EndpointsService,
     private alerts: AlertsService,
+    private endPoints: EndpointsService,
+    public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
     addIcons({ checkmark, addOutline })
     this.user = JSON.parse(String(localStorage.getItem("userData")))
@@ -101,6 +106,7 @@ export class MonitoringPage implements OnInit {
   }
   GetDasboards() {
     this.api.GetRequestRender(this.endPoints.Render('dashboards/group/' + this.dashboardData.dashboard_group_id), false).then((response: any) => {
+      console.log(response.items);
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
         id: item.dashboard_id,
@@ -113,6 +119,7 @@ export class MonitoringPage implements OnInit {
 
       //const organizationIds: number[] = this.user.Company.Organizations.map((org: any) => org.OrganizationId);
       this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.dashboardData.organization_id)).then((response: any) => {
+
         if (response.items.length > 0) {
           this.machines = response.items
           this.newWidgetData.machine = response.items[0].machineId + ""
@@ -190,10 +197,12 @@ export class MonitoringPage implements OnInit {
       this.changeDetector.detectChanges()
     })
   }
+
   ChangeSensor(sensor: any) {
     const selectedSensor = this.getSensorsForMachine(sensor.machine_id).find((s: any) => s.sensor_id === sensor.sensor_id);
     sensor.sensor_name = selectedSensor?.sensor_name || '';
   }
+
   async removeWidget(id: number) {//Eliminar widget
     if (await this.alerts.ShowAlert("¿Deseas eliminar este dashboard?", "Alerta", "Atrás", "Eliminar")) {
       this.api.DeleteRequestRender(this.endPoints.Render('dashboards/') + id).then((response: any) => {
@@ -207,8 +216,40 @@ export class MonitoringPage implements OnInit {
       })
     }
   }
+
   async removeSensor(sensor: any) {
     this.newWidgetData.sensors = this.newWidgetData.sensors.filter((se: any) => se !== sensor);
     this.changeDetector.detectChanges()
+  }
+
+
+  saveWidgetOrder() {
+    const body = this.widgets.map((item: any) => ({
+      dashboard_id: item.id,
+      index: item.index
+    }))
+    console.log(body);
+    this.api.UpdateRequestRender(this.endPoints.Render('dashboards/order'), { "items": body }, false).then((response: any) => {
+      if (!response.errorsExistFlag) {
+        //this.alerts.Success("Dashboard eliminado")
+      } else {
+        this.alerts.Error("Error al reordenar los widgets, intente más tarde.")
+      }
+    })
+  }
+
+  onDrop(event: CdkDragDrop<any[]>) {
+    if (event.previousIndex !== event.currentIndex) {
+      moveItemInArray(this.widgets, event.previousIndex, event.currentIndex);
+      this.widgets.forEach((widget: any, i: any) => {
+        widget.index = i;
+      });
+      this.saveWidgetOrder();
+    }
+  }
+
+
+  trackByWidget(index: number, widget: any): any {
+    return widget.jsonParams.dashboard_id;
   }
 }
