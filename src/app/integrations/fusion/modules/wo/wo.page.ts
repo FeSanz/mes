@@ -63,6 +63,8 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
       WorkDefinitionId: data.WorkDefinitionId,
       ItemId: data.PrimaryProductId,
       ItemNumber:data.ItemNumber,
+      Description: data.Description,
+      UoM: data.PrimaryProductUOMCode,
       Resources: data.ProcessWorkOrderResource,
       PlannedQuantity: data.PrimaryProductQuantity,
       CompletedQuantity: data.CompletedQuantity,
@@ -76,6 +78,8 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
       WorkDefinitionId: data.WorkDefinitionId,
       ItemId: data.InventoryItemId,
       ItemNumber:data.ItemNumber,
+      Description: data.Description,
+      UoM: data.UOMCode,
       Resources: data.WorkOrderResource,
       PlannedQuantity: data.PlannedStartQuantity,
       CompletedQuantity: data.CompletedQuantity,
@@ -130,7 +134,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
     });
   }
 
-  OnOrganizationSelected() {
+  async OnOrganizationSelected() {
     if(this.organizationSelected) {
       let clause = `workOrders/${this.organizationSelected.OrganizationId}`;
       this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
@@ -138,11 +142,11 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         this.dbData = response;
 
         const path = this.organizationSelected.WorkMethod === 'PROCESOS' ? 'wo_process' : 'wo_discrete';
-        this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code)).then((response: any) => {
+        this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code)).then(async (response: any) => {
           const data = JSON.parse(response);
 
           if (this.organizationSelected.WorkMethod === 'MIXTA') {
-            this.mixedManufacturingCase();
+            this.MixedManufacturingCase();
           }
 
           //Para manufactura por PROCESOS O DISCRETA
@@ -155,16 +159,21 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
           // Transformar y asignar datos
           const restructuredData = data.items.map((item: any) => transformer(item));
 
-          console.log(restructuredData.Resources);
+          const objRestructured = { items: restructuredData };
 
+          //Obtener IDs de maquinas y articulos render
+          const matchMachines = await this.apiService.PostRequestRender(this.endPoints.Render('workOrdersMachines'), this.PayloadWOMachines(objRestructured));
+          const matchItems = await this.apiService.PostRequestRender(this.endPoints.Render('workOrdersItems'), this.PayloadItems(objRestructured));
+
+          //Mezclar datos de IDs de render con datos de fusion
+          const  mergeData = this.MergeWOData(restructuredData, matchMachines, matchItems);
           this.fusionData = {
-            items: restructuredData,
+            items: mergeData,
             totalResults: data.totalResults,
             count: data.count,
             hasMore: false,
           };
 
-          console.log(this.fusionData);
           this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
 
           this.FilterRegisteredItems();
@@ -173,8 +182,71 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
+  PayloadWOMachines(WO_Resources: any)
+  {
+    const payloadMachine: any[] = [];
 
-  async mixedManufacturingCase()
+    WO_Resources.items.forEach((i: any) => {
+      // Para cada OT, recorrer sus recursos
+      i.Resources.items.forEach((r: any) => {
+        payloadMachine.push({
+          MachineCode: r.ResourceCode,
+          WorkOrderNumber: i.WorkOrderNumber
+        });
+      });
+    });
+
+    return { items: payloadMachine };
+  }
+
+  PayloadItems(WO_Items: any)
+  {
+    const payloadItems: any[] = [];
+
+    WO_Items.items.forEach((i: any) => {
+      payloadItems.push({
+        Number: i.ItemNumber,
+        Description: i.Description,
+        UoM: i.UoM,
+        WorkOrderNumber: i.WorkOrderNumber
+      });
+    });
+
+    return {
+      CompanyId: this.dbOrganizations.Company.CompanyId,
+      items: payloadItems
+    };
+  }
+
+  // Mezclar datos de Fusion y Render
+  private MergeWOData(restructuredData: any[], matchMachines: any, matchItems: any): any[] {
+    if (!restructuredData?.length) return [];
+    return restructuredData.map((item: any) => {
+      // Buscar la máquina correspondiente por OT
+      const machine = matchMachines.items?.find((m: any) => m.workOrderNumber === item.WorkOrderNumber);
+      // Buscar el item correspondiente por OT
+      const product = matchItems.items?.find((it: any) => it.WorkOrderNumber === item.WorkOrderNumber);
+
+      return {
+        WorkOrderId: item.WorkOrderId,
+        WorkOrderNumber:  item.WorkOrderNumber,
+        WorkDefinitionId: item.WorkDefinitionId,
+        ItemId: product ? parseInt(product.ItemId) : null,
+        ItemNumber: item.ItemNumber,
+        Description: item.Description,
+        UoM: item.UOM,
+        ResourceId: machine ? parseInt(machine.MachineId) : null,
+        ResourceCode: machine ? machine.Code : "*****",
+        PlannedQuantity: item.PlannedQuantity,
+        CompletedQuantity: item.CompletedQuantity,
+        StartDate: item.StartDate,
+        CompletionDate: item.CompletionDate,
+      };
+    });
+  }
+
+
+  async MixedManufacturingCase()
   {
     let paths: string[] =  ['wo_process', 'wo_discrete'];
     let method: string[] = ['PROCESOS', 'DISCRETA'];
@@ -249,15 +321,20 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         return;
       }
 
-      const itemsData = this.selectedItemsFusion.map((item: any) => ({
+      const itemsData = this.selectedItemsFusion
+        .filter((item: any) => item.ResourceCode !== '*****')
+        .map((item: any) => ({
+        OrganizationId: this.organizationSelected.OrganizationId,
         MachineId: item.ResourceId,
-        OrganizationId: this.organizationSelected,
-        Code: item.ResourceCode,
-        Name: item.ResourceName,
-        //WorkCenterId: this.workCenterSelected.WorkCenterId,
-        //WorkCenter: this.workCenterSelected.WorkCenterName,
-        Class: item.ResourceClassCode,
-        Token: null
+        WorkOrderNumber: item.WorkOrderNumber,
+        WorkDefinitionId: item.WorkDefinitionId,
+        ItemId: item.ItemId,
+        PlannedQuantity: item.PlannedQuantity,
+        CompletedQuantity: item.CompletedQuantity,
+        Status: item.CompletedQuantity > 0 ? 'IN_PROCESS' : 'RELEASED',
+        StartDate: item.StartDate,
+        CompletionDate: item.CompletionDate,
+        Type: this.organizationSelected.WorkMethod.charAt(0)
       }));
 
       const payload = {
@@ -287,15 +364,13 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         return;
       }
 
-      console.log('DB:', this.selectedItemsDB);
-
       try {
         let successCount = 0;
 
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
           const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('workOrders/' + item.MachineId),
+            this.endPoints.Render('workOrders/' + item.WorkOrderId),
           );
 
           if (!response.errorsExistFlag) {
@@ -330,7 +405,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
   }
 
   RefreshTables() {
-    let clause = `workOrders/${this.organizationSelected.Code}`;
+    let clause = `workOrders/${this.organizationSelected.OrganizationId}`;
     this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
@@ -345,6 +420,5 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
     // Limpiar selecciones
     this.selectedItemsFusion = [];
     this.selectedItemsDB = [];
-
   }
 }

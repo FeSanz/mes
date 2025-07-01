@@ -12,43 +12,43 @@ export class EndpointsService {
 
   private endPoints: { [key: string]: string } = {
     'organizations': '/inventoryOrganizations?' + this._params +
-      '&fields=OrganizationId,OrganizationCode,OrganizationName,LocationCode,ManagementBusinessUnitId,Status;plantParameters:DefaultWorkMethod' +
-      '&q=ManufacturingPlantFlag=true',
+                      '&fields=OrganizationId,OrganizationCode,OrganizationName,LocationCode,ManagementBusinessUnitId,Status;plantParameters:DefaultWorkMethod' +
+                      '&q=ManufacturingPlantFlag=true',
 
     'auth': '{0}/inventoryOrganizations?limit=1&totalResults=true&onlyData=true&links=canonical' +
-      '&fields=OrganizationId',
+             '&fields=OrganizationId',
 
     'shifts': '/shifts?' + this._params +
-      '&fields=ShiftId,Name,StartTime,EndTime,Duration',
+                '&fields=ShiftId,Name,StartTime,EndTime,Duration',
 
     'work_centers': '/workCenters?' + this._params +
-      '&fields=WorkCenterId,WorkCenterName' +
-      '&q=OrganizationCode=\'{0}\'',
+                    '&fields=WorkCenterId,WorkCenterName' +
+                    '&q=OrganizationCode=\'{0}\'',
 
     'machines': '/productionResources?' + this._params +
-      '&fields=ResourceId,ResourceCode,ResourceName,ResourceClassCode' +
-      '&finder=findByWorkCenterId;WorkCenterId={0}' +
-      '&q=OrganizationCode=\'{1}\' and ResourceType=\'EQUIPMENT\' and Status=\'Active\'',
+                '&fields=ResourceId,ResourceCode,ResourceName,ResourceClassCode' +
+                '&finder=findByWorkCenterId;WorkCenterId={0}' +
+                '&q=OrganizationCode=\'{1}\' and ResourceType=\'EQUIPMENT\' and Status=\'Active\'',
 
     'lookups': '/standardLookups?' + this._params +
-      '&fields=Meaning,Description;lookupCodes:LookupCode,Meaning' +
-      '&q=LookupType=\'{0}\'',
+              '&fields=Meaning,Description;lookupCodes:LookupCode,Meaning' +
+              '&q=LookupType=\'{0}\'',
 
     'items':  '/itemsV2?' + this._params +
-      '&fields=ItemId,ItemNumber,ItemDescription,PrimaryUOMValue,LotControlValue' +
-      '&q=OrganizationCode=\'{0}\' and ItemStatusValue=\'Active\' and UserItemTypeValue=\'{1}\' and ItemNumber!=\'null\'',
+              '&fields=ItemId,ItemNumber,ItemDescription,PrimaryUOMValue,LotControlValue' +
+              '&q=OrganizationCode=\'{0}\' and ItemStatusValue=\'Active\' and UserItemTypeValue=\'{1}\' and ItemNumber!=\'null\'',
 
     'items_all': '/itemsV2?' + this._params +
-      '&fields=ItemId,ItemNumber,ItemDescription,PrimaryUOMValue,LotControlValue,UserItemTypeValue' +
-      '&q=OrganizationCode=\'{0}\' and ItemStatusValue=\'Active\' and ItemNumber!=\'null\'',
+                '&fields=ItemId,ItemNumber,ItemDescription,PrimaryUOMValue,LotControlValue,UserItemTypeValue' +
+                '&q=OrganizationCode=\'{0}\' and ItemStatusValue=\'Active\' and ItemNumber!=\'null\'',
 
     'wo_process': '/processWorkOrders?' + this._params +
-      '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceCode' +
-      '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\'',
+                  '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,Description,PrimaryProductUOMCode,PrimaryProductQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;ProcessWorkOrderResource:ResourceCode' +
+                  '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\'',
 
     'wo_discrete': '/workOrders?' + this._params +
-      '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceCode' +
-      '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\'',
+                    '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,Description,UOMCode,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceCode' +
+                    '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\'',
   };
 
   constructor() { }
