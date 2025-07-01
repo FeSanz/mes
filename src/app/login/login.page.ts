@@ -58,4 +58,8 @@ export class LoginPage {
     }
     return credentials
   }
+
+  ionViewWillEnter(){
+    this.app.showMenu = false
+  }
 }

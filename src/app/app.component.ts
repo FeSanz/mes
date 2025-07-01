@@ -59,7 +59,7 @@ export class AppComponent {
   }
   isModalOpen = false
   user: any = {}
-  showMenu = true;
+  showMenu = false;
   editDashOrder = false
   constructor(
     private router: Router,

@@ -211,13 +211,12 @@ ion-card-title {
 }
 
 .modern-thermometer {
+  width: auto;
+  height: 100%;
+  aspect-ratio: 140 / 400;
   background: var(--thermometer-bg);
   border-radius: 15px;
   transition: transform 0.3s ease;
-
-  &:hover {
-    transform: scale(1.02);
-  }
 }
 
 .scale-marks text {
