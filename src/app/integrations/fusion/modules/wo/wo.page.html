@@ -119,14 +119,14 @@
             </th>
             <th pSortableColumn="StartDate" style="min-width: 12rem">
               <div class="flex justify-between items-center">
-                Fecha Inicio
+                F. Inicio
                 <p-sortIcon field="StartDate" />
                 <p-columnFilter field="StartDate" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
             <th pSortableColumn="CompletionDate" style="min-width: 12rem">
               <div class="flex justify-between items-center">
-                Fecha Fin
+                F. Fin
                 <p-sortIcon field="CompletionDate" />
                 <p-columnFilter field="CompletionDate" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
@@ -144,8 +144,8 @@
             <td>{{ item.ResourceCode }}</td>
             <td>{{ item.PlannedQuantity }}</td>
             <td>{{ item.CompletedQuantity }}</td>
-            <td>{{ item.StartDate }}</td>
-            <td>{{ item.CompletionDate }}</td>
+            <td>{{ FormatForDisplayUser(item.StartDate) }}</td>
+            <td>{{ FormatForDisplayUser(item.CompletionDate) }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -155,7 +155,6 @@
         </ng-template>
       </p-table>
     </div>
-
 
     <!-------------------------- Region DB ------------------------------------>
     <div class="region-container">
@@ -253,14 +252,14 @@
             </th>
             <th pSortableColumn="StartDate" style="min-width: 12rem">
               <div class="flex justify-between items-center">
-                Fecha Inicio
+                F. Inicio
                 <p-sortIcon field="StartDate" />
                 <p-columnFilter field="StartDate" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
             <th pSortableColumn="CompletionDate" style="min-width: 12rem">
               <div class="flex justify-between items-center">
-                Fecha Fin
+                F. Fin
                 <p-sortIcon field="CompletionDate" />
                 <p-columnFilter field="CompletionDate" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
@@ -277,8 +276,8 @@
             <td>{{ item.ResourceCode }}</td>
             <td>{{ item.PlannedQuantity }}</td>
             <td>{{ item.CompletedQuantity }}</td>
-            <td>{{ item.StartDate }}</td>
-            <td>{{ item.CompletionDate }}</td>
+            <td>{{ FormatForDisplayUser(item.StartDate) }}</td>
+            <td>{{ FormatForDisplayUser(item.CompletionDate) }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

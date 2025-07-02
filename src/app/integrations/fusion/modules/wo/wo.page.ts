@@ -8,7 +8,7 @@ import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
 import {HeightTable} from "../../../../models/tables.prime";
-import {FromISO8601} from "../../../../models/date.format";
+import {Iso8601ToCDMX, FormatForDisplayUser} from "../../../../models/date.format";
 import {addIcons} from "ionicons";
 
 import { TableModule } from 'primeng/table';
@@ -68,8 +68,8 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
       Resources: data.ProcessWorkOrderResource,
       PlannedQuantity: data.PrimaryProductQuantity,
       CompletedQuantity: data.CompletedQuantity,
-      StartDate: FromISO8601(data.PlannedStartDate),
-      CompletionDate: FromISO8601(data.PlannedCompletionDate)
+      StartDate: Iso8601ToCDMX(data.PlannedStartDate),
+      CompletionDate: Iso8601ToCDMX(data.PlannedCompletionDate)
     }),
 
     'DISCRETA': (data: any) => ({
@@ -83,8 +83,8 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
       Resources: data.WorkOrderResource,
       PlannedQuantity: data.PlannedStartQuantity,
       CompletedQuantity: data.CompletedQuantity,
-      StartDate: FromISO8601(data.PlannedStartDate),
-      CompletionDate: FromISO8601(data.PlannedCompletionDate)
+      StartDate: Iso8601ToCDMX(data.PlannedStartDate),
+      CompletionDate: Iso8601ToCDMX(data.PlannedCompletionDate)
     })
   };
 
@@ -174,6 +174,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
             hasMore: false,
           };
 
+          console.log(this.fusionData);
           this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
 
           this.FilterRegisteredItems();
@@ -321,9 +322,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         return;
       }
 
-      const itemsData = this.selectedItemsFusion
-        .filter((item: any) => item.ResourceCode !== '*****')
-        .map((item: any) => ({
+      const itemsData = this.selectedItemsFusion.map((item: any) => ({
         OrganizationId: this.organizationSelected.OrganizationId,
         MachineId: item.ResourceId,
         WorkOrderNumber: item.WorkOrderNumber,
@@ -421,4 +420,6 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
     this.selectedItemsFusion = [];
     this.selectedItemsDB = [];
   }
+
+  protected readonly FormatForDisplayUser = FormatForDisplayUser;
 }
