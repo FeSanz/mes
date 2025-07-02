@@ -144,8 +144,8 @@
             <td>{{ item.ResourceCode }}</td>
             <td>{{ item.PlannedQuantity }}</td>
             <td>{{ item.CompletedQuantity }}</td>
-            <td>{{ FormatForDisplayUser(item.StartDate) }}</td>
-            <td>{{ FormatForDisplayUser(item.CompletionDate) }}</td>
+            <td>{{ FormatForDisplayFromISO(item.StartDate) }}</td>
+            <td>{{ FormatForDisplayFromISO(item.CompletionDate) }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -276,8 +276,8 @@
             <td>{{ item.ResourceCode }}</td>
             <td>{{ item.PlannedQuantity }}</td>
             <td>{{ item.CompletedQuantity }}</td>
-            <td>{{ FormatForDisplayUser(item.StartDate) }}</td>
-            <td>{{ FormatForDisplayUser(item.CompletionDate) }}</td>
+            <td>{{ FormatForDisplayFromISO(item.StartDate) }}</td>
+            <td>{{ FormatForDisplayFromISO(item.CompletionDate) }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

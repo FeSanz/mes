@@ -8,7 +8,7 @@ import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
 import {HeightTable} from "../../../../models/tables.prime";
-import {Iso8601ToCDMX, FormatForDisplayUser} from "../../../../models/date.format";
+import {FormatForDisplayFromISO} from "../../../../models/date.format";
 import {addIcons} from "ionicons";
 
 import { TableModule } from 'primeng/table';
@@ -68,8 +68,8 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
       Resources: data.ProcessWorkOrderResource,
       PlannedQuantity: data.PrimaryProductQuantity,
       CompletedQuantity: data.CompletedQuantity,
-      StartDate: Iso8601ToCDMX(data.PlannedStartDate),
-      CompletionDate: Iso8601ToCDMX(data.PlannedCompletionDate)
+      StartDate: data.PlannedStartDate,
+      CompletionDate: data.PlannedCompletionDate
     }),
 
     'DISCRETA': (data: any) => ({
@@ -83,8 +83,8 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
       Resources: data.WorkOrderResource,
       PlannedQuantity: data.PlannedStartQuantity,
       CompletedQuantity: data.CompletedQuantity,
-      StartDate: Iso8601ToCDMX(data.PlannedStartDate),
-      CompletionDate: Iso8601ToCDMX(data.PlannedCompletionDate)
+      StartDate: data.PlannedStartDate,
+      CompletionDate: data.PlannedCompletionDate
     })
   };
 
@@ -174,7 +174,6 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
             hasMore: false,
           };
 
-          console.log(this.fusionData);
           this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
 
           this.FilterRegisteredItems();
@@ -235,7 +234,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         ItemId: product ? parseInt(product.ItemId) : null,
         ItemNumber: item.ItemNumber,
         Description: item.Description,
-        UoM: item.UOM,
+        UoM: item.UoM,
         ResourceId: machine ? parseInt(machine.MachineId) : null,
         ResourceCode: machine ? machine.Code : "*****",
         PlannedQuantity: item.PlannedQuantity,
@@ -322,7 +321,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         return;
       }
 
-      const itemsData = this.selectedItemsFusion.map((item: any) => ({
+      const itemsData = this.selectedItemsFusion.filter((item: any) => item.ResourceCode !== '*****').map((item: any) => ({
         OrganizationId: this.organizationSelected.OrganizationId,
         MachineId: item.ResourceId,
         WorkOrderNumber: item.WorkOrderNumber,
@@ -336,6 +335,10 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         Type: this.organizationSelected.WorkMethod.charAt(0)
       }));
 
+      if(itemsData.length === 0) {
+        this.alerts.Warning("Seleccione algún elemento para cargar");
+        return;
+      }
       const payload = {
         items: itemsData
       };
@@ -421,5 +424,5 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
     this.selectedItemsDB = [];
   }
 
-  protected readonly FormatForDisplayUser = FormatForDisplayUser;
+  protected readonly FormatForDisplayFromISO = FormatForDisplayFromISO;
 }
