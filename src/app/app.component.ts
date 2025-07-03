@@ -72,7 +72,12 @@ export class AppComponent {
   ) {
     addIcons({ ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline, reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline, person, homeOutline });
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false
-    this.user = JSON.parse(String(localStorage.getItem("userData")))
+    const rawData = localStorage.getItem("userData");
+    try {
+      this.user = rawData ? JSON.parse(rawData) : {};
+    } catch (e) {
+      this.user = {};
+    }
     isLogged ? this.username = String(localStorage.getItem('user') || "No user") : "Inicie sesión"
     const theme = localStorage.getItem('theme');
     if (theme == null) {
@@ -237,17 +242,26 @@ export class AppComponent {
     this.username = username
     const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/byOrganizations/?organizations=' + orgsIds), false).then((response: any) => {
+      console.log(response);
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
         this.permissions.reloadUserData()
         this.dashboardGroups = response.items
         console.log(response.items);
-        this.router.navigate(['/monitoring/' + response.items[0].dashboard_group_id], {
-          state: {
-            dash: response.items[0]
-          }
-        });
+        if (response.items[0]) {
+          this.router.navigate(['/monitoring/' + response.items[0].dashboard_group_id], {
+            state: {
+              dash: response.items[0]
+            }
+          });
+        } else {
+          this.router.navigate(['/settings/users'], {
+            state: {
+              dash: response.items[0]
+            }
+          });
+        }
       }
     })
   }

@@ -6,7 +6,12 @@ import { Injectable } from '@angular/core';
 export class PermissionsService {
   user: any = {}
   constructor() {
-    this.user = JSON.parse(String(localStorage.getItem("userData")))
+    const rawData = localStorage.getItem("userData");
+    try {
+      this.user = rawData ? JSON.parse(rawData) : {};
+    } catch (e) {
+      this.user = {};
+    }
   }
 
   isAdmin(): boolean {

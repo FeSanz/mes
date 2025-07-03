@@ -91,6 +91,8 @@ ion-select::part(label) {
 }
 
 ion-card {
+  min-width: 250px;
+  max-width: 350px;
   min-height: 450.5px;
   --background: var(--ion-color-back-shade, #fff);
   border-radius: 12px;
@@ -517,9 +519,11 @@ ion-card-title {
 .progress-path {
   animation: glow-effect 4s ease-in-out infinite;
 }
+
 .progress-path:hover {
   stroke-width: 20;
 }
+
 .gauge-value {
   animation: pulse-humidity 3s ease-in-out infinite;
 }

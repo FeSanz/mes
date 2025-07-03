@@ -252,4 +252,5 @@ export class MonitoringPage implements OnInit {
   trackByWidget(index: number, widget: any): any {
     return widget.jsonParams.dashboard_id;
   }
+
 }

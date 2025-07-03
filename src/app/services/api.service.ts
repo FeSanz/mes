@@ -230,7 +230,7 @@ export class ApiService {
   /*******************************Authentication************************** */
   async AuthRequestDatabase(url: string, user: string, password: string) {
     await this.alerts.ShowLoading("Autenticando...");
-    password = btoa(password)
+    password = btoa(password)    
     try {
       const options = {
         url: url,

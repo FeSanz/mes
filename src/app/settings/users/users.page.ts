@@ -63,6 +63,7 @@ export class UsersPage implements OnInit {
     addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline })
     const user = JSON.parse(String(localStorage.getItem("userData")))
     this.company = user.Company
+
     this.breakpointObserver.observe([Breakpoints.Handset])
       .subscribe(result => {
         this.isSmallScreen = result.matches;
@@ -72,7 +73,9 @@ export class UsersPage implements OnInit {
     this.GetUsers();
   }
   GetUsers() {
-    this.apiService.GetRequestRender(this.endPoints.Render('users?companyId=' + this.company.CompanyId)).then((response: any) => {
+    const orgsIds = this.company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
+    console.log(orgsIds);    
+    this.apiService.GetRequestRender(this.endPoints.Render('users?organizations=' + orgsIds)).then((response: any) => {
       this.users = response.items
       this.apiService.GetRequestRender(this.endPoints.Render('organizations/' + this.company.CompanyId)).then((responseOrg: any) => {
         this.organizations = responseOrg.items.map((org: any) => ({

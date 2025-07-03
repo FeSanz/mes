@@ -187,7 +187,7 @@
             <ion-icon name="trash-outline"></ion-icon>
           </ion-fab-button>
         </ion-fab>
-        <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="!machine.isNew && permissions.isSuperAdmin()">
+        <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="machine.isNew && permissions.isSuperAdmin()">
           <ion-fab-button (click)="machine.isNew ? addNewMachine() : updateMachine()">
             <ion-icon name="checkmark-outline"></ion-icon>
           </ion-fab-button>
