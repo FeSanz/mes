@@ -12,12 +12,12 @@ import {IonButtons, IonContent, IonHeader, IonMenuButton, IonTitle, IonToolbar} 
 })
 export class ReadyPage implements OnInit {
 
-  userData: any = {};
+  xdara: any = {};
 
   constructor() { }
 
   ngOnInit() {
-    this.userData = JSON.parse(String(localStorage.getItem("userData")));
+    this.xdara = JSON.parse(String(localStorage.getItem("userData")));
   }
 
 }

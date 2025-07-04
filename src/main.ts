@@ -5,7 +5,7 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 //Para PrimeNG
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
-// import 'primeicons/primeicons.css';
+import 'primeicons/primeicons.css';
 
 //Temas PrimeNG
 import Aura from '@primeng/themes/aura';
