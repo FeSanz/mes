@@ -13,11 +13,12 @@ import { HeatmapComponent } from 'src/app/components/heatmap/heatmap.component';
 import { ThermometerComponent } from 'src/app/components/thermometer/thermometer.component';
 import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmark } from 'ionicons/icons';
+import { addOutline, checkmark, logoHackernews } from 'ionicons/icons';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PermissionsService } from 'src/app/services/permissions.service';
+import { ResizeEvent, ResizableModule } from 'angular-resizable-element';
 
 export interface SensorData {
   [key: string]: any;
@@ -39,7 +40,7 @@ export type ChartOptions = {
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent, OnoffComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
-    IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule]
+    IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule]
 })
 export class MonitoringPage implements OnInit {
   sensorData: SensorData[] = [];
@@ -106,20 +107,23 @@ export class MonitoringPage implements OnInit {
   }
   GetDasboards() {
     this.api.GetRequestRender(this.endPoints.Render('dashboards/group/' + this.dashboardData.dashboard_group_id), false).then((response: any) => {
-      console.log(response.items);
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
         id: item.dashboard_id,
         name: item.name,
+        colSize: item.col_size || 4,
+        previewWidth: undefined,
+        colSizePreview: undefined,
         jsonParams: {
-          ...item.parameters, dashboard_id: item.dashboard_id,
-          organization_id: item.organization_id, name: item.name, color: item.color,
+          ...item.parameters,
+          dashboard_id: item.dashboard_id,
+          organization_id: item.organization_id,
+          name: item.name,
+          color: item.color,
         }
       }));
-
-      //const organizationIds: number[] = this.user.Company.Organizations.map((org: any) => org.OrganizationId);
+      this.changeDetector.detectChanges()
       this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.dashboardData.organization_id)).then((response: any) => {
-
         if (response.items.length > 0) {
           this.machines = response.items
           this.newWidgetData.machine = response.items[0].machineId + ""
@@ -132,6 +136,10 @@ export class MonitoringPage implements OnInit {
     this.newWidgetData.name = "Widget " + (this.widgets.length + 1)
     this.newWidgetData.widgetType = "chart"
     this.newWidgetData.chartType = "area"
+  }
+  getColSize(widget: any): number {
+    const val = Number(widget.colSize);
+    return isNaN(val) ? 4 : Math.min(Math.max(val, 1), 12);
   }
   async addNewSensor() {
     this.newWidgetData.sensors.push({
@@ -222,7 +230,6 @@ export class MonitoringPage implements OnInit {
     this.changeDetector.detectChanges()
   }
 
-
   saveWidgetOrder() {
     const body = this.widgets.map((item: any) => ({
       dashboard_id: item.id,
@@ -248,9 +255,75 @@ export class MonitoringPage implements OnInit {
     }
   }
 
-
   trackByWidget(index: number, widget: any): any {
     return widget.jsonParams.dashboard_id;
   }
 
+  validateResize = ({ rectangle }: any): boolean => {
+    const minWidth = 200;
+    const maxWidth = 800;
+
+    return rectangle.width >= minWidth && rectangle.width <= maxWidth;
+  }
+
+  onResizeEnd(event: ResizeEvent, widget: any): void {
+    widget.colSize = widget.colSizePreview;
+    widget.previewWidth = undefined;
+    delete widget.colSizePreview;
+    this.changeDetector.detectChanges();
+    this.api.UpdateRequestRender(this.endPoints.Render('dashboards/size'), { "dashboard_id": widget.id, "colSize": widget.colSize }, false).then((response: any) => {
+      if (!response.errorsExistFlag) {
+        //this.alerts.Success("Dashboard eliminado")
+      } else {
+        this.alerts.Error("Error al reordenar los widgets, intente más tarde.")
+      }
+    })
+  }
+  onResizing(event: ResizeEvent, widget: any): void {
+    //console.log(JSON.parse(JSON.stringify(widget)));
+    const row = document.querySelector('.drag-row');
+    const gridWidth = row ? row.clientWidth : window.innerWidth;
+
+    if (event.rectangle.width) {
+      const colUnit = gridWidth / 12;
+      let colSize = Math.round(event.rectangle.width / colUnit);
+      colSize = Math.min(Math.max(colSize, 1), 12);
+
+      widget.previewWidth = event.rectangle.width;
+      widget.colSizePreview = colSize;
+
+      this.changeDetector.detectChanges();
+    }
+  }
+  
+  onResizeStart(event: ResizeEvent, widget: any): void {
+    console.log(JSON.parse(JSON.stringify(widget)));
+    this.onResizing(event, widget)
+  }
+  // Obtener ancho por defecto basado en breakpoints
+  getDefaultWidth(): number {
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth >= 1200) {
+      return 400; // xl
+    } else if (screenWidth >= 992) {
+      return 500; // lg
+    } else if (screenWidth >= 768) {
+      return 350; // md
+    } else {
+      return screenWidth - 40; // sm/xs con padding
+    }
+  }
+
+  getResponsiveSize(widget: any): number {
+    const screenWidth = window.innerWidth;
+    // En pantallas pequeñas, usar 12 columnas
+    if (screenWidth < 768) {
+      return 12;
+    }
+    return widget.colSizePreview || widget.colSize || 4;
+  }
+  getPageWidth(): number {
+    return window.innerWidth;
+  }
 }

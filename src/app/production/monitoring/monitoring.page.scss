@@ -64,3 +64,77 @@ ion-select::part(label) {
 [cdkDrag] {
     cursor: default;
 }
+
+.drag-row {
+    display: flex;
+    flex-wrap: wrap;
+    /* Permitir que se acomoden en múltiples filas */
+    align-items: stretch;
+}
+
+.resizable-col {
+    position: relative;
+    min-height: 300px;
+    transition: none;
+}
+
+.resizable-col:hover {
+    border-color: var(--ion-color-primary);
+}
+
+.widget-container {
+    height: 100%;
+    padding: 0px;
+    overflow: hidden;
+}
+
+/* Handles de redimensionamiento */
+.resize-handle {
+    position: absolute;
+    z-index: 999;
+    background: transparent;
+}
+
+.resize-handle-right {
+    top: 0;
+    right: 12px;
+    bottom: 0;
+    width: 6px;
+    cursor: col-resize;
+    background: linear-gradient(to right, transparent 2px, var(--ion-color-primary) 2px, var(--ion-color-primary) 4px, transparent 4px);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.resizable-col:hover .resize-handle-right {
+    opacity: 0.6;
+}
+
+.resize-handle-right:hover {
+    opacity: 1 !important;
+    background: var(--ion-color-primary);
+}
+
+/* Cuando se está redimensionando */
+.resize-ghost-element {
+    background: rgba(var(--ion-color-primary-rgb), 0.1);
+    border: 2px dashed var(--ion-color-primary);
+    pointer-events: none;
+}
+
+/* Responsive - deshabilitar redimensionamiento en móviles */
+@media (max-width: 768px) {
+    .resize-handle {
+        display: none;
+    }
+
+    .resizable-col {
+        width: 100% !important;
+        flex: 1 1 100%;
+    }
+}
+
+.force-inline {
+    flex-wrap: nowrap !important;
+}
+

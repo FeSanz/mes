@@ -1,5 +1,5 @@
 ion-card {
-  max-width: 350px;
+  //max-width: 350px;
   min-height: 450.5px;
   min-width: 250px;
   --background: var(--ion-color-back-shade, #fff);
@@ -379,7 +379,7 @@ ion-card-title {
 // ✅ CONTROL COMPACTO
 .temperature-control {
   width: 100%;
-  max-width: 300px;
+  //max-width: 300px;
 
   &.compact {
     padding: var(--spacing-sm);

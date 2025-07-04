@@ -4,8 +4,8 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class WebSocketService {
-  //server = "ws://localhost:3000";
-  server = "wss://iot-services-rd.onrender.com";
+  server = "ws://localhost:3000";
+  //server = "wss://iot-services-rd.onrender.com";
   
 
   constructor() { }

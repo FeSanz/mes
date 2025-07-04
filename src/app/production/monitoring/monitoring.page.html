@@ -11,25 +11,34 @@
   <ion-grid class="drag-grid">
     <ion-row cdkDropList (cdkDropListDropped)="onDrop($event)" [cdkDropListData]="widgets"
       cdkDropListOrientation="mixed" class="drag-row">
-      <ion-col size="12" size-sm="12" size-md="6" size-lg="6" size-xl="4"
-        *ngFor="let widget of widgets; trackBy: trackByWidget" cdkDrag class="widget-column">
-        <ng-container [ngSwitch]="widget.jsonParams.widgetType">
-          <app-charts *ngSwitchCase="'chart'" [data]="widget.jsonParams"
-            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
-          </app-charts>
-          <app-heatmap *ngSwitchCase="'heatmap'" [data]="widget.jsonParams"
-            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
-          </app-heatmap>
-          <app-thermometer *ngSwitchCase="'thermo'" [data]="widget.jsonParams"
-            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
-          </app-thermometer>
-          <app-gauge *ngSwitchCase="'gauge'" [data]="widget.jsonParams"
-            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
-          </app-gauge>
-          <app-onoff *ngSwitchCase="'onoff'" [data]="widget.jsonParams"
-            (remove)="removeWidget(widget.jsonParams.dashboard_id)">
-          </app-onoff>
-        </ng-container>
+      <ion-col *ngFor="let widget of widgets; let i = index;" [size]="widget.colSizePreview || widget.colSize"
+        [style.width.px]="widget.previewWidth || getDefaultWidth()" [class.resizing-mode]="!!widget.previewWidth"
+        [style.max-width]="widget.previewWidth ? widget.previewWidth + 'px' : ''"
+        (resizing)="onResizing($event, widget)" class="resizable-col" cdkDrag mwlResizable [enableGhostResize]="true"
+        [ghostElementPositioning]="'absolute'" [resizeEdges]="{ top: false, bottom: false, left: i > 0, right: true }"
+        (resizeEnd)="onResizeEnd($event, widget)"(resizeStart)="onResizeStart($event, widget)">
+
+        <div class="resize-handle resize-handle-right" mwlResizeHandle [resizeEdges]="{ right: true }">
+        </div>
+        <div class="widget-container">
+          <ng-container [ngSwitch]="widget.jsonParams.widgetType">
+            <app-charts *ngSwitchCase="'chart'" [data]="widget.jsonParams"
+              (remove)="removeWidget(widget.jsonParams.dashboard_id)">
+            </app-charts>
+            <app-heatmap *ngSwitchCase="'heatmap'" [data]="widget.jsonParams"
+              (remove)="removeWidget(widget.jsonParams.dashboard_id)">
+            </app-heatmap>
+            <app-thermometer *ngSwitchCase="'thermo'" [data]="widget.jsonParams"
+              (remove)="removeWidget(widget.jsonParams.dashboard_id)">
+            </app-thermometer>
+            <app-gauge *ngSwitchCase="'gauge'" [data]="widget.jsonParams"
+              (remove)="removeWidget(widget.jsonParams.dashboard_id)">
+            </app-gauge>
+            <app-onoff *ngSwitchCase="'onoff'" [data]="widget.jsonParams"
+              (remove)="removeWidget(widget.jsonParams.dashboard_id)">
+            </app-onoff>
+          </ng-container>
+        </div>
       </ion-col>
     </ion-row>
   </ion-grid>
