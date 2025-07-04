@@ -52,7 +52,7 @@ export class OnoffComponent implements OnInit {
     this.GetSensorValue()
   }
   GetSensorValue() {
-    this.api.GetRequestRender(this.endPoints.Render('sensorData/' + this.widgetData.sensors[0].sensor_id + '?limit=1'), false).then((response: any) => {
+    this.api.GetRequestRender(this.endPoints.Render('sensorData/' + this.widgetData.sensors[0].sensor_id), false).then((response: any) => {
       this.lastValue = response.items.data[0].value
       this.lastDate = response.items.data[0].time
       this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true
@@ -77,7 +77,7 @@ export class OnoffComponent implements OnInit {
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
     this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id)).then((response: any) => {
-      console.log(response);
+      //console.log(response);
       this.machines = response.items
       this.isModalOpen = true;
       this.changeDetector.detectChanges()
@@ -102,7 +102,7 @@ export class OnoffComponent implements OnInit {
     return machine ? machine.sensors : [];
   }
   updateChartDB() {
-    console.log(this.copyWidgetData);
+    //console.log(this.copyWidgetData);
     const body = {
       name: this.copyWidgetData.name,
       user_id: 1,
@@ -114,7 +114,7 @@ export class OnoffComponent implements OnInit {
         sensors: this.copyWidgetData.sensors,
       }
     }
-    console.log(body);
+    //console.log(body);
     this.showChart = false;
     this.api.UpdateRequestRender(this.endPoints.Render('dashboards/') + this.widgetData.dashboard_id, body).then((response: any) => {
       //console.log(response);
@@ -130,7 +130,7 @@ export class OnoffComponent implements OnInit {
     const selectedValue = event.detail.value;
     const sensor = this.getSensorsForMachine(this.widgetData.sensors[0].machine_id).find((s: any) => s.sensor_id == selectedValue)
     this.copyWidgetData.sensors[0].sensor_name = sensor.sensor_name
-    console.log(this.copyWidgetData.sensors[0].sensor_name);
+    //console.log(this.copyWidgetData.sensors[0].sensor_name);
 
   }
   get borderColor(): string {

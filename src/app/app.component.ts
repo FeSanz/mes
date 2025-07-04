@@ -140,7 +140,7 @@ export class AppComponent {
       dashboard_group_id: group.dashboard_group_id,
       index: group.index
     }));
-    console.log(body);
+    //console.log(body);
 
     this.api.UpdateRequestRender(this.endPoints.Render('dashboardsGroup/order'), { items: body }, false).then(response => {
       if (!response.errorsExistFlag) {
@@ -242,13 +242,13 @@ export class AppComponent {
     this.username = username
     const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/byOrganizations/?organizations=' + orgsIds), false).then((response: any) => {
-      console.log(response);
+      //console.log(response);
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
         this.permissions.reloadUserData()
         this.dashboardGroups = response.items
-        console.log(response.items);
+        //console.log(response.items);
         if (response.items[0]) {
           this.router.navigate(['/monitoring/' + response.items[0].dashboard_group_id], {
             state: {

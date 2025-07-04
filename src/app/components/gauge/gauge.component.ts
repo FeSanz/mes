@@ -55,7 +55,7 @@ export class GaugeComponent implements OnInit {
     this.initializeConfig();
   }
   GetSensorValue() {
-    this.api.GetRequestRender(this.endPoints.Render('sensorData/' + this.widgetData.sensors[0].sensor_id + '?limit=1'), false).then((response: any) => {
+    this.api.GetRequestRender(this.endPoints.Render('sensorData/' + this.widgetData.sensors[0].sensor_id), false).then((response: any) => {
       const lastValue = response.items.data[0].value
       this.lastDate = response.items.data[0].time
       this.humiditySubject.next(lastValue);
@@ -79,9 +79,9 @@ export class GaugeComponent implements OnInit {
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
-    console.log(this.copyWidgetData.widgetType);
+    //console.log(this.copyWidgetData.widgetType);
     this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id)).then((response: any) => {
-      console.log(response);
+      //console.log(response);
       this.machines = response.items
       this.isModalOpen = true;
       this.changeDetector.detectChanges()

@@ -46,8 +46,8 @@ export class UsersPage implements OnInit {
     type: 'USER',
     password: '',
     email: '',
-    level: 1,
-    rfid: null,
+    //level: 1,
+    //rfid: null,
     enabled_flag: 'Y'
   };
   isNewFlag = true
@@ -73,9 +73,9 @@ export class UsersPage implements OnInit {
     this.GetUsers();
   }
   GetUsers() {
-    const orgsIds = this.company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
-    console.log(orgsIds);    
-    this.apiService.GetRequestRender(this.endPoints.Render('users?organizations=' + orgsIds)).then((response: any) => {
+    /*const orgsIds = this.company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
+    console.log(orgsIds);*/
+    this.apiService.GetRequestRender(this.endPoints.Render('users?company_id=' + this.company.CompanyId)).then((response: any) => {
       this.users = response.items
       this.apiService.GetRequestRender(this.endPoints.Render('organizations/' + this.company.CompanyId)).then((responseOrg: any) => {
         this.organizations = responseOrg.items.map((org: any) => ({
@@ -169,17 +169,19 @@ export class UsersPage implements OnInit {
       }
     })
   }
-  DeleteUser() {//eliminar usuario
-    this.api.DeleteRequestRender(this.endPoints.Render('users/' + this.user.user_id)).then((response: any) => {
-      if (response.errorsExistFlag) {
-        this.alerts.Info(response.message);
-      } else {
-        this.alerts.Success("Usuario eliminado")
-        this.users = this.users.filter((user: any) => user.user_id !== this.user.user_id);//se filtran los usuarios que no tengan este user_id
-        this.isModalOpen = false
-        this.changeDetector.detectChanges()
-      }
-    })
+  async DeleteUser() {//eliminar usuario
+    if (await this.alerts.ShowAlert("¿Deseas eliminar este usuario?", "Alerta", "Atrás", "Eliminar")) {
+      this.api.DeleteRequestRender(this.endPoints.Render('users/' + this.user.user_id)).then((response: any) => {
+        if (response.errorsExistFlag) {
+          this.alerts.Info(response.message);
+        } else {
+          this.alerts.Success("Usuario eliminado")
+          this.users = this.users.filter((user: any) => user.user_id !== this.user.user_id);//se filtran los usuarios que no tengan este user_id
+          this.isModalOpen = false
+          this.changeDetector.detectChanges()
+        }
+      })
+    }
   }
   resetUser() {//se reinician los datos del usuario nuevo o a editar
     this.user = {
@@ -189,8 +191,8 @@ export class UsersPage implements OnInit {
       type: 'USER',
       password: '',
       email: '',
-      level: 1,
-      rfid: null,
+      //level: 1,
+      //rfid: null,
       enabled_flag: 'Y'
     };
   }

@@ -89,7 +89,7 @@ export class DevicesPage implements OnInit {
         }, {})
       ).sort((a: any, b: any) => a.organization_name.localeCompare(b.organization_name));
 
-      console.log(this.organizations);
+      //console.log(this.organizations);
 
     })
   }
@@ -173,7 +173,7 @@ export class DevicesPage implements OnInit {
       })
     };
     this.api.UpdateRequestRender(this.endPoints.Render('machines/') + machineBody.machine_id, machineBody).then((response: any) => {
-      console.log(response);
+      //console.log(response);
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
@@ -207,7 +207,7 @@ export class DevicesPage implements OnInit {
     });
   }
   async deleteMachine(machine_id: number = 0) {
-    console.log(this.machine);
+    //console.log(this.machine);
 
     if (await this.alerts.ShowAlert("¿Deseas eliminar esta máquina?", "Alerta", "Atrás", "Eliminar")) {
       this.api.DeleteRequestRender(this.endPoints.Render('machines') + machine_id ? machine_id : this.machine.machine_id).then((response: any) => {
@@ -229,7 +229,7 @@ export class DevicesPage implements OnInit {
     } else
       if (await this.alerts.ShowAlert("¿Deseas eliminar este sensor?", "Alerta", "Atrás", "Eliminar")) {
         this.api.DeleteRequestRender(this.endPoints.Render('sensors') + sensor.sensor_id).then((response: any) => {
-          console.log(response);
+          //console.log(response);
           this.machine.sensors = this.machine.sensors.filter((se: any) => se !== sensor);
           this.changeDetector.detectChanges()
         })

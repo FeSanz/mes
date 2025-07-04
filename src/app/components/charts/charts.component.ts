@@ -158,22 +158,6 @@ export class ChartsComponent implements OnInit {
       this.ajustarYaxis();
       this.startSubscriptions();
     })
-    /*
-    const seriesData = await Promise.all(
-      sensores.map((sensor: any) =>
-        this.api.GetRequestRender(this.endPoints.Render('sensorData/') + sensor.sensor_id + '?start=' + result + '&end=' + nowDate).then((response: any) => (
-          console.log(response),{
-          color: sensor.color,
-          group: sensor.sensor_id, // ID único
-          name: response.sensor_name,
-          data: response.items.map((item: any) => ({
-            x: new Date(item.time).getTime(),
-            y: Number(item.value)
-          }))
-        }))
-      )
-    );
-    this.chartOptions.series = seriesData;*/
     if (this.chart && this.chart.updateOptions) {
       this.chart.updateOptions(this.chartOptions);
     }

@@ -123,6 +123,11 @@ export class MonitoringPage implements OnInit {
           color: item.color,
         }
       }));
+
+      // Simular resize para cada widget
+      setTimeout(() => {
+        this.simulateResizeForAllWidgets();
+      }, 100);
       this.changeDetector.detectChanges()
       this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.dashboardData.organization_id)).then((response: any) => {
         if (response.items.length > 0) {
@@ -131,6 +136,31 @@ export class MonitoringPage implements OnInit {
         }
       })
     })
+  }
+  private simulateResizeForAllWidgets(): void {
+    this.widgets.forEach((widget: any, index: any) => {
+      // Simular el evento de resize
+      const row = document.querySelector('.drag-row');
+      const gridWidth = row ? row.clientWidth : window.innerWidth;
+      const colUnit = gridWidth / 12;
+      const currentWidth = (widget.colSize || 4) * colUnit;
+
+      // Crear un evento de resize simulado
+      const simulatedEvent: any = {
+        rectangle: {
+          width: currentWidth,
+          height: 200 // altura por defecto
+        }
+      };
+
+      // Llamar a onResizing
+      this.onResizing(simulatedEvent, widget);
+
+      // Inmediatamente llamar a onResizeEnd
+      setTimeout(() => {
+        this.onResizeEnd(simulatedEvent, widget);
+      }, 10);
+    });
   }
   setOpen(isOpen: boolean) {
     this.isModalOpen = isOpen;
@@ -236,7 +266,7 @@ export class MonitoringPage implements OnInit {
       dashboard_id: item.id,
       index: item.index
     }))
-    console.log(body);
+    //console.log(body);
     this.api.UpdateRequestRender(this.endPoints.Render('dashboards/order'), { "items": body }, false).then((response: any) => {
       if (!response.errorsExistFlag) {
         //this.alerts.Success("Dashboard eliminado")
@@ -302,7 +332,7 @@ export class MonitoringPage implements OnInit {
   }
 
   onResizeStart(event: ResizeEvent, widget: any): void {
-    console.log(JSON.parse(JSON.stringify(widget)));
+    //(JSON.parse(JSON.stringify(widget)));
     this.onResizing(event, widget)
   }
   // Obtener ancho por defecto basado en breakpoints
@@ -326,7 +356,7 @@ export class MonitoringPage implements OnInit {
     if (screenWidth < 768) {
       return 12;
     }
-    return widget.colSizePreview || widget.colSize || 4;
+    return widget.colSizePreview || widget.colSize;
   }
   getPageWidth(): number {
     return window.innerWidth;

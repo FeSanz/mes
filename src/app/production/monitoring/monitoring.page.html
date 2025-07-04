@@ -11,7 +11,7 @@
   <ion-grid class="drag-grid">
     <ion-row cdkDropList (cdkDropListDropped)="onDrop($event)" [cdkDropListData]="widgets"
       cdkDropListOrientation="mixed" class="drag-row">
-      <ion-col *ngFor="let widget of widgets; let i = index;" [size]="widget.colSizePreview || widget.colSize"
+      <ion-col *ngFor="let widget of widgets; let i = index;" [size]="getResponsiveSize(widget)"
         [style.width.px]="widget.previewWidth || getDefaultWidth()" [class.resizing-mode]="!!widget.previewWidth"
         [style.max-width]="widget.previewWidth ? widget.previewWidth + 'px' : ''"
         (resizing)="onResizing($event, widget)" class="resizable-col" cdkDrag mwlResizable [enableGhostResize]="true"

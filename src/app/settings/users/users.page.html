@@ -119,12 +119,12 @@
         </ion-toolbar>
       </ion-header>
       <ion-content>
-        <ion-item>
+        <!--ion-item>
           <ion-select label="Tipo:" [(ngModel)]="user.type" required interface="popover">
             <ion-select-option value="USER">USER</ion-select-option>
             <ion-select-option value="ANDON">ANDON</ion-select-option>
           </ion-select>
-        </ion-item>
+        </ion-item-->
         <ion-item>
           <ion-select label="Rol:" [(ngModel)]="user.role" required interface="popover">
             <ion-select-option value="Viewer">Viewer</ion-select-option>
@@ -132,7 +132,7 @@
             <ion-select-option value="SuperAdmin">SuperAdmin</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item>
+        <!--ion-item>
           <ion-select label="Nivel:" [(ngModel)]="user.level" required interface="popover">
             <ion-select-option [value]="1">1</ion-select-option>
             <ion-select-option [value]="2">2</ion-select-option>
@@ -140,7 +140,7 @@
             <ion-select-option [value]="4">4</ion-select-option>
             <ion-select-option [value]="5">5</ion-select-option>
           </ion-select>
-        </ion-item>
+        </ion-item-->
         <ion-item>
           <ion-input placeholder="Nombre" [(ngModel)]="user.name" name="name" required>
             <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
@@ -158,11 +158,11 @@
             <ion-input-password-toggle slot="end"></ion-input-password-toggle>
           </ion-input>
         </ion-item>
-        <ion-item>
+        <!--ion-item>
           <ion-input placeholder="RFID" [(ngModel)]="user.rfid" name="rfid" type="number">
             <div slot="label"><ion-text color="primary">RFID:</ion-text></div>
           </ion-input>
-        </ion-item>
+        </ion-item-->
         <ion-item>
           <ion-toggle [checked]="user.enabled_flag == 'Y'"
             (ionChange)="user.enabled_flag = $event.detail.checked ? 'Y' : 'N'">
