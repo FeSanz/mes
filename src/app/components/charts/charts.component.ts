@@ -303,4 +303,9 @@ export class ChartsComponent implements OnInit {
   get widgetTextColor(): string {
     return this.isDarkColor(this.widgetData.color) ? 'white' : 'black';
   }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['refreshData'] && changes['refreshData'].currentValue === true) {
+      this.ajustarYaxis();
+    }
+  }
 }

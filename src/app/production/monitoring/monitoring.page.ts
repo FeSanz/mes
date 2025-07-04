@@ -68,6 +68,7 @@ export class MonitoringPage implements OnInit {
   widgets: any = []
   machines: any = []
   dashboardData: any = {}
+  shouldRefresh = false;
   constructor(
     private api: ApiService,
     private router: Router,
@@ -271,6 +272,10 @@ export class MonitoringPage implements OnInit {
     widget.previewWidth = undefined;
     delete widget.colSizePreview;
     this.changeDetector.detectChanges();
+    this.shouldRefresh = true;
+
+    // Reiniciar bandera para permitir futuros refresh
+    setTimeout(() => this.shouldRefresh = false, 100);
     this.api.UpdateRequestRender(this.endPoints.Render('dashboards/size'), { "dashboard_id": widget.id, "colSize": widget.colSize }, false).then((response: any) => {
       if (!response.errorsExistFlag) {
         //this.alerts.Success("Dashboard eliminado")
@@ -295,7 +300,7 @@ export class MonitoringPage implements OnInit {
       this.changeDetector.detectChanges();
     }
   }
-  
+
   onResizeStart(event: ResizeEvent, widget: any): void {
     console.log(JSON.parse(JSON.stringify(widget)));
     this.onResizing(event, widget)

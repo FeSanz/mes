@@ -22,7 +22,7 @@
         </div>
         <div class="widget-container">
           <ng-container [ngSwitch]="widget.jsonParams.widgetType">
-            <app-charts *ngSwitchCase="'chart'" [data]="widget.jsonParams"
+            <app-charts *ngSwitchCase="'chart'" [data]="widget.jsonParams" [refreshData]="shouldRefresh"
               (remove)="removeWidget(widget.jsonParams.dashboard_id)">
             </app-charts>
             <app-heatmap *ngSwitchCase="'heatmap'" [data]="widget.jsonParams"
