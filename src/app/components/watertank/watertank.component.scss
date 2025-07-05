@@ -1,0 +1,141 @@
+:host {
+  --tank-primary: #3498db;
+  --tank-secondary: #1a1a1a;
+  --tank-accent: #2980b9;
+  --tank-critical: #e74c3c;
+  --tank-low: #f39c12;
+  --tank-medium: #3498db;
+  --tank-high: #27ae60;
+  --tank-bg: rgba(255, 255, 255, 0.02);
+  --tank-border: rgba(52, 152, 219, 0.2);
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+ion-card {
+  //max-width: 350px;
+  min-height: 450.5px;
+  min-width: 250px;
+  --background: var(--ion-color-back-shade, #fff);
+  border-radius: 12px;
+
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+  }
+}
+
+ion-select::part(label) {
+  color: var(--ion-color-primary);
+}
+
+ion-toolbar {
+  padding-left: 0.5rem;
+  flex-shrink: 0;
+  position: relative;
+}
+
+ion-card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+
+  ion-icon {
+    font-size: 1.3rem;
+  }
+}
+
+
+// TÍTULOS CON BOTÓN DE CONFIGURACIÓN
+.card-title {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xs);
+
+  ion-icon {
+    font-size: 1.3rem;
+  }
+}
+
+.config-button {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --color: rgba(255, 255, 255, 0.9);
+}
+
+.tank-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin: 0;
+
+  ion-icon {
+    font-size: 0.9rem;
+  }
+}
+
+// CONTENEDOR PRINCIPAL
+.water-tank-container {
+  display: flex;
+  height: 100%;
+  gap: var(--spacing-lg);
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  &.config-open {
+    gap: var(--spacing-md);
+    justify-content: flex-start;
+    
+    .tank-section {
+      flex: 0 0 auto;
+    }
+  }
+  
+}
+
+// SVG DEL TANQUE
+.tank-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 380px;
+  min-width: 320px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  
+  .level-markers-left,
+  .level-markers-right {
+    opacity: 0.9;
+    
+    text {
+      font-family: 'Segoe UI', sans-serif;
+      font-weight: 600;
+      pointer-events: none;
+    }
+    
+    line {
+      pointer-events: none;
+    }
+  }
+}

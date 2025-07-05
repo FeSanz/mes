@@ -10,12 +10,13 @@ import { ChartsComponent } from 'src/app/components/charts/charts.component';
 import { NgxColorsModule } from 'ngx-colors';
 import { GaugeComponent } from 'src/app/components/gauge/gauge.component';
 import { HeatmapComponent } from 'src/app/components/heatmap/heatmap.component';
+import { WaterTankComponent } from 'src/app/components/watertank/watertank.component';
 import { ThermometerComponent } from 'src/app/components/thermometer/thermometer.component';
 import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
 import { addOutline, checkmark, logoHackernews } from 'ionicons/icons';
 import { EndpointsService } from 'src/app/services/endpoints.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { ResizeEvent, ResizableModule } from 'angular-resizable-element';
@@ -39,7 +40,7 @@ export type ChartOptions = {
   styleUrls: ['./monitoring.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent, OnoffComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
+  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
     IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule]
 })
 export class MonitoringPage implements OnInit {
@@ -167,6 +168,10 @@ export class MonitoringPage implements OnInit {
     this.newWidgetData.name = "Widget " + (this.widgets.length + 1)
     this.newWidgetData.widgetType = "chart"
     this.newWidgetData.chartType = "area"
+    this.newWidgetData.sensors[0].machine_id = this.machines[0].machine_id
+    this.newWidgetData.sensors[0].sensor_id = this.machines[0].sensors[0].sensor_id
+    console.log(this.machines);
+
   }
   getColSize(widget: any): number {
     const val = Number(widget.colSize);
@@ -185,7 +190,7 @@ export class MonitoringPage implements OnInit {
   }
   async addNewWidget() {
     let body: any = {}
-    if (this.newWidgetData.widgetType == 'chart' || this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo' || this.newWidgetData.widgetType == 'onoff') {
+    if (this.newWidgetData.widgetType == 'chart' || this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo' || this.newWidgetData.widgetType == 'onoff' || this.newWidgetData.widgetType == 'watertank') {
       body = {
         "user_id": this.user.user_id,
         "color": this.newWidgetData.color,

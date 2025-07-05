@@ -154,7 +154,6 @@ export class ThermometerComponent implements OnInit {
     }
   }
 
-
   // ✅ MÉTODO PARA CALCULAR LA POSICIÓN DE LA MARCA DE CERO
   public getZeroPosition(): number | null {
     const minValue = this.widgetData.sensors[0].min;
