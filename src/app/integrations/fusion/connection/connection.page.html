@@ -56,8 +56,8 @@
           </div>
         </div>
         <div class="right-actions">
-          <ion-button color="success" (click)="SaveConnection()" [disabled]="!canSave">
-            Guardar
+          <ion-button color="success" (click)="SaveOrUpdateConnection()" [disabled]="!canSave">
+            {{ btnSavaOrUpdate }}
           </ion-button>
         </div>
       </div>

@@ -52,6 +52,10 @@ export class ConnectionPage implements OnInit {
   statusColor = 'warning';
   canSave = false;
 
+  btnSavaOrUpdate: string = "Guardar";
+
+  userData: any = {};
+
   fusionCards = [
     {
       icon: 'globe-outline',
@@ -110,7 +114,48 @@ export class ConnectionPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadSavedConnection();
+    this.GetSettings();
+  }
+
+  GetSettings(){
+      this.userData = JSON.parse(String(localStorage.getItem("userData")));
+      const settingsData = this.userData.Company.Settings;
+
+      if(settingsData && Array.isArray(settingsData)) {
+        const fusionSettings = settingsData.filter((item: any) =>
+          item.Name === "FUSION_URL" || item.Name === "FUSION_CREDENTIALS"
+        );
+
+        this.host = fusionSettings.find((item: any) => item.Name === "FUSION_URL")?.Value;
+        this.credentials = fusionSettings.find((item: any) => item.Name === "FUSION_CREDENTIALS")?.Value;
+
+        // Validación si se obtivieron los valores
+        if (!this.host || !this.credentials) {
+          console.log('Datos de integración no encontrados');
+          return;
+        }
+
+        try {
+          const credentialsParts = atob(this.credentials).split(':');
+
+          if (credentialsParts.length !== 2) {
+            this.alerts.Error('Formato de credenciales inválido');
+            return;
+          }
+
+          this.user = credentialsParts[0];
+          this.pwd = credentialsParts[1];
+          this.btnSavaOrUpdate = "Actualizar";
+
+          this.statusMessage = 'Verificado';
+          this.statusIcon = 'checkmark-circle';
+          this.statusColor = 'success';
+
+        } catch (error) {
+          console.error('Error al decodificar credenciales:', error);
+          this.alerts.Error('Error al procesar credenciales');
+        }
+      }
   }
 
   loadSavedConnection(): void {
@@ -139,13 +184,39 @@ export class ConnectionPage implements OnInit {
     });
   }
 
-  async SaveConnection(){
-    if (this.host != "" && this.user != "" && this.pwd != "") {
-      localStorage.setItem('server', this.host);
-      localStorage.setItem('credentials', btoa(`${this.user}:${this.pwd}`));
-      await this.alerts.Success('Guardado correctamente');
-    } else {
-      await this.alerts.Warning('Completar todos los campos');
+  async SaveOrUpdateConnection() {
+    const isUpdate = this.btnSavaOrUpdate === "Actualizar";
+
+    const payload = {
+      CompanyId: this.userData.Company.CompanyId,
+      User: this.userData.Name,
+      items: [
+        {
+          Name: "FUSION_URL",
+          Value: this.host,
+          ...(isUpdate ? {} : { Description: "Dirección para conexión con REST API Fusion" })
+        },
+        {
+          Name: "FUSION_CREDENTIALS",
+          Value: btoa(`${this.user}:${this.pwd}`),
+          ...(isUpdate ? {} : { Description: "Credenciales para conexión con REST API Fusion" })
+        }
+      ]
+    };
+
+    const apiCall = isUpdate
+      ? await this.apiService.PutRequestRender(this.endPoints.Render('settingsFusion'), payload)
+      : await this.apiService.PostRequestRender(this.endPoints.Render('settingsFusion'), payload);
+
+    try {
+      const response: any = await apiCall;
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
+        this.alerts.Success(response.message);
+      }
+    } catch (error) {
+      console.error('Error en SaveOrUpdateConnection:', error);
     }
   }
 
@@ -202,16 +273,22 @@ export class ConnectionPage implements OnInit {
   }
 
   navigateToModule(module: string) {
-    if (document.activeElement && document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur(); //Desenfocar el elemento activo antes de navegar
+    if (this.host || this.credentials) {
+      if (document.activeElement && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur(); //Desenfocar el elemento activo antes de navegar
+      }
+
+      const m_modules = ['organizations', 'shifts', 'resources', 'items', 'wo'];
+
+      if (m_modules.includes(module)) {
+        this.router.navigate([`/${module}`]);
+      } else {
+        console.log('Ruta desconocida:', module);
+      }
     }
-
-    const m_modules = ['organizations', 'shifts', 'resources', 'items', 'wo'];
-
-    if (m_modules.includes(module)) {
-      this.router.navigate([`/${module}`]);
-    } else {
-      console.log('Ruta desconocida:', module);
+    else{
+      this.alerts.Warning("Acceso no autorizado. Primero verifique y guarde los datos de conexión ")
     }
   }
+
 }
