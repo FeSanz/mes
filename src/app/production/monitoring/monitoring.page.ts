@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@a
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, IonRippleEffect } from '@ionic/angular/standalone';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
@@ -41,7 +41,7 @@ export type ChartOptions = {
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
-    IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule]
+    IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule, IonRippleEffect]
 })
 export class MonitoringPage implements OnInit {
   sensorData: SensorData[] = [];
@@ -108,7 +108,7 @@ export class MonitoringPage implements OnInit {
     this.GetDasboards()
   }
   GetDasboards() {
-    this.api.GetRequestRender(this.endPoints.Render('dashboards/group/' + this.dashboardData.dashboard_group_id), false).then((response: any) => {
+    this.api.GetRequestRender('dashboards/group/' + this.dashboardData.dashboard_group_id, false).then((response: any) => {
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
         id: item.dashboard_id,
@@ -130,7 +130,7 @@ export class MonitoringPage implements OnInit {
         this.simulateResizeForAllWidgets();
       }, 100);
       this.changeDetector.detectChanges()
-      this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.dashboardData.organization_id)).then((response: any) => {
+      this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + this.dashboardData.organization_id).then((response: any) => {
         if (response.items.length > 0) {
           this.machines = response.items
           this.newWidgetData.machine = response.items[0].machineId + ""
@@ -190,10 +190,13 @@ export class MonitoringPage implements OnInit {
   }
   async addNewWidget() {
     let body: any = {}
+    console.log(this.user);
+
     if (this.newWidgetData.widgetType == 'chart' || this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo' || this.newWidgetData.widgetType == 'onoff' || this.newWidgetData.widgetType == 'watertank') {
       body = {
-        "user_id": this.user.user_id,
+        "user_id": this.user.UserId,
         "color": this.newWidgetData.color,
+        "index": Number(this.widgets.length) + 1,
         "name": this.newWidgetData.name,
         "dashboard_group_id": this.dashboardData.dashboard_group_id,
         "parameters": {
@@ -201,23 +204,24 @@ export class MonitoringPage implements OnInit {
           "chartType": this.newWidgetData.chartType,
           "sensors": this.newWidgetData.sensors,
         },
-        "created_by": this.user.user_id,
-        "updated_by": this.user.user_id
+        "created_by": this.user.UserId,
+        "updated_by": this.user.UserId
       }
     } else if (this.newWidgetData.widgetType == 'heatmap') {
       body = {
-        "user_id": this.user.user_id,
+        "user_id": this.user.UserId,
+        "index": Number(this.widgets.length) + 1,
         "name": this.newWidgetData.name,
         "dashboard_group_id": this.dashboardData.dashboard_group_id,
         "color": this.newWidgetData.color,
         "parameters": {
           "widgetType": this.newWidgetData.widgetType
         },
-        "created_by": this.user.user_id,
-        "updated_by": this.user.user_id
+        "created_by": this.user.UserId,
+        "updated_by": this.user.UserId
       }
     }
-    this.api.PostRequestRender(this.endPoints.Render('dashboards'), body).then((response: any) => {
+    this.api.PostRequestRender('dashboards', body).then((response: any) => {
       this.setOpen(false)
       this.GetDasboards()
       this.newWidgetData = {
@@ -249,7 +253,7 @@ export class MonitoringPage implements OnInit {
 
   async removeWidget(id: number) {//Eliminar widget
     if (await this.alerts.ShowAlert("¿Deseas eliminar este dashboard?", "Alerta", "Atrás", "Eliminar")) {
-      this.api.DeleteRequestRender(this.endPoints.Render('dashboards/') + id).then((response: any) => {
+      this.api.DeleteRequestRender('dashboards/' + id).then((response: any) => {
         if (!response.errorsExistFlag) {
           this.widgets = this.widgets.filter((w: any) => w.jsonParams.dashboard_id !== id);
           this.changeDetector.detectChanges()
@@ -272,7 +276,7 @@ export class MonitoringPage implements OnInit {
       index: item.index
     }))
     //console.log(body);
-    this.api.UpdateRequestRender(this.endPoints.Render('dashboards/order'), { "items": body }, false).then((response: any) => {
+    this.api.PutRequestRender('dashboards/order', { "items": body }, false).then((response: any) => {
       if (!response.errorsExistFlag) {
         //this.alerts.Success("Dashboard eliminado")
       } else {
@@ -311,7 +315,7 @@ export class MonitoringPage implements OnInit {
 
     // Reiniciar bandera para permitir futuros refresh
     setTimeout(() => this.shouldRefresh = false, 100);
-    this.api.UpdateRequestRender(this.endPoints.Render('dashboards/size'), { "dashboard_id": widget.id, "colSize": widget.colSize }, false).then((response: any) => {
+    this.api.PutRequestRender('dashboards/size', { "dashboard_id": widget.id, "colSize": widget.colSize }, false).then((response: any) => {
       if (!response.errorsExistFlag) {
         //this.alerts.Success("Dashboard eliminado")
       } else {

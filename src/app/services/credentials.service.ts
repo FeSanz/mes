@@ -10,14 +10,16 @@ export class CredentialsService {
   }
 
   /*******************************Credentials************************** */
-  Fusion(): string[]{
+  Fusion(): string[] {
     const userDataString = localStorage.getItem("userData");
-    if (!userDataString) {
+    let userData: any = {}
+    try {
+      userData = userDataString ? JSON.parse(userDataString) : {};
+    } catch (e) {
       console.log('No se encontraron datos de usuario');
       return [];
     }
-
-    const userData = JSON.parse(userDataString);
+    //const userData = JSON.parse(userDataString);
 
     // Validar estructura básica
     if (!userData?.Company?.Settings) {

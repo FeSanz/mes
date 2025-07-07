@@ -141,7 +141,7 @@ export class ChartsComponent implements OnInit {
     const result = midnight.toISOString().slice(0, 19);
     const sensors = this.widgetData.sensors;
     const sensorIDsString = sensors.map((sensor: any) => sensor.sensor_id).join(',');//IDs separados por coma (,)
-    this.api.GetRequestRender(this.endPoints.Render('sensorsData/?sensors=') + sensorIDsString + '&start=' + result + '&end=' + nowDate, false).then((response: any) => {
+    this.api.GetRequestRender('sensorsData/?sensors=' + sensorIDsString + '&start=' + result + '&end=' + nowDate, false).then((response: any) => {
       const data = response.items.map((sensor: any) => {
         const colorObj = sensors.find((s: any) => s.sensor_id == sensor.sensor_id);
         return {
@@ -243,7 +243,7 @@ export class ChartsComponent implements OnInit {
       }
     }
     this.showChart = false;
-    this.api.UpdateRequestRender(this.endPoints.Render('dashboards/') + this.widgetData.dashboard_id, body).then((response: any) => {
+    this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
@@ -261,7 +261,7 @@ export class ChartsComponent implements OnInit {
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id)).then((response: any) => {
+    this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id).then((response: any) => {
       this.machines = response.items
       this.isModalOpen = true;
       //this.newWidgetData.machine = response.data[0].MachineId + ""

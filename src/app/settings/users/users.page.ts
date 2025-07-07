@@ -75,9 +75,9 @@ export class UsersPage implements OnInit {
   GetUsers() {
     /*const orgsIds = this.company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     console.log(orgsIds);*/
-    this.apiService.GetRequestRender(this.endPoints.Render('users?company_id=' + this.company.CompanyId)).then((response: any) => {
+    this.apiService.GetRequestRender('users?company_id=' + this.company.CompanyId).then((response: any) => {
       this.users = response.items
-      this.apiService.GetRequestRender(this.endPoints.Render('organizations/' + this.company.CompanyId)).then((responseOrg: any) => {
+      this.apiService.GetRequestRender('organizations/' + this.company.CompanyId).then((responseOrg: any) => {
         this.organizations = responseOrg.items.map((org: any) => ({
           ...org,
           OrganizationId: Number(org.OrganizationId)
@@ -101,7 +101,7 @@ export class UsersPage implements OnInit {
   }
   AddNewUser() {
     this.user.password = btoa(this.user.password)
-    this.api.PostRequestRender(this.endPoints.Render('users'), this.user).then((response: any) => {
+    this.api.PostRequestRender('users', this.user).then((response: any) => {
       this.user.user_id = response.user_id
       this.isModalOpen = false
       this.users.push(this.user)
@@ -112,7 +112,7 @@ export class UsersPage implements OnInit {
   }
   UpdateUser() {
     this.user.password = btoa(this.user.password)
-    this.api.UpdateRequestRender(this.endPoints.Render('users/' + this.user.user_id), this.user).then((response: any) => {
+    this.api.PutRequestRender('users/' + this.user.user_id, this.user).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
@@ -160,7 +160,7 @@ export class UsersPage implements OnInit {
     this.isModalOpen = true;
   }
   ChangeUserStatus(event: any, user: any) {//Deshabilita al usuario
-    this.api.UpdateRequestRender(this.endPoints.Render('users/' + user.user_id + "/status"), { enabled_flag: event.detail.checked ? 'Y' : 'N' }).then((response: any) => {
+    this.api.PutRequestRender('users/' + user.user_id + "/status", { enabled_flag: event.detail.checked ? 'Y' : 'N' }).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
@@ -171,7 +171,7 @@ export class UsersPage implements OnInit {
   }
   async DeleteUser() {//eliminar usuario
     if (await this.alerts.ShowAlert("¿Deseas eliminar este usuario?", "Alerta", "Atrás", "Eliminar")) {
-      this.api.DeleteRequestRender(this.endPoints.Render('users/' + this.user.user_id)).then((response: any) => {
+      this.api.DeleteRequestRender('users/' + this.user.user_id).then((response: any) => {
         if (response.errorsExistFlag) {
           this.alerts.Info(response.message);
         } else {

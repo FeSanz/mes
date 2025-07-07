@@ -72,6 +72,7 @@ export class AppComponent {
   ) {
     addIcons({ ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline, reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline, person, homeOutline });
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false
+    console.log(isLogged);
     const rawData = localStorage.getItem("userData");
     try {
       this.user = rawData ? JSON.parse(rawData) : {};
@@ -142,7 +143,7 @@ export class AppComponent {
     }));
     //console.log(body);
 
-    this.api.UpdateRequestRender(this.endPoints.Render('dashboardsGroup/order'), { items: body }, false).then(response => {
+    this.api.PutRequestRender('dashboardsGroup/order', { items: body }, false).then(response => {
       if (!response.errorsExistFlag) {
         //this.alerts.Success("Dashboard eliminado")
       } else {
@@ -170,7 +171,7 @@ export class AppComponent {
   addNewWidgetGroup() {//llamada a la api para crear el grupo de tableros
     this.dashboardGroupData.created_by = this.user.UserId
     this.dashboardGroupData.index = Number(this.dashboardGroups.length) + 1
-    this.api.PostRequestRender(this.endPoints.Render('dashboardsGroup'), this.dashboardGroupData).then((response: any) => {
+    this.api.PostRequestRender('dashboardsGroup', this.dashboardGroupData).then((response: any) => {
       if (!response.errorsExistFlag) {
         this.alerts.Success("Dashboard creado")
         this.isModalOpen = false
@@ -191,7 +192,7 @@ export class AppComponent {
   GetDashGroup() {//extrae todos los grupos de tableros
     if (this.user?.Company?.Organizations?.length > 0) {
       const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
-      this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/byOrganizations/?organizations=' + orgsIds), false).then((response: any) => {
+      this.api.GetRequestRender('dashboardsGroup/byOrganizations/?organizations=' + orgsIds, false).then((response: any) => {
         this.dashboardGroups = response.items
         //console.log(this.dashboardGroups);
       })
@@ -207,7 +208,7 @@ export class AppComponent {
   }
   async deleteDashGroup(dashId: any = 0) {
     if (await this.alerts.ShowAlert("¿Deseas eliminar este grupo de tableros?", "Alerta", "Atrás", "Eliminar")) {
-      this.api.DeleteRequestRender(this.endPoints.Render('dashboardsGroup/') + (dashId != 0 ? dashId : this.dashboardGroupData.dashboard_group_id)).then((response: any) => {
+      this.api.DeleteRequestRender('dashboardsGroup/') + (dashId != 0 ? dashId : this.dashboardGroupData.dashboard_group_id).then((response: any) => {
         if (!response.errorsExistFlag) {
           this.dashboardGroups = this.dashboardGroups.filter((dash: any) => dash.dashboard_group_id !== dashId);
           this.changeDetector.detectChanges()
@@ -219,7 +220,7 @@ export class AppComponent {
     }
   }
   updateWidgetGroup() {
-    this.api.UpdateRequestRender(this.endPoints.Render('dashboardsGroup/' + this.dashboardGroupData.dashboard_group_id), this.dashboardGroupData).then((response: any) => {
+    this.api.PutRequestRender('dashboardsGroup/' + this.dashboardGroupData.dashboard_group_id, this.dashboardGroupData).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
@@ -240,9 +241,11 @@ export class AppComponent {
   SaveLogin(user: any, username: any) {//login
     this.user = user
     this.username = username
-    const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
-    this.api.GetRequestRender(this.endPoints.Render('dashboardsGroup/byOrganizations/?organizations=' + orgsIds), false).then((response: any) => {
-      //console.log(response);
+    console.log(this.user);
+    
+    const orgsIds = this.user?.Company?.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
+    this.api.GetRequestRender('dashboardsGroup/byOrganizations/?organizations=' + orgsIds, false).then((response: any) => {
+      console.log(response);
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {

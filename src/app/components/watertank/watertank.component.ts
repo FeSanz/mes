@@ -38,7 +38,7 @@ export interface ThermoData {
     ])
   ]
 })
-export class WaterTankComponent implements OnInit  {
+export class WaterTankComponent implements OnInit {
 
   public waterLevelSubject = new BehaviorSubject<number>(750);
   public waterLevel$ = this.waterLevelSubject.asObservable();
@@ -71,10 +71,6 @@ export class WaterTankComponent implements OnInit  {
   ngOnInit() {
     this.initializeConfig();
     this.initializeWaterLevel();
-  }
-
-  ngOnDestroy() {
-    this.stopSimulation();
   }
 
   public getInterpolatedColor(): string {
@@ -154,15 +150,13 @@ export class WaterTankComponent implements OnInit  {
 
     return Math.max(tankTop, Math.min(tankTop + tankHeight, levelY));
   }
-
   private initializeConfig() {
     this.widgetData = this.data
     console.log(this.widgetData);
     this.GetSensorValue()
   }
-
   GetSensorValue() {
-    this.api.GetRequestRender(this.endPoints.Render('sensorData/' + this.widgetData.sensors[0].sensor_id), false).then((response: any) => {
+    this.api.GetRequestRender('sensorData/' + this.widgetData.sensors[0].sensor_id, false).then((response: any) => {
       const lastValue = response.items.data[0].value
       this.lastDate = response.items.data[0].time
       //this.temperatureSubject.next(lastValue);
@@ -184,36 +178,18 @@ export class WaterTankComponent implements OnInit  {
     const initialValue = Math.max(0, Math.min(this.widgetData.sensors[0].max, 0));
     this.waterLevelSubject.next(initialValue);
   }
-
-  private validateCurrentLevel() {
-    const currentValue = this.waterLevelSubject.value;
-    const maxCapacity = this.widgetData.sensors[0].max;
-
-    if (currentValue > maxCapacity) {
-      this.updateWaterLevel(maxCapacity);
-    }
-  }
-
-  private stopSimulation() {
-    this.isSimulationActive = false;
-    if (this.simulationSubscription) {
-      this.simulationSubscription.unsubscribe();
-    }
-  }
-
   private updateWaterLevel(level: number) {
     const clampedLevel = Math.max(0, Math.min(this.widgetData.sensors[0].max, level));
     const roundedLevel = Math.round(clampedLevel * Math.pow(10, 1)) / Math.pow(10, 1);
     this.waterLevelSubject.next(roundedLevel);
   }
-
   deleteChart() {
     this.remove.emit(this.widgetData.id);
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
     //console.log(this.copyWidgetData.widgetType);
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id)).then((response: any) => {
+    this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id).then((response: any) => {
       this.machines = response.items
       this.isModalOpen = true;
     })
@@ -232,7 +208,7 @@ export class WaterTankComponent implements OnInit  {
     }
     //console.log(body);
     this.showChart = false;
-    this.api.UpdateRequestRender(this.endPoints.Render('dashboards/') + this.widgetData.dashboard_id, body).then((response: any) => {
+    this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
       //console.log(response);
       this.widgetData = JSON.parse(JSON.stringify(this.copyWidgetData))
       this.data = this.widgetData
@@ -260,9 +236,11 @@ export class WaterTankComponent implements OnInit  {
     const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
     return luma < 128;
   }
-
   get widgetTextColor(): string {
     return this.isDarkColor(this.widgetData.color) ? 'white' : 'black';
+  }
+  get widgetTextColorLevel(): string {
+    return this.isDarkColor(this.getInterpolatedColor()) ? 'white' : 'black';
   }
   onSensorChange(event: any) {
     const selectedValue = event.detail.value;

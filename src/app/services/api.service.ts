@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Capacitor, CapacitorHttp, HttpResponse } from '@capacitor/core';
 import { AlertsService } from "./alerts.service";
-import {CredentialsService} from "./credentials.service";
+import { CredentialsService } from "./credentials.service";
 
 
 @Injectable({
@@ -14,7 +14,7 @@ export class ApiService {
   offset: number = 0;
 
   constructor(public alerts: AlertsService, private credentialService: CredentialsService) {
-    const credentialsData= this.credentialService.Fusion();
+    const credentialsData = this.credentialService.Fusion();
     this.urlFusion = `https://${credentialsData[0]}/fscmRestApi/resources/latest`;
     this.credentials = credentialsData[1];
   }
@@ -31,8 +31,8 @@ export class ApiService {
     try {
       while (hasMore) {
         const url = this.offset === 0
-                         ? this.urlFusion + endPoint
-                         : `${this.urlFusion}${endPoint}&offset=${this.offset}`;
+          ? this.urlFusion + endPoint
+          : `${this.urlFusion}${endPoint}&offset=${this.offset}`;
         const options = {
           url: url,
           headers: {
@@ -131,7 +131,7 @@ export class ApiService {
     try {
       if (show) await this.alerts.ShowLoading()
       const options = {
-        url: `${this.urlRender}${endPoint}`,
+        url: `${this.urlRender}/${endPoint}`,
         headers: { 'Content-Type': 'application/json' }
       };
       const response: HttpResponse = await CapacitorHttp.get(options);
@@ -150,7 +150,7 @@ export class ApiService {
     try {
       if (show) await this.alerts.ShowLoading()
       const options = {
-        url: `${this.urlRender}${endPoint}`,
+        url: `${this.urlRender}/${endPoint}`,
         headers: { 'Content-Type': 'application/json' },
         data: payload
       };
@@ -171,27 +171,7 @@ export class ApiService {
     try {
       if (show) await this.alerts.ShowLoading()
       const options = {
-        url: `${this.urlRender}${endPoint}`,
-        headers: { 'Content-Type': 'application/json' },
-        data: payload
-      };
-      const response: HttpResponse = await CapacitorHttp.put(options);
-      this.RequestStatusCode(response.status);
-      return response.data;
-    } catch (error: any) {
-      console.log('Error (PG):', error);
-      await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
-      return null;
-    } finally {
-      if (show) await this.alerts.HideLoading()
-    }
-  }
-
-  async UpdateRequestRender(endPoint: string, payload: any, show: boolean = true) {
-    try {
-      if (show) await this.alerts.ShowLoading()
-      const options = {
-        url: `${this.urlRender}${endPoint}`,
+        url: `${this.urlRender}/${endPoint}`,
         headers: { 'Content-Type': 'application/json' },
         data: payload
       };
@@ -211,7 +191,7 @@ export class ApiService {
     await this.alerts.ShowLoading();
     try {
       const options = {
-        url: `${this.urlRender}${endPoint}`,
+        url: `${this.urlRender}/${endPoint}`,
         headers: { 'Content-Type': 'application/json' }
       };
       const response: HttpResponse = await CapacitorHttp.delete(options);
@@ -260,7 +240,7 @@ export class ApiService {
     password = btoa(password)
     try {
       const options = {
-        url: url,
+        url: `${this.urlRender}/${url}`,
         headers: {
           'Content-Type': 'application/json'
         },

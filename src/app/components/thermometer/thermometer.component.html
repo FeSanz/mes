@@ -146,7 +146,6 @@
         <span style="color: #ccc;">{{widgetData.sensors[0].sensor_name}}</span>
         <div class="temperature-value" [style.color]="getInterpolatedColor()">
           {{ temperature$ | async | number : "1.1-1" }}°C
-
         </div>
         <ion-item lines="none" style="align-self: stretch" class="ion-text-center">
           <ion-label color="medium">

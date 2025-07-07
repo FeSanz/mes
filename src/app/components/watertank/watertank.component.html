@@ -12,12 +12,7 @@
   </ion-toolbar>
 
   <ion-card-content>
-
-
-    <!-- Control manual del nivel -->
-
-    <!-- Layout principal -->
-    <div class="water-tank-container" [class.config-open]="showConfigPanel">
+    <div class="water-tank-container">
       <!-- Sección del tanque -->
       <div class="tank-section">
         <!-- Tanque visual -->
@@ -128,16 +123,14 @@
                 <animate attributeName="opacity" values="0.4;0.6;0.4" dur="2s" repeatCount="indefinite" />
               </ellipse>
             </g>
-
-            <!-- Texto del nivel -->
-            <text x="160" y="320" text-anchor="middle" [attr.fill]="getInterpolatedColor()" font-size="12"
-              font-family="Arial, sans-serif" font-weight="bold">
-              NIVEL
+            <text x="160" [attr.y]="getWaterY() + (getWaterHeight() / 2) + 6" text-anchor="middle" fill="white" class="tank-value"
+              [attr.fill]="widgetTextColorLevel" font-size="24" font-family="Arial, sans-serif" font-weight="bold">
+              {{ formatValue((waterLevel$ | async) ?? 0) }} L
             </text>
 
-            <text x="160" y="340" text-anchor="middle" [attr.fill]="getInterpolatedColor()" font-size="18"
-              font-family="Arial, sans-serif" font-weight="bold">
-              {{ formatValue((waterLevel$ | async) ?? 0) }} {{ 'L' }}
+            <text x="160" y="340" text-anchor="middle" font-size="16" [attr.fill]="'#92949c'"
+              font-family="Arial, sans-serif">
+              Última actualización: {{ lastDate | date: 'hh:mm a dd/MM/yyyy' }}
             </text>
           </svg>
         </div>

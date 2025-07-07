@@ -138,3 +138,42 @@ ion-select::part(label) {
     flex-wrap: nowrap !important;
 }
 
+.add-widget-card {
+    border: 2px dashed var(--ion-color-primary);
+    transition: transform 0.2s ease;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        transform: scale(1.008);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    ion-card-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 440px; // Ajusta según tu diseño
+    }
+
+    .add-widget-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .add-text h2 {
+        margin: 0;
+        font-size: 24px;
+        color: var(--ion-color-primary);
+    }
+
+    .add-text p {
+        margin: 0;
+        font-size: 18px;
+    }
+}

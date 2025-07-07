@@ -68,7 +68,7 @@ export class DevicesPage implements OnInit {
   }
   getMachines() {
     const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + orgsIds)).then((response: any) => {
+    this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + orgsIds).then((response: any) => {
 
       const orgMap = this.user.Company.Organizations.reduce((acc: any, org: any) => {
         acc[org.OrganizationId] = org.Name;
@@ -152,9 +152,9 @@ export class DevicesPage implements OnInit {
       sensor.created_by = this.user.UserId;
       sensor.updated_by = this.user.UserId;
     });
-    this.api.PostRequestRender(this.endPoints.Render('machines'), machineBody).then((response: any) => {
+    this.api.PostRequestRender('machines', machineBody).then((response: any) => {
       const machineId = response.result.machine_id;
-      this.api.PostRequestRender(this.endPoints.Render('sensors/') + machineId, { "items": this.machine.sensors }).then((response: any) => {
+      this.api.PostRequestRender('sensors/' + machineId, { "items": this.machine.sensors }).then((response: any) => {
         this.getMachines()
         this.isModalOpen = false;
       })
@@ -173,7 +173,7 @@ export class DevicesPage implements OnInit {
         }
       })
     };
-    this.api.UpdateRequestRender(this.endPoints.Render('machines/') + machineBody.machine_id, machineBody).then((response: any) => {
+    this.api.PutRequestRender('machines/' + machineBody.machine_id, machineBody).then((response: any) => {
       //console.log(response);
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
@@ -211,7 +211,7 @@ export class DevicesPage implements OnInit {
     //console.log(this.machine);
 
     if (await this.alerts.ShowAlert("¿Deseas eliminar esta máquina?", "Alerta", "Atrás", "Eliminar")) {
-      this.api.DeleteRequestRender(this.endPoints.Render('machines') + machine_id ? machine_id : this.machine.machine_id).then((response: any) => {
+      this.api.DeleteRequestRender('machines' + machine_id ? machine_id : this.machine.machine_id).then((response: any) => {
         if (response.errorsExistFlag) {
           this.alerts.Info(response.message);
         } else {
@@ -229,7 +229,7 @@ export class DevicesPage implements OnInit {
       this.changeDetector.detectChanges();
     } else
       if (await this.alerts.ShowAlert("¿Deseas eliminar este sensor?", "Alerta", "Atrás", "Eliminar")) {
-        this.api.DeleteRequestRender(this.endPoints.Render('sensors') + sensor.sensor_id).then((response: any) => {
+        this.api.DeleteRequestRender('sensors' + sensor.sensor_id).then((response: any) => {
           //console.log(response);
           this.machine.sensors = this.machine.sensors.filter((se: any) => se !== sensor);
           this.changeDetector.detectChanges()

@@ -52,7 +52,7 @@ export class OnoffComponent implements OnInit {
     this.GetSensorValue()
   }
   GetSensorValue() {
-    this.api.GetRequestRender(this.endPoints.Render('sensorData/' + this.widgetData.sensors[0].sensor_id), false).then((response: any) => {
+    this.api.GetRequestRender('sensorData/' + this.widgetData.sensors[0].sensor_id, false).then((response: any) => {
       this.lastValue = response.items.data[0].value
       this.lastDate = response.items.data[0].time
       this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true
@@ -76,7 +76,7 @@ export class OnoffComponent implements OnInit {
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
-    this.api.GetRequestRender(this.endPoints.Render('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id)).then((response: any) => {
+    this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id).then((response: any) => {
       //console.log(response);
       this.machines = response.items
       this.isModalOpen = true;
@@ -116,7 +116,7 @@ export class OnoffComponent implements OnInit {
     }
     //console.log(body);
     this.showChart = false;
-    this.api.UpdateRequestRender(this.endPoints.Render('dashboards/') + this.widgetData.dashboard_id, body).then((response: any) => {
+    this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
       //console.log(response);
       this.widgetData = JSON.parse(JSON.stringify(this.copyWidgetData))
       this.data = this.widgetData

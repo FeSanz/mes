@@ -30,6 +30,6 @@ export class PermissionsService {
     return this.isAdmin() || this.isSuperAdmin();
   }
   reloadUserData() {
-    this.user = JSON.parse(String(localStorage.getItem("userData")))
+    this.user = JSON.parse(String(localStorage.getItem("userData") == "undefined" ? "{}" : localStorage.getItem("userData")))
   }
 }

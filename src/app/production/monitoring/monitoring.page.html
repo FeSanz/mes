@@ -37,13 +37,27 @@
           </ng-container>
         </div>
       </ion-col>
+      <ion-col size="3">
+        <ion-card class="add-widget-card ion-activatable ripple-parent" (click)="setOpen(true)">
+          <ion-ripple-effect></ion-ripple-effect>
+          <ion-card-content>
+            <div class="add-widget-container">
+              <ion-icon name="add-circle-outline" class="add-icon"></ion-icon>
+              <div class="add-text">
+                <h2>Agregar Widget</h2>
+                <p>Haz clic para añadir un nuevo widget al dashboard</p>
+              </div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
     </ion-row>
   </ion-grid>
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="!permissions.isViewer()">
+  <!--ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="!permissions.isViewer()">
     <ion-fab-button (click)="setOpen(true)">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab-->
   <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
     <ng-template>
       <ion-header>
@@ -110,8 +124,7 @@
             </ion-input>
             <div slot="end" style="display: flex; align-items: center; gap: 10px; width: 42%;">
               <ion-label color="primary" style="white-space: nowrap; margin: 0;">Color encendido:</ion-label>
-              <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
-                [(ngModel)]="sensor.maxColor">
+              <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" [(ngModel)]="sensor.maxColor">
               </ngx-colors>
             </div>
           </ion-item>
