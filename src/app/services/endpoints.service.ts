@@ -5,10 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class EndpointsService {
 
-  private _urlFusion = `https://${String(localStorage.getItem('server'))}/fscmRestApi/resources/latest`;
   private _params = `limit=500&totalResults=true&onlyData=true&links=canonical`;
-  //public _urlRender = 'https://iot-services-rd.onrender.com/api';
-  public _urlRender = 'http://localhost:3000/api';
 
   private endPoints: { [key: string]: string } = {
     'organizations': '/inventoryOrganizations?' + this._params +
@@ -53,19 +50,13 @@ export class EndpointsService {
 
   constructor() { }
 
-  Render(endPoint: string)
-  {
-    return `${this._urlRender}/${endPoint}` ;
-  }
-
   Path(key: string, ...args: any[]): string {
     if (!this.endPoints[key]) {
       console.error(`Dirección '${key}' no encontrada`);
       return '';
     }
 
-    const pathBase = key != 'auth' ? this._urlFusion + this.endPoints[key] : this.endPoints[key];
-    return this.FormatString(pathBase, ...args);
+    return this.FormatString(this.endPoints[key], ...args);
   }
 
   //Formatear strings con marcadores de posición estilo C#

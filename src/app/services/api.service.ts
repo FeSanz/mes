@@ -1,17 +1,22 @@
 import { Injectable } from '@angular/core';
 import { Capacitor, CapacitorHttp, HttpResponse } from '@capacitor/core';
 import { AlertsService } from "./alerts.service";
+import {CredentialsService} from "./credentials.service";
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  credentials: string = '';
+  private credentials: string = '';
+  private urlFusion: string = '';
+  private urlRender: string = 'http://localhost:3000/api';
   offset: number = 0;
 
-  constructor(public alerts: AlertsService) {
-    this.credentials = String(localStorage.getItem('credentials'));
+  constructor(public alerts: AlertsService, private credentialService: CredentialsService) {
+    const credentialsData= this.credentialService.Fusion();
+    this.urlFusion = `https://${credentialsData[0]}/fscmRestApi/resources/latest`;
+    this.credentials = credentialsData[1];
   }
   /******************* HttpRequest FUSION Capacitor *******************/
   async GetRequestFusion(endPoint: string) {
@@ -25,7 +30,9 @@ export class ApiService {
 
     try {
       while (hasMore) {
-        const url = this.offset === 0 ? endPoint : `${endPoint}&offset=${this.offset}`;
+        const url = this.offset === 0
+                         ? this.urlFusion + endPoint
+                         : `${this.urlFusion}${endPoint}&offset=${this.offset}`;
         const options = {
           url: url,
           headers: {
@@ -124,7 +131,7 @@ export class ApiService {
     try {
       if (show) await this.alerts.ShowLoading()
       const options = {
-        url: endPoint,
+        url: `${this.urlRender}${endPoint}`,
         headers: { 'Content-Type': 'application/json' }
       };
       const response: HttpResponse = await CapacitorHttp.get(options);
@@ -143,7 +150,7 @@ export class ApiService {
     try {
       if (show) await this.alerts.ShowLoading()
       const options = {
-        url: endPoint,
+        url: `${this.urlRender}${endPoint}`,
         headers: { 'Content-Type': 'application/json' },
         data: payload
       };
@@ -164,7 +171,7 @@ export class ApiService {
     try {
       if (show) await this.alerts.ShowLoading()
       const options = {
-        url: endPoint,
+        url: `${this.urlRender}${endPoint}`,
         headers: { 'Content-Type': 'application/json' },
         data: payload
       };
@@ -184,7 +191,7 @@ export class ApiService {
     try {
       if (show) await this.alerts.ShowLoading()
       const options = {
-        url: endPoint,
+        url: `${this.urlRender}${endPoint}`,
         headers: { 'Content-Type': 'application/json' },
         data: payload
       };
@@ -204,7 +211,7 @@ export class ApiService {
     await this.alerts.ShowLoading();
     try {
       const options = {
-        url: endPoint,
+        url: `${this.urlRender}${endPoint}`,
         headers: { 'Content-Type': 'application/json' }
       };
       const response: HttpResponse = await CapacitorHttp.delete(options);
@@ -274,45 +281,4 @@ export class ApiService {
       await this.alerts.HideLoading();
     }
   }
-
-  /*******************************Credentials************************** */
-  CredentialsFusion(): string[]{
-    const userDataString = localStorage.getItem("userData");
-    if (!userDataString) {
-      console.log('No se encontraron datos de usuario');
-      return [];
-    }
-
-    const userData = JSON.parse(userDataString);
-
-    // Validar estructura básica
-    if (!userData?.Company?.Settings) {
-      console.log('Estructura de datos inválida');
-      return [];
-    }
-
-    const settingsData = userData.Company.Settings;
-
-    if (!Array.isArray(settingsData)) {
-      console.log('Configuraciones no encontradas');
-      return [];
-    }
-
-    // Buscar configuraciones de Fusion
-    const fusionSettings = settingsData.filter((item: any) =>
-      item.Name === "FUSION_URL" || item.Name === "FUSION_CREDENTIALS"
-    );
-
-      const host = fusionSettings.find((item: any) => item.Name === "FUSION_URL")?.Value;
-      const credentials = fusionSettings.find((item: any) => item.Name === "FUSION_CREDENTIALS")?.Value;
-
-      // Validación si se obtivieron los valores
-      if (!host || !credentials) {
-        console.log('Dirección y/o credenciales no encontrados');
-        return [];
-      }
-
-      return [host, credentials];
-  }
-
 }

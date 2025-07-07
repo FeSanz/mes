@@ -101,7 +101,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   GetOrganizations(){
-    this.apiService.GetRequestRender(this.endPoints.Render(`organizations/${this.userData.Company.CompanyId}`)).then((response: any) => {
+    this.apiService.GetRequestRender(`organizations/${this.userData.Company.CompanyId}`).then((response: any) => {
       this.dbData = response;
 
       this.apiService.GetRequestFusion(this.endPoints.Path('organizations')).then((response: any) => {
@@ -156,7 +156,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
         items: itemsData
       };
 
-      this.apiService.PostRequestRender(this.endPoints.Render('organizations'), payload).then(async (response: any) => {
+      this.apiService.PostRequestRender('organizations', payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
           this.alerts.Info(response.message);
         }else {
@@ -187,9 +187,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
 
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
-          const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('organizations/' + item.OrganizationId)
-          );
+          const response = await this.apiService.DeleteRequestRender('organizations/' + item.OrganizationId);
 
           if (!response.errorsExistFlag) {
             successCount++;
@@ -223,7 +221,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   RefreshTables() {
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
+    this.apiService.GetRequestRender('organizations').then((response: any) => {
       this.dbData = response;
 
      this.FilterRegisteredItems();

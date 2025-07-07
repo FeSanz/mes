@@ -98,7 +98,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   GetOrganizationsRender(){
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations/1')).then((response: any) => {
+    this.apiService.GetRequestRender('organizations/1').then((response: any) => {
       this.dbOrganizations = response;
     });
   }
@@ -114,7 +114,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   OnWorkCenterSelected() {
     if(this.workCenterSelected) {
       let clause = `resourceMachines/${this.organizationSelected.OrganizationId}/${this.workCenterSelected.WorkCenterId}`;
-      this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+      this.apiService.GetRequestRender(clause).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
         this.dbData = response;
 
@@ -170,7 +170,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
         items: itemsData
       };
 
-      this.apiService.PostRequestRender(this.endPoints.Render('resourceMachines'), payload).then(async (response: any) => {
+      this.apiService.PostRequestRender('resourceMachines', payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
           this.alerts.Info(response.message);
         }else {
@@ -198,9 +198,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
-          const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('resourceMachines/' + item.MachineId),
-          );
+          const response = await this.apiService.DeleteRequestRender('resourceMachines/' + item.MachineId);
 
           if (!response.errorsExistFlag) {
             successCount++;
@@ -235,7 +233,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
   RefreshTables() {
     let clause = `resourceMachines/${this.organizationSelected.OrganizationId}/${this.workCenterSelected.WorkCenterId}`;
-    this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+    this.apiService.GetRequestRender(clause).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
 

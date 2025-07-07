@@ -31,6 +31,7 @@ import {
   alarmOutline,
   clipboardOutline
 } from 'ionicons/icons';
+import {CredentialsService} from "../../../services/credentials.service";
 
 @Component({
   selector: 'app-connection',
@@ -96,6 +97,7 @@ export class ConnectionPage implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private credentialService: CredentialsService,
     private endPoints: EndpointsService,
     private alerts: AlertsService,
     private router: Router) {
@@ -118,44 +120,34 @@ export class ConnectionPage implements OnInit {
   }
 
   GetSettings(){
-      this.userData = JSON.parse(String(localStorage.getItem("userData")));
-      const settingsData = this.userData.Company.Settings;
+    [this.host, this.credentials] = this.credentialService.Fusion();
 
-      if(settingsData && Array.isArray(settingsData)) {
-        const fusionSettings = settingsData.filter((item: any) =>
-          item.Name === "FUSION_URL" || item.Name === "FUSION_CREDENTIALS"
-        );
+    // Validación si se obtivieron los valores
+    if (!this.host || !this.credentials) {
+      console.log('Dirección y/o credenciales no encontrados');
+      return;
+    }
 
-        this.host = fusionSettings.find((item: any) => item.Name === "FUSION_URL")?.Value;
-        this.credentials = fusionSettings.find((item: any) => item.Name === "FUSION_CREDENTIALS")?.Value;
+    try {
+      const credentialsParts = atob(this.credentials).split(':');
 
-        // Validación si se obtivieron los valores
-        if (!this.host || !this.credentials) {
-          console.log('Datos de integración no encontrados');
-          return;
-        }
-
-        try {
-          const credentialsParts = atob(this.credentials).split(':');
-
-          if (credentialsParts.length !== 2) {
-            this.alerts.Error('Formato de credenciales inválido');
-            return;
-          }
-
-          this.user = credentialsParts[0];
-          this.pwd = credentialsParts[1];
-          this.btnSavaOrUpdate = "Actualizar";
-
-          this.statusMessage = 'Verificado';
-          this.statusIcon = 'checkmark-circle';
-          this.statusColor = 'success';
-
-        } catch (error) {
-          console.error('Error al decodificar credenciales:', error);
-          this.alerts.Error('Error al procesar credenciales');
-        }
+      if (credentialsParts.length !== 2) {
+        this.alerts.Error('Formato de credenciales inválido');
+        return;
       }
+
+      this.user = credentialsParts[0];
+      this.pwd = credentialsParts[1];
+      this.btnSavaOrUpdate = "Actualizar";
+
+      this.statusMessage = 'Verificado';
+      this.statusIcon = 'checkmark-circle';
+      this.statusColor = 'success';
+
+    } catch (error) {
+      console.error('Error al decodificar credenciales:', error);
+      this.alerts.Error('Error al procesar credenciales');
+    }
   }
 
   loadSavedConnection(): void {
@@ -205,8 +197,8 @@ export class ConnectionPage implements OnInit {
     };
 
     const apiCall = isUpdate
-      ? await this.apiService.PutRequestRender(this.endPoints.Render('settingsFusion'), payload)
-      : await this.apiService.PostRequestRender(this.endPoints.Render('settingsFusion'), payload);
+      ? await this.apiService.PutRequestRender('settingsFusion', payload)
+      : await this.apiService.PostRequestRender('settingsFusion', payload);
 
     try {
       const response: any = await apiCall;

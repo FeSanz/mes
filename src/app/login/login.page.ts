@@ -35,7 +35,7 @@ export class LoginPage {
   }
 
   LogIn() {
-    this.api.AuthRequestDatabase(this.endPoints.Render('login'), this.username, this.password).then((response: any) => {//obtener resultado del intento de login
+    this.api.AuthRequestDatabase('login', this.username, this.password).then((response: any) => {//obtener resultado del intento de login
       console.log(response);
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);

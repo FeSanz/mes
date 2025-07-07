@@ -129,7 +129,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
   }
 
   GetOrganizationsRender(){
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
+    this.apiService.GetRequestRender('organizations').then((response: any) => {
       this.dbOrganizations = response;
     });
   }
@@ -137,7 +137,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
   async OnOrganizationSelected() {
     if(this.organizationSelected) {
       let clause = `workOrders/${this.organizationSelected.OrganizationId}`;
-      this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+      this.apiService.GetRequestRender(clause).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
         this.dbData = response;
 
@@ -162,8 +162,8 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
           const objRestructured = { items: restructuredData };
 
           //Obtener IDs de maquinas y articulos render
-          const matchMachines = await this.apiService.PostRequestRender(this.endPoints.Render('workOrdersMachines'), this.PayloadWOMachines(objRestructured));
-          const matchItems = await this.apiService.PostRequestRender(this.endPoints.Render('workOrdersItems'), this.PayloadItems(objRestructured));
+          const matchMachines = await this.apiService.PostRequestRender('workOrdersMachines', this.PayloadWOMachines(objRestructured));
+          const matchItems = await this.apiService.PostRequestRender('workOrdersItems', this.PayloadItems(objRestructured));
 
           //Mezclar datos de IDs de render con datos de fusion
           const  mergeData = this.MergeWOData(restructuredData, matchMachines, matchItems);
@@ -343,7 +343,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         items: itemsData
       };
 
-      this.apiService.PostRequestRender(this.endPoints.Render('workOrders'), payload).then(async (response: any) => {
+      this.apiService.PostRequestRender('workOrders', payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
           this.alerts.Info(response.message);
         }else {
@@ -371,9 +371,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
 
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
-          const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('workOrders/' + item.WorkOrderId),
-          );
+          const response = await this.apiService.DeleteRequestRender('workOrders/' + item.WorkOrderId);
 
           if (!response.errorsExistFlag) {
             successCount++;
@@ -408,7 +406,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
 
   RefreshTables() {
     let clause = `workOrders/${this.organizationSelected.OrganizationId}`;
-    this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+    this.apiService.GetRequestRender(clause).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
 

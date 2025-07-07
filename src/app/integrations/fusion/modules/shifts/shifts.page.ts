@@ -96,7 +96,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   GetOrganizationsRender(){
-    this.apiService.GetRequestRender(this.endPoints.Render('organizations')).then((response: any) => {
+    this.apiService.GetRequestRender('organizations').then((response: any) => {
       this.dbOrganizations = response;
     });
   }
@@ -104,7 +104,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
   OnOrganizationSelected() {
     if(this.organizationSelected) {
       let clause = `shifts/${this.organizationSelected.OrganizationId}`;
-      this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+      this.apiService.GetRequestRender(clause).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
         this.dbData = response;
 
@@ -142,7 +142,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
         items: itemsData
       };
 
-      this.apiService.PostRequestRender(this.endPoints.Render('shifts'), payload).then(async (response: any) => {
+      this.apiService.PostRequestRender('shifts', payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
           this.alerts.Info(response.message);
         }else {
@@ -170,9 +170,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
 
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
-          const response = await this.apiService.DeleteRequestRender(
-            this.endPoints.Render('shifts/' + item.ShiftId),
-          );
+          const response = await this.apiService.DeleteRequestRender('shifts/' + item.ShiftId);
 
           if (!response.errorsExistFlag) {
             successCount++;
@@ -207,7 +205,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
 
   RefreshTables() {
     let clause = `shifts/${this.organizationSelected.OrganizationId}`;
-    this.apiService.GetRequestRender(this.endPoints.Render(clause)).then((response: any) => {
+    this.apiService.GetRequestRender(clause).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
 
