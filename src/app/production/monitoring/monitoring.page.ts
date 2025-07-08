@@ -14,7 +14,7 @@ import { WaterTankComponent } from 'src/app/components/watertank/watertank.compo
 import { ThermometerComponent } from 'src/app/components/thermometer/thermometer.component';
 import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmark, logoHackernews } from 'ionicons/icons';
+import { addCircleOutline, addOutline, checkmark, logoHackernews } from 'ionicons/icons';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -77,7 +77,7 @@ export class MonitoringPage implements OnInit {
     private endPoints: EndpointsService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
-    addIcons({ checkmark, addOutline })
+    addIcons({ checkmark, addOutline, addCircleOutline })
     this.user = JSON.parse(String(localStorage.getItem("userData")))
     const nav = this.router.getCurrentNavigation();
     const state: any = nav?.extras?.state;
@@ -124,7 +124,6 @@ export class MonitoringPage implements OnInit {
           color: item.color,
         }
       }));
-
       // Simular resize para cada widget
       setTimeout(() => {
         this.simulateResizeForAllWidgets();
@@ -159,7 +158,7 @@ export class MonitoringPage implements OnInit {
 
       // Inmediatamente llamar a onResizeEnd
       setTimeout(() => {
-        this.onResizeEnd(simulatedEvent, widget);
+        this.onResizeEnd(null, widget);
       }, 10);
     });
   }
@@ -170,7 +169,6 @@ export class MonitoringPage implements OnInit {
     this.newWidgetData.chartType = "area"
     this.newWidgetData.sensors[0].machine_id = this.machines[0].machine_id
     this.newWidgetData.sensors[0].sensor_id = this.machines[0].sensors[0].sensor_id
-    console.log(this.machines);
 
   }
   getColSize(widget: any): number {
@@ -190,8 +188,6 @@ export class MonitoringPage implements OnInit {
   }
   async addNewWidget() {
     let body: any = {}
-    console.log(this.user);
-
     if (this.newWidgetData.widgetType == 'chart' || this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo' || this.newWidgetData.widgetType == 'onoff' || this.newWidgetData.widgetType == 'watertank') {
       body = {
         "user_id": this.user.UserId,
@@ -306,7 +302,7 @@ export class MonitoringPage implements OnInit {
     return rectangle.width >= minWidth && rectangle.width <= maxWidth;
   }
 
-  onResizeEnd(event: ResizeEvent, widget: any): void {
+  onResizeEnd(event: any, widget: any): void {
     widget.colSize = widget.colSizePreview;
     widget.previewWidth = undefined;
     delete widget.colSizePreview;
@@ -315,22 +311,31 @@ export class MonitoringPage implements OnInit {
 
     // Reiniciar bandera para permitir futuros refresh
     setTimeout(() => this.shouldRefresh = false, 100);
-    this.api.PutRequestRender('dashboards/size', { "dashboard_id": widget.id, "colSize": widget.colSize }, false).then((response: any) => {
-      if (!response.errorsExistFlag) {
-        //this.alerts.Success("Dashboard eliminado")
-      } else {
-        this.alerts.Error("Error al reordenar los widgets, intente más tarde.")
-      }
-    })
+    if (event != null) {
+      this.api.PutRequestRender('dashboards/size', { "dashboard_id": widget.id, "colSize": widget.colSize }, false).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          //this.alerts.Success("Dashboard")
+        } else {
+          this.alerts.Error("Error al reordenar los widgets, intente más tarde.")
+        }
+      })
+    }
   }
   onResizing(event: ResizeEvent, widget: any): void {
-    //console.log(JSON.parse(JSON.stringify(widget)));
     const row = document.querySelector('.drag-row');
     const gridWidth = row ? row.clientWidth : window.innerWidth;
 
     if (event.rectangle.width) {
       const colUnit = gridWidth / 12;
-      let colSize = Math.round(event.rectangle.width / colUnit);
+
+      // Permitir pasos de 0.5
+      let rawSize = event.rectangle.width / colUnit;
+
+      // Redondear al múltiplo más cercano de 0.5
+      let step = 0.5;
+      let colSize = Math.round(rawSize / step) * step;
+
+      // Limitar entre 1 y 12
       colSize = Math.min(Math.max(colSize, 1), 12);
 
       widget.previewWidth = event.rectangle.width;

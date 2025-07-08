@@ -1,7 +1,7 @@
 ion-card {
   //max-width: 350px;
   min-height: 450.5px;
-  min-width: 250px;
+  min-width: 200px;
   --background: var(--ion-color-back-shade, #fff);
   border-radius: 12px;
 
@@ -258,7 +258,7 @@ ion-card-title {
   }
 
   @media (min-width: 1024px) {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
   }
 }
 

@@ -154,10 +154,15 @@ export class DevicesPage implements OnInit {
     });
     this.api.PostRequestRender('machines', machineBody).then((response: any) => {
       const machineId = response.result.machine_id;
-      this.api.PostRequestRender('sensors/' + machineId, { "items": this.machine.sensors }).then((response: any) => {
+      if (this.machine.sensors.length > 0) {
+        this.api.PostRequestRender('sensors/' + machineId, { "items": this.machine.sensors }).then((response: any) => {
+          this.getMachines()
+          this.isModalOpen = false;
+        })
+      } else {
         this.getMachines()
         this.isModalOpen = false;
-      })
+      }
     })
   }
   updateMachine() {
@@ -208,10 +213,8 @@ export class DevicesPage implements OnInit {
     });
   }
   async deleteMachine(machine_id: number = 0) {
-    //console.log(this.machine);
-
     if (await this.alerts.ShowAlert("¿Deseas eliminar esta máquina?", "Alerta", "Atrás", "Eliminar")) {
-      this.api.DeleteRequestRender('machines' + machine_id ? machine_id : this.machine.machine_id).then((response: any) => {
+      this.api.DeleteRequestRender('machines/' + (machine_id ? machine_id : this.machine.machine_id)).then((response: any) => {
         if (response.errorsExistFlag) {
           this.alerts.Info(response.message);
         } else {

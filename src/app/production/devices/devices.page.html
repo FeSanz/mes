@@ -93,6 +93,22 @@
       </ion-col-->
     </ion-row>
   </ion-grid>
+  <ion-row>
+    <ion-col size="3">
+      <ion-card class="add-widget-card ion-activatable ripple-parent" (click)="openAsNewMachine()">
+        <ion-ripple-effect></ion-ripple-effect>
+        <ion-card-content>
+          <div class="add-widget-container">
+            <ion-icon name="add-circle-outline" class="add-icon"></ion-icon>
+            <div class="add-text">
+              <h2>Agregar dispositivo</h2>
+              <p>Haz clic para añadir un dispositivo</p>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
   <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
     <ng-template>
       <ion-header>
@@ -195,9 +211,9 @@
       </ion-content>
     </ng-template>
   </ion-modal>
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="permissions.isSuperAdmin()">
+  <!--ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="permissions.isSuperAdmin()">
     <ion-fab-button (click)="openAsNewMachine()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab-->
 </ion-content>

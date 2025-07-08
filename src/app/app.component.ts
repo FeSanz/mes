@@ -201,7 +201,7 @@ export class AppComponent {
   }
   async deleteDashGroup(dashId: any = 0) {
     if (await this.alerts.ShowAlert("¿Deseas eliminar este grupo de tableros?", "Alerta", "Atrás", "Eliminar")) {
-      this.api.DeleteRequestRender('dashboardsGroup/') + (dashId != 0 ? dashId : this.dashboardGroupData.dashboard_group_id).then((response: any) => {
+      this.api.DeleteRequestRender('dashboardsGroup/' + (dashId != 0 ? dashId : this.dashboardGroupData.dashboard_group_id)).then((response: any) => {
         if (!response.errorsExistFlag) {
           this.dashboardGroups = this.dashboardGroups.filter((dash: any) => dash.dashboard_group_id !== dashId);
           this.changeDetector.detectChanges()
