@@ -69,12 +69,10 @@ export const routes: Routes = [
     path: 'settings/user',
     loadComponent: () => import('./settings/user/user.page').then( m => m.UserPage),
     canActivate: [AuthGuard]
-  },  {
-    path: 'ready',
-    loadComponent: () => import('./integrations/fusion/monitoring/ready/ready.page').then( m => m.ReadyPage)
   },
-
-
-
+  {
+    path: 'fusion_production',
+    loadComponent: () => import('./integrations/fusion/monitoring/production/production.page').then( m => m.ProductionPage)
+  }
 
 ];

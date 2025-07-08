@@ -2,34 +2,22 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/c
 import { addIcons } from 'ionicons';
 
 import {
-  IonAccordion,
-  IonAccordionGroup,
-  IonApp,
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonFooter,
-  IonHeader,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenu,
-  IonMenuToggle,
-  IonNote,
-  IonPopover,
-  IonRouterOutlet,
-  IonTitle,
-  IonToolbar,
-  IonToggle, IonAvatar, IonCol, IonGrid, IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonSplitPane, IonRouterLink, IonReorder, IonReorderGroup, ItemReorderEventDetail
+  IonAccordion, IonAccordionGroup, IonApp, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonItem, IonLabel,
+  IonList, IonMenu, IonMenuToggle, IonNote, IonPopover, IonRouterOutlet, IonTitle, IonToolbar, IonToggle, IonAvatar, IonCol,
+  IonGrid, IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonSplitPane, IonRouterLink,
+  IonReorder, IonReorderGroup, ItemReorderEventDetail
 } from '@ionic/angular/standalone';
+
 import { NavController } from '@ionic/angular';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from "@angular/router";
+
 import {
   person, ellipsisVerticalOutline, personOutline, settingsOutline, powerOutline, homeOutline, cubeOutline,
   statsChartOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline,
-  gitNetworkOutline, closeOutline, barChartOutline, pieChartOutline, addOutline, checkmark, pencilOutline, trashOutline, reorderThreeOutline, reorderTwoOutline
+  gitNetworkOutline, closeOutline, barChartOutline, pieChartOutline, addOutline, checkmark, pencilOutline, trashOutline,
+  reorderThreeOutline, reorderTwoOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline
 } from 'ionicons/icons';
+
 import { FormsModule } from '@angular/forms';
 import { ApiService } from './services/api.service';
 import { EndpointsService } from './services/endpoints.service';
@@ -44,7 +32,8 @@ import { PermissionsService } from './services/permissions.service';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [IonApp, RouterLink, IonMenu, IonToolbar, IonHeader, IonTitle, IonItem, IonIcon, IonLabel,
     IonButtons, IonButton, IonPopover, IonContent, IonList, IonMenuToggle, IonAccordionGroup, IonSplitPane, IonReorder, IonReorderGroup,
-    IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid, IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink,],
+    IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid,
+    IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink]
 })
 export class AppComponent {
   darkMode = false
@@ -70,7 +59,11 @@ export class AppComponent {
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef,
   ) {
-    addIcons({ ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline, reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline, person, homeOutline });
+    addIcons({ ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline,
+               reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline,
+              timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline,
+              person, homeOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline });
+
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false
     console.log(isLogged);
     const rawData = localStorage.getItem("userData");
@@ -242,7 +235,7 @@ export class AppComponent {
     this.user = user
     this.username = username
     console.log(this.user);
-    
+
     const orgsIds = this.user?.Company?.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.api.GetRequestRender('dashboardsGroup/byOrganizations/?organizations=' + orgsIds, false).then((response: any) => {
       console.log(response);
