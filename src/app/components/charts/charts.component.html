@@ -1,5 +1,21 @@
 <ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
   <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
+    <ion-card-title [ngStyle]="{'color': widgetTextColor}" slot="start">{{widgetData.name}} </ion-card-title>
+    <ion-text slot="end" *ngIf="isPaused">Desde </ion-text>
+    <ion-datetime-button datetime="datetimeStart" slot="end" *ngIf="isPaused"></ion-datetime-button>
+    <ion-text slot="end" *ngIf="isPaused">hasta </ion-text>
+    <ion-datetime-button datetime="datetimeEnd" slot="end" *ngIf="isPaused" (click)="UpdateNow()"></ion-datetime-button>
+    <ion-select slot="end" [(ngModel)]="widgetData.dateRange" placeholder="Seleccionar período"
+      (ionChange)="changeOnTimeRange($event)" interface="popover"
+      [ngStyle]="{ 'color': widgetTextColor, 'font-weight': 'bold' }">
+      <ion-select-option value="today">Hoy</ion-select-option>
+      <ion-select-option value="last24h">Últimas 24 horas</ion-select-option>
+      <ion-select-option value="last7days">Últimos 7 días</ion-select-option>
+      <ion-select-option value="thisWeek">Esta semana</ion-select-option>
+      <ion-select-option value="last30days">Últimos 30 días</ion-select-option>
+      <ion-select-option value="thisMonth">Este mes</ion-select-option>
+      <ion-select-option value="custom">Rango personalizado</ion-select-option>
+    </ion-select>
     <ion-buttons slot="end">
       <ion-button title="Mover" cdkDragHandle class="drag-handle">
         <ion-icon slot="icon-only" name="move-outline" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
@@ -8,11 +24,10 @@
         <ion-icon slot="icon-only" name="ellipsis-vertical" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-card-title [ngStyle]="{'color': widgetTextColor}">{{widgetData.name}} </ion-card-title>
   </ion-toolbar>
   <ion-card-content>
     <apx-chart #splineChart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis"
-      *ngIf="showChart" [stroke]="chartOptions.stroke" [tooltip]="chartOptions.tooltip"
+      *ngIf="showChart" [stroke]="chartOptions.stroke" [tooltip]="chartOptions.tooltip" [legend]="chartOptions.legend"
       [dataLabels]="chartOptions.dataLabels"></apx-chart>
   </ion-card-content>
 </ion-card>
@@ -28,7 +43,24 @@
     </ion-content>
   </ng-template>
 </ion-popover>
-
+<ion-modal [keepContentsMounted]="true">
+  <ng-template>
+    <ion-datetime id="datetimeStart" [(ngModel)]="customStartDate" (ionChange)="onStartDateChange($event)" locale="es-MX"
+      hourCycle="h12" presentation="date-time" [max]="customEndDate" show-default-buttons="true" cancel-text="Cancelar"
+      done-text="Confirmar">
+      <span slot="title">Fecha inicial</span>
+    </ion-datetime>
+  </ng-template>
+</ion-modal>
+<ion-modal [keepContentsMounted]="true">
+  <ng-template>
+    <ion-datetime id="datetimeEnd" [(ngModel)]="customEndDate" (ionChange)="onEndDateChange($event)" locale="es-MX"
+      hourCycle="h12" presentation="date-time" [min]="customStartDate"  [max]="nowDate"  show-default-buttons="true"
+      cancel-text="Cancelar" done-text="Confirmar">
+      <span slot="title">Fecha final</span>
+    </ion-datetime>
+  </ng-template>
+</ion-modal>
 <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
   <ng-template>
     <ion-header>
