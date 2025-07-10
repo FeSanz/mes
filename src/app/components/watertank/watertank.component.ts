@@ -152,7 +152,7 @@ export class WaterTankComponent implements OnInit {
   }
   private initializeConfig() {
     this.widgetData = this.data
-    console.log(this.widgetData);
+    //console.log(this.widgetData);
     this.GetSensorValue()
   }
   GetSensorValue() {

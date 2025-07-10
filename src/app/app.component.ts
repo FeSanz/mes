@@ -59,13 +59,15 @@ export class AppComponent {
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef,
   ) {
-    addIcons({ ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline,
-               reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline,
-              timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline,
-              person, homeOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline });
+    addIcons({
+      ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline,
+      reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline,
+      timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline,
+      person, homeOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline
+    });
 
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false
-    console.log(isLogged);
+    //console.log(isLogged);
     const rawData = localStorage.getItem("userData");
     try {
       this.user = rawData ? JSON.parse(rawData) : {};
@@ -148,8 +150,15 @@ export class AppComponent {
     this.router.navigate(['/monitoring/' + dash.dashboard_group_id], {
       state: {
         dash: dash
-      }
+      },
+      replaceUrl: true
     });
+
+    /*this.router.navigateByUrl('/monitoring/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['/monitoring/' + dash.dashboard_group_id], {
+        state: { dash }
+      });
+    });*/
   }
   setOpen(isOpen: boolean) {//abrir modal para nuevo grupo de tableros
     this.isModalOpen = isOpen

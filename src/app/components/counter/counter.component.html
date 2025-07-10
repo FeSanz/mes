@@ -1,0 +1,103 @@
+<ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
+  <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
+    <ion-buttons slot="end">
+      <ion-button title="Mover" cdkDragHandle class="drag-handle">
+        <ion-icon slot="icon-only" name="move-outline" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
+      </ion-button>
+      <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
+        <ion-icon slot="icon-only" name="ellipsis-vertical" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-card-title [ngStyle]="{'color': widgetTextColor}">{{widgetData.name}} </ion-card-title>
+  </ion-toolbar>
+
+  <ion-card-content>
+    <div class="counter-container">
+      <div class="counter-section">
+        <!-- ✅ DISPLAY DEL CONTADOR DIGITAL -->
+        <div class="digital-counter-display">
+          <div class="counter-frame">
+            <div class="counter-digits">
+              <!-- ✅ DÍGITOS CON COLOR PERSONALIZABLE -->
+              <div *ngFor="let digit of displayDigits; let i = index" class="digit-container">
+                <div class="digit" [class]="flipStates[i]" [style.color]="widgetData.sensors[0].color">
+                  {{ digit }}
+                </div>
+              </div>
+            </div>
+
+            <div class="counter-label">
+              <span class="label-text">{{ 'PIEZAS' }}</span>
+              <!--div class="status-indicator" [style.background]="isSimulationActive ? '#27ae60' : '#95a5a6'"></div-*-->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ion-item lines="none" style="align-self: stretch" class="ion-text-center">
+      <ion-label color="medium">
+        Última actualización: {{ lastDate | date: 'hh:mm a dd/MM/yyyy' }}
+      </ion-label>
+    </ion-item>
+  </ion-card-content>
+</ion-card>
+<ion-popover trigger="popover-spline-${{data['dashboard_id']}}" [dismissOnSelect]="true" showBackdrop="false">
+  <ng-template>
+    <ion-content>
+      <ion-list>
+        <ion-item [button]="true" [detail]="false" (click)="editChart()">Editar <ion-icon slot="start"
+            name="pencil-outline" color="success"></ion-icon></ion-item>
+        <ion-item [button]="true" [detail]="false" (click)="deleteChart()">Eliminar <ion-icon slot="start"
+            name="trash-outline" color="danger"></ion-icon></ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
+
+<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Editar widget</ion-title>
+        <ion-buttons slot="end">
+          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+            [(ngModel)]="copyWidgetData.color"></ngx-colors>
+          <ion-button (click)="isModalOpen = false">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <ion-item>
+        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.name" style="text-align: right;">
+          <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label color="primary" slot="start">Tipo:</ion-label>
+        <ion-label slot="end"><strong>Contador</strong></ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id"
+          label-placement="floating" interface="popover">
+          <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
+            {{ mach.machine_name }}
+          </ion-select-option>
+        </ion-select>
+        <ion-select label="Sensor:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].sensor_id"
+          (ionChange)="onSensorChange($event)" label-placement="floating" interface="popover">
+          <ion-select-option *ngFor="let s of getSensorsForMachine(copyWidgetData.sensors[0].machine_id)"
+            [value]="s.sensor_id">
+            {{ s.sensor_name }}
+          </ion-select-option>
+        </ion-select>
+        <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" style="margin-left: 10px;"
+          [(ngModel)]="copyWidgetData.sensors[0].color"></ngx-colors>
+      </ion-item>
+      <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab-button (click)="updateChartDB()">
+          <ion-icon name="checkmark"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -34,6 +34,8 @@
               (remove)="removeWidget(widget.jsonParams.dashboard_id)"> </app-onoff>
             <app-watertank *ngSwitchCase="'watertank'" [data]="widget.jsonParams"
               (remove)="removeWidget(widget.jsonParams.dashboard_id)"> </app-watertank>
+            <app-counter *ngSwitchCase="'counter'" [data]="widget.jsonParams"
+              (remove)="removeWidget(widget.jsonParams.dashboard_id)"> </app-counter>
           </ng-container>
         </div>
       </ion-col>
@@ -85,6 +87,7 @@
             <ion-select-option value="onoff">On Off</ion-select-option>
             <ion-select-option value="gauge">Gauge</ion-select-option>
             <ion-select-option value="watertank">Nivel</ion-select-option>
+            <ion-select-option value="counter">Counter</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item *ngIf="newWidgetData.widgetType == 'chart'">
@@ -144,7 +147,7 @@
         <ion-item lines="none">
         </ion-item>
         <div class="ion-text-center"
-          *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge' && newWidgetData.widgetType != 'watertank' && newWidgetData.widgetType != 'onoff'">
+          *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge' && newWidgetData.widgetType != 'watertank' && newWidgetData.widgetType != 'onoff' && newWidgetData.widgetType != 'counter'">
           <ion-button fill="outline" (click)="addNewSensor()">Agregar sensor</ion-button>
         </div>
         <ion-item lines="none">
