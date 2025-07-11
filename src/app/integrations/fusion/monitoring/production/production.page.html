@@ -14,7 +14,7 @@
         <p-table #dtWorkOrders
                  [value]="workOrders.items"
                  dataKey="WorkOrderNumber"
-                 styleClass="card-table-primeng"
+                 styleClass="card-table-primeng wo-table-custom "
                  [tableStyle]="{ 'min-width': '96rem','height': '100%'}"
                  [size]="'small'"
                  [rowHover]="true"
@@ -29,6 +29,10 @@
                  [scrollable]="true"
                  [scrollHeight]="scrollHeight"
                  [alwaysShowPaginator]="true"
+                 rowGroupMode="rowspan"
+                 groupRowsBy="ResourceCode"
+                 sortField="ResourceCode"
+                 [sortOrder]="1"
         >
           <ng-template #caption>
             <div class="table-caption">
@@ -54,20 +58,20 @@
 
           <ng-template pTemplate="header">
             <tr>
-              <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem">
-                <div class="flex justify-between items-center">
-                  O.T.
-                  <p-sortIcon field="WorkOrderNumber" />
-                  <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
-                </div>
-              </th>
-              <th pSortableColumn="ResourceCode" style="min-width: 9rem">
+              <th pSortableColumn="ResourceCode" style="min-width: 9rem" class="td-center">
                 <div class="flex justify-between items-center">
                   Máquina
                   <p-sortIcon field="ResourceCode" />
                   <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto" />
                 </div>
               </th>
+              <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem" class="td-center">
+              <div class="flex justify-between items-center">
+                O.T.
+                <p-sortIcon field="WorkOrderNumber" />
+                <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
+              </div>
+            </th>
               <th pSortableColumn="ItemNumber" style="min-width: 9rem">
                 <div class="flex justify-between items-center">
                   Producto
@@ -75,28 +79,28 @@
                   <p-columnFilter field="ItemNumber" matchMode="equals" display="menu" class="ml-auto"/>
                 </div>
               </th>
-              <th pSortableColumn="Description" style="min-width: 9rem">
+              <th pSortableColumn="Description" style="min-width: 9rem" class="td-center">
                 <div class="flex justify-between items-center">
                   Descripción
                   <p-sortIcon field="Description" />
                   <p-columnFilter field="Description" matchMode="equals" display="menu" class="ml-auto"/>
                 </div>
               </th>
-              <th pSortableColumn="PlannedQuantity" style="min-width:7rem">
+              <th pSortableColumn="PlannedQuantity" style="min-width:7rem" class="td-center">
                 <div class="flex justify-between items-center">
                   Meta
                   <p-sortIcon field="PlannedQuantity" />
                   <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
                 </div>
               </th>
-              <th pSortableColumn="CompletedQuantity" style="min-width: 7rem">
+              <th pSortableColumn="CompletedQuantity" style="min-width: 7rem" class="td-center">
                 <div class="flex justify-between items-center">
                   Completo
                   <p-sortIcon field="CompletedQuantity" />
                   <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
                 </div>
               </th>
-              <th pSortableColumn="ProgressQuantity" style="min-width: 7rem">
+              <th pSortableColumn="ProgressQuantity" style="min-width: 7rem" class="td-center">
                 <div class="flex justify-between items-center">
                   Avance
                   <p-columnFilter field="Advance" matchMode="between" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
@@ -133,16 +137,20 @@
               </th>
             </tr>
           </ng-template>
-          <ng-template pTemplate="body" let-item>
+          <ng-template pTemplate="body" let-item let-rowgroup="rowgroup" let-rowspan="rowspan">
             <tr>
-              <td>
-                <p-badge [value]="item.WorkOrderNumber" [severity]="GetColorByAdvanced(+item.CompletedQuantity)"/>
+              <td *ngIf="rowgroup" [attr.rowspan]="rowspan" class="resource-column td-center">
+                {{ item.ResourceCode}}
               </td>
-              <td>{{ item.ResourceCode}}</td>
+              <td class="td-center">
+                <p-tag
+                  [value]="item.WorkOrderNumber"
+                  [severity]="GetColorByAdvanced(+item.CompletedQuantity)"/>
+              </td>
               <td>{{ item.ItemNumber }}</td>
               <td>{{ item.Description }}</td>
-              <td>{{ item.PlannedQuantity }}</td>
-              <td>{{ item.CompletedQuantity }}</td>
+              <td class="td-center">{{ item.PlannedQuantity }}</td>
+              <td class="td-center">{{ item.CompletedQuantity }}</td>
               <td>
                 <p-progressbar [value]="item.Advance" [showValue]="false" />
               </td>

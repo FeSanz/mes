@@ -1,0 +1,19 @@
+:host ::ng-deep {
+  .p-progressbar {
+    height: .5rem;
+    background-color: #D8DADC;
+
+    .p-progressbar-value {
+      background-color: #607D8B;
+    }
+  }
+}
+
+::ng-deep .wo-table-custom {
+  .resource-column {
+    background-color: #222436 !important;
+  }
+  /*.p-datatable-tbody > tr > td:nth-child(2) {
+    background-color: #222436 !important;
+  }*/
+}

@@ -25,6 +25,11 @@
     background-color: var(--ion-color-card-shade) !important;
     color: var(--ion-color-card-contrast) !important;
     border-color: var(--ion-color-card-tint) !important;
+    //border-bottom: 1px solid rgba(255, 255, 255, 0.32) !important;
+  }
+
+  .p-datatable-tbody > tr > td {
+    border-color: rgba(255, 255, 255, 0.09) !important;
   }
 
   // Filas del cuerpo
@@ -73,4 +78,10 @@
       border-color: var(--ion-color-card-tint) !important;
     }
   }
+}
+
+// Centrar horizontal y verticalmente
+.td-center {
+  text-align: center !important;
+  vertical-align: middle !important;
 }
