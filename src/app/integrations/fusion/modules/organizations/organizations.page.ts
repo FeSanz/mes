@@ -52,7 +52,9 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   userData: any = {};
 
   fusionOriginalData: any = {};
-  fusionData: any = {};
+  fusionData: any = {
+    items : []
+  };
   dbData: any = {};
 
   selectedItemsFusion: any[] = [];

@@ -141,7 +141,7 @@ export class ChartsComponent implements OnInit {
       this.chart?.updateOptions(this.chartOptions);
     }
     const { start, end } = this.getDateRangeFromOption(this.widgetData.dateRange);
-    this.nowDate = this.formatLocalISO(new Date())    
+    this.nowDate = this.formatLocalISO(new Date())
     this.loadSensorData(start, end)
   }
   async loadSensorData(start: Date, end: Date) {
@@ -178,11 +178,11 @@ export class ChartsComponent implements OnInit {
   changeOnTimeRange(event: any) {
     const selectedValue = event.detail.value;
     if (selectedValue == 'custom') {
+      this.isPaused = true
       const { start, end } = this.getDateRangeFromOption('last7days');
       this.customStartDate = this.formatLocalISO(start)//.toISOString()
       this.customEndDate = this.formatLocalISO(end)//.toISOString()
       this.changeDetector.detectChanges()
-      this.isPaused = true
       this.loadSensorData(start, end)
     } else {
       this.api.PutRequestRender('dashboards/dateRange', { dateRange: selectedValue, dashboard_id: this.widgetData.dashboard_id }).then((response: any) => {
@@ -210,6 +210,10 @@ export class ChartsComponent implements OnInit {
     const end = new Date(); // Fecha actual
     let start: Date;
     switch (option) {
+      case 'last1h':
+        start = new Date(now.getTime() - 1 * 60 * 60 * 1000); // Hace 1 hora
+        break;
+
       case 'today':
         start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         break;
@@ -267,10 +271,19 @@ export class ChartsComponent implements OnInit {
       this.ws.Suscribe(sensor_id, (data) => {
         if (this.isPaused) return;
         const timestamp = new Date(data.data.time).getTime();
+        const { start } = this.getDateRangeFromOption(this.widgetData.dateRange);
         const serie: any = this.chartOptions.series.find((s: any) => s.sensorId == data.data.sensorId);
-        if (serie) {
+        console.log(serie);
+        console.log(data.data.sensorId);
+        
+        
+        if (serie) {// Agrega el nuevo dato
           serie.data.unshift({ x: timestamp, y: Number(data.data.value) });
+          //serie.data.unshift({ x: timestamp, y: Number(data.data.value) });
+          serie.data = serie.data.filter((d: any) => d.x >= start.getTime());
           if (this.chart && this.chart.updateSeries) {
+            console.log(serie);
+            console.log(this.chartOptions.series);
             this.chart.updateSeries(this.chartOptions.series);
             this.ajustarYaxis();
           }
@@ -335,8 +348,6 @@ export class ChartsComponent implements OnInit {
       parameters: {
         widgetType: this.copyWidgetData.widgetType,
         selectedTimeRange: this.copyWidgetData.selectedTimeRange,
-        customStartDate: this.copyWidgetData.customStartDate,
-        customEndDate: this.copyWidgetData.customEndDate,
         chartType: this.copyWidgetData.chartType,
         sensors: this.copyWidgetData.sensors,
       }

@@ -13,10 +13,10 @@ import {
   IonToolbar
 } from '@ionic/angular/standalone';
 
-import {ApiService} from "../../../services/api.service";
-import {EndpointsService} from "../../../services/endpoints.service";
-import {AlertsService} from "../../../services/alerts.service";
-import {addIcons} from "ionicons";
+import { ApiService } from "../../../services/api.service";
+import { EndpointsService } from "../../../services/endpoints.service";
+import { AlertsService } from "../../../services/alerts.service";
+import { addIcons } from "ionicons";
 
 import {
   cloudOutline,
@@ -31,7 +31,7 @@ import {
   alarmOutline,
   clipboardOutline
 } from 'ionicons/icons';
-import {CredentialsService} from "../../../services/credentials.service";
+import { CredentialsService } from "../../../services/credentials.service";
 
 @Component({
   selector: 'app-connection',
@@ -102,7 +102,8 @@ export class ConnectionPage implements OnInit {
     private alerts: AlertsService,
     private router: Router) {
 
-    addIcons({   cloudOutline,
+    addIcons({
+      cloudOutline,
       serverOutline,
       personOutline,
       keyOutline,
@@ -112,14 +113,16 @@ export class ConnectionPage implements OnInit {
       syncOutline,
       globeOutline,
       alarmOutline,
-      clipboardOutline});
+      clipboardOutline
+    });
+    this.userData = JSON.parse(String(localStorage.getItem("userData")))
   }
 
   ngOnInit() {
     this.GetSettings();
   }
 
-  GetSettings(){
+  GetSettings() {
     [this.host, this.credentials] = this.credentialService.Fusion();
 
     // Validación si se obtivieron los valores
@@ -168,7 +171,7 @@ export class ConnectionPage implements OnInit {
     }
   }
 
-  async VerifyConnection(){
+  async VerifyConnection() {
     this.server = `https://${this.host}/fscmRestApi/resources/latest`;
     this.credentials = btoa(`${this.user}:${this.pwd}`);
     this.apiService.AuthRequestFusion(this.endPoints.Path('auth', this.server), this.credentials).then(async (response: any) => {
@@ -195,6 +198,7 @@ export class ConnectionPage implements OnInit {
         }
       ]
     };
+    console.log(payload);
 
     const apiCall = isUpdate
       ? await this.apiService.PutRequestRender('settingsFusion', payload)
@@ -213,7 +217,7 @@ export class ConnectionPage implements OnInit {
   }
 
 
-  RequestStatusConnection(statusCode: number){
+  RequestStatusConnection(statusCode: number) {
     if (statusCode >= 200 && statusCode <= 202) {
       this.statusMessage = 'Acceso autorizado';
       this.statusIcon = 'warning'; //checkmark-circle';
@@ -278,7 +282,7 @@ export class ConnectionPage implements OnInit {
         console.log('Ruta desconocida:', module);
       }
     }
-    else{
+    else {
       this.alerts.Warning("Acceso no autorizado. Primero verifique y guarde los datos de conexión ")
     }
   }

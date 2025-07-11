@@ -1,13 +1,14 @@
 <ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
   <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
     <ion-card-title [ngStyle]="{'color': widgetTextColor}" slot="start">{{widgetData.name}} </ion-card-title>
-    <ion-text slot="end" *ngIf="isPaused">Desde </ion-text>
+    <ion-text slot="end" *ngIf="isPaused" [ngStyle]="{'color': widgetTextColor}" >Desde: </ion-text>
     <ion-datetime-button datetime="datetimeStart" slot="end" *ngIf="isPaused"></ion-datetime-button>
-    <ion-text slot="end" *ngIf="isPaused">hasta </ion-text>
+    <ion-text slot="end" *ngIf="isPaused" [ngStyle]="{'color': widgetTextColor}" >hasta: </ion-text>
     <ion-datetime-button datetime="datetimeEnd" slot="end" *ngIf="isPaused" (click)="UpdateNow()"></ion-datetime-button>
     <ion-select slot="end" [(ngModel)]="widgetData.dateRange" placeholder="Seleccionar período"
       (ionChange)="changeOnTimeRange($event)" interface="popover"
       [ngStyle]="{ 'color': widgetTextColor, 'font-weight': 'bold' }">
+      <ion-select-option value="last1h">Última hora</ion-select-option>
       <ion-select-option value="today">Hoy</ion-select-option>
       <ion-select-option value="last24h">Últimas 24 horas</ion-select-option>
       <ion-select-option value="last7days">Últimos 7 días</ion-select-option>
