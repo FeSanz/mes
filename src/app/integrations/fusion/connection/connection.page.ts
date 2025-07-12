@@ -81,7 +81,7 @@ export class ConnectionPage implements OnInit {
     },
     {
       icon: 'cube-outline',
-      iconClass: 'bg-red',
+      iconClass: 'bg-purple',
       idModule: 'items',
       moduleName: 'ARTÍCULOS PRODUCCIÓN',
       updateDate: '10/04/2024 10:25:12'

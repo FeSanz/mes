@@ -11,9 +11,6 @@
 
 ::ng-deep .wo-table-custom {
   .resource-column {
-    background-color: #222436 !important;
+    background-color: var(--ion-color-tab-col) !important;
   }
-  /*.p-datatable-tbody > tr > td:nth-child(2) {
-    background-color: #222436 !important;
-  }*/
 }

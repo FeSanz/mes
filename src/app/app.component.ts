@@ -94,6 +94,11 @@ export class AppComponent {
 
   ChangeColorMode() {
     document.body.classList.toggle('dark', this.darkMode);
+
+    // Para PrimeNG
+    const element = document.querySelector('html');
+    element?.classList.toggle('my-app-dark', this.darkMode);
+
     localStorage.setItem('theme', String(this.darkMode));
   }
 

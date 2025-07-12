@@ -28,7 +28,10 @@ bootstrapApplication(AppComponent, {
     provideAnimationsAsync(), //Para PrimeNG
     providePrimeNG({//Para PrimeNG
       theme: {
-        preset: Aura
+        preset: Aura,
+        options: {
+          darkModeSelector: '.my-app-dark'
+        }
       }
     }),
     { provide: LOCALE_ID, useValue: 'es' }

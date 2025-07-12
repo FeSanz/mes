@@ -29,7 +29,7 @@
   }
 
   .p-datatable-tbody > tr > td {
-    border-color: rgba(255, 255, 255, 0.09) !important;
+    border-color: var(--ion-color-tab-border) !important;
   }
 
   // Filas del cuerpo

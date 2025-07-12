@@ -10,161 +10,164 @@
 <ion-content [fullscreen]="true">
   <ion-grid>
     <ion-row>
-      <ion-card class="stats-card">
-        <p-table #dtWorkOrders
-                 [value]="workOrders.items"
-                 dataKey="WorkOrderNumber"
-                 styleClass="card-table-primeng wo-table-custom "
-                 [tableStyle]="{ 'min-width': '96rem','height': '100%'}"
-                 [size]="'small'"
-                 [rowHover]="true"
-                 [rows]="rowsPerPage"
-                 [showCurrentPageReport]="true"
-                 [rowsPerPageOptions]="rowsPerPageOptions"
-                 [paginator]="true"
-                 currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
-                 [filterDelay]="0"
-                 [globalFilterFields]="['WorkOrderNumber', 'ResourceCode', 'ItemNumber']"
-                 stripedRows
-                 [scrollable]="true"
-                 [scrollHeight]="scrollHeight"
-                 [alwaysShowPaginator]="true"
-                 rowGroupMode="rowspan"
-                 groupRowsBy="ResourceCode"
-                 sortField="ResourceCode"
-                 [sortOrder]="1"
-        >
-          <ng-template #caption>
-            <div class="table-caption">
-              <p-button
-                [outlined]="true"
-                icon="pi pi-filter-slash"
-                label="Limpiar"
-                (click)="ClearWorkOrders(dtWorkOrders)"/>
+      <ion-col size="12">
+        <ion-card class="stats-card">
+          <p-table #dtWorkOrders
+                   [value]="workOrders.items"
+                   dataKey="WorkOrderNumber"
+                   styleClass="card-table-primeng wo-table-custom "
+                   [tableStyle]="{ 'min-width': '96rem','height': '100%'}"
+                   [size]="'small'"
+                   [rowHover]="true"
+                   [rows]="rowsPerPage"
+                   [showCurrentPageReport]="true"
+                   [rowsPerPageOptions]="rowsPerPageOptions"
+                   [paginator]="true"
+                   currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+                   [filterDelay]="0"
+                   [globalFilterFields]="['WorkOrderNumber', 'ResourceCode', 'ItemNumber']"
+                   stripedRows
+                   [scrollable]="true"
+                   [scrollHeight]="scrollHeight"
+                   [alwaysShowPaginator]="true"
+                   rowGroupMode="rowspan"
+                   groupRowsBy="ResourceCode"
+                   sortField="ResourceCode"
+                   [sortOrder]="1"
+          >
+            <ng-template #caption>
+              <div class="table-caption">
+                <p-button
+                  [outlined]="true"
+                  icon="pi pi-filter-slash"
+                  label="Limpiar"
+                  (click)="ClearWorkOrders(dtWorkOrders)"/>
 
-              <div></div> <!-- Spacer -->
+                <div></div> <!-- Spacer -->
 
-              <p-iconField iconPosition="left">
-                <p-inputIcon>
-                  <i class="pi pi-search"></i>
-                </p-inputIcon>
-                <input pInputText type="text"
-                       [(ngModel)]="searchValueWO"
-                       (input)="OnFilterGlobal($event, dtWorkOrders)"
-                       placeholder="Buscar" />
-              </p-iconField>
-            </div>
-          </ng-template>
-
-          <ng-template pTemplate="header">
-            <tr>
-              <th pSortableColumn="ResourceCode" style="min-width: 9rem" class="td-center">
-                <div class="flex justify-between items-center">
-                  Máquina
-                  <p-sortIcon field="ResourceCode" />
-                  <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto" />
-                </div>
-              </th>
-              <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem" class="td-center">
-              <div class="flex justify-between items-center">
-                O.T.
-                <p-sortIcon field="WorkOrderNumber" />
-                <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
+                <p-iconField iconPosition="left">
+                  <p-inputIcon>
+                    <i class="pi pi-search"></i>
+                  </p-inputIcon>
+                  <input pInputText type="text"
+                         [(ngModel)]="searchValueWO"
+                         (input)="OnFilterGlobal($event, dtWorkOrders)"
+                         placeholder="Buscar" />
+                </p-iconField>
               </div>
-            </th>
-              <th pSortableColumn="ItemNumber" style="min-width: 9rem">
-                <div class="flex justify-between items-center">
-                  Producto
-                  <p-sortIcon field="ItemNumber" />
-                  <p-columnFilter field="ItemNumber" matchMode="equals" display="menu" class="ml-auto"/>
-                </div>
-              </th>
-              <th pSortableColumn="Description" style="min-width: 9rem" class="td-center">
-                <div class="flex justify-between items-center">
-                  Descripción
-                  <p-sortIcon field="Description" />
-                  <p-columnFilter field="Description" matchMode="equals" display="menu" class="ml-auto"/>
-                </div>
-              </th>
-              <th pSortableColumn="PlannedQuantity" style="min-width:7rem" class="td-center">
-                <div class="flex justify-between items-center">
-                  Meta
-                  <p-sortIcon field="PlannedQuantity" />
-                  <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
-                </div>
-              </th>
-              <th pSortableColumn="CompletedQuantity" style="min-width: 7rem" class="td-center">
-                <div class="flex justify-between items-center">
-                  Completo
-                  <p-sortIcon field="CompletedQuantity" />
-                  <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
-                </div>
-              </th>
-              <th pSortableColumn="ProgressQuantity" style="min-width: 7rem" class="td-center">
-                <div class="flex justify-between items-center">
-                  Avance
-                  <p-columnFilter field="Advance" matchMode="between" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
-                    <ng-template #filter let-value let-filter="filterCallback">
-                      <p-slider
-                        [(ngModel)]="progressValue"
-                        [range]="true"
-                        [min]="0"
-                        [max]="100"
-                        [step]="1"
-                        styleClass="m-4"
-                        (onSlideEnd)="$event.values && onAdvanceFilter($event.values, filter)" />
-                      <div class="flex items-center justify-center px-2">
-                        <span *ngIf="!value">0</span>
-                        <span *ngIf="value">{{ value[0] }} - {{ value[1] }}</span>
-                      </div>
-                    </ng-template>
-                  </p-columnFilter>
-                </div>
-              </th>
-              <th pSortableColumn="StartDate" style="min-width: 7rem">
-                <div class="flex justify-between items-center">
-                  F. Inicio
-                  <p-sortIcon field="StartDate" />
-                  <p-columnFilter field="StartDate" matchMode="equals" display="menu" class="ml-auto"/>
-                </div>
-              </th>
-              <th pSortableColumn="CompletionDate" style="min-width: 7rem">
-                <div class="flex justify-between items-center">
-                  F. Fin
-                  <p-sortIcon field="CompletionDate" />
-                  <p-columnFilter field="CompletionDate" matchMode="equals" display="menu" class="ml-auto"/>
-                </div>
-              </th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-item let-rowgroup="rowgroup" let-rowspan="rowspan">
-            <tr>
-              <td *ngIf="rowgroup" [attr.rowspan]="rowspan" class="resource-column td-center">
-                {{ item.ResourceCode}}
-              </td>
-              <td class="td-center">
-                <p-tag
-                  [value]="item.WorkOrderNumber"
-                  [severity]="GetColorByAdvanced(+item.CompletedQuantity)"/>
-              </td>
-              <td>{{ item.ItemNumber }}</td>
-              <td>{{ item.Description }}</td>
-              <td class="td-center">{{ item.PlannedQuantity }}</td>
-              <td class="td-center">{{ item.CompletedQuantity }}</td>
-              <td>
-                <p-progressbar [value]="item.Advance" [showValue]="false" />
-              </td>
-              <td>{{ FormatForDisplayFromISO(item.StartDate) }}</td>
-              <td>{{ FormatForDisplayFromISO(item.CompletionDate) }}</td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="5">No se encontraron recursos.</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </ion-card>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="ResourceCode" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Máquina
+                    <p-sortIcon field="ResourceCode" />
+                    <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    O.T.
+                    <p-sortIcon field="WorkOrderNumber" />
+                    <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="ItemNumber" style="min-width: 9rem">
+                  <div class="flex justify-between items-center">
+                    Producto
+                    <p-sortIcon field="ItemNumber" />
+                    <p-columnFilter field="ItemNumber" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="Description" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Descripción
+                    <p-sortIcon field="Description" />
+                    <p-columnFilter field="Description" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="PlannedQuantity" style="min-width:7rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Meta
+                    <p-sortIcon field="PlannedQuantity" />
+                    <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="CompletedQuantity" style="min-width: 7rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Completo
+                    <p-sortIcon field="CompletedQuantity" />
+                    <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="ProgressQuantity" style="min-width: 7rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Avance
+                    <p-columnFilter field="Advance" matchMode="between" display="menu" [showMatchModes]="false" [showOperator]="false" [showAddButton]="false">
+                      <ng-template #filter let-value let-filter="filterCallback">
+                        <p-slider
+                          [(ngModel)]="progressValue"
+                          [range]="true"
+                          [min]="0"
+                          [max]="100"
+                          [step]="1"
+                          styleClass="m-4"
+                          (onSlideEnd)="$event.values && onAdvanceFilter($event.values, filter)" />
+                        <div class="flex items-center justify-center px-2">
+                          <span *ngIf="!value">0</span>
+                          <span *ngIf="value">{{ value[0] }} - {{ value[1] }}</span>
+                        </div>
+                      </ng-template>
+                    </p-columnFilter>
+                  </div>
+                </th>
+                <th pSortableColumn="StartDate" style="min-width: 7rem">
+                  <div class="flex justify-between items-center">
+                    F. Inicio
+                    <p-sortIcon field="StartDate" />
+                    <p-columnFilter field="StartDate" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="CompletionDate" style="min-width: 7rem">
+                  <div class="flex justify-between items-center">
+                    F. Fin
+                    <p-sortIcon field="CompletionDate" />
+                    <p-columnFilter field="CompletionDate" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-rowgroup="rowgroup" let-rowspan="rowspan">
+              <tr>
+                <td *ngIf="rowgroup" [attr.rowspan]="rowspan" class="resource-column td-center">
+                  {{ item.ResourceCode}}
+                </td>
+                <td class="td-center">
+                  <p-tag
+                    [value]="item.WorkOrderNumber"
+                    [severity]="GetColorByAdvanced(+item.CompletedQuantity)"/>
+                </td>
+                <td>{{ item.ItemNumber }}</td>
+                <td>{{ item.Description }}</td>
+                <td class="td-center">{{ item.PlannedQuantity }}</td>
+                <td class="td-center">{{ item.CompletedQuantity }}</td>
+                <td>
+                  <p-progressbar [value]="item.Advance" [showValue]="false" />
+                </td>
+                <td>{{ FormatForDisplayFromISO(item.StartDate) }}</td>
+                <td>{{ FormatForDisplayFromISO(item.CompletionDate) }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5">No se encontraron recursos.</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ion-card>
+      </ion-col>
+
     </ion-row>
   </ion-grid>
 </ion-content>
