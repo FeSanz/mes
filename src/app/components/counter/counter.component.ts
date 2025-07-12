@@ -34,6 +34,7 @@ export class CounterComponent implements OnInit {
   lastValue = 0
   @Input() data: CounterData = {};
   @Output() remove = new EventEmitter<number>();
+  countStr: number = 0
   public displayDigits: string[] = ['0', '0', '0', '0', '0', '0'];
   public flipStates: string[] = [
     'normal',
@@ -67,6 +68,7 @@ export class CounterComponent implements OnInit {
       this.updateCounterDisplay(Math.round(response.items.data[0].value));
       this.lastDate = response.items.data[0].time
       this.startSubscriptions()
+
     })
   }
   updateChartDB() {
@@ -96,7 +98,7 @@ export class CounterComponent implements OnInit {
   }
   startSubscriptions() {
     this.ws.Suscribe(this.widgetData.sensors[0].sensor_id, (response) => {
-      //console.log(response);      
+      console.log(response);      
       this.updateCounterDisplay(Math.round(response.data.value));
       this.lastDate = response.data.time
     }).then((ws) => {
@@ -106,23 +108,19 @@ export class CounterComponent implements OnInit {
   }
 
   public updateCounterDisplay(count: number): void {
-    const countStr = count.toString().padStart(6, '0');
+    this.countStr += count
+    const countStr = this.countStr.toString().padStart(6, '0')
     const newDigits = countStr.split('');
+    for (let i = 0; i < 6; i++) {
+      if (this.displayDigits[i] !== newDigits[i]) {
+        this.flipStates[i] =
+          this.flipStates[i] === 'normal' ? 'flipped' : 'normal';
+        this.displayDigits[i] = newDigits[i];
 
-    if (true) {
-      for (let i = 0; i < 6; i++) {
-        if (this.displayDigits[i] !== newDigits[i]) {
-          this.flipStates[i] =
-            this.flipStates[i] === 'normal' ? 'flipped' : 'normal';
-          this.displayDigits[i] = newDigits[i];
-
-          setTimeout(() => {
-            this.flipStates[i] = 'normal';
-          }, 100);
-        }
+        setTimeout(() => {
+          this.flipStates[i] = 'normal';
+        }, 100);
       }
-    } else {
-      this.displayDigits = newDigits;
     }
   }
   deleteChart() {

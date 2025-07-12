@@ -1,7 +1,11 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button autoHide="false">
+        <ion-button size="large" (click)="toggleMenu()">
+          <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-menu-button>
     </ion-buttons>
     <ion-title>{{dashboardData.group_name}} - {{dashboardData.organization_name}}</ion-title>
   </ion-toolbar>
@@ -55,11 +59,11 @@
       </ion-col>
     </ion-row>
   </ion-grid>
-  <!--ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="!permissions.isViewer()">
-    <ion-fab-button (click)="setOpen(true)">
-      <ion-icon name="add-outline"></ion-icon>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="toggleFullscreen()">
+      <ion-icon [name]="isFullscreen ? 'contract-outline' : 'expand-outline'"></ion-icon>
     </ion-fab-button>
-  </ion-fab-->
+  </ion-fab>
   <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
     <ng-template>
       <ion-header>

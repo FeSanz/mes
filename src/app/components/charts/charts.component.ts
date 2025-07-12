@@ -158,14 +158,14 @@ export class ChartsComponent implements OnInit {
         return {
           color: colorObj.color,
           name: sensor.sensor_name,
-          sensorId: sensor.sensor_id,
+          zIndex : sensor.sensor_id,
           data: sensor.data.map((data: any) => ({
             x: new Date(data.time).getTime(),
             y: Number(data.value)
           }))
         };
       });
-      this.chartOptions.series = data;
+      this.chartOptions.series = data;      
       this.ajustarYaxis();
       if (this.chart && this.chart.updateOptions) {
         this.chart.updateOptions(this.chartOptions);
@@ -272,18 +272,12 @@ export class ChartsComponent implements OnInit {
         if (this.isPaused) return;
         const timestamp = new Date(data.data.time).getTime();
         const { start } = this.getDateRangeFromOption(this.widgetData.dateRange);
-        const serie: any = this.chartOptions.series.find((s: any) => s.sensorId == data.data.sensorId);
-        console.log(serie);
-        console.log(data.data.sensorId);
-        
-        
+        const serie: any = this.chartOptions.series.find((s: any) => s.zIndex == data.data.sensorId);
         if (serie) {// Agrega el nuevo dato
           serie.data.unshift({ x: timestamp, y: Number(data.data.value) });
           //serie.data.unshift({ x: timestamp, y: Number(data.data.value) });
           serie.data = serie.data.filter((d: any) => d.x >= start.getTime());
           if (this.chart && this.chart.updateSeries) {
-            console.log(serie);
-            console.log(this.chartOptions.series);
             this.chart.updateSeries(this.chartOptions.series);
             this.ajustarYaxis();
           }

@@ -15,12 +15,13 @@ import { CounterComponent } from 'src/app/components/counter/counter.component';
 import { ThermometerComponent } from 'src/app/components/thermometer/thermometer.component';
 import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
-import { addCircleOutline, addOutline, checkmark } from 'ionicons/icons';
+import { addCircleOutline, addOutline, checkmark, contractOutline, expandOutline, menuOutline } from 'ionicons/icons';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { ResizeEvent, ResizableModule } from 'angular-resizable-element';
+
 
 export interface SensorData {
   [key: string]: any;
@@ -78,7 +79,7 @@ export class MonitoringPage implements OnInit {
     private endPoints: EndpointsService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
-    addIcons({ checkmark, addOutline, addCircleOutline })
+    addIcons({ checkmark, addOutline, addCircleOutline, menuOutline, contractOutline, expandOutline })
     this.user = JSON.parse(String(localStorage.getItem("userData")))
     const nav = this.router.getCurrentNavigation();
     const state: any = nav?.extras?.state;
@@ -348,7 +349,6 @@ export class MonitoringPage implements OnInit {
       })
     }
     this.shouldRefresh = true;
-
     // Reiniciar bandera para permitir futuros refresh
     setTimeout(() => this.shouldRefresh = false, 100);
 
@@ -404,5 +404,53 @@ export class MonitoringPage implements OnInit {
   }
   getPageWidth(): number {
     return window.innerWidth;
+  }
+  toggleMenu() {
+    const SIZE_TO_MEDIA: any = {
+      'xs': '(min-width: 0px)',
+      'sm': '(min-width: 576px)',
+      'md': '(min-width: 768px)',
+      'lg': '(min-width: 992px)',
+      'xl': '(min-width: 1200px)'
+    };
+    const splitPane: any = document.querySelector('ion-split-pane') as HTMLIonSplitPaneElement;
+    if (!splitPane) return;
+
+    const media = SIZE_TO_MEDIA[splitPane.when] || splitPane.when;
+
+    if (window.matchMedia(media).matches) {
+      splitPane.classList.toggle('split-pane-visible');
+    }
+
+    this.shouldRefresh = true;
+    // Reiniciar bandera para permitir futuros refresh
+    setTimeout(() => this.shouldRefresh = false, 100);
+  }
+  isFullscreen = false;
+
+  enterFullScreen() {
+    const el = document.documentElement;
+    this.isFullscreen = true;
+
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if ((el as any).webkitRequestFullscreen) (el as any).webkitRequestFullscreen();
+    else if ((el as any).mozRequestFullScreen) (el as any).mozRequestFullScreen();
+    else if ((el as any).msRequestFullscreen) (el as any).msRequestFullscreen();
+  }
+
+  exitFullScreen() {
+    this.isFullscreen = false;
+
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+    else if ((document as any).mozCancelFullScreen) (document as any).mozCancelFullScreen();
+    else if ((document as any).msExitFullscreen) (document as any).msExitFullscreen();
+  }
+  toggleFullscreen() {
+    if (!this.isFullscreen) {
+      this.enterFullScreen();
+    } else {
+      this.exitFullScreen();
+    }
   }
 }
