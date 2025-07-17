@@ -24,6 +24,7 @@ import { Badge } from "primeng/badge";
 import { Tag } from "primeng/tag";
 import { ProgressBar } from "primeng/progressbar";
 import {Slider} from "primeng/slider";
+import {WebSocketService} from "../../../../services/web-socket.service";
 
 
 @Component({
@@ -50,7 +51,8 @@ export class ProductionPage implements OnInit, AfterViewInit  {
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
               private alerts: AlertsService,
-              private platform: Platform) { }
+              private platform: Platform,
+              private websocket: WebSocketService) { }
 
   ngOnInit() {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
@@ -80,8 +82,21 @@ export class ProductionPage implements OnInit, AfterViewInit  {
           Advance: this.CalculateAdvance(item.PlannedQuantity, item.CompletedQuantity)
         }));
       }
+
+      this.OnStartSuscription();
+
     }).catch(error => {
       console.error('Error al obtener OTs:', error);
+    });
+  }
+
+  OnStartSuscription(){
+    this.websocket.SuscribeById({ organization_id: this.userData.Company.Organizations[0].OrganizationId }, 'workorders', (response) => {
+      console.log('WS');
+      console.log(response);
+    }).then((ws) => {
+    }).catch(err => {
+      console.log(err);
     });
   }
 
@@ -95,7 +110,7 @@ export class ProductionPage implements OnInit, AfterViewInit  {
     return Math.min(Math.max(Math.round(percentage), 0), 100);
   }
 
-  onAdvanceFilter(values: number[], filterCallback: any) {
+  OnAdvanceFilter(values: number[], filterCallback: any) {
     this.progressValue = values;
     filterCallback(values);
   }

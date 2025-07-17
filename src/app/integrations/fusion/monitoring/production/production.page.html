@@ -113,7 +113,7 @@
                           [max]="100"
                           [step]="1"
                           styleClass="m-4"
-                          (onSlideEnd)="$event.values && onAdvanceFilter($event.values, filter)" />
+                          (onSlideEnd)="$event.values && OnAdvanceFilter($event.values, filter)" />
                         <div class="flex items-center justify-center px-2">
                           <span *ngIf="!value">0</span>
                           <span *ngIf="value">{{ value[0] }} - {{ value[1] }}</span>
