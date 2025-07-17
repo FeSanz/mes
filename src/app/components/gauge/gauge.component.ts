@@ -9,7 +9,6 @@ import { ApiService } from 'src/app/services/api.service';
 import { addIcons } from 'ionicons';
 import { ellipsisVertical, moveOutline, pencilOutline, trashOutline } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
 import { NgxColorsModule } from 'ngx-colors';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
@@ -47,7 +46,6 @@ export class GaugeComponent implements OnInit {
   constructor(
     private changeDetector: ChangeDetectorRef,
     private ws: WebSocketService,
-    private endPoints: EndpointsService,
     private api: ApiService) {
     addIcons({ ellipsisVertical, pencilOutline, trashOutline, moveOutline })
   }
@@ -64,7 +62,7 @@ export class GaugeComponent implements OnInit {
     })
   }
   startSubscriptions() {
-    this.ws.Suscribe(this.widgetData.sensors[0].sensor_id, (response) => {
+    this.ws.SuscribeById({sensor_id : this.widgetData.sensors[0].sensor_id}, "sensor", (response) => {
       const lastValue = response.data.value
       this.lastDate = response.data.time
       this.humiditySubject.next(lastValue);

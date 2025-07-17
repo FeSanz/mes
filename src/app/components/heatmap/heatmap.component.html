@@ -1,3 +1,112 @@
-<p>
-  heatmap works!
-</p>
+<ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
+  <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
+    <ion-card-title [ngStyle]="{'color': widgetTextColor}">{{widgetData.name}} </ion-card-title>
+    <ion-text slot="end" *ngIf="isPaused" [ngStyle]="{'color': widgetTextColor}">Desde: </ion-text>
+    <ion-datetime-button datetime="datetimeStart" slot="end" *ngIf="isPaused"></ion-datetime-button>
+    <ion-text slot="end" *ngIf="isPaused" [ngStyle]="{'color': widgetTextColor}">hasta: </ion-text>
+    <ion-datetime-button datetime="datetimeEnd" slot="end" *ngIf="isPaused" (click)="UpdateNow()"></ion-datetime-button>
+    <ion-select slot="end" [(ngModel)]="widgetData.dateRange" placeholder="Seleccionar período"
+      (ionChange)="changeOnTimeRange($event)" interface="popover"
+      [ngStyle]="{ 'color': widgetTextColor, 'font-weight': 'bold' }">
+      <ion-select-option value="last1h">Última hora</ion-select-option>
+      <ion-select-option value="today">Hoy</ion-select-option>
+      <ion-select-option value="last24h">Últimas 24 horas</ion-select-option>
+      <ion-select-option value="last7days">Últimos 7 días</ion-select-option>
+      <ion-select-option value="thisWeek">Esta semana</ion-select-option>
+      <ion-select-option value="last30days">Últimos 30 días</ion-select-option>
+      <ion-select-option value="thisMonth">Este mes</ion-select-option>
+      <ion-select-option value="custom">Rango personalizado</ion-select-option>
+    </ion-select>
+    <ion-buttons slot="end">
+      <ion-button title="Mover" cdkDragHandle class="drag-handle">
+        <ion-icon slot="icon-only" name="move-outline" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
+      </ion-button>
+      <ion-button id="popover-spline-${{data['dashboard_id']}}" title="Opciones">
+        <ion-icon slot="icon-only" name="ellipsis-vertical" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-card-content>
+    <apx-chart #heatmapChart [series]="chartOptions.series" [chart]="chartOptions.chart" [colors]="chartOptions.colors"
+      [dataLabels]="chartOptions.dataLabels" [plotOptions]="chartOptions.plotOptions">
+    </apx-chart>
+  </ion-card-content>
+</ion-card>
+<ion-popover trigger="popover-spline-${{data['dashboard_id']}}" [dismissOnSelect]="true" showBackdrop="false">
+  <ng-template>
+    <ion-content>
+      <ion-list>
+        <ion-item [button]="true" [detail]="false" (click)="editChart()">Editar <ion-icon slot="start"
+            name="pencil-outline" color="success"></ion-icon></ion-item>
+        <ion-item [button]="true" [detail]="false" (click)="deleteChart()">Eliminar <ion-icon slot="start"
+            name="trash-outline" color="danger"></ion-icon></ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-popover>
+
+<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Editar widget</ion-title>
+        <ion-buttons slot="end">
+          <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+            [(ngModel)]="copyWidgetData.color"></ngx-colors>
+          <ion-button (click)="isModalOpen = false">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <ion-item>
+        <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.name" style="text-align: right;">
+          <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label color="primary" slot="start">Tipo:</ion-label>
+        <ion-label slot="end"><strong>Mapa de calor</strong></ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-select label="Estilo:" color="primary" [(ngModel)]="copyWidgetData.chartType" interface="popover">
+          <ion-select-option value="area">Area</ion-select-option>
+          <ion-select-option value="line">Lineas</ion-select-option>
+          <ion-select-option value="bar">Barras</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item-sliding *ngFor="let sensor of copyWidgetData.sensors; let i = index">
+        <ion-item>
+          <ion-select label="Máquina:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating"
+            interface="popover">
+            <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
+              {{ mach.machine_name }}
+            </ion-select-option>
+          </ion-select>
+          <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating"
+            interface="popover">
+            <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
+              {{ s.sensor_name }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item *ngFor="let rule of copyWidgetData.rules">
+          
+        </ion-item>
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="removeSensor(sensor)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+      <ion-item lines="none">
+      </ion-item>
+      <ion-item lines="none">
+      </ion-item>
+      <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab-button (click)="updateChartDB()">
+          <ion-icon name="checkmark"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-content>
+  </ng-template>
+</ion-modal>

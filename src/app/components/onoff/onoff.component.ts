@@ -60,7 +60,7 @@ export class OnoffComponent implements OnInit {
     })
   }
   startSubscriptions() {
-    this.ws.Suscribe(this.widgetData.sensors[0].sensor_id, (response) => {
+    this.ws.SuscribeById({sensor_id : this.widgetData.sensors[0].sensor_id}, "sensor",  (response) => {
       this.lastValue = response.data.value
       this.lastDate = response.data.time
       this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true//false

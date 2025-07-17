@@ -117,6 +117,12 @@ export class MonitoringPage implements OnInit {
     this.shouldRefresh = false;*/
   }
   ngOnInit() {
+    document.addEventListener('visibilitychange', () => {
+      /* console.log(document.visibilityState);      
+       if (document.visibilityState === 'visible') {
+         //location.reload(); // 🔄 Fuerza recarga
+       }*/
+    });
   }
   ionViewDidEnter() {
     this.GetDasboards()
@@ -212,22 +218,23 @@ export class MonitoringPage implements OnInit {
   }
   async addNewWidget() {
     let body: any = {}
-    if (this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo' || this.newWidgetData.widgetType == 'onoff' || this.newWidgetData.widgetType == 'watertank' || this.newWidgetData.widgetType == 'counter') {
-      body = {
-        "user_id": this.user.UserId,
-        "color": this.newWidgetData.color,
-        "index": Number(this.widgets.length) + 1,
-        "name": this.newWidgetData.name,
-        "dashboard_group_id": this.dashboardData.dashboard_group_id,
-        "parameters": {
-          "widgetType": this.newWidgetData.widgetType,
-          "chartType": this.newWidgetData.chartType,
-          "sensors": this.newWidgetData.sensors,
-        },
-        "created_by": this.user.UserId,
-        "updated_by": this.user.UserId
-      }
-    } else if (this.newWidgetData.widgetType == 'chart') {
+    // if (this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo' || this.newWidgetData.widgetType == 'onoff' || this.newWidgetData.widgetType == 'watertank' || this.newWidgetData.widgetType == 'counter') {
+    body = {
+      "user_id": this.user.UserId,
+      "color": this.newWidgetData.color,
+      "index": Number(this.widgets.length) + 1,
+      "name": this.newWidgetData.name,
+      "dateRange": 'today',
+      "dashboard_group_id": this.dashboardData.dashboard_group_id,
+      "parameters": {
+        "widgetType": this.newWidgetData.widgetType,
+        "chartType": this.newWidgetData.chartType,
+        "sensors": this.newWidgetData.sensors,
+      },
+      "created_by": this.user.UserId,
+      "updated_by": this.user.UserId
+    }
+    /*} else if (this.newWidgetData.widgetType == 'chart') {
       body = {
         "user_id": this.user.UserId,
         "color": this.newWidgetData.color,
@@ -256,7 +263,7 @@ export class MonitoringPage implements OnInit {
         "created_by": this.user.UserId,
         "updated_by": this.user.UserId
       }
-    }
+    }*/
     this.api.PostRequestRender('dashboards', body).then((response: any) => {
 
       this.setOpen(false)

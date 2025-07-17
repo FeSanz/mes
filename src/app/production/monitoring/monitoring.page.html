@@ -28,7 +28,7 @@
           <ng-container [ngSwitch]="widget.jsonParams.widgetType">
             <app-charts *ngSwitchCase="'chart'" [data]="widget.jsonParams" [refreshData]="shouldRefresh"
               (remove)="removeWidget(widget.jsonParams.dashboard_id)"> </app-charts>
-            <app-heatmap *ngSwitchCase="'heatmap'" [data]="widget.jsonParams"
+            <app-heatmap *ngSwitchCase="'heatmap'" [data]="widget.jsonParams" [refreshData]="shouldRefresh"
               (remove)="removeWidget(widget.jsonParams.dashboard_id)"> </app-heatmap>
             <app-thermometer *ngSwitchCase="'thermo'" [data]="widget.jsonParams"
               (remove)="removeWidget(widget.jsonParams.dashboard_id)"> </app-thermometer>
@@ -146,6 +146,15 @@
               <div slot="label"><ion-text color="primary">Máximo:</ion-text></div>
             </ion-input><ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
               [(ngModel)]="sensor.maxColor" style="margin-left: 10px;"></ngx-colors>
+          </ion-item>
+          <ion-item *ngIf="newWidgetData.widgetType == 'heatmap'">
+            <ion-input type="text" placeholder="" [(ngModel)]="sensor.min" style="text-align: right;">
+              <div slot="label"><ion-text color="primary">Mínimo:</ion-text></div>
+            </ion-input>
+            <ion-input type="text" placeholder="" [(ngModel)]="sensor.max"
+              style="text-align: right; margin-left: 10px;">
+              <div slot="label"><ion-text color="primary">Máximo:</ion-text></div>
+            </ion-input>
           </ion-item>
         </ion-item-sliding>
         <ion-item lines="none">

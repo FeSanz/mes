@@ -48,7 +48,6 @@ export class ChartsComponent implements OnInit {
   @Input() refreshData: boolean = false;
   @Output() remove = new EventEmitter<number>();
   public chartOptions: ChartOptions;
-  title = "Spline"
   widgetData: any = {}
   copyWidgetData: any = {}
   machines: any
@@ -57,6 +56,9 @@ export class ChartsComponent implements OnInit {
 
   private conexionesLocales: { [sensorId: string]: WebSocket } = {};
   isPaused = false;
+  customStartDate = '2025-07-10T13:34:49';
+  customEndDate = '2025-07-10T13:34:49';
+  nowDate = ''
   constructor(private changeDetector: ChangeDetectorRef,
     private alerts: AlertsService,
     private ws: WebSocketService,
@@ -128,9 +130,6 @@ export class ChartsComponent implements OnInit {
       }
     };
   }
-  customStartDate = '2025-07-10T13:34:49';
-  customEndDate = '2025-07-10T13:34:49';
-  nowDate = ''
   ngOnInit() {
     this.widgetData = this.data
     this.initializeChart();
@@ -158,16 +157,17 @@ export class ChartsComponent implements OnInit {
         return {
           color: colorObj.color,
           name: sensor.sensor_name,
-          zIndex : sensor.sensor_id,
+          zIndex: sensor.sensor_id,
           data: sensor.data.map((data: any) => ({
             x: new Date(data.time).getTime(),
             y: Number(data.value)
           }))
         };
       });
-      this.chartOptions.series = data;      
+      this.chartOptions.series = data;
       this.ajustarYaxis();
       if (this.chart && this.chart.updateOptions) {
+        console.log("UPDATE chart");
         this.chart.updateOptions(this.chartOptions);
       }
       this.startSubscriptions();
@@ -268,7 +268,7 @@ export class ChartsComponent implements OnInit {
     }
     sensores.forEach((sensor: any) => {
       const sensor_id = sensor.sensor_id;
-      this.ws.Suscribe(sensor_id, (data) => {
+      this.ws.SuscribeById({sensor_id}, "sensor", (data) => {
         if (this.isPaused) return;
         const timestamp = new Date(data.data.time).getTime();
         const { start } = this.getDateRangeFromOption(this.widgetData.dateRange);

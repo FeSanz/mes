@@ -1,22 +1,29 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild, Input, OnChanges, SimpleChanges, EventEmitter, Output } from '@angular/core';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem } from '@ionic/angular/standalone';
-import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, NgApexchartsModule, ApexXAxis, ApexYAxis, ApexPlotOptions, ApexTooltip } from "ng-apexcharts";
+import { Component, OnInit, ViewChild, Input, OnChanges, SimpleChanges, EventEmitter, Output, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
+import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, NgApexchartsModule, ApexXAxis, ApexYAxis, ApexPlotOptions, ApexTooltip, ChartComponent } from "ng-apexcharts";
+import { FormsModule } from '@angular/forms';
+import { NgxColorsModule } from 'ngx-colors';
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
+import { WebSocketService } from 'src/app/services/web-socket.service';
+import { ApiService } from 'src/app/services/api.service';
+import { ellipsisVertical, moveOutline, pencilOutline, trashOutline, checkmark } from 'ionicons/icons';
+import { addIcons } from 'ionicons';
+import { AlertsService } from 'src/app/services/alerts.service';
 
 export interface HeatmapData {
   [key: string]: any;
 }
-
+type HeatmapCell = {
+  name: string;
+  data: { x: string, y: number }[];
+};
 export type ChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
-  xaxis: ApexXAxis;
-  yaxis: ApexYAxis;
+  xaxis: ApexXAxis,
   dataLabels: ApexDataLabels;
-  title: ApexTitleSubtitle;
-  grid: ApexGrid;
   plotOptions: ApexPlotOptions;
-  tooltip: ApexTooltip;
   colors: string[];
 };
 
@@ -25,284 +32,193 @@ export type ChartOptions = {
   templateUrl: './heatmap.component.html',
   styleUrls: ['./heatmap.component.scss'],
   standalone: true,
-  imports: [CommonModule, NgApexchartsModule/*, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem*/],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput,
+    IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle],
 })
-export class HeatmapComponent  implements OnInit {
-  @ViewChild("heatmapChar") chart: any;
+export class HeatmapComponent implements OnInit {
+  @ViewChild("heatmapChart", { static: false }) chart: ChartComponent | undefined;
+  widgetData: any = {}
   @Input() data: HeatmapData = {};
   @Input() refreshData: boolean = false;
   @Output() remove = new EventEmitter<number>();
   public chartOptions: ChartOptions;
   title = "Heatmap"
-
-  constructor() {
-    // Configuración inicial predeterminada
+  copyWidgetData: any = {}
+  machines: any
+  isModalOpen = false;
+  showChart: boolean = true;
+  customStartDate = '2025-07-10T13:34:49';
+  customEndDate = '2025-07-10T13:34:49';
+  isPaused = false;
+  nowDate = ''
+  constructor(
+    private api: ApiService,
+    private ws: WebSocketService,
+    private alerts: AlertsService,
+    private changeDetector: ChangeDetectorRef,) {
+    addIcons({ moveOutline, ellipsisVertical, pencilOutline, trashOutline, checkmark });
     this.chartOptions = {
-      series: [],
+      series: [
+        {
+          name: "Jan",
+          data: this.generateData(20, {
+            min: -30,
+            max: 55
+          })
+        },
+        {
+          name: "Feb",
+          data: this.generateData(20, {
+            min: -30,
+            max: 55
+          })
+        },
+        {
+          name: "Mar",
+          data: this.generateData(20, {
+            min: -30,
+            max: 55
+          })
+        },
+        {
+          name: "Apr",
+          data: this.generateData(20, {
+            min: -30,
+            max: 55
+          })
+        },
+        {
+          name: "May",
+          data: this.generateData(20, {
+            min: -30,
+            max: 55
+          })
+        },
+        {
+          name: "Jun",
+          data: this.generateData(20, {
+            min: -30,
+            max: 55
+          })
+        },
+        {
+          name: "Jul",
+          data: this.generateData(20, {
+            min: -30,
+            max: 55
+          })
+        },
+        {
+          name: "Aug",
+          data: this.generateData(20, {
+            min: -30,
+            max: 55
+          })
+        },
+        {
+          name: "Sep",
+          data: this.generateData(20, {
+            min: -30,
+            max: 55
+          })
+        }
+      ],
+      colors: [],
       chart: {
         height: 350,
         type: "heatmap"
       },
-      dataLabels: {
-        enabled: false
-      },
-      colors: [
-        "#008FFB"
-      ],
       xaxis: {
         type: "category",
         categories: []
       },
-      title: {
-        text: "Mapa de calor"
-      },
-      grid: {
-        padding: {
-          right: 20
+      plotOptions: {
+        heatmap: {
+          colorScale: {
+            ranges: [
+              {
+                from: -30,
+                to: 5,
+                name: "low",
+                color: "#00A100"
+              },
+              {
+                from: 6,
+                to: 20,
+                name: "medium",
+                color: "#128FD9"
+              },
+              {
+                from: 21,
+                to: 45,
+                name: "high",
+                color: "#FFB200"
+              },
+              {
+                from: 46,
+                to: 55,
+                name: "extreme",
+                color: "#FF0000"
+              }
+            ]
+          }
         }
       },
-      yaxis: {},
-      plotOptions: {},
-      tooltip: {}
-    };
-  }
-
-  ngOnInit() {
-    this.initializeChart();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    // Actualizar el gráfico cuando cambian los datos de entrada
-    if (changes['data'] && !changes['data'].firstChange) {
-      this.updateChart();
-    }
-
-    // Forzar actualización cuando refreshData cambia a true
-    if (changes['refreshData'] && changes['refreshData'].currentValue === true) {
-      this.updateChart();
-    }
-  }
-
-  initializeChart() {
-    this.loadDefaultData();
-  }
-
-  updateChart() {
-    // Actualizar solo las propiedades que vienen en los datos de entrada
-    /*if (this.data.series) {
-      this.chartOptions.series = this.data.series;
-    }
-
-    if (this.data.title) {
-      this.chartOptions.title = {
-        ...this.chartOptions.title,
-        text: this.data.title
-      };
-    }
-
-    if (this.data.colors) {
-      this.chartOptions.colors = this.data.colors;
-    }
-
-    if (this.data.height) {
-      this.chartOptions.chart = {
-        ...this.chartOptions.chart,
-        height: this.data.height
-      };
-    }
-    console.log(this.chartOptions);
-    /*console.log(this.chart);
-
-    // Si el gráfico ya está inicializado, actualizar
-    if (this.chart && this.chart.updateOptions) {
-      this.chart.updateOptions(this.chartOptions);
-    }*/
-  }
-
-  loadDefaultData() {
-    // Cargar datos de ejemplo si no hay datos de entrada
-    this.chartOptions.series = [
-      {
-        name: "23:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "22:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "21:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "20:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "19:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "18:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "17:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "16:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "06:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "15:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "14:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "13:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "12:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "11:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "10:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "09:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "08:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "07:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "05:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "04:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "03:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "02:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "01:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
-      },
-      {
-        name: "00:00",
-        data: this.generateData(6, {
-          min: 0,
-          max: 100
-        })
+      dataLabels: {
+        enabled: false
       }
-    ]
+    };
 
-    // Si el gráfico ya está inicializado, actualizar
-    if (this.chart && this.chart.updateOptions) {
-      this.chart.updateOptions(this.chartOptions);
+  }
+  ngOnInit() {
+    this.initializeConfig();
+  }
+  initializeConfig() {
+    this.widgetData = this.data
+    console.log(this.widgetData);
+    
+    /*if (
+      this.chartOptions?.plotOptions?.heatmap?.colorScale?.ranges?.[0] &&
+      this.widgetData?.sensors?.[0]?.color
+    ) {
+      this.chartOptions.plotOptions.heatmap.colorScale.ranges[0].color =
+        this.widgetData.sensors[0].color;
+    }*/
+
+    this.chart?.updateOptions(this.chartOptions);
+    /*const { start, end } = this.getDateRangeFromOption(this.widgetData.dateRange);
+    this.nowDate = this.formatLocalISO(new Date())
+    this.loadSensorData(start, end)*/
+    this.changeDetector.detectChanges()
+  }
+  async loadSensorData(start: Date, end: Date) {
+    const startStr = start.toISOString()
+    const endStr = end.toISOString()
+    const sensors = this.widgetData.sensors;
+    const sensorIDsString = sensors.map((sensor: any) => sensor.sensor_id).join(',');
+    try {
+      const response: any = await this.api.GetRequestRender(
+        `sensorsData/?sensors=${sensorIDsString}&start=${startStr}&end=${endStr}`, false
+      );
+      const series = this.generateHeatmapMatrix(response.items[0].data);
+      this.chartOptions.series = series
+      console.log(series);
+
+      //this.ajustarYaxis();
+      if (this.chart && this.chart.updateOptions) {
+        this.chart.updateOptions(this.chartOptions);
+      }
+      //this.startSubscriptions();
+    } catch (error) {
+      console.error('Error al cargar datos de sensores:', error);
     }
   }
-
-  generateData(count: number, yrange: { min: number, max: number }) {
+  generateData(count: any, yrange: any) {
     var i = 0;
     var series = [];
     while (i < count) {
-      var x = (i + 1).toString() + "0 m"
+      var x = "w" + (i + 1).toString();
       var y =
         Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
 
@@ -314,7 +230,200 @@ export class HeatmapComponent  implements OnInit {
     }
     return series;
   }
+  generateHeatmapMatrix(data: { value: string, time: string }[]) {
+    const grouped: { [day: string]: { [hour: number]: number[] } } = {};
+
+    data.forEach(entry => {
+      const date = new Date(entry.time);
+      const day = date.toISOString().substring(0, 10);
+      const hour = date.getHours(); // o getUTCHours() si manejas UTC
+      const val = parseFloat(entry.value);
+
+      if (!grouped[day]) {
+        grouped[day] = {};
+      }
+      if (!grouped[day][hour]) {
+        grouped[day][hour] = [];
+      }
+      grouped[day][hour].push(val);
+    });
+
+    const series: any = [];
+
+    const days = Object.keys(grouped).sort();
+    for (const day of days) {
+      const row: { x: string, y: number }[] = [];
+
+      for (let hour = 0; hour < 24; hour++) {
+        const hourLabel = `${hour.toString().padStart(2, '0')}:00`;
+        const values = grouped[day][hour] || [];
+        const avg = values.length > 0
+          ? values.reduce((sum, v) => sum + v, 0) / values.length
+          : -20;
+
+        row.push({ x: hourLabel, y: parseFloat(avg.toFixed(2)) });
+      }
+
+      series.push({
+        name: day,
+        data: row
+      });
+    }
+
+    return series;
+  }
+
+  getSensorsForMachine(MachineId: number) {
+    const machine: any = this.machines.find((m: any) => m.machine_id == MachineId);
+    return machine ? machine.sensors : [];
+  }
+  async removeSensor(sensor: any) {
+    this.copyWidgetData.sensors = this.copyWidgetData.sensors.filter((se: any) => se !== sensor);
+    this.changeDetector.detectChanges()
+  }
+  updateChartDB() {
+    const body = {
+      name: this.copyWidgetData.name,
+      user_id: 1,
+      color: this.copyWidgetData.color,
+      updated_by: 1,
+      parameters: {
+        widgetType: this.copyWidgetData.widgetType,
+        selectedTimeRange: this.copyWidgetData.selectedTimeRange,
+        chartType: this.copyWidgetData.chartType,
+        sensors: this.copyWidgetData.sensors,
+      }
+    }
+    this.isModalOpen = false;
+    this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
+        this.widgetData = JSON.parse(JSON.stringify(this.copyWidgetData))
+        this.data = this.widgetData
+        this.showChart = true;
+        this.initializeConfig()
+        this.isModalOpen = false
+        this.changeDetector.detectChanges()
+      }
+    })
+  }
   Delete() {
     this.remove.emit(this.data['id']);
+  }
+  UpdateNow() {
+    this.nowDate = this.formatLocalISO(new Date())
+  }
+  formatLocalISO(date: Date): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T` +
+      `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  }
+  getDateRangeFromOption(option: string): { start: Date; end: Date } {
+    const now = new Date();
+    const end = new Date(); // Fecha actual
+    let start: Date;
+    switch (option) {
+      case 'last1h':
+        start = new Date(now.getTime() - 1 * 60 * 60 * 1000); // Hace 1 hora
+        break;
+
+      case 'today':
+        start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+
+      case 'last24h':
+        start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
+
+      case 'last7days':
+        start = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000);
+        start.setHours(0, 0, 0, 0);
+        break;
+
+      case 'thisWeek': {
+        const dayOfWeek = now.getDay(); // 0 = domingo
+        const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // lunes
+        start = new Date(now.setDate(diff));
+        start.setHours(0, 0, 0, 0);
+        break;
+      }
+      case 'last30days':
+        start = new Date(now.getTime() - 29 * 24 * 60 * 60 * 1000);
+        start.setHours(0, 0, 0, 0);
+        break;
+
+      case 'thisMonth':
+        start = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+
+      default:
+        throw new Error('Opción de rango de fechas no válida');
+    }
+
+    return { start, end };
+  }
+  localToISOString(localString: string): string {
+    const localDate = new Date(localString);
+    return localDate.toISOString();
+  }
+  isDarkColor(hexColor: string): boolean {
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return luma < 128;
+  }
+  get widgetTextColor(): string {
+    return this.isDarkColor(this.widgetData.color) ? 'white' : 'black';
+  }
+
+  changeOnTimeRange(event: any) {
+    const selectedValue = event.detail.value;
+    if (selectedValue == 'custom') {
+      this.isPaused = true
+      const { start, end } = this.getDateRangeFromOption('last7days');
+      this.customStartDate = this.formatLocalISO(start)//.toISOString()
+      this.customEndDate = this.formatLocalISO(end)//.toISOString()
+      this.changeDetector.detectChanges()
+      this.loadSensorData(start, end)
+    } else {
+      this.api.PutRequestRender('dashboards/dateRange', { dateRange: selectedValue, dashboard_id: this.widgetData.dashboard_id }).then((response: any) => {
+        if (response.errorsExistFlag) {
+        } else {
+          this.isPaused = false
+          const { start, end } = this.getDateRangeFromOption(selectedValue);
+          this.loadSensorData(start, end)
+        }
+      })
+    }
+  }
+  onStartDateChange(event: any) {
+    const selectedValue = event.detail.value;
+    this.changeDetector.detectChanges()
+    this.loadSensorData(new Date(selectedValue), new Date(this.customEndDate))
+  }
+  onEndDateChange(event: any) {
+    const selectedValue = event.detail.value;
+    this.changeDetector.detectChanges()
+    this.loadSensorData(new Date(this.customStartDate), new Date(selectedValue))
+  }
+  deleteChart() {
+    this.remove.emit(this.widgetData.id);
+  }
+  editChart() {
+    this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
+    this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id).then((response: any) => {
+      this.machines = response.items
+      this.isModalOpen = true;
+      //this.newWidgetData.machine = response.data[0].MachineId + ""
+      //console.log(response.data[0].MachineId);
+    })
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['refreshData'] && changes['refreshData'].currentValue === true) {
+      //this.ajustarYaxis();
+    }
   }
 }
