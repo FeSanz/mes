@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild, Input, OnChanges, SimpleChanges, EventEmitter, Output, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
 import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, NgApexchartsModule, ApexXAxis, ApexYAxis, ApexPlotOptions, ApexTooltip, ChartComponent } from "ng-apexcharts";
 import { FormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
@@ -33,7 +33,7 @@ export type ChartOptions = {
   styleUrls: ['./heatmap.component.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput,
+  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput, IonItemSliding, IonItemOptions, IonItemOption,
     IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle],
 })
 export class HeatmapComponent implements OnInit {
@@ -59,72 +59,8 @@ export class HeatmapComponent implements OnInit {
     private changeDetector: ChangeDetectorRef,) {
     addIcons({ moveOutline, ellipsisVertical, pencilOutline, trashOutline, checkmark });
     this.chartOptions = {
-      series: [
-        {
-          name: "Jan",
-          data: this.generateData(20, {
-            min: -30,
-            max: 55
-          })
-        },
-        {
-          name: "Feb",
-          data: this.generateData(20, {
-            min: -30,
-            max: 55
-          })
-        },
-        {
-          name: "Mar",
-          data: this.generateData(20, {
-            min: -30,
-            max: 55
-          })
-        },
-        {
-          name: "Apr",
-          data: this.generateData(20, {
-            min: -30,
-            max: 55
-          })
-        },
-        {
-          name: "May",
-          data: this.generateData(20, {
-            min: -30,
-            max: 55
-          })
-        },
-        {
-          name: "Jun",
-          data: this.generateData(20, {
-            min: -30,
-            max: 55
-          })
-        },
-        {
-          name: "Jul",
-          data: this.generateData(20, {
-            min: -30,
-            max: 55
-          })
-        },
-        {
-          name: "Aug",
-          data: this.generateData(20, {
-            min: -30,
-            max: 55
-          })
-        },
-        {
-          name: "Sep",
-          data: this.generateData(20, {
-            min: -30,
-            max: 55
-          })
-        }
-      ],
-      colors: [],
+      series: [],
+      colors: ["#fd9800ff"],
       chart: {
         height: 350,
         type: "heatmap"
@@ -137,30 +73,6 @@ export class HeatmapComponent implements OnInit {
         heatmap: {
           colorScale: {
             ranges: [
-              {
-                from: -30,
-                to: 5,
-                name: "low",
-                color: "#00A100"
-              },
-              {
-                from: 6,
-                to: 20,
-                name: "medium",
-                color: "#128FD9"
-              },
-              {
-                from: 21,
-                to: 45,
-                name: "high",
-                color: "#FFB200"
-              },
-              {
-                from: 46,
-                to: 55,
-                name: "extreme",
-                color: "#FF0000"
-              }
             ]
           }
         }
@@ -176,8 +88,10 @@ export class HeatmapComponent implements OnInit {
   }
   initializeConfig() {
     this.widgetData = this.data
-    console.log(this.widgetData);
-    
+    //console.log(this.widgetData);
+    if (this.chartOptions?.plotOptions?.heatmap?.colorScale) {
+      this.chartOptions.plotOptions.heatmap.colorScale.ranges = this.widgetData.rules
+    }
     /*if (
       this.chartOptions?.plotOptions?.heatmap?.colorScale?.ranges?.[0] &&
       this.widgetData?.sensors?.[0]?.color
@@ -187,9 +101,9 @@ export class HeatmapComponent implements OnInit {
     }*/
 
     this.chart?.updateOptions(this.chartOptions);
-    /*const { start, end } = this.getDateRangeFromOption(this.widgetData.dateRange);
+    const { start, end } = this.getDateRangeFromOption(this.widgetData.dateRange);
     this.nowDate = this.formatLocalISO(new Date())
-    this.loadSensorData(start, end)*/
+    this.loadSensorData(start, end)
     this.changeDetector.detectChanges()
   }
   async loadSensorData(start: Date, end: Date) {
@@ -203,6 +117,8 @@ export class HeatmapComponent implements OnInit {
       );
       const series = this.generateHeatmapMatrix(response.items[0].data);
       this.chartOptions.series = series
+      console.log(response);
+
       console.log(series);
 
       //this.ajustarYaxis();
@@ -235,8 +151,10 @@ export class HeatmapComponent implements OnInit {
 
     data.forEach(entry => {
       const date = new Date(entry.time);
-      const day = date.toISOString().substring(0, 10);
-      const hour = date.getHours(); // o getUTCHours() si manejas UTC
+      const day = date.getFullYear() + "-" +
+        (date.getMonth() + 1).toString().padStart(2, '0') + "-" +
+        date.getDate().toString().padStart(2, '0');
+      const hour = date.getHours(); // Hora local
       const val = parseFloat(entry.value);
 
       if (!grouped[day]) {
@@ -249,8 +167,8 @@ export class HeatmapComponent implements OnInit {
     });
 
     const series: any = [];
-
     const days = Object.keys(grouped).sort();
+
     for (const day of days) {
       const row: { x: string, y: number }[] = [];
 
@@ -259,7 +177,7 @@ export class HeatmapComponent implements OnInit {
         const values = grouped[day][hour] || [];
         const avg = values.length > 0
           ? values.reduce((sum, v) => sum + v, 0) / values.length
-          : -20;
+          : 0;
 
         row.push({ x: hourLabel, y: parseFloat(avg.toFixed(2)) });
       }
@@ -272,6 +190,7 @@ export class HeatmapComponent implements OnInit {
 
     return series;
   }
+
 
   getSensorsForMachine(MachineId: number) {
     const machine: any = this.machines.find((m: any) => m.machine_id == MachineId);
@@ -288,6 +207,7 @@ export class HeatmapComponent implements OnInit {
       color: this.copyWidgetData.color,
       updated_by: 1,
       parameters: {
+        rules: this.copyWidgetData.rules,
         widgetType: this.copyWidgetData.widgetType,
         selectedTimeRange: this.copyWidgetData.selectedTimeRange,
         chartType: this.copyWidgetData.chartType,
@@ -378,7 +298,44 @@ export class HeatmapComponent implements OnInit {
   get widgetTextColor(): string {
     return this.isDarkColor(this.widgetData.color) ? 'white' : 'black';
   }
+  async removeRule(rule: any, index: number) {
+    this.copyWidgetData.rules = this.copyWidgetData.rules.filter((ru: any) => ru !== rule);
+    // Reajustar los valores min después de eliminar una regla
+    this.recalculateRules();
 
+    this.changeDetector.detectChanges();
+  }
+  async addNewRule() {
+    let newMin = 0;
+    // Si hay reglas anteriores, tomar el máximo de la última regla
+    if (this.copyWidgetData.rules.length > 0) {
+      const lastRule = this.copyWidgetData.rules[this.copyWidgetData.rules.length - 1];
+      newMin = Number(lastRule.to);
+    }
+    this.copyWidgetData.rules.push({
+      from: newMin,
+      to: newMin + 20, // O el valor que prefieras por defecto
+      name: "Regla " + Number(this.copyWidgetData.rules.length + 1),
+      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+    });
+  }
+  onMaxChange(rule: any, index: number) {
+    // Actualizar el min de la siguiente regla si existe
+    if (index < this.copyWidgetData.rules.length - 1) {
+      this.copyWidgetData.rules[index + 1].from = Number(rule.to);
+    }
+    if (Number(rule.to) <= Number(rule.from)) {
+      rule.to = Number(rule.from) + 1;
+      this.copyWidgetData.rules[index + 1].from = Number(rule.from) + 1
+    }
+
+    this.changeDetector.detectChanges();
+  }
+  recalculateRules() {
+    for (let i = 1; i < this.copyWidgetData.rules.length; i++) {
+      this.copyWidgetData.rules[i].from = this.copyWidgetData.rules[i - 1].to;
+    }
+  }
   changeOnTimeRange(event: any) {
     const selectedValue = event.detail.value;
     if (selectedValue == 'custom') {
@@ -417,7 +374,7 @@ export class HeatmapComponent implements OnInit {
     this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id).then((response: any) => {
       this.machines = response.items
       this.isModalOpen = true;
-      //this.newWidgetData.machine = response.data[0].MachineId + ""
+      //this.copyWidgetData.machine = response.data[0].MachineId + ""
       //console.log(response.data[0].MachineId);
     })
   }

@@ -64,6 +64,12 @@ export class MonitoringPage implements OnInit {
         maxColor: '#198bfd'
       }
     ],
+    rules: [{
+      from: 0,
+      to: 100,
+      name: "Regla 1",
+      color: "#003699ff"
+    }],
     widgetType: "",
     chartType: ""
   }
@@ -188,6 +194,13 @@ export class MonitoringPage implements OnInit {
       this.newWidgetData.name = "Widget " + (this.widgets.length + 1)
       this.newWidgetData.widgetType = "chart"
       this.newWidgetData.chartType = "area"
+      this.newWidgetData.rules = [{
+        from: 0,
+        to: 100,
+        name: "Regla 1",
+        color: "#003699ff"
+      }]
+
       this.newWidgetData.sensors[0].machine_id = this.machines[0].machine_id
       this.newWidgetData.sensors[0].sensor_id = this.machines[0].sensors[0].sensor_id
     } else {
@@ -197,6 +210,12 @@ export class MonitoringPage implements OnInit {
         this.newWidgetData.chartType = "area"
         this.newWidgetData.sensors[0].machine_id = this.machines[0].machine_id
         this.newWidgetData.sensors[0].sensor_id = this.machines[0].sensors[0].sensor_id
+        this.newWidgetData.rules = [{
+          from: 0,
+          to: 100,
+          name: "Regla 1",
+          color: "#003699ff"
+        }]
       }, 500);
     }
 
@@ -205,21 +224,12 @@ export class MonitoringPage implements OnInit {
     const val = Number(widget.colSize);
     return isNaN(val) ? 4 : Math.min(Math.max(val, 1), 12);
   }
-  async addNewSensor() {
-    this.newWidgetData.sensors.push({
-      machine_id: "",
-      sensor_name: "",
-      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
-    })
-  }
   getSensorsForMachine(machine_id: number) {
     const machine = this.machines.find((d: any) => d.machine_id === machine_id);
     return machine ? machine.sensors : [];
   }
   async addNewWidget() {
-    let body: any = {}
-    // if (this.newWidgetData.widgetType == 'gauge' || this.newWidgetData.widgetType == 'thermo' || this.newWidgetData.widgetType == 'onoff' || this.newWidgetData.widgetType == 'watertank' || this.newWidgetData.widgetType == 'counter') {
-    body = {
+    const body: any = {
       "user_id": this.user.UserId,
       "color": this.newWidgetData.color,
       "index": Number(this.widgets.length) + 1,
@@ -229,6 +239,7 @@ export class MonitoringPage implements OnInit {
       "parameters": {
         "widgetType": this.newWidgetData.widgetType,
         "chartType": this.newWidgetData.chartType,
+        ...(this.newWidgetData.widgetType == 'heatmap' ? { rules: this.newWidgetData.rules } : {}),
         "sensors": this.newWidgetData.sensors,
       },
       "created_by": this.user.UserId,
@@ -271,6 +282,11 @@ export class MonitoringPage implements OnInit {
       this.newWidgetData = {
         name: "",
         color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
+        rules: [{
+          min: 0,
+          max: 100,
+          color: "#003699ff"
+        }],
         sensors: [
           {
             machine_id: null,
@@ -306,9 +322,54 @@ export class MonitoringPage implements OnInit {
       })
     }
   }
+  async addNewSensor() {
+    this.newWidgetData.sensors.push({
+      machine_id: "",
+      sensor_name: "",
+      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+    })
+  }
   async removeSensor(sensor: any) {
     this.newWidgetData.sensors = this.newWidgetData.sensors.filter((se: any) => se !== sensor);
     this.changeDetector.detectChanges()
+  }
+  async removeRule(rule: any, index: number) {
+    this.newWidgetData.rules = this.newWidgetData.rules.filter((ru: any) => ru !== rule);
+    // Reajustar los valores min después de eliminar una regla
+    this.recalculateRules();
+
+    this.changeDetector.detectChanges();
+  }
+  async addNewRule() {
+    let newMin = 0;
+    // Si hay reglas anteriores, tomar el máximo de la última regla
+    if (this.newWidgetData.rules.length > 0) {
+      const lastRule = this.newWidgetData.rules[this.newWidgetData.rules.length - 1];
+      newMin = Number(lastRule.to);
+    }
+    this.newWidgetData.rules.push({
+      from: newMin,
+      to: newMin + 20, // O el valor que prefieras por defecto
+      name: "Regla " + Number(this.newWidgetData.rules.length + 1),
+      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+    });
+  }
+  onMaxChange(rule: any, index: number) {
+    // Actualizar el min de la siguiente regla si existe
+    if (index < this.newWidgetData.rules.length - 1) {
+      this.newWidgetData.rules[index + 1].from = Number(rule.to);
+    }
+    if (Number(rule.to) <= Number(rule.from)) {
+      rule.to = Number(rule.from) + 1;
+      this.newWidgetData.rules[index + 1].from = Number(rule.from) + 1
+    }
+
+    this.changeDetector.detectChanges();
+  }
+  recalculateRules() {
+    for (let i = 1; i < this.newWidgetData.rules.length; i++) {
+      this.newWidgetData.rules[i].from = this.newWidgetData.rules[i - 1].to;
+    }
   }
   saveWidgetOrder() {
     const body = this.widgets.map((item: any) => ({

@@ -4,9 +4,10 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class WebSocketService {
-  webSocketServer = "ws://localhost:3000";
+  //webSocketServer = "ws://localhost:3000";
   //scmServer = "ws://localhost:3000/workorders-ws";
   //server = "wss://iot-services-rd.onrender.com";
+  webSocketServer = "wss://iot-services-rd-ww45.onrender.com";
 
 
   constructor() { }
@@ -18,7 +19,8 @@ export class WebSocketService {
       ws.onopen = () => {
         ws.send(JSON.stringify({
           ...id,
-          typews: typews}));
+          typews: typews
+        }));
         resolve(ws);
       };
 
@@ -37,7 +39,7 @@ export class WebSocketService {
       };
 
       ws.onclose = (event) => {
-        console.log(`WebSocket ${typews} cerrado:`, event.code, event.reason);
+        //console.log(`WebSocket ${typews} cerrado:`, event.code, event.reason);
       };
     });
   }

@@ -73,6 +73,9 @@ export const routes: Routes = [
   {
     path: 'fusion_production',
     loadComponent: () => import('./integrations/fusion/monitoring/production/production.page').then( m => m.ProductionPage)
+  },
+  {
+    path: 'alerts',
+    loadComponent: () => import('./integrations/modules/alerts/alerts.page').then( m => m.AlertsPage)
   }
-
 ];

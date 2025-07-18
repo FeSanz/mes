@@ -104,6 +104,8 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
 
   GetOrganizations(){
     this.apiService.GetRequestRender(`organizations/${this.userData.Company.CompanyId}`).then((response: any) => {
+      console.log(response);
+      
       this.dbData = response;
 
       this.apiService.GetRequestFusion(this.endPoints.Path('organizations')).then((response: any) => {
