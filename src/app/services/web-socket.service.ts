@@ -19,7 +19,6 @@ export class WebSocketService {
         ws.send(JSON.stringify({
           ...id,
           typews: typews}));
-        console.log(`Suscrito a ${typews} para Id: ${id}`);
         resolve(ws);
       };
 

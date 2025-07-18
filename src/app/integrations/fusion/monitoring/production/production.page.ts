@@ -92,8 +92,15 @@ export class ProductionPage implements OnInit, AfterViewInit  {
 
   OnStartSuscription(){
     this.websocket.SuscribeById({ organization_id: this.userData.Company.Organizations[0].OrganizationId }, 'workorders', (response) => {
-      console.log('WS');
-      console.log(response);
+      const newWorkOrders = response;
+      if (newWorkOrders.items && Array.isArray(newWorkOrders.items)) {
+        const newItems = newWorkOrders.items.map((item: any) => ({
+          ...item,
+          Advance: this.CalculateAdvance(item.PlannedQuantity, item.CompletedQuantity)
+        }));
+
+        this.workOrders.items = [...this.workOrders.items, ...newItems];
+      }
     }).then((ws) => {
     }).catch(err => {
       console.log(err);
