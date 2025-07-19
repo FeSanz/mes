@@ -190,8 +190,55 @@ export class HeatmapComponent implements OnInit {
 
     return series;
   }
+  ajustarColorScale() {
+    const allValues: number[] = [];
 
+    this.chartOptions.series.forEach((serie: any) => {
+      serie.data.forEach((point: any) => {
+        if (typeof point.y === 'number') {
+          allValues.push(point.y);
+        }
+      });
+    });
 
+    if (allValues.length === 0) return;
+
+    const min = Math.min(...allValues);
+    const max = Math.max(...allValues);
+
+    const padding = 2;
+
+    const adjustedMin = Math.max(0, min - padding);
+    const adjustedMax = max + padding;
+
+    const newColorScale = {
+      min: adjustedMin,
+      max: adjustedMax
+    };
+
+    // Actualizar chartOptions en memoria
+    this.chartOptions.plotOptions = {
+      ...this.chartOptions.plotOptions,
+      heatmap: {
+        ...(this.chartOptions.plotOptions?.heatmap || {}),
+        colorScale: {
+          ...(this.chartOptions.plotOptions?.heatmap?.colorScale || {}),
+          ...newColorScale
+        }
+      }
+    };
+
+    // Actualizar visualmente el gráfico si está instanciado
+    if (this.chart && this.chart.updateOptions) {
+      this.chart.updateOptions({
+        plotOptions: {
+          heatmap: {
+            colorScale: newColorScale
+          }
+        }
+      });
+    }
+  }
   getSensorsForMachine(MachineId: number) {
     const machine: any = this.machines.find((m: any) => m.machine_id == MachineId);
     return machine ? machine.sensors : [];
@@ -380,7 +427,7 @@ export class HeatmapComponent implements OnInit {
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['refreshData'] && changes['refreshData'].currentValue === true) {
-      //this.ajustarYaxis();
+      this.ajustarColorScale();
     }
   }
 }
