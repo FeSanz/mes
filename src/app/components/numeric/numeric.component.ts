@@ -1,30 +1,33 @@
+import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
-import { NgxColorsModule } from 'ngx-colors';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, pencilOutline, trashOutline, checkmark, moveOutline } from 'ionicons/icons';
+import { checkmark, ellipsisVertical, moveOutline, pencilOutline, trashOutline } from 'ionicons/icons';
+import { NgxColorsModule } from 'ngx-colors';
 import { ApiService } from 'src/app/services/api.service';
 import { WebSocketService } from 'src/app/services/web-socket.service';
-import { EndpointsService } from 'src/app/services/endpoints.service';
-import { CdkDragHandle } from '@angular/cdk/drag-drop';
 
-export interface OnOffData {
+export interface NumericData {
   [key: string]: any;
 }
 
 @Component({
-  selector: 'app-onoff',
-  templateUrl: './onoff.component.html',
-  styleUrls: ['./onoff.component.scss'],
+  selector: 'app-numeric',
+  templateUrl: './numeric.component.html',
+  styleUrls: ['./numeric.component.scss'],
   standalone: true,
   imports: [FormsModule, CommonModule, NgxColorsModule, IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption,
     IonModal, IonInput, CdkDragHandle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class OnoffComponent implements OnInit {
-  isOn = false
+export class NumericComponent implements OnInit {
+
+  fontFamily: string = 'sans-serif';
+  //@Input() fontSize: string = '100px';
+  @Input() fontSize: string = '50px';
+
   widgetData: any = {}
   copyWidgetData: any = {}
   isModalOpen = false;
@@ -32,7 +35,8 @@ export class OnoffComponent implements OnInit {
   showChart: boolean = true;
   machines: any = []
   lastValue = 0
-  @Input() data: OnOffData = {};
+
+  @Input() data: NumericData = {};
   @Output() remove = new EventEmitter<number>();
   constructor(
     private changeDetector: ChangeDetectorRef,
@@ -44,25 +48,36 @@ export class OnoffComponent implements OnInit {
   ngOnInit() {
     this.initializeConfig();
   }
-
   private initializeConfig() {
     this.widgetData = this.data
+    console.log(this.widgetData);
     this.GetSensorValue()
   }
   GetSensorValue() {
-    this.api.GetRequestRender('sensorData/' + this.widgetData.sensors[0].sensor_id, false).then((response: any) => {
-      this.lastValue = response.items.data[0].value
+    const sensorIDsString = this.widgetData.sensors.map((sensor: any) => sensor.sensor_id).join(',');
+    this.api.GetRequestRender(`sensorsLatest/?sensorIDs=${sensorIDsString}`, false).then((response: any) => {
+      this.widgetData.sensors = this.widgetData.sensors.map((sensor: any) => {
+        const apiSensor = response.items.find((item: any) => item.sensor_id === sensor.sensor_id);
+        if (apiSensor) {
+          return {
+            ...sensor,
+            sensor_name: apiSensor.sensor_name || sensor.sensor_name,
+            value: apiSensor.value,
+            date_time: apiSensor.date_time
+          };
+        }
+        return sensor;
+      });
+      /*this.lastValue = response.items.data[0].value
       this.lastDate = response.items.data[0].time
-      this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true
+      this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true*/
       //this.updateCurrentColor();
-      this.startSubscriptions()
+      //this.startSubscriptions()
     })
   }
   startSubscriptions() {
-    this.ws.SuscribeById({sensor_id : this.widgetData.sensors[0].sensor_id}, "sensor",  (response) => {
-      this.lastValue = response.data.value
-      this.lastDate = response.data.time
-      this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true//false
+    this.ws.SuscribeById({ sensor_id: this.widgetData.sensors[0].sensor_id }, "sensor", (response) => {
+      //this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true//false
       //this.updateCurrentColor();
     }).then((ws) => {
     }).catch(err => {
@@ -107,12 +122,13 @@ export class OnoffComponent implements OnInit {
       color: this.copyWidgetData.color,
       updated_by: 1,
       parameters: {
+        size: this.copyWidgetData.size,
         widgetType: this.copyWidgetData.widgetType,
         chartType: this.copyWidgetData.chartType,
         sensors: this.copyWidgetData.sensors,
       }
     }
-    //console.log(body);
+    console.log(body.parameters.sensors);
     this.showChart = false;
     this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
       //console.log(response);
@@ -131,7 +147,11 @@ export class OnoffComponent implements OnInit {
     //console.log(this.copyWidgetData.sensors[0].sensor_name);
 
   }
-  get borderColor(): string {
-    return this.isOn ? this.widgetData.sensors[0].maxColor : 'var(--ion-color-light)'
+  async addNewSensor() {
+    this.copyWidgetData.sensors.push({ color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'), uom: "" })
+  }
+  async removeSensor(sensor: any) {
+    this.copyWidgetData.sensors = this.copyWidgetData.sensors.filter((se: any) => se !== sensor);
+    this.changeDetector.detectChanges()
   }
 }

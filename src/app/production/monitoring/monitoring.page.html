@@ -40,6 +40,8 @@
               (remove)="removeWidget(widget.jsonParams.dashboard_id)"> </app-watertank>
             <app-counter *ngSwitchCase="'counter'" [data]="widget.jsonParams"
               (remove)="removeWidget(widget.jsonParams.dashboard_id)"> </app-counter>
+            <app-numeric *ngSwitchCase="'number'" [data]="widget.jsonParams"
+              (remove)="removeWidget(widget.jsonParams.dashboard_id)"> </app-numeric>
           </ng-container>
         </div>
       </ion-col>
@@ -92,6 +94,7 @@
             <ion-select-option value="gauge">Gauge</ion-select-option>
             <ion-select-option value="watertank">Nivel</ion-select-option>
             <ion-select-option value="counter">Counter</ion-select-option>
+            <ion-select-option value="number">Número</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item *ngIf="newWidgetData.widgetType == 'chart'">
@@ -99,6 +102,13 @@
             <ion-select-option value="area">Area</ion-select-option>
             <ion-select-option value="line">Lineas</ion-select-option>
             <ion-select-option value="bar">Barras</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item *ngIf="newWidgetData.widgetType == 'number'">
+          <ion-select label="Tamaño:" color="primary" [(ngModel)]="newWidgetData.font_size" interface="popover">
+            <ion-select-option value="50px">Pequeño</ion-select-option>
+            <ion-select-option value="100px">Mediano</ion-select-option>
+            <ion-select-option value="150px">Grande</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item-sliding *ngFor="let sensor of newWidgetData.sensors; let i = index" lines="full">
@@ -115,6 +125,9 @@
                 {{ s.sensor_name }}
               </ion-select-option>
             </ion-select>
+            <ion-input type="text" placeholder="UoM" [(ngModel)]="sensor.uom"
+              style="text-align: right; max-width: 80px;" *ngIf="newWidgetData.widgetType == 'number'">
+            </ion-input>
             <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" style="margin-left: 10px;"
               *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge' && newWidgetData.widgetType != 'watertank' && newWidgetData.widgetType != 'onoff' && newWidgetData.widgetType != 'heatmap'"
               [(ngModel)]="sensor.color"></ngx-colors>

@@ -21,6 +21,7 @@ import { Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { ResizeEvent, ResizableModule } from 'angular-resizable-element';
+import { NumericComponent } from 'src/app/components/numeric/numeric.component';
 
 
 export interface SensorData {
@@ -42,7 +43,7 @@ export type ChartOptions = {
   styleUrls: ['./monitoring.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, CounterComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
+  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, CounterComponent, NumericComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
     IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule, IonRippleEffect]
 })
 export class MonitoringPage implements OnInit {
@@ -52,6 +53,7 @@ export class MonitoringPage implements OnInit {
   newWidgetData: any = {
     name: "",
     color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
+    font_size: "100px",
     sensors: [
       {
         machine_id: "",
@@ -59,6 +61,7 @@ export class MonitoringPage implements OnInit {
         sensor_id: "",
         color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
         min: 0,
+        uom: "",
         max: 100,
         minColor: '#ff8300',
         maxColor: '#198bfd'
@@ -151,6 +154,8 @@ export class MonitoringPage implements OnInit {
           color: item.color,
         }
       }));
+      //console.log(this.widgets);
+
       setTimeout(() => {
         this.simulateResizeForAllWidgets();
       }, 100);
@@ -239,6 +244,7 @@ export class MonitoringPage implements OnInit {
       "parameters": {
         "widgetType": this.newWidgetData.widgetType,
         "chartType": this.newWidgetData.chartType,
+        size: this.newWidgetData.font_size,
         ...(this.newWidgetData.widgetType == 'heatmap' ? { rules: this.newWidgetData.rules } : {}),
         "sensors": this.newWidgetData.sensors,
       },
@@ -281,6 +287,7 @@ export class MonitoringPage implements OnInit {
       this.GetDasboards()
       this.newWidgetData = {
         name: "",
+        size: "",
         color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
         rules: [{
           min: 0,
@@ -295,6 +302,7 @@ export class MonitoringPage implements OnInit {
             color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
             min: 0,
             max: 100,
+            oum: "",
             minColor: '#ff8300',
             maxColor: '#198bfd'
           }
@@ -326,7 +334,8 @@ export class MonitoringPage implements OnInit {
     this.newWidgetData.sensors.push({
       machine_id: "",
       sensor_name: "",
-      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
+      uom: ""
     })
   }
   async removeSensor(sensor: any) {

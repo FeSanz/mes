@@ -117,11 +117,8 @@ export class HeatmapComponent implements OnInit {
       );
       const series = this.generateHeatmapMatrix(response.items[0].data);
       this.chartOptions.series = series
-      console.log(response);
-
-      console.log(series);
-
-      //this.ajustarYaxis();
+      this.startSubscriptions()
+      this.ajustarColorScale()
       if (this.chart && this.chart.updateOptions) {
         this.chart.updateOptions(this.chartOptions);
       }
@@ -148,7 +145,6 @@ export class HeatmapComponent implements OnInit {
   }
   generateHeatmapMatrix(data: { value: string, time: string }[]) {
     const grouped: { [day: string]: { [hour: number]: number[] } } = {};
-
     data.forEach(entry => {
       const date = new Date(entry.time);
       const day = date.getFullYear() + "-" +
@@ -190,6 +186,56 @@ export class HeatmapComponent implements OnInit {
 
     return series;
   }
+
+  startSubscriptions() {
+    this.ws.SuscribeById({ sensor_id: this.widgetData.sensors[0].sensor_id }, "sensor", (response) => {
+      const lastValue = response.data.value
+      //this.lastDate = response.data.time
+      //this.updateHeatmapSafe({ value: lastValue, time: response.data.time });
+      this.ajustarColorScale();
+    }).then((ws) => {
+    }).catch(err => {
+      console.log(err);
+    });
+  }
+  updateHeatmapSafe(newEntry: { value: string, time: string }) {
+    const date = new Date(newEntry.time);
+
+    const day = date.getUTCFullYear() + '-' +
+      String(date.getUTCMonth() + 1).padStart(2, '0') + '-' +
+      String(date.getUTCDate()).padStart(2, '0');
+    const hour = date.getUTCHours();
+    const val = parseFloat(newEntry.value);
+
+    // Buscar serie del día
+    let daySeriesIndex = this.chartOptions.series.findIndex((series: any) => series.name === day);
+
+    if (daySeriesIndex === -1) {
+      // Crear nueva serie
+      const newDaySeries = {
+        name: day,
+        data: Array.from({ length: 24 }, (_, h) => ({
+          x: `${h.toString().padStart(2, '0')}:00`,
+          y: h === hour ? val : 0
+        }))
+      };
+
+      // Insertar en orden
+      const insertIndex = this.chartOptions.series.findIndex((series: any) => series.name > day);
+      if (insertIndex === -1) {
+        this.chartOptions.series.push(newDaySeries);
+      } else {
+        this.chartOptions.series.splice(insertIndex, 0, newDaySeries);
+      }
+    } else {
+      // Actualizar hora específica de forma segura
+      this.chartOptions.series[daySeriesIndex].data[hour] = {
+        x: `${hour.toString().padStart(2, '0')}:00`,
+        y: val
+      };
+    }
+  }
+//CORREGIR
   ajustarColorScale() {
     const allValues: number[] = [];
 
