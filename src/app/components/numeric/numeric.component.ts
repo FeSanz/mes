@@ -50,6 +50,8 @@ export class NumericComponent implements OnInit {
   }
   private initializeConfig() {
     this.widgetData = this.data
+    console.log(this.widgetData);
+    
     this.GetSensorValue()
   }
   GetSensorValue() {
@@ -147,8 +149,6 @@ export class NumericComponent implements OnInit {
     const selectedValue = event.detail.value;
     const sensor = this.getSensorsForMachine(this.widgetData.sensors[0].machine_id).find((s: any) => s.sensor_id == selectedValue)
     this.copyWidgetData.sensors[0].sensor_name = sensor.sensor_name
-    //console.log(this.copyWidgetData.sensors[0].sensor_name);
-
   }
   async addNewSensor() {
     this.copyWidgetData.sensors.push({ color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'), uom: "" })

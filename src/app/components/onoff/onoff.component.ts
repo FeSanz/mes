@@ -59,7 +59,7 @@ export class OnoffComponent implements OnInit {
     })
   }
   startSubscriptions() {
-    this.ws.SuscribeById({sensor_id : this.widgetData.sensors[0].sensor_id}, "sensor",  (response) => {
+    this.ws.SuscribeById({ sensor_id: this.widgetData.sensors[0].sensor_id }, "sensor", (response) => {
       this.lastValue = response.data.value
       this.lastDate = response.data.time
       this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true//false
@@ -128,8 +128,6 @@ export class OnoffComponent implements OnInit {
     const selectedValue = event.detail.value;
     const sensor = this.getSensorsForMachine(this.widgetData.sensors[0].machine_id).find((s: any) => s.sensor_id == selectedValue)
     this.copyWidgetData.sensors[0].sensor_name = sensor.sensor_name
-    //console.log(this.copyWidgetData.sensors[0].sensor_name);
-
   }
   get borderColor(): string {
     return this.isOn ? this.widgetData.sensors[0].maxColor : 'var(--ion-color-light)'

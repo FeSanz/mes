@@ -21,10 +21,8 @@
         <div class="onoff-text">
           <span class="main-state" [ngStyle]="{'color': isOn ? widgetOnOffTextColor : 'var(--ion-color-dark)'}">{{ isOn
             ? 'ON' : 'OFF' }}</span>
-          <ion-text
-            [ngStyle]="{'color': isOn ? widgetOnOffTextColor : 'var(--ion-color-dark)'}">{{widgetData.sensors[0].sensor_name
-            + ': '
-            +lastValue}}</ion-text>
+          <ion-text [ngStyle]="{'color': isOn ? widgetOnOffTextColor : 'var(--ion-color-dark)'}">
+            {{widgetData.sensors[0].sensor_name + ': ' +lastValue}} {{ widgetData.sensors[0].uom || '' }}</ion-text>
         </div>
       </div>
     </div>
@@ -84,6 +82,9 @@
             {{ s.sensor_name }}
           </ion-select-option>
         </ion-select>
+        <ion-input type="text" placeholder="UoM" [(ngModel)]="copyWidgetData.sensors[0].uom"
+          style="text-align: right; max-width: 80px;">
+        </ion-input>
       </ion-item>
       <ion-item>
         <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].max">

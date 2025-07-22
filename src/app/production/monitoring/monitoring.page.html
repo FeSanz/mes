@@ -126,7 +126,8 @@
               </ion-select-option>
             </ion-select>
             <ion-input type="text" placeholder="UoM" [(ngModel)]="sensor.uom"
-              style="text-align: right; max-width: 80px;" *ngIf="newWidgetData.widgetType == 'number'">
+              style="text-align: right; max-width: 80px;"
+              *ngIf="newWidgetData.widgetType == 'thermo' || newWidgetData.widgetType == 'onoff' || newWidgetData.widgetType == 'gauge' || newWidgetData.widgetType == 'watertank' || newWidgetData.widgetType == 'counter' || newWidgetData.widgetType == 'number'">
             </ion-input>
             <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" style="margin-left: 10px;"
               *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge' && newWidgetData.widgetType != 'watertank' && newWidgetData.widgetType != 'onoff' && newWidgetData.widgetType != 'heatmap'"

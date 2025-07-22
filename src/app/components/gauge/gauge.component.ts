@@ -1,4 +1,3 @@
-// src/app/components/gauge/humidity-gauge.component.ts
 import { Component, Input, OnInit, EventEmitter, Output, ChangeDetectorRef, LOCALE_ID, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
@@ -7,7 +6,7 @@ import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, moveOutline, pencilOutline, trashOutline } from 'ionicons/icons';
+import { ellipsisVertical, moveOutline, pencilOutline, trashOutline, checkmark } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
@@ -47,10 +46,14 @@ export class GaugeComponent implements OnInit {
     private changeDetector: ChangeDetectorRef,
     private ws: WebSocketService,
     private api: ApiService) {
-    addIcons({ ellipsisVertical, pencilOutline, trashOutline, moveOutline })
+    addIcons({moveOutline,ellipsisVertical,pencilOutline,trashOutline,checkmark});
   }
   ngOnInit() {
     this.initializeConfig();
+  }
+  private initializeConfig() {
+    this.widgetData = this.data
+    this.GetSensorValue()
   }
   GetSensorValue() {
     this.api.GetRequestRender('sensorData/' + this.widgetData.sensors[0].sensor_id, false).then((response: any) => {
@@ -112,10 +115,6 @@ export class GaugeComponent implements OnInit {
   getSensorsForMachine(MachineId: number) {
     const machine: any = this.machines.find((m: any) => m.machine_id == MachineId);
     return machine ? machine.sensors : [];
-  }
-  private initializeConfig() {
-    this.widgetData = this.data
-    this.GetSensorValue()
   }
   // ✅ MÉTODO MEJORADO PARA ACTUALIZACIÓN DE COLOR
   private updateCurrentColor() {

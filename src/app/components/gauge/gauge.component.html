@@ -51,7 +51,7 @@
             </text>
             <text x="180" y="165" text-anchor="middle" [attr.fill]="currentColor" font-size="28" font-weight="bold"
               class="gauge-value">
-              {{ (currentValue$ | async) ?? 0 | number:'1.1-1' }}%
+              {{ (currentValue$ | async) ?? 0 | number:'1.1-1' }} {{ widgetData.sensors[0].uom || '' }}
             </text>
           </svg>
         </div>
@@ -113,6 +113,9 @@
             {{ s.sensor_name }}
           </ion-select-option>
         </ion-select>
+        <ion-input type="text" placeholder="UoM" [(ngModel)]="copyWidgetData.sensors[0].uom"
+          style="text-align: right; max-width: 80px;">
+        </ion-input>
       </ion-item>
       <ion-item>
         <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].min" style="text-align: right;">
