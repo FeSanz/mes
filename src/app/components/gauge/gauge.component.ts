@@ -97,7 +97,7 @@ export class GaugeComponent implements OnInit {
         sensors: this.copyWidgetData.sensors,
       }
     }
-    console.log(body);
+    //console.log(body);
     this.showChart = false;
     this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
       //console.log(response);

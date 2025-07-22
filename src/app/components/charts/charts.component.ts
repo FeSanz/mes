@@ -167,7 +167,7 @@ export class ChartsComponent implements OnInit {
       this.chartOptions.series = data;
       this.ajustarYaxis();
       if (this.chart && this.chart.updateOptions) {
-        console.log("UPDATE chart");
+        //console.log("UPDATE chart");
         this.chart.updateOptions(this.chartOptions);
       }
       this.startSubscriptions();
@@ -293,7 +293,7 @@ export class ChartsComponent implements OnInit {
     for (const sensorId in this.conexionesLocales) {
       const ws = this.conexionesLocales[sensorId];
       if (ws && ws.readyState === WebSocket.OPEN) {
-        console.log("unsuscribed");
+        //console.log("unsuscribed");
         ws.send(JSON.stringify({ type: 'unsuscribe', sensor_id: sensorId }));
         ws.close();
       }

@@ -50,7 +50,6 @@ export class NumericComponent implements OnInit {
   }
   private initializeConfig() {
     this.widgetData = this.data
-    console.log(this.widgetData);
     this.GetSensorValue()
   }
   GetSensorValue() {
@@ -72,16 +71,20 @@ export class NumericComponent implements OnInit {
       this.lastDate = response.items.data[0].time
       this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true*/
       //this.updateCurrentColor();
-      //this.startSubscriptions()
+      this.startSubscriptions()
     })
   }
   startSubscriptions() {
-    this.ws.SuscribeById({ sensor_id: this.widgetData.sensors[0].sensor_id }, "sensor", (response) => {
-      //this.isOn = Number(this.lastValue) < Number(this.widgetData.sensors[0].max) ? false : true//false
-      //this.updateCurrentColor();
-    }).then((ws) => {
-    }).catch(err => {
-      console.log(err);
+    const sensores = this.widgetData.sensors;
+    sensores.forEach((sensor: any) => {
+      const sensor_id = sensor.sensor_id;
+      this.ws.SuscribeById({ sensor_id }, "sensor", (data) => {       
+        sensor.date_time = data.data.time
+        sensor.value = data.data.value
+      }).then((ws) => {
+      }).catch(err => {
+        console.error('Error suscribiendo a sensor', sensor_id, err);
+      });
     });
   }
   deleteChart() {
@@ -128,7 +131,7 @@ export class NumericComponent implements OnInit {
         sensors: this.copyWidgetData.sensors,
       }
     }
-    console.log(body.parameters.sensors);
+    //console.log(body.parameters.sensors);
     this.showChart = false;
     this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
       //console.log(response);

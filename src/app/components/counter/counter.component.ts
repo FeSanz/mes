@@ -98,7 +98,7 @@ export class CounterComponent implements OnInit {
   }
   startSubscriptions() {
     this.ws.SuscribeById({sensor_id : this.widgetData.sensors[0].sensor_id}, "sensor",  (response) => {
-      console.log(response);      
+      //console.log(response);      
       this.updateCounterDisplay(Math.round(response.data.value));
       this.lastDate = response.data.time
     }).then((ws) => {
