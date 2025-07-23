@@ -2,7 +2,10 @@ import { Component, OnInit, Input, EventEmitter, Output, ChangeDetectorRef, LOCA
 import { BehaviorSubject } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton,
+  IonSelect, IonSelectOption, IonModal, IonInput, IonToggle
+} from '@ionic/angular/standalone';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
@@ -22,7 +25,7 @@ export interface ThermoData {
   styleUrls: ['./thermometer.component.scss'],
   standalone: true,
   imports: [FormsModule, CommonModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect,
-    IonSelectOption, IonModal, IonInput, CdkDragHandle],
+    IonSelectOption, IonModal, IonInput, CdkDragHandle, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
     { provide: LOCALE_ID, useValue: 'en-US' }
@@ -66,6 +69,7 @@ export class ThermometerComponent implements OnInit {
       name: this.copyWidgetData.name,
       user_id: 1,
       color: this.copyWidgetData.color,
+      border_flag: this.copyWidgetData.borderFlag,
       updated_by: 1,
       parameters: {
         widgetType: this.copyWidgetData.widgetType,
@@ -105,7 +109,7 @@ export class ThermometerComponent implements OnInit {
     })
   }
   startSubscriptions() {
-    this.ws.SuscribeById({sensor_id : this.widgetData.sensors[0].sensor_id}, "sensor",  (response) => {
+    this.ws.SuscribeById({ sensor_id: this.widgetData.sensors[0].sensor_id }, "sensor", (response) => {
       const lastValue = response.data.value
       this.lastDate = response.data.time
       this.updateTemperature(lastValue);

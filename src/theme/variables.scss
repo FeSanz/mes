@@ -472,3 +472,7 @@ ion-split-pane {
 ion-reorder.custom-reorder-icon {
   color: var(--ion-color-secondary);
 }
+
+ion-toggle::part(label) {
+  color: var(--ion-color-primary);
+}

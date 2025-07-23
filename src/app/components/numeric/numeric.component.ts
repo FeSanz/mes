@@ -2,7 +2,10 @@ import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
+import {
+  IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader,
+  IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonToggle
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmark, ellipsisVertical, moveOutline, pencilOutline, trashOutline } from 'ionicons/icons';
 import { NgxColorsModule } from 'ngx-colors';
@@ -18,8 +21,8 @@ export interface NumericData {
   templateUrl: './numeric.component.html',
   styleUrls: ['./numeric.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule, NgxColorsModule, IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption,
-    IonModal, IonInput, CdkDragHandle],
+  imports: [FormsModule, CommonModule, NgxColorsModule, IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList,
+    IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, CdkDragHandle, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class NumericComponent implements OnInit {
@@ -49,7 +52,7 @@ export class NumericComponent implements OnInit {
     this.initializeConfig();
   }
   private initializeConfig() {
-    this.widgetData = this.data    
+    this.widgetData = this.data
     this.GetSensorValue()
   }
   GetSensorValue() {
@@ -78,7 +81,7 @@ export class NumericComponent implements OnInit {
     const sensores = this.widgetData.sensors;
     sensores.forEach((sensor: any) => {
       const sensor_id = sensor.sensor_id;
-      this.ws.SuscribeById({ sensor_id }, "sensor", (data) => {       
+      this.ws.SuscribeById({ sensor_id }, "sensor", (data) => {
         sensor.date_time = data.data.time
         sensor.value = data.data.value
       }).then((ws) => {
@@ -123,6 +126,7 @@ export class NumericComponent implements OnInit {
       name: this.copyWidgetData.name,
       user_id: 1,
       color: this.copyWidgetData.color,
+      border_flag: this.copyWidgetData.borderFlag,
       updated_by: 1,
       parameters: {
         size: this.copyWidgetData.size,

@@ -111,6 +111,12 @@
             <ion-select-option value="150px">Grande</ion-select-option>
           </ion-select>
         </ion-item>
+        <ion-item lines="none">
+          <ion-toggle [checked]="newWidgetData.borderFlag == 'Y'"
+            (ionChange)="newWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">
+            Borde
+          </ion-toggle>
+        </ion-item>
         <ion-item-sliding *ngFor="let sensor of newWidgetData.sensors; let i = index" lines="full">
           <ion-item>
             <ion-select label="Dispositivo:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating"
@@ -188,8 +194,6 @@
             </ion-item-options>
           </ion-item-sliding>
         </div>
-        <ion-item lines="none">
-        </ion-item>
         <div class="ion-text-center"
           *ngIf="newWidgetData.widgetType != 'thermo' && newWidgetData.widgetType != 'gauge' && newWidgetData.widgetType != 'watertank' && newWidgetData.widgetType != 'onoff' && newWidgetData.widgetType != 'counter' && newWidgetData.widgetType != 'heatmap'">
           <ion-button fill="outline" (click)="addNewSensor()">Agregar sensor</ion-button>
@@ -197,8 +201,6 @@
         <div class="ion-text-center" *ngIf="newWidgetData.widgetType == 'heatmap'">
           <ion-button fill="outline" (click)="addNewRule()">Agregar regla</ion-button>
         </div>
-        <ion-item lines="none">
-        </ion-item>
         <ion-fab slot="fixed" vertical="bottom" horizontal="end">
           <ion-fab-button (click)="addNewWidget()">
             <ion-icon name="checkmark"></ion-icon>

@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Inp
 import { FormsModule } from '@angular/forms';
 import {
   IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList,
-  IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton
+  IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle
 } from '@ionic/angular/standalone';
 import { NgxColorsModule } from 'ngx-colors';
 import { GaugeData } from '../gauge/gauge.component';
@@ -24,7 +24,7 @@ export interface CounterData {
   styleUrls: ['./counter.component.scss'],
   standalone: true,
   imports: [FormsModule, CommonModule, NgxColorsModule, IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption,
-    IonModal, IonInput, CdkDragHandle, IonDatetime, IonDatetimeButton],
+    IonModal, IonInput, CdkDragHandle, IonDatetime, IonDatetimeButton, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class CounterComponent implements OnInit {
@@ -95,6 +95,7 @@ export class CounterComponent implements OnInit {
       user_id: 1,
       color: this.copyWidgetData.color,
       updated_by: 1,
+      border_flag: this.copyWidgetData.borderFlag,
       parameters: {
         widgetType: this.copyWidgetData.widgetType,
         chartType: this.copyWidgetData.chartType,

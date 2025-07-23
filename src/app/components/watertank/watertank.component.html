@@ -1,4 +1,4 @@
-<ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
+<ion-card [ngStyle]="widgetData.borderFlag == 'Y' ? {'border': '.2px solid ' + widgetData.color} : {}">
   <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
     <ion-buttons slot="end">
       <ion-button title="Mover" cdkDragHandle class="drag-handle">
@@ -44,7 +44,8 @@
               <!-- Marcador Crítico -->
               <line x1="60" y1="265" x2="85" y2="265" stroke="#666666" stroke-width="2" />
               <text x="53" y="269" fill="#666666" font-size="10" text-anchor="end" font-weight="bold">
-                {{ formatValue((widgetData.sensors[0].max * thresholds.critical) / 100) }} {{ widgetData.sensors[0].uom || '' }}
+                {{ formatValue((widgetData.sensors[0].max * thresholds.critical) / 100) }} {{ widgetData.sensors[0].uom
+                || '' }}
               </text>
 
               <!-- Marcador Bajo -->
@@ -52,7 +53,8 @@
                 stroke-width="2" />
               <text x="53" [attr.y]="getLevelY('low') + 4" fill="#666666" font-size="10" text-anchor="end"
                 font-weight="bold">
-                {{ formatValue((widgetData.sensors[0].max * thresholds.low) / 100) }} {{ widgetData.sensors[0].uom || '' }}
+                {{ formatValue((widgetData.sensors[0].max * thresholds.low) / 100) }} {{ widgetData.sensors[0].uom || ''
+                }}
               </text>
 
               <!-- Marcador Medio -->
@@ -60,7 +62,8 @@
                 stroke-width="2" />
               <text x="53" [attr.y]="getLevelY('medium') + 4" fill="#666666" font-size="10" text-anchor="end"
                 font-weight="bold">
-                {{ formatValue((widgetData.sensors[0].max * thresholds.medium) / 100) }} {{ widgetData.sensors[0].uom || '' }}
+                {{ formatValue((widgetData.sensors[0].max * thresholds.medium) / 100) }} {{ widgetData.sensors[0].uom ||
+                '' }}
               </text>
 
               <!-- Marcador Alto -->
@@ -68,7 +71,8 @@
                 stroke-width="2" />
               <text x="53" [attr.y]="getLevelY('high') + 4" fill="#666666" font-size="10" text-anchor="end"
                 font-weight="bold">
-                {{ formatValue((widgetData.sensors[0].max * thresholds.high) / 100) }} {{ widgetData.sensors[0].uom || '' }}
+                {{ formatValue((widgetData.sensors[0].max * thresholds.high) / 100) }} {{ widgetData.sensors[0].uom ||
+                '' }}
               </text>
 
               <!-- Marcador Máximo -->
@@ -174,6 +178,12 @@
       <ion-item>
         <ion-label color="primary" slot="start">Tipo:</ion-label>
         <ion-label slot="end"><strong>Nivel</strong></ion-label>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-toggle [checked]="copyWidgetData.borderFlag == 'Y'"
+          (ionChange)="copyWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">
+          Borde
+        </ion-toggle>
       </ion-item>
       <ion-item>
         <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id"

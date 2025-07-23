@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild, Input, OnChanges, SimpleChanges, EventEmitter, Output, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton,
+   IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle } from '@ionic/angular/standalone';
 import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, NgApexchartsModule, ApexXAxis, ApexPlotOptions, ApexTooltip, ChartComponent } from "ng-apexcharts";
 import { FormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
@@ -34,7 +35,7 @@ export type ChartOptions = {
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput,
-    IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton],
+    IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton, IonToggle],
 })
 export class HeatmapComponent implements OnInit {
   @ViewChild("heatmapChart", { static: false }) chart: ChartComponent | undefined;
@@ -297,6 +298,7 @@ export class HeatmapComponent implements OnInit {
       user_id: 1,
       color: this.copyWidgetData.color,
       updated_by: 1,
+      border_flag: this.copyWidgetData.borderFlag,
       parameters: {
         rules: this.copyWidgetData.rules,
         widgetType: this.copyWidgetData.widgetType,

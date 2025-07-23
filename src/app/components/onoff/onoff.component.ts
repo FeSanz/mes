@@ -1,7 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
+import {
+  IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader,
+  IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonToggle
+} from '@ionic/angular/standalone';
 import { NgxColorsModule } from 'ngx-colors';
 import { addIcons } from 'ionicons';
 import { ellipsisVertical, pencilOutline, trashOutline, checkmark, moveOutline } from 'ionicons/icons';
@@ -20,7 +23,7 @@ export interface OnOffData {
   styleUrls: ['./onoff.component.scss'],
   standalone: true,
   imports: [FormsModule, CommonModule, NgxColorsModule, IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption,
-    IonModal, IonInput, CdkDragHandle],
+    IonModal, IonInput, CdkDragHandle, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class OnoffComponent implements OnInit {
@@ -106,6 +109,7 @@ export class OnoffComponent implements OnInit {
       user_id: 1,
       color: this.copyWidgetData.color,
       updated_by: 1,
+      border_flag: this.copyWidgetData.borderFlag,
       parameters: {
         widgetType: this.copyWidgetData.widgetType,
         chartType: this.copyWidgetData.chartType,

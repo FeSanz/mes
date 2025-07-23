@@ -10,8 +10,8 @@ import { CredentialsService } from "./credentials.service";
 export class ApiService {
   private credentials: string = '';
   private urlFusion: string = '';
-  //private urlRender: string = 'http://localhost:3000/api';
-  private urlRender: string = 'https://iot-services-rd-ww45.onrender.com/api';
+  private urlRender: string = 'http://localhost:3000/api';
+  //private urlRender: string = 'https://iot-services-rd-ww45.onrender.com/api';
   offset: number = 0;
 
   constructor(public alerts: AlertsService, private credentialService: CredentialsService) {

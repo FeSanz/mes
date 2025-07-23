@@ -1,10 +1,12 @@
-<ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
+<ion-card [ngStyle]="widgetData.borderFlag == 'Y' ? {'border': '.2px solid ' + widgetData.color} : {}">
   <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
     <ion-card-title [ngStyle]="{'color': widgetTextColor}" slot="start">{{widgetData.name}} </ion-card-title>
-    <ion-text slot="end" *ngIf="isPaused" [ngStyle]="{'color': widgetTextColor}" >Desde: </ion-text>
-    <ion-datetime-button datetime="datetimeStart-${{data['dashboard_id']}}" slot="end" *ngIf="isPaused"></ion-datetime-button>
-    <ion-text slot="end" *ngIf="isPaused" [ngStyle]="{'color': widgetTextColor}" >hasta: </ion-text>
-    <ion-datetime-button datetime="datetimeEnd-${{data['dashboard_id']}}" slot="end" *ngIf="isPaused" (click)="UpdateNow()"></ion-datetime-button>
+    <ion-text slot="end" *ngIf="isPaused" [ngStyle]="{'color': widgetTextColor}">Desde: </ion-text>
+    <ion-datetime-button datetime="datetimeStart-${{data['dashboard_id']}}" slot="end"
+      *ngIf="isPaused"></ion-datetime-button>
+    <ion-text slot="end" *ngIf="isPaused" [ngStyle]="{'color': widgetTextColor}">hasta: </ion-text>
+    <ion-datetime-button datetime="datetimeEnd-${{data['dashboard_id']}}" slot="end" *ngIf="isPaused"
+      (click)="UpdateNow()"></ion-datetime-button>
     <ion-select slot="end" [(ngModel)]="widgetData.dateRange" placeholder="Seleccionar período"
       (ionChange)="changeOnTimeRange($event)" interface="popover"
       [ngStyle]="{ 'color': widgetTextColor, 'font-weight': 'bold' }">
@@ -46,18 +48,18 @@
 </ion-popover>
 <ion-modal [keepContentsMounted]="true">
   <ng-template>
-    <ion-datetime id="datetimeStart-${{data['dashboard_id']}}" [(ngModel)]="customStartDate" (ionChange)="onStartDateChange($event)" locale="es-MX"
-      hourCycle="h12" presentation="date-time" [max]="customEndDate" show-default-buttons="true" cancel-text="Cancelar"
-      done-text="Confirmar">
+    <ion-datetime id="datetimeStart-${{data['dashboard_id']}}" [(ngModel)]="customStartDate"
+      (ionChange)="onStartDateChange($event)" locale="es-MX" hourCycle="h12" presentation="date-time"
+      [max]="customEndDate" show-default-buttons="true" cancel-text="Cancelar" done-text="Confirmar">
       <span slot="title">Fecha inicial</span>
     </ion-datetime>
   </ng-template>
 </ion-modal>
 <ion-modal [keepContentsMounted]="true">
   <ng-template>
-    <ion-datetime id="datetimeEnd-${{data['dashboard_id']}}" [(ngModel)]="customEndDate" (ionChange)="onEndDateChange($event)" locale="es-MX"
-      hourCycle="h12" presentation="date-time" [min]="customStartDate"  [max]="nowDate"  show-default-buttons="true"
-      cancel-text="Cancelar" done-text="Confirmar">
+    <ion-datetime id="datetimeEnd-${{data['dashboard_id']}}" [(ngModel)]="customEndDate"
+      (ionChange)="onEndDateChange($event)" locale="es-MX" hourCycle="h12" presentation="date-time"
+      [min]="customStartDate" [max]="nowDate" show-default-buttons="true" cancel-text="Cancelar" done-text="Confirmar">
       <span slot="title">Fecha final</span>
     </ion-datetime>
   </ng-template>
@@ -90,6 +92,12 @@
           <ion-select-option value="line">Lineas</ion-select-option>
           <ion-select-option value="bar">Barras</ion-select-option>
         </ion-select>
+      </ion-item>
+      <ion-item lines="none">
+        <ion-toggle [checked]="copyWidgetData.borderFlag == 'Y'"
+          (ionChange)="copyWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">
+          Borde
+        </ion-toggle>
       </ion-item>
       <ion-item-sliding *ngFor="let sensor of copyWidgetData.sensors; let i = index">
         <ion-item>
