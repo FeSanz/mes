@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild, Input, OnChanges, SimpleChanges, EventEmitter, Output, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
-import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, NgApexchartsModule, ApexXAxis, ApexYAxis, ApexPlotOptions, ApexTooltip, ChartComponent } from "ng-apexcharts";
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton } from '@ionic/angular/standalone';
+import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, NgApexchartsModule, ApexXAxis, ApexPlotOptions, ApexTooltip, ChartComponent } from "ng-apexcharts";
 import { FormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
@@ -33,8 +33,8 @@ export type ChartOptions = {
   styleUrls: ['./heatmap.component.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput, IonItemSliding, IonItemOptions, IonItemOption,
-    IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle],
+  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput,
+    IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton],
 })
 export class HeatmapComponent implements OnInit {
   @ViewChild("heatmapChart", { static: false }) chart: ChartComponent | undefined;
@@ -117,8 +117,9 @@ export class HeatmapComponent implements OnInit {
       );
       const series = this.generateHeatmapMatrix(response.items[0].data);
       this.chartOptions.series = series
+      //console.log(this.chartOptions.series);
       this.startSubscriptions()
-      this.ajustarColorScale()
+      this.adjustColorScale()
       if (this.chart && this.chart.updateOptions) {
         this.chart.updateOptions(this.chartOptions);
       }
@@ -126,22 +127,6 @@ export class HeatmapComponent implements OnInit {
     } catch (error) {
       console.error('Error al cargar datos de sensores:', error);
     }
-  }
-  generateData(count: any, yrange: any) {
-    var i = 0;
-    var series = [];
-    while (i < count) {
-      var x = "w" + (i + 1).toString();
-      var y =
-        Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
-
-      series.push({
-        x: x,
-        y: y
-      });
-      i++;
-    }
-    return series;
   }
   generateHeatmapMatrix(data: { value: string, time: string }[]) {
     const grouped: { [day: string]: { [hour: number]: number[] } } = {};
@@ -161,82 +146,95 @@ export class HeatmapComponent implements OnInit {
       }
       grouped[day][hour].push(val);
     });
-
     const series: any = [];
     const days = Object.keys(grouped).sort();
-
     for (const day of days) {
       const row: { x: string, y: number }[] = [];
-
       for (let hour = 0; hour < 24; hour++) {
         const hourLabel = `${hour.toString().padStart(2, '0')}:00`;
         const values = grouped[day][hour] || [];
         const avg = values.length > 0
-          ? values.reduce((sum, v) => sum + v, 0) / values.length
-          : 0;
-
+          ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
         row.push({ x: hourLabel, y: parseFloat(avg.toFixed(2)) });
       }
-
       series.push({
         name: day,
         data: row
       });
     }
-
     return series;
   }
 
   startSubscriptions() {
     this.ws.SuscribeById({ sensor_id: this.widgetData.sensors[0].sensor_id }, "sensor", (response) => {
-      const lastValue = response.data.value
+      this.updateHeatmapWithNewData(response.data.value, response.data.time)
       //this.lastDate = response.data.time
       //this.updateHeatmapSafe({ value: lastValue, time: response.data.time });
-      this.ajustarColorScale();
+      this.adjustColorScale();
     }).then((ws) => {
     }).catch(err => {
       console.log(err);
     });
   }
-  updateHeatmapSafe(newEntry: { value: string, time: string }) {
-    const date = new Date(newEntry.time);
+  updateHeatmapWithNewData(newValue: string, newTime: string) {
+    const date = new Date(newTime);
+    const day = date.getFullYear() + "-" +
+      (date.getMonth() + 1).toString().padStart(2, '0') + "-" +
+      date.getDate().toString().padStart(2, '0');
+    const hour = date.getHours();
+    const hourLabel = `${hour.toString().padStart(2, '0')}:00`;
+    const val = parseFloat(newValue);
 
-    const day = date.getUTCFullYear() + '-' +
-      String(date.getUTCMonth() + 1).padStart(2, '0') + '-' +
-      String(date.getUTCDate()).padStart(2, '0');
-    const hour = date.getUTCHours();
-    const val = parseFloat(newEntry.value);
-
-    // Buscar serie del día
+    // Buscar si ya existe la serie (día) en el mapa de calor
     let daySeriesIndex = this.chartOptions.series.findIndex((series: any) => series.name === day);
 
     if (daySeriesIndex === -1) {
-      // Crear nueva serie
-      const newDaySeries = {
-        name: day,
-        data: Array.from({ length: 24 }, (_, h) => ({
-          x: `${h.toString().padStart(2, '0')}:00`,
-          y: h === hour ? val : 0
-        }))
-      };
+      // Si el día no existe, crear una nueva serie con todas las 24 horas
+      const newRow: { x: string, y: number }[] = [];
 
-      // Insertar en orden
-      const insertIndex = this.chartOptions.series.findIndex((series: any) => series.name > day);
-      if (insertIndex === -1) {
-        this.chartOptions.series.push(newDaySeries);
-      } else {
-        this.chartOptions.series.splice(insertIndex, 0, newDaySeries);
+      for (let h = 0; h < 24; h++) {
+        const hLabel = `${h.toString().padStart(2, '0')}:00`;
+        // Si es la hora del nuevo dato, usar el valor, sino 0
+        const value = h === hour ? val : 0;
+        newRow.push({ x: hLabel, y: parseFloat(value.toFixed(2)) });
       }
+
+      // Agregar la nueva serie
+      this.chartOptions.series.push({
+        name: day,
+        data: newRow
+      });
+
+      // Ordenar las series por fecha
+      this.chartOptions.series.sort((a: any, b: any) => a.name.localeCompare(b.name));
+
     } else {
-      // Actualizar hora específica de forma segura
-      this.chartOptions.series[daySeriesIndex].data[hour] = {
-        x: `${hour.toString().padStart(2, '0')}:00`,
-        y: val
-      };
+      // Si el día existe, actualizar el promedio para esa hora
+      const daySeries: any = this.chartOptions.series[daySeriesIndex];
+      const hourIndex = daySeries.data.findIndex((item: any) => item.x === hourLabel);
+
+      if (hourIndex !== -1) {
+        const currentValue = daySeries.data[hourIndex].y;
+
+        // Si el valor actual es 0, significa que es el primer dato para esa hora
+        if (currentValue === 0) {
+          daySeries.data[hourIndex].y = parseFloat(val.toFixed(2));
+        } else {
+          // Necesitamos calcular cuántos valores ya hay para hacer el promedio correcto
+          // Como solo tenemos el promedio actual, tendremos que usar una aproximación
+          // o mantener un contador de valores por hora
+
+          // Opción 1: Promedio simple (asume que solo hay 1 valor previo)
+          const newAverage = (currentValue + val) / 2;
+          daySeries.data[hourIndex].y = parseFloat(newAverage.toFixed(2));
+        }
+      }
     }
+
+    return this.chartOptions.series;
   }
-//CORREGIR
-  ajustarColorScale() {
+  //CORREGIR
+  adjustColorScale() {
     const allValues: number[] = [];
 
     this.chartOptions.series.forEach((serie: any) => {
@@ -473,7 +471,7 @@ export class HeatmapComponent implements OnInit {
   }
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['refreshData'] && changes['refreshData'].currentValue === true) {
-      this.ajustarColorScale();
+      this.adjustColorScale();
     }
   }
 }

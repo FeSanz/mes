@@ -49,9 +49,7 @@ export class NumericComponent implements OnInit {
     this.initializeConfig();
   }
   private initializeConfig() {
-    this.widgetData = this.data
-    console.log(this.widgetData);
-    
+    this.widgetData = this.data    
     this.GetSensorValue()
   }
   GetSensorValue() {

@@ -96,29 +96,37 @@ ion-select::part(label) {
 }
 
 .resize-handle-right {
-    top: 0;
-    right: 12px;
-    bottom: 0;
-    width: 6px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 13.5px;
+    height: 90%;
+    width: 4px;
     cursor: col-resize;
-    background: linear-gradient(to right, transparent 2px, var(--ion-color-primary) 2px, var(--ion-color-primary) 4px, transparent 4px);
+    background-color: transparent;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px var(--ion-color-secondary);
     opacity: 0;
-    transition: opacity 0.2s;
+    transition:
+        opacity 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .resizable-col:hover .resize-handle-right {
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .resize-handle-right:hover {
     opacity: 1 !important;
-    background: var(--ion-color-primary);
+    background-color: var(--ion-color-secondary);
+    box-shadow: 0 0 4px var(--ion-color-secondary);
 }
 
 /* Cuando se está redimensionando */
 .resize-ghost-element {
-    background: rgba(var(--ion-color-primary-rgb), 0.1);
-    border: 2px dashed var(--ion-color-primary);
+    background: rgba(var(--ion-color-secondary-rgb), 0.1);
+    border: 2px dashed var(--ion-color-secondary);
     pointer-events: none;
 }
 
@@ -139,48 +147,48 @@ ion-select::part(label) {
 }
 
 .add-widget-card {
-  border: 2px dashed var(--ion-color-primary);
-  transition: transform 0.2s ease;
-  transition: transform 0.2s ease;
-  --background: var(--ion-color-back-shade, #fff);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
+    border: 2px dashed var(--ion-color-primary);
+    transition: transform 0.2s ease;
+    transition: transform 0.2s ease;
+    --background: var(--ion-color-back-shade, #fff);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 
-  &:hover {
-    transform: scale(1.008);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  }
+    &:hover {
+        transform: scale(1.008);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
 
-  ion-card-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 450px; // Ajusta según tu diseño
-  }
+    ion-card-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 450px; // Ajusta según tu diseño
+    }
 
-  .add-widget-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 12px;
-  }
+    .add-widget-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
 
 
-  .add-icon {
-    font-size: 48px;
-    color: var(--ion-color-secondary);
-  }
+    .add-icon {
+        font-size: 48px;
+        color: var(--ion-color-secondary);
+    }
 
-  .add-text h2 {
-    margin: 0;
-    font-size: 24px;
-    color: var(--ion-color-secondary);
-  }
+    .add-text h2 {
+        margin: 0;
+        font-size: 24px;
+        color: var(--ion-color-secondary);
+    }
 
-  .add-text p {
-    margin: 0;
-    font-size: 18px;
-  }
+    .add-text p {
+        margin: 0;
+        font-size: 18px;
+    }
 }

@@ -154,7 +154,6 @@ export class MonitoringPage implements OnInit {
           color: item.color,
         }
       }));
-      console.log(this.widgets);
 
       setTimeout(() => {
         this.simulateResizeForAllWidgets();
@@ -239,7 +238,7 @@ export class MonitoringPage implements OnInit {
       "color": this.newWidgetData.color,
       "index": Number(this.widgets.length) + 1,
       "name": this.newWidgetData.name,
-      "dateRange": 'today',
+      "dateRange": 'last7days',
       "dashboard_group_id": this.dashboardData.dashboard_group_id,
       "parameters": {
         "widgetType": this.newWidgetData.widgetType,
@@ -315,9 +314,7 @@ export class MonitoringPage implements OnInit {
   }
   ChangeSensor(sensor: any) {
     const selectedSensor = this.getSensorsForMachine(sensor.machine_id).find((s: any) => s.sensor_id === sensor.sensor_id);
-    sensor.sensor_name = selectedSensor.sensor_name;
-    console.log(selectedSensor.sensor_name);
-    
+    sensor.sensor_name = selectedSensor.sensor_name;    
   }
   async removeWidget(id: number) {//Eliminar widget
     if (await this.alerts.ShowAlert("¿Deseas eliminar este dashboard?", "Alerta", "Atrás", "Eliminar")) {
