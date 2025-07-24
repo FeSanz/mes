@@ -23,7 +23,7 @@
       <ion-icon name="server-outline"></ion-icon>
       <span>Recursos DB</span>
     </div>
-    <p-table #dtDB [value]="dbData.items" [(selection)]="selectedItemsDB" dataKey="Code" styleClass="card-table-primeng"
+    <p-table #dtDB [value]="dbData.items" dataKey="Code" styleClass="card-table-primeng"
       [tableStyle]="{ 'min-width': '50rem'}" [size]="'small'" [rowHover]="true" [rows]="rowsPerPage"
       [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions" [paginator]="true"
       currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos" [filterDelay]="0"
@@ -46,9 +46,6 @@
 
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 4rem">
-            <p-tableHeaderCheckbox />
-          </th>
           <th pSortableColumn="Code" style="min-width: 10rem">
             <div class="flex justify-between items-center">
               Código
@@ -74,9 +71,6 @@
       </ng-template>
       <ng-template pTemplate="body" let-item>
         <tr>
-          <td>
-            <p-tableCheckbox [value]="item" />
-          </td>
           <td>{{ item.Code }}</td>
           <td>{{ item.Name }}</td>
           <td>{{ item.Class }}</td>
