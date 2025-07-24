@@ -1,0 +1,135 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Máquinas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="region-container">
+    <div class="card-select flex flex-wrap justify-center items-end gap-4">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
+          [options]="dbOrganizations.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
+          placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
+          [virtualScrollItemSize]="38" (onChange)="OnOrganizationSelected()" />
+        <label for="organization_select">Organización</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="region-header" style="background-color: #00bf9a">
+      <ion-icon name="server-outline"></ion-icon>
+      <span>Recursos DB</span>
+    </div>
+    <p-table #dtDB [value]="dbData.items" [(selection)]="selectedItemsDB" dataKey="Code" styleClass="card-table-primeng"
+      [tableStyle]="{ 'min-width': '50rem'}" [size]="'small'" [rowHover]="true" [rows]="rowsPerPage"
+      [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions" [paginator]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos" [filterDelay]="0"
+      [globalFilterFields]="['Code', 'Name', 'Location']" stripedRows [scrollable]="true"
+      [scrollHeight]="GetScrollHeight()" [alwaysShowPaginator]="true">
+      <ng-template pTemplate="caption">
+        <div class="table-caption">
+
+          <div></div> <!-- Spacer -->
+
+          <p-iconField iconPosition="left">
+            <p-inputIcon>
+              <i class="pi pi-search"></i>
+            </p-inputIcon>
+            <input pInputText type="text" [(ngModel)]="searchValueDB" (input)="OnFilterGlobal($event, dtDB)"
+              placeholder="Buscar" style="width: 250px;" />
+          </p-iconField>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem">
+            <p-tableHeaderCheckbox />
+          </th>
+          <th pSortableColumn="Code" style="min-width: 10rem">
+            <div class="flex justify-between items-center">
+              Código
+              <p-sortIcon field="Code" />
+              <p-columnFilter type="text" field="Code" display="menu" class="ml-auto" />
+            </div>
+          </th>
+          <th pSortableColumn="Name" style="min-width: 14rem">
+            <div class="flex justify-between items-center">
+              Nombre
+              <p-sortIcon field="Name" />
+              <p-columnFilter type="text" field="Name" display="menu" class="ml-auto" />
+            </div>
+          </th>
+          <th pSortableColumn="Class" style="min-width: 10rem">
+            <div class="flex justify-between items-center">
+              Clase
+              <p-sortIcon field="Class" />
+              <p-columnFilter field="Class" matchMode="equals" display="menu" class="ml-auto" />
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="item" />
+          </td>
+          <td>{{ item.Code }}</td>
+          <td>{{ item.Name }}</td>
+          <td>{{ item.Class }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5">No se encontraron organizaciones.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Agregar nueva máquina</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="isModalOpen = false;">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content>
+        <ion-item>
+          <ion-input placeholder="Código" [(ngModel)]="resource.Code" name="code" required>
+            <div slot="label"><ion-text color="primary">Código:</ion-text></div>
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input placeholder="Nombre" [(ngModel)]="resource.Name" name="name" required>
+            <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+          </ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input placeholder="Clase" [(ngModel)]="resource.Class" name="class" required>
+            <div slot="label"><ion-text color="primary">Clase:</ion-text></div>
+          </ion-input>
+        </ion-item>
+
+        <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+          <ion-fab-button (click)="AddNewResource()" color="success">
+            <ion-icon name="checkmark-outline"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="permissions.isSuperAdmin()">
+    <ion-fab-button (click)="OpenAsNewResource()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

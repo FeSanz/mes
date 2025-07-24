@@ -65,11 +65,11 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./login/login.page').then( m => m.LoginPage)
   },
-  {
-    path: 'settings/user',
-    loadComponent: () => import('./settings/user/user.page').then( m => m.UserPage),
-    canActivate: [AuthGuard]
-  },
+  // {
+  //   path: 'settings/user',
+  //   loadComponent: () => import('./settings/user/user.page').then( m => m.UserPage),
+  //   canActivate: [AuthGuard]
+  // },
   {
     path: 'fusion_production',
     loadComponent: () => import('./integrations/fusion/monitoring/production/production.page').then( m => m.ProductionPage)
@@ -77,5 +77,10 @@ export const routes: Routes = [
   {
     path: 'alerts',
     loadComponent: () => import('./integrations/modules/alerts/alerts.page').then( m => m.AlertsPage)
+  },
+  {
+    path: 'settings/machines',
+    loadComponent: () => import('./settings/machines/machines.page').then( m => m.MachinesPage),
+    canActivate: [AuthGuard]
   }
 ];
