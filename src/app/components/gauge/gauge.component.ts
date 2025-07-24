@@ -1,4 +1,3 @@
-// src/app/components/gauge/humidity-gauge.component.ts
 import { Component, Input, OnInit, EventEmitter, Output, ChangeDetectorRef, LOCALE_ID, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { trigger, style, transition, animate } from '@angular/animations';
@@ -7,10 +6,11 @@ import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, moveOutline, pencilOutline, trashOutline } from 'ionicons/icons';
+import { ellipsisVertical, moveOutline, pencilOutline, trashOutline, checkmark } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, 
+  IonSelectOption, IonModal, IonInput, IonToggle } from '@ionic/angular/standalone';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 
 export interface GaugeData {
@@ -23,7 +23,7 @@ export interface GaugeData {
   styleUrls: ['./gauge.component.scss'],
   standalone: true,
   imports: [FormsModule, CommonModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect,
-    IonSelectOption, IonModal, IonInput, CdkDragHandle],
+    IonSelectOption, IonModal, IonInput, CdkDragHandle, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
     { provide: LOCALE_ID, useValue: 'en-US' }
@@ -47,10 +47,14 @@ export class GaugeComponent implements OnInit {
     private changeDetector: ChangeDetectorRef,
     private ws: WebSocketService,
     private api: ApiService) {
-    addIcons({ ellipsisVertical, pencilOutline, trashOutline, moveOutline })
+    addIcons({moveOutline,ellipsisVertical,pencilOutline,trashOutline,checkmark});
   }
   ngOnInit() {
     this.initializeConfig();
+  }
+  private initializeConfig() {
+    this.widgetData = this.data
+    this.GetSensorValue()
   }
   GetSensorValue() {
     this.api.GetRequestRender('sensorData/' + this.widgetData.sensors[0].sensor_id, false).then((response: any) => {
@@ -91,13 +95,14 @@ export class GaugeComponent implements OnInit {
       user_id: 1,
       color: this.copyWidgetData.color,
       updated_by: 1,
+      border_flag: this.copyWidgetData.borderFlag,
       parameters: {
         widgetType: this.copyWidgetData.widgetType,
         chartType: this.copyWidgetData.chartType,
         sensors: this.copyWidgetData.sensors,
       }
     }
-    console.log(body);
+    //console.log(body);
     this.showChart = false;
     this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
       //console.log(response);
@@ -112,10 +117,6 @@ export class GaugeComponent implements OnInit {
   getSensorsForMachine(MachineId: number) {
     const machine: any = this.machines.find((m: any) => m.machine_id == MachineId);
     return machine ? machine.sensors : [];
-  }
-  private initializeConfig() {
-    this.widgetData = this.data
-    this.GetSensorValue()
   }
   // ✅ MÉTODO MEJORADO PARA ACTUALIZACIÓN DE COLOR
   private updateCurrentColor() {

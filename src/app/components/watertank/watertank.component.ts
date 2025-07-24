@@ -1,7 +1,10 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges, CUSTOM_ELEMENTS_SCHEMA, LOCALE_ID, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { BehaviorSubject, Observable, interval, Subscription } from 'rxjs';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonSelect, IonSelectOption, IonModal, IonInput } from '@ionic/angular/standalone';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton,
+  IonSelect, IonSelectOption, IonModal, IonInput, IonToggle
+} from '@ionic/angular/standalone';
 import { NgxColorsModule } from 'ngx-colors';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
@@ -21,7 +24,7 @@ export interface ThermoData {
   styleUrls: ['./watertank.component.scss'],
   standalone: true,
   imports: [FormsModule, CommonModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect,
-    IonSelectOption, IonModal, IonInput, CdkDragHandle],
+    IonSelectOption, IonModal, IonInput, CdkDragHandle, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [
     { provide: LOCALE_ID, useValue: 'en-US' }
@@ -165,7 +168,7 @@ export class WaterTankComponent implements OnInit {
     })
   }
   startSubscriptions() {
-    this.ws.SuscribeById({sensor_id : this.widgetData.sensors[0].sensor_id}, "sensor",  (response) => {
+    this.ws.SuscribeById({ sensor_id: this.widgetData.sensors[0].sensor_id }, "sensor", (response) => {
       const lastValue = response.data.value
       this.lastDate = response.data.time
       this.updateWaterLevel(lastValue);
@@ -199,6 +202,7 @@ export class WaterTankComponent implements OnInit {
       name: this.copyWidgetData.name,
       user_id: 1,
       color: this.copyWidgetData.color,
+      border_flag: this.copyWidgetData.borderFlag,
       updated_by: 1,
       parameters: {
         widgetType: this.copyWidgetData.widgetType,

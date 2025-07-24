@@ -1,4 +1,4 @@
-<ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
+<ion-card [ngStyle]="widgetData.borderFlag == 'Y' ? {'border': '.2px solid ' + widgetData.color} : {}">
   <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
     <ion-buttons slot="end">
       <ion-button title="Mover" cdkDragHandle class="drag-handle">
@@ -51,7 +51,7 @@
             </text>
             <text x="180" y="165" text-anchor="middle" [attr.fill]="currentColor" font-size="28" font-weight="bold"
               class="gauge-value">
-              {{ (currentValue$ | async) ?? 0 | number:'1.1-1' }}%
+              {{ (currentValue$ | async) ?? 0 | number:'1.1-1' }} {{ widgetData.sensors[0].uom || '' }}
             </text>
           </svg>
         </div>
@@ -99,6 +99,12 @@
         <ion-label color="primary" slot="start">Tipo:</ion-label>
         <ion-label slot="end"><strong>Gauge</strong></ion-label>
       </ion-item>
+      <ion-item lines="none">
+        <ion-toggle [checked]="copyWidgetData.borderFlag == 'Y'"
+          (ionChange)="copyWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">
+          Borde
+        </ion-toggle>
+      </ion-item>
       <ion-item>
         <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id"
           label-placement="floating" interface="popover">
@@ -113,6 +119,9 @@
             {{ s.sensor_name }}
           </ion-select-option>
         </ion-select>
+        <ion-input type="text" placeholder="UoM" [(ngModel)]="copyWidgetData.sensors[0].uom"
+          style="text-align: right; max-width: 80px;">
+        </ion-input>
       </ion-item>
       <ion-item>
         <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].min" style="text-align: right;">

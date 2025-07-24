@@ -3,7 +3,7 @@ import { Component, OnInit, OnChanges, SimpleChanges, ViewChild, Input, ChangeDe
 import { NgModel } from '@angular/forms';
 import {
   IonCard, IonCardHeader, IonText, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader,
-  IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton
+  IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle
 } from '@ionic/angular/standalone';
 import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexDataLabels, ApexTooltip, ApexStroke, NgApexchartsModule, ChartType, ChartComponent } from "ng-apexcharts";
 import { NgxColorsModule } from 'ngx-colors';
@@ -39,7 +39,7 @@ export type ChartOptions = {
   styleUrls: ['./charts.component.scss'],
   standalone: true,
   imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput,
-    IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton],
+    IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class ChartsComponent implements OnInit {
@@ -167,7 +167,7 @@ export class ChartsComponent implements OnInit {
       this.chartOptions.series = data;
       this.ajustarYaxis();
       if (this.chart && this.chart.updateOptions) {
-        console.log("UPDATE chart");
+        //console.log("UPDATE chart");
         this.chart.updateOptions(this.chartOptions);
       }
       this.startSubscriptions();
@@ -268,7 +268,7 @@ export class ChartsComponent implements OnInit {
     }
     sensores.forEach((sensor: any) => {
       const sensor_id = sensor.sensor_id;
-      this.ws.SuscribeById({sensor_id}, "sensor", (data) => {
+      this.ws.SuscribeById({ sensor_id }, "sensor", (data) => {
         if (this.isPaused) return;
         const timestamp = new Date(data.data.time).getTime();
         const { start } = this.getDateRangeFromOption(this.widgetData.dateRange);
@@ -293,7 +293,7 @@ export class ChartsComponent implements OnInit {
     for (const sensorId in this.conexionesLocales) {
       const ws = this.conexionesLocales[sensorId];
       if (ws && ws.readyState === WebSocket.OPEN) {
-        console.log("unsuscribed");
+        //console.log("unsuscribed");
         ws.send(JSON.stringify({ type: 'unsuscribe', sensor_id: sensorId }));
         ws.close();
       }
@@ -339,6 +339,7 @@ export class ChartsComponent implements OnInit {
       user_id: 1,
       color: this.copyWidgetData.color,
       updated_by: 1,
+      border_flag: this.copyWidgetData.borderFlag,
       parameters: {
         widgetType: this.copyWidgetData.widgetType,
         selectedTimeRange: this.copyWidgetData.selectedTimeRange,

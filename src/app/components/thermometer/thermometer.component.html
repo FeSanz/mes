@@ -1,4 +1,4 @@
-<ion-card [ngStyle]="{'border': '.2px solid'+ widgetData.color}">
+<ion-card [ngStyle]="widgetData.borderFlag == 'Y' ? {'border': '.2px solid ' + widgetData.color} : {}">
   <ion-toolbar [ngStyle]="{'--background': widgetData.color}">
     <ion-buttons slot="end">
       <ion-button title="Mover" cdkDragHandle class="drag-handle">
@@ -30,11 +30,11 @@
             <ng-container *ngIf="getZeroPosition() as zeroY">
               <line x1="50" [attr.y1]="zeroY" x2="25" [attr.y2]="zeroY" stroke="#00BFFF" stroke-width="3" />
               <text x="22" [attr.y]="zeroY + 5" fill="#00BFFF" font-size="12" text-anchor="end" font-weight="bold">
-                0°C
+                0 {{ widgetData.sensors[0].uom || '' }}
               </text>
               <line x1="90" [attr.y1]="zeroY" x2="115" [attr.y2]="zeroY" stroke="#00BFFF" stroke-width="3" />
               <text x="118" [attr.y]="zeroY + 5" fill="#00BFFF" font-size="12" text-anchor="start" font-weight="bold">
-                0°C
+                0 {{ widgetData.sensors[0].uom || '' }}
               </text>
             </ng-container>
 
@@ -42,11 +42,11 @@
             <ng-container>
               <line x1="50" y1="50" x2="35" y2="50" [attr.stroke]="'var(--thermometer-primary)'" stroke-width="2" />
               <text x="32" y="55" fill="#DAA520" font-size="11" text-anchor="end" font-weight="bold">
-                {{ widgetData.sensors[0].max }}°C
+                {{ widgetData.sensors[0].max }} {{ widgetData.sensors[0].uom || '' }}
               </text>
               <line x1="90" y1="50" x2="105" y2="50" [attr.stroke]="'var(--thermometer-primary)'" stroke-width="2" />
               <text x="108" y="55" fill="#DAA520" font-size="11" text-anchor="start" font-weight="bold">
-                {{ widgetData.sensors[0].max }}°C
+                {{ widgetData.sensors[0].max }} {{ widgetData.sensors[0].uom || '' }}
               </text>
             </ng-container>
 
@@ -54,12 +54,12 @@
             <ng-container>
               <line x1="50" y1="106" x2="35" y2="106" [attr.stroke]="'var(--thermometer-primary)'" stroke-width="1.5" />
               <text x="32" y="111" fill="#DAA520" font-size="10" text-anchor="end">
-                {{ getPercentageFromValue(80) }}°C
+                {{ getPercentageFromValue(80) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
               <line x1="90" y1="106" x2="105" y2="106" [attr.stroke]="'var(--thermometer-primary)'"
                 stroke-width="1.5" />
               <text x="108" y="111" fill="#DAA520" font-size="10" text-anchor="start">
-                {{ getPercentageFromValue(80) }}°C
+                {{ getPercentageFromValue(80) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
             </ng-container>
 
@@ -67,12 +67,12 @@
             <ng-container>
               <line x1="50" y1="162" x2="35" y2="162" [attr.stroke]="'var(--thermometer-primary)'" stroke-width="1.5" />
               <text x="32" y="167" fill="#DAA520" font-size="10" text-anchor="end">
-                {{ getPercentageFromValue(60) }}°C
+                {{ getPercentageFromValue(60) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
               <line x1="90" y1="162" x2="105" y2="162" [attr.stroke]="'var(--thermometer-primary)'"
                 stroke-width="1.5" />
               <text x="108" y="167" fill="#DAA520" font-size="10" text-anchor="start">
-                {{ getPercentageFromValue(60) }}°C
+                {{ getPercentageFromValue(60) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
             </ng-container>
 
@@ -80,12 +80,12 @@
             <ng-container>
               <line x1="50" y1="218" x2="35" y2="218" [attr.stroke]="'var(--thermometer-primary)'" stroke-width="1.5" />
               <text x="32" y="223" fill="#DAA520" font-size="10" text-anchor="end">
-                {{ getPercentageFromValue(40) }}°C
+                {{ getPercentageFromValue(40) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
               <line x1="90" y1="218" x2="105" y2="218" [attr.stroke]="'var(--thermometer-primary)'"
                 stroke-width="1.5" />
               <text x="108" y="223" fill="#DAA520" font-size="10" text-anchor="start">
-                {{ getPercentageFromValue(40) }}°C
+                {{ getPercentageFromValue(40) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
             </ng-container>
 
@@ -93,12 +93,12 @@
             <ng-container>
               <line x1="50" y1="274" x2="35" y2="274" [attr.stroke]="'var(--thermometer-primary)'" stroke-width="1.5" />
               <text x="32" y="279" fill="#DAA520" font-size="10" text-anchor="end">
-                {{ getPercentageFromValue(20) }}°C
+                {{ getPercentageFromValue(20) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
               <line x1="90" y1="274" x2="105" y2="274" [attr.stroke]="'var(--thermometer-primary)'"
                 stroke-width="1.5" />
               <text x="108" y="279" fill="#DAA520" font-size="10" text-anchor="start">
-                {{ getPercentageFromValue(20) }}°C
+                {{ getPercentageFromValue(20) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
             </ng-container>
 
@@ -106,11 +106,11 @@
             <ng-container *ngIf="!isZeroAtPosition(0)">
               <line x1="50" y1="330" x2="35" y2="330" [attr.stroke]="'var(--thermometer-primary)'" stroke-width="2" />
               <text x="32" y="335" fill="#DAA520" font-size="11" text-anchor="end" font-weight="bold">
-                {{ getPercentageFromValue(0) }}°C
+                {{ getPercentageFromValue(0) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
               <line x1="90" y1="330" x2="105" y2="330" [attr.stroke]="'var(--thermometer-primary)'" stroke-width="2" />
               <text x="108" y="335" fill="#DAA520" font-size="11" text-anchor="start" font-weight="bold">
-                {{getPercentageFromValue(0) }}°C
+                {{getPercentageFromValue(0) }} {{ widgetData.sensors[0].uom || '' }}
               </text>
             </ng-container>
 
@@ -145,7 +145,7 @@
         <!-- Valor principal grande -->
         <span style="color: #ccc;">{{widgetData.sensors[0].sensor_name}}</span>
         <div class="temperature-value" [style.color]="getInterpolatedColor()">
-          {{ temperature$ | async | number : "1.1-1" }}°C
+          {{ temperature$ | async | number : "1.1-1" }} {{ widgetData.sensors[0].uom || '' }}
         </div>
         <ion-item lines="none" style="align-self: stretch" class="ion-text-center">
           <ion-label color="medium">
@@ -192,6 +192,12 @@
         <ion-label color="primary" slot="start">Tipo:</ion-label>
         <ion-label slot="end"><strong>Termómetro</strong></ion-label>
       </ion-item>
+      <ion-item lines="none">
+        <ion-toggle [checked]="copyWidgetData.borderFlag == 'Y'"
+          (ionChange)="copyWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">
+          Borde
+        </ion-toggle>
+      </ion-item>
       <ion-item>
         <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id"
           label-placement="floating" interface="popover">
@@ -206,6 +212,9 @@
             {{ s.sensor_name }}
           </ion-select-option>
         </ion-select>
+        <ion-input type="text" placeholder="UoM" [(ngModel)]="copyWidgetData.sensors[0].uom"
+          style="text-align: right; max-width: 80px;">
+        </ion-input>
       </ion-item>
       <ion-item>
         <ion-input type="text" placeholder="" [(ngModel)]="copyWidgetData.sensors[0].min" style="text-align: right;">

@@ -248,11 +248,11 @@ export class AppComponent {
   SaveLogin(user: any, username: any) {//login
     this.user = user
     this.username = username
-    console.log(this.user);
+    //console.log(this.user);
 
     const orgsIds = this.user?.Company?.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.api.GetRequestRender('dashboardsGroup/byOrganizations/?organizations=' + orgsIds, false).then((response: any) => {
-      console.log(response);
+      //console.log(response);
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {

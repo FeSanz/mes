@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, IonRippleEffect } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, IonRippleEffect, IonToggle } from '@ionic/angular/standalone';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
@@ -21,6 +21,7 @@ import { Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { ResizeEvent, ResizableModule } from 'angular-resizable-element';
+import { NumericComponent } from 'src/app/components/numeric/numeric.component';
 
 
 export interface SensorData {
@@ -42,8 +43,8 @@ export type ChartOptions = {
   styleUrls: ['./monitoring.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, CounterComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
-    IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule, IonRippleEffect]
+  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, CounterComponent, NumericComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
+    IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule, IonRippleEffect, IonToggle]
 })
 export class MonitoringPage implements OnInit {
   sensorData: SensorData[] = [];
@@ -52,6 +53,8 @@ export class MonitoringPage implements OnInit {
   newWidgetData: any = {
     name: "",
     color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
+    font_size: "100px",
+    enabledFlag: 'Y',
     sensors: [
       {
         machine_id: "",
@@ -59,6 +62,7 @@ export class MonitoringPage implements OnInit {
         sensor_id: "",
         color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
         min: 0,
+        uom: "",
         max: 100,
         minColor: '#ff8300',
         maxColor: '#198bfd'
@@ -145,12 +149,15 @@ export class MonitoringPage implements OnInit {
         jsonParams: {
           ...item.parameters,
           dateRange: item.date_range,
+          borderFlag: item.border_flag,
           dashboard_id: item.dashboard_id,
           organization_id: item.organization_id,
           name: item.name,
           color: item.color,
         }
       }));
+      console.log(this.widgets);
+
       setTimeout(() => {
         this.simulateResizeForAllWidgets();
       }, 100);
@@ -194,6 +201,7 @@ export class MonitoringPage implements OnInit {
       this.newWidgetData.name = "Widget " + (this.widgets.length + 1)
       this.newWidgetData.widgetType = "chart"
       this.newWidgetData.chartType = "area"
+      this.newWidgetData.borderFlag = "Y"
       this.newWidgetData.rules = [{
         from: 0,
         to: 100,
@@ -208,6 +216,7 @@ export class MonitoringPage implements OnInit {
         this.newWidgetData.name = "Widget " + (this.widgets.length + 1)
         this.newWidgetData.widgetType = "chart"
         this.newWidgetData.chartType = "area"
+        this.newWidgetData.borderFlag = "Y"
         this.newWidgetData.sensors[0].machine_id = this.machines[0].machine_id
         this.newWidgetData.sensors[0].sensor_id = this.machines[0].sensors[0].sensor_id
         this.newWidgetData.rules = [{
@@ -234,11 +243,13 @@ export class MonitoringPage implements OnInit {
       "color": this.newWidgetData.color,
       "index": Number(this.widgets.length) + 1,
       "name": this.newWidgetData.name,
-      "dateRange": 'today',
+      "border_flag": this.newWidgetData.borderFlag,
+      "dateRange": 'last7days',
       "dashboard_group_id": this.dashboardData.dashboard_group_id,
       "parameters": {
         "widgetType": this.newWidgetData.widgetType,
         "chartType": this.newWidgetData.chartType,
+        size: this.newWidgetData.font_size,
         ...(this.newWidgetData.widgetType == 'heatmap' ? { rules: this.newWidgetData.rules } : {}),
         "sensors": this.newWidgetData.sensors,
       },
@@ -281,6 +292,8 @@ export class MonitoringPage implements OnInit {
       this.GetDasboards()
       this.newWidgetData = {
         name: "",
+        size: "",
+        enabledFlag: 'Y',
         color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
         rules: [{
           min: 0,
@@ -295,6 +308,7 @@ export class MonitoringPage implements OnInit {
             color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
             min: 0,
             max: 100,
+            oum: "",
             minColor: '#ff8300',
             maxColor: '#198bfd'
           }
@@ -307,7 +321,7 @@ export class MonitoringPage implements OnInit {
   }
   ChangeSensor(sensor: any) {
     const selectedSensor = this.getSensorsForMachine(sensor.machine_id).find((s: any) => s.sensor_id === sensor.sensor_id);
-    sensor.sensor_name = selectedSensor?.sensor_name || '';
+    sensor.sensor_name = selectedSensor.sensor_name;
   }
   async removeWidget(id: number) {//Eliminar widget
     if (await this.alerts.ShowAlert("¿Deseas eliminar este dashboard?", "Alerta", "Atrás", "Eliminar")) {
@@ -326,7 +340,8 @@ export class MonitoringPage implements OnInit {
     this.newWidgetData.sensors.push({
       machine_id: "",
       sensor_name: "",
-      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+      color: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0'),
+      uom: ""
     })
   }
   async removeSensor(sensor: any) {

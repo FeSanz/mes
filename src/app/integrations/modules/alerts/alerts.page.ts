@@ -9,8 +9,8 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton,
   templateUrl: './alerts.page.html',
   styleUrls: ['./alerts.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
-    IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading]
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton,/* IonIcon, IonFab, IonFabButton,
+    IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading*/]
 })
 export class AlertsPage implements OnInit {
 
