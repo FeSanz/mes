@@ -545,3 +545,11 @@ ion-card-title {
     --thermometer-dark: #000000;
   }
 }
+
+::ng-deep .opened {
+  background: var(--ion-color-back) !important;
+}
+
+::ng-deep .opened button {
+  color: var(--ion-color-dark) !important;
+}

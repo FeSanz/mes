@@ -50,7 +50,7 @@
 }
 
 ion-card {
-  min-width: 250px;
+  min-width: 200px;
   //max-width: 320px;
   min-height: 450.5px;
   --background: var(--ion-color-back-shade, #fff);
@@ -86,4 +86,12 @@ ion-card-title {
 
 ion-select::part(label) {
   color: var(--ion-color-primary);
+}
+
+::ng-deep .opened {
+  background: var(--ion-color-back) !important;
+}
+
+::ng-deep .opened button {
+  color: var(--ion-color-dark) !important;
 }

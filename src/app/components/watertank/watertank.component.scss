@@ -56,7 +56,7 @@ ion-card-title {
   width: 100%;
   height: auto;
   max-width: 380px;
-  min-width: 320px;
+  min-width: 300px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -82,4 +82,12 @@ ion-card-title {
   transition: all 0.3s ease;
   text-align: center;
   line-height: 1;
+}
+
+::ng-deep .opened {
+  background: var(--ion-color-back) !important;
+}
+
+::ng-deep .opened button {
+  color: var(--ion-color-dark) !important;
 }

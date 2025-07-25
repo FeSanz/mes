@@ -6,7 +6,6 @@ import {
   IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle
 } from '@ionic/angular/standalone';
 import { NgxColorsModule } from 'ngx-colors';
-import { GaugeData } from '../gauge/gauge.component';
 import { addIcons } from 'ionicons';
 import { ellipsisVertical, pencilOutline, trashOutline, checkmark, moveOutline, refresh, reloadOutline } from 'ionicons/icons';
 import { ApiService } from 'src/app/services/api.service';
@@ -35,6 +34,7 @@ export class CounterComponent implements OnInit {
   showChart: boolean = true;
   machines: any = []
   lastValue = 0
+  show = false
   @Input() data: CounterData = {};
   @Output() remove = new EventEmitter<number>();
   countStr: number = 0

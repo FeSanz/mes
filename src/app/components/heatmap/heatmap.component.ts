@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild, Input, OnChanges, SimpleChanges, EventEmitter, Output, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton,
-   IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle } from '@ionic/angular/standalone';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton,
+  IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle
+} from '@ionic/angular/standalone';
 import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, NgApexchartsModule, ApexXAxis, ApexPlotOptions, ApexTooltip, ChartComponent } from "ng-apexcharts";
 import { FormsModule } from '@angular/forms';
 import { NgxColorsModule } from 'ngx-colors';
@@ -147,12 +149,22 @@ export class HeatmapComponent implements OnInit {
       }
       grouped[day][hour].push(val);
     });
+
     const series: any = [];
     const days = Object.keys(grouped).sort();
+
+    // Función helper para convertir hora 24h a 12h AM/PM
+    const formatHour = (hour: number): string => {
+      if (hour === 0) return "12 AM";
+      if (hour < 12) return `${hour} AM`;
+      if (hour === 12) return "12 PM";
+      return `${hour - 12} PM`;
+    };
+
     for (const day of days) {
       const row: { x: string, y: number }[] = [];
       for (let hour = 0; hour < 24; hour++) {
-        const hourLabel = `${hour.toString().padStart(2, '0')}:00`;
+        const hourLabel = formatHour(hour); // ← CAMBIO AQUÍ
         const values = grouped[day][hour] || [];
         const avg = values.length > 0
           ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
@@ -183,7 +195,16 @@ export class HeatmapComponent implements OnInit {
       (date.getMonth() + 1).toString().padStart(2, '0') + "-" +
       date.getDate().toString().padStart(2, '0');
     const hour = date.getHours();
-    const hourLabel = `${hour.toString().padStart(2, '0')}:00`;
+
+    // Usar la misma función formatHour para consistencia
+    const formatHour = (hour: number): string => {
+      if (hour === 0) return "12 AM";
+      if (hour < 12) return `${hour} AM`;
+      if (hour === 12) return "12 PM";
+      return `${hour - 12} PM`;
+    };
+
+    const hourLabel = formatHour(hour);
     const val = parseFloat(newValue);
 
     // Buscar si ya existe la serie (día) en el mapa de calor
@@ -194,7 +215,7 @@ export class HeatmapComponent implements OnInit {
       const newRow: { x: string, y: number }[] = [];
 
       for (let h = 0; h < 24; h++) {
-        const hLabel = `${h.toString().padStart(2, '0')}:00`;
+        const hLabel = formatHour(h); 
         // Si es la hora del nuevo dato, usar el valor, sino 0
         const value = h === hour ? val : 0;
         newRow.push({ x: hLabel, y: parseFloat(value.toFixed(2)) });

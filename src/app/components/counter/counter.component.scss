@@ -50,7 +50,7 @@
 }
 
 ion-card {
-  min-width: 250px;
+  min-width: 230px;
   //max-width: 320px;
   min-height: 450.5px;
   --background: var(--ion-color-back-shade, #fff);
@@ -93,12 +93,12 @@ ion-select::part(label) {
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
-  
+
   --font-xs: 0.7rem;
   --font-sm: 0.8rem;
   --font-md: 0.9rem;
   --font-lg: 1rem;
-  
+
   --digit-size: 4rem;
   --digit-width: 40px;
   --digit-height: 80px;
@@ -193,4 +193,12 @@ ion-select::part(label) {
   font-weight: 600;
   color: #ecf0f1;
   text-transform: uppercase;
+}
+
+::ng-deep .opened {
+  background: var(--ion-color-back) !important;
+}
+
+::ng-deep .opened button {
+  color: var(--ion-color-dark) !important;
 }

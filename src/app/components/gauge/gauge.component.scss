@@ -390,7 +390,7 @@ ion-card-title {
   }
 
   .humidity-svg-gauge.large {
-    min-width: 260px;
+    min-width: 250px;
   }
 
   .gauge-wrapper.large {
@@ -416,7 +416,7 @@ ion-card-title {
   }
 
   .humidity-svg-gauge.large {
-    min-width: 220px;
+    min-width: 210px;
   }
 
   .humidity-stats {
@@ -448,7 +448,7 @@ ion-card-title {
       .gauge-section {
         flex: 0 0 auto;
         width: auto;
-        min-width: 360px;
+        min-width: 350px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -457,7 +457,7 @@ ion-card-title {
       .info-section {
         flex: 0 0 auto;
         width: auto;
-        min-width: 200px;
+        min-width: 190px;
         max-width: 300px;
         justify-content: center;
         align-items: center;
@@ -476,11 +476,11 @@ ion-card-title {
     gap: 2.5rem;
 
     .gauge-section {
-      min-width: 380px;
+      min-width: 370px;
     }
 
     .info-section {
-      min-width: 250px;
+      min-width: 240px;
       max-width: 350px;
       gap: var(--spacing-lg);
     }
@@ -534,4 +534,12 @@ ion-card-title {
     --humidity-bg: rgba(255, 255, 255, 0.03);
     --humidity-border: rgba(74, 144, 226, 0.15);
   }
+}
+
+::ng-deep .opened {
+  background: var(--ion-color-back) !important;
+}
+
+::ng-deep .opened button {
+  color: var(--ion-color-dark) !important;
 }
