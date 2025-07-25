@@ -74,16 +74,19 @@ export class AppComponent {
     } catch (e) {
       this.user = {};
     }
+
     isLogged ? this.username = String(localStorage.getItem('user') || "No user") : "Inicie sesión"
     const theme = localStorage.getItem('theme');
+
     if (theme == null) {
       const prefersDark = window.matchMedia('(prefers-color-scheme: light)');
       this.darkMode = prefersDark.matches;
-      document.body.classList.toggle('dark', this.darkMode);
+      this.ApplyTheme(this.darkMode);
     } else {
       this.darkMode = theme == 'true' ? true : false;
-      document.body.classList.toggle('dark', this.darkMode);
+      this.ApplyTheme(this.darkMode);
     }
+
     isLogged && this.GetDashGroup()
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
@@ -93,13 +96,15 @@ export class AppComponent {
   }
 
   ChangeColorMode() {
-    document.body.classList.toggle('dark', this.darkMode);
+    this.ApplyTheme(this.darkMode);
+    localStorage.setItem('theme', String(this.darkMode));
+  }
 
+  ApplyTheme(isDark: boolean) {
+    document.body.classList.toggle('dark', isDark);
     // Para PrimeNG
     const element = document.querySelector('html');
-    element?.classList.toggle('my-app-dark', this.darkMode);
-
-    localStorage.setItem('theme', String(this.darkMode));
+    element?.classList.toggle('my-app-dark', isDark);
   }
 
   LogOut() {//cierra sesión, resetea la ruta y reasiga el nombre de usuario

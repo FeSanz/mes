@@ -25,6 +25,8 @@ import { Tag } from "primeng/tag";
 import { ProgressBar } from "primeng/progressbar";
 import {Slider} from "primeng/slider";
 import {WebSocketService} from "../../../../services/web-socket.service";
+import {FloatLabel} from "primeng/floatlabel";
+import {Select} from "primeng/select";
 
 
 @Component({
@@ -35,7 +37,7 @@ import {WebSocketService} from "../../../../services/web-socket.service";
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton, IonButton,
     IonCard, IonCol, IonGrid, IonIcon, IonRow, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule,
-    Badge, Tag, ProgressBar, Slider]
+    Badge, Tag, ProgressBar, Slider, FloatLabel, Select]
 })
 export class ProductionPage implements OnInit, AfterViewInit  {
   scrollHeight: string = '550px';
@@ -43,10 +45,12 @@ export class ProductionPage implements OnInit, AfterViewInit  {
   rowsPerPageOptions: number[] = [10, 25, 50];
 
   userData: any = {};
-  workOrders: any = {};
+  workOrders: any = { items: [] };
   progressValue: number[] = [0, 100];
 
   searchValueWO: string = '';
+
+  organizationSelected: string | any = '';
 
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
@@ -56,7 +60,19 @@ export class ProductionPage implements OnInit, AfterViewInit  {
 
   ngOnInit() {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
-    this.GetWorkOrders();
+    if (this.userData && this.userData.Company && this.userData.Company.Organizations) {
+
+      const organizations = this.userData.Company.Organizations;
+
+      // Validar si hay organizaciones
+      if (organizations && Array.isArray(organizations) && organizations.length > 0) {
+        const sortedOrganizations = organizations.sort((a, b) => a.OrganizationId - b.OrganizationId);
+        this.organizationSelected = sortedOrganizations[0];
+        this.GetWorkOrders();
+      }else{
+        this.alerts.Warning("No se encontraron organizaciones");
+      }
+    }
   }
 
   ngAfterViewInit() {
@@ -73,7 +89,8 @@ export class ProductionPage implements OnInit, AfterViewInit  {
   }
 
   GetWorkOrders(){
-    this.apiService.GetRequestRender(`workOrders/${this.userData.Company.Organizations[0].OrganizationId}`).then((response: any) => {
+    this.workOrders = { items: [] };
+    this.apiService.GetRequestRender(`workOrders/${this.organizationSelected.OrganizationId}`).then((response: any) => {
       this.workOrders = response;
 
       if (this.workOrders.items && Array.isArray(this.workOrders.items)) {
@@ -83,15 +100,15 @@ export class ProductionPage implements OnInit, AfterViewInit  {
         }));
       }
 
-      this.OnStartSuscription();
+      this.OnStartSuscription(this.organizationSelected.OrganizationId);
 
     }).catch(error => {
       console.error('Error al obtener OTs:', error);
     });
   }
 
-  OnStartSuscription(){
-    this.websocket.SuscribeById({ organization_id: this.userData.Company.Organizations[0].OrganizationId }, 'workorders', (response) => {
+  OnStartSuscription(orgId:number){
+    this.websocket.SuscribeById({ organization_id: orgId }, 'workorders', (response) => {
       const newWorkOrders = response;
       if (newWorkOrders.items && Array.isArray(newWorkOrders.items)) {
         const newItems = newWorkOrders.items.map((item: any) => ({

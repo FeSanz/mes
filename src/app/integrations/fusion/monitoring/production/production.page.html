@@ -8,6 +8,23 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <div class="card-select flex flex-wrap justify-center items-end gap-4">
+
+    <p-floatlabel class="w-full md:w-56" variant="on">
+      <p-select [(ngModel)]="organizationSelected"
+                inputId="organization_select"
+                [options]="userData.Company.Organizations"
+                optionLabel="Name"
+                [filter]="true"
+                filterBy="Name"
+                placeholder="Seleccione una organización"
+                styleClass="w-full"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="38"
+                (onChange)="GetWorkOrders()" />
+      <label for="organization_select">Organización</label>
+    </p-floatlabel>
+  </div>
   <ion-grid>
     <ion-row>
       <ion-col size="12">
