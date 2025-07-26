@@ -292,4 +292,36 @@ export class CounterComponent implements OnInit {
     const sensor = this.getSensorsForMachine(this.widgetData.sensors[0].machine_id).find((s: any) => s.sensor_id == selectedValue)
     this.copyWidgetData.sensors[0].sensor_name = sensor.sensor_name
   }
+  onColorPickerOpen() {
+    
+  setTimeout(() => {
+    const overlay = document.getElementById('ngx-colors-overlay');
+
+    if (!overlay) return;
+
+    const oldInput = overlay.querySelector('input');
+    if (!oldInput) return;
+
+    // Crea un nuevo ion-input
+    const ionInput = document.createElement('ion-input');
+    console.log(ionInput);
+    
+    ionInput.setAttribute('value', this.copyWidgetData.color || '#FFFFFF');
+    ionInput.setAttribute('placeholder', '#FFFFFF');
+    ionInput.setAttribute('style', 'font-size: 12px; letter-spacing: 1.5px; z-index: 999999; background: white');
+
+    // Opcional: agregar evento para actualizar el color en tiempo real
+    ionInput.addEventListener('ionInput', (event: any) => {
+      this.copyWidgetData.color = event.target.value;
+    });
+
+    // Reemplaza el input original
+    oldInput.replaceWith(ionInput);
+
+    // Esperar a que ion-input se cargue y luego darle focus
+    setTimeout(() => {
+      (ionInput as any).setFocus?.(); // algunos ion-input necesitan esto
+    }, 50);
+  }, 150);
+  }
 }
