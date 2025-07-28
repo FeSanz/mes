@@ -93,7 +93,7 @@
     </ion-content>
   </ng-template>
 </ion-popover>
-<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false" [focusTrap]="false">
   <ng-template>
     <ion-header>
       <ion-toolbar color="primary">
@@ -149,8 +149,3 @@
     </ion-content>
   </ng-template>
 </ion-modal>
-
-<ion-button (click)="show = !show">Cerrar</ion-button>
-
-<ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar" [hideTextInput]="false" *ngIf="show"
-  style="margin-left: 10px; position: relative;" [(ngModel)]="copyWidgetData.color"></ngx-colors>

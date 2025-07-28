@@ -64,7 +64,7 @@
     </ion-datetime>
   </ng-template>
 </ion-modal>
-<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false" [focusTrap]="false">
   <ng-template>
     <ion-header>
       <ion-toolbar color="primary">

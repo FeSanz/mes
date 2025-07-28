@@ -109,7 +109,7 @@
       </ion-card>
     </ion-col>
   </ion-row>
-  <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false">
+  <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false" [focusTrap]="false">
     <ng-template>
       <ion-header>
         <ion-toolbar color="primary">
