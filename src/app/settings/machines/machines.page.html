@@ -113,7 +113,8 @@
         </ion-item>
 
         <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-          <ion-fab-button (click)="AddNewResource()" color="success">
+          <ion-fab-button (click)="AddNewResource()" color="success" 
+            [disabled]="!resource.Code?.trim() || !resource.Name?.trim() || !resource.Class?.trim()">
             <ion-icon name="checkmark-outline"></ion-icon>
           </ion-fab-button>
         </ion-fab>

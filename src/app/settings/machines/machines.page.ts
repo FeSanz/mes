@@ -20,6 +20,7 @@ import { ApiService } from "../../services/api.service";
 import { EndpointsService } from "../../services/endpoints.service";
 import { AlertsService } from "../../services/alerts.service";
 import { PermissionsService } from 'src/app/services/permissions.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 
 @Component({
@@ -39,7 +40,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   private resizeObserver!: ResizeObserver;
   scrollHeight: string = '550px';
   rowsPerPage: number = 50;
-  rowsPerPageOptions: number[] = [10, 25, 50];
+  rowsPerPageOptions: number[] = [10, 25, 50];  
 
   fusionOriginalData: any = {};
   fusionData: any = {};
@@ -64,16 +65,17 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   };
 
   isNewFlag = true;
-  isModalOpen = false;
+  isModalOpen = false;  
 
   constructor(private apiService: ApiService,
     private endPoints: EndpointsService,
     private alerts: AlertsService,
     public permissions: PermissionsService,
-    private changeDetector: ChangeDetectorRef
+    private changeDetector: ChangeDetectorRef    
   ) {
-    addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline })
-   }
+  
+  addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline })
+  }
 
   ngOnInit() {
     this.dbOrganizations = JSON.parse(String(localStorage.getItem("userData")));
