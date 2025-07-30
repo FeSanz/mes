@@ -1,0 +1,30 @@
+.table-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  flex-wrap: wrap; // opcional si quieres que se adapten en pantallas pequeñas
+}
+
+.left-caption,
+.right-caption {
+  display: flex;
+  align-items: center;
+}
+
+.tabla-centrada ::ng-deep th,
+.tabla-centrada ::ng-deep td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+
+
+
+ion-title {
+  font-size: 20px; // Tamaño normal por defecto
+
+  @media (max-width: 400px) {
+    font-size: 16px; // Tamaño más pequeño en pantallas pequeñas
+  }
+}

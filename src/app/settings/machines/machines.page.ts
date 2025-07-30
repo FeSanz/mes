@@ -22,7 +22,6 @@ import { AlertsService } from "../../services/alerts.service";
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-
 @Component({
   selector: 'app-machines',
   templateUrl: './machines.page.html',
@@ -40,7 +39,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   private resizeObserver!: ResizeObserver;
   scrollHeight: string = '550px';
   rowsPerPage: number = 50;
-  rowsPerPageOptions: number[] = [10, 25, 50];  
+  rowsPerPageOptions: number[] = [10, 25, 50];
 
   fusionOriginalData: any = {};
   fusionData: any = {};
@@ -65,20 +64,39 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   };
 
   isNewFlag = true;
-  isModalOpen = false;  
+  isModalOpen = false;
+  userData: any = {};
+
+  workCenters: any[] = [];
+  workCenterSelected: string | any = '';
 
   constructor(private apiService: ApiService,
     private endPoints: EndpointsService,
     private alerts: AlertsService,
     public permissions: PermissionsService,
-    private changeDetector: ChangeDetectorRef    
+    private changeDetector: ChangeDetectorRef
   ) {
-  
-  addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline })
+
+    addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline })
   }
 
   ngOnInit() {
     this.dbOrganizations = JSON.parse(String(localStorage.getItem("userData")));
+    this.userData = JSON.parse(String(localStorage.getItem("userData")));
+    if (this.userData && this.userData.Company && this.userData.Company.Organizations) {
+
+      const organizations = this.userData.Company.Organizations;
+
+      // Validar si hay organizaciones
+      if (organizations && Array.isArray(organizations) && organizations.length > 0) {
+        const sortedOrganizations = organizations.sort((a, b) => a.OrganizationId - b.OrganizationId);
+        this.organizationSelected = sortedOrganizations[0];
+        this.orgSelect = this.organizationSelected.OrganizationId;
+        this.RefreshTables();
+      } else {
+        this.alerts.Warning("No se encontraron organizaciones");
+      }
+    }
   }
 
   ngAfterViewInit() {
@@ -110,11 +128,10 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   OnOrganizationSelected() {
     if (this.organizationSelected) {
       let clause = `orgResourceMachines/${this.organizationSelected.OrganizationId}`;
-      this.orgSelect = this.organizationSelected.OrganizationId;
+      this.orgSelect = this.organizationSelected.OrganizationId;      
       this.apiService.GetRequestRender(clause).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
-        this.dbData = response;
-
+        this.dbData = response;        
       });
     }
   }
@@ -129,6 +146,8 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     this.isNewFlag = true
     this.resource.OrganizationId = this.orgSelect
     this.isModalOpen = true;
+    this.getWorkCenters();   
+    this.resource.Token = this.generateToken();
   }
 
   resetResource() {//se reinician los datos del usuario nuevo o a editar
@@ -144,12 +163,13 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   AddNewResource() {
-    if(this.organizationSelected) {
+    if (this.organizationSelected) {
       const itemsArray = [this.resource];
       const payload = {
         items: itemsArray
       };
-      // console.log(JSON.stringify(payload, null, 2))
+      // console.log(JSON.stringify(payload, null, 2));
+
       this.apiService.PostRequestRender('resourceMachines', payload).then(async (response: any) => {
         if (response.errorsExistFlag) {
           this.alerts.Info(response.message);
@@ -163,7 +183,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
         }
       });
       this.isModalOpen = false
-    }else{
+    } else {
       this.alerts.Info('Seleccione una organización');
     }
   }
@@ -172,10 +192,42 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     let clause = `orgResourceMachines/${this.organizationSelected.OrganizationId}`;
     this.apiService.GetRequestRender(clause).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
-      this.dbData = response;      
+      this.dbData = response;
     });
 
     this.searchValueDB = '';
   }
-  
+
+  getWorkCenters() {
+    this.apiService.GetRequestFusion(this.endPoints.Path('work_centers', this.organizationSelected.Code)).then((response: any) => {
+      const parsed = JSON.parse(response).items;
+      this.workCenters = parsed;
+    });
+  }
+
+  OnWorkCenterSelected() {
+    this.resource.WorkCenterId = this.workCenterSelected.WorkCenterId;
+    this.resource.WorkCenter = this.workCenterSelected.WorkCenterName;
+  }
+
+  generateToken(): string {
+    let d = new Date().getTime();
+    let d2 = (performance && performance.now && (performance.now() * 1000)) || 0; // alta precisión si disponible
+
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      let r = Math.random() * 16;
+
+      if (d > 0) {
+        r = (d + r) % 16 | 0;
+        d = Math.floor(d / 16);
+      } else {
+        r = (d2 + r) % 16 | 0;
+        d2 = Math.floor(d2 / 16);
+      }
+
+      return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+
+  }
 }
+

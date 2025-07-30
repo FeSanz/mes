@@ -41,3 +41,11 @@
 @use "./theme/alertify.scss"; 
 @use "./theme/integrations.ui.scss";
 @use "./theme/tables.primeng.scss";
+
+
+ion-modal.custom-modal::part(content) {
+  width: auto;
+  max-width: 90%;
+  height: 50%;
+  max-height: auto;
+}
