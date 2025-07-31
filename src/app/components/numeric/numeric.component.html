@@ -16,8 +16,10 @@
       <ion-row>
         <ion-col *ngFor="let number of widgetData.sensors; let i = index;" class="ion-text-center"
           [title]="number.sensor_name">
-          <div [style.font-size]="widgetData.size" [style.color]="number.color" [style.fontWeight]="'bold'">
-            {{ number.value }}{{ number.uom || '' }}
+          <div [style.font-size]="widgetData.size" [style.color]="number.color" [style.fontWeight]="'bold'" [ngStyle]="{
+            textShadow: '0 0 1px ' + number.color + ', 0 0 3px ' + number.color + ', 0 0 20px ' + number.color
+            }"> {{ number.value }} <span  [style.fontWeight]="'normal'">{{ number.uom || '' }}
+            </span>
           </div>
           <ion-label [style.color]="number.color"> {{ number.sensor_name }} </ion-label><br />
           <ion-label color="medium"> {{ number.date_time | date: 'hh:mm a dd/MM/yyyy' }} </ion-label>

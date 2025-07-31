@@ -9,7 +9,7 @@ ion-toolbar {
 }
 
 ion-card {
-    min-width: 300px;
+    min-width: 250px;
     min-height: 400px;
     --background: var(--ion-color-back-shade, #fff);
     border-radius: 12px;
@@ -23,7 +23,6 @@ ion-card {
 }
 
 ion-card-content {
-    max-height: 393px;
     min-height: 393px;
 }
 
@@ -49,9 +48,17 @@ ion-card-title {
 }
 
 ::ng-deep .opened {
-  background: var(--ion-color-back) !important;
+    background: var(--ion-color-back) !important;
 }
 
 ::ng-deep .opened button {
-  color: var(--ion-color-dark) !important;
+    color: var(--ion-color-dark) !important;
+}
+
+.display-section {
+    text-shadow:
+        0 0 5px rgba(255, 255, 255, 0.8),
+        0 0 10px rgba(255, 255, 255, 0.6),
+        0 0 20px rgba(255, 255, 255, 0.4);
+    transition: text-shadow 0.3s ease;
 }

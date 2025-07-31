@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-menu-button >
+      <ion-menu-button>
       </ion-menu-button>
     </ion-buttons>
     <ion-title>Alertas</ion-title>
@@ -9,9 +9,157 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">alerts</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12">
+        <ion-card class="stats-card">
+          <p-table #dtAlerts [value]="alertsData" dataKey="alert_id" styleClass="card-table-primeng wo-table-custom "
+            [tableStyle]="{ 'min-width': '96rem','height': '100%'}" [size]="'small'" [rowHover]="true" [rows]="5"
+            [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true"
+            [scrollHeight]="scrollHeight" sortField="ExecutionDate" [sortOrder]="1">
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="name" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Nombre
+                    <p-sortIcon field="name" />
+                    <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="type" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Tipo
+                    <p-sortIcon field="type" />
+                    <p-columnFilter type="text" field="type" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="area" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Area
+                    <p-sortIcon field="area" />
+                    <p-columnFilter type="text" field="area" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="status" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Estado
+                    <p-sortIcon field="status" />
+                    <p-columnFilter type="text" field="status" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="start_date" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Inicio
+                    <p-sortIcon field="start_date" />
+                    <p-columnFilter type="text" field="start_date" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="response_time" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Tiempo de respuesta
+                    <p-sortIcon field="response_time" />
+                    <p-columnFilter type="text" field="response_time" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="repair_time" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Tiempo de reparación
+                    <p-sortIcon field="repair_time" />
+                    <p-columnFilter type="text" field="repair_time" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Acciones
+                  </div>
+                </th>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+              <tr>
+                <td class="td-center"><strong>{{ item.name }}</strong></td>
+                <td class="td-center">{{item.type}}</td>
+                <td class="td-center">{{ item.area}}</td>
+                <td class="td-center">{{ item.status == 'attend' ? 'Atender' : item.area == 'in_proccess' ? 'En proceso' : item.area == 'Finalizada' }}</td>
+                <td class="td-center">{{ item.start_date | date: 'hh:mm a dd/MM/yyyy' }}</td>
+                <td class="td-center">{{ item.response_time | date: 'hh:mm a dd/MM/yyyy'}}</td>
+                <td class="td-center">{{ item.repair_time | date: 'hh:mm a dd/MM/yyyy'}}</td>
+                <td>
+                  <ion-button *ngIf="permissions.isSuperAdmin()" size="small" color="warning"> Atender </ion-button>
+                  <ion-button *ngIf="permissions.isSuperAdmin()" size="small" color="success"> Finalizar </ion-button>
+                  <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item.alert_id)">
+                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                  </ion-button>
+
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5">No se encontraron recursos.</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="permissions.isSuperAdmin()">
+    <ion-fab-button (click)="ShowNewAlert()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
+
+<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false" [focusTrap]="false">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Crear nueva alerta</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="isModalOpen = false;">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-item>
+        <ion-select label="Máquina:" [(ngModel)]="selectedMachine" interface="popover">
+          <ion-select-option *ngFor="let machine of machines" [value]="machine.machine_id">{{ machine.machine_name
+            }}</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-searchbar [(ngModel)]="searchTerm" placeholder="Buscar falla"></ion-searchbar>
+      <ion-item>
+        <ion-col>
+          <ion-select label="Área:" [(ngModel)]="selectedArea" interface="popover" placeholder="seleccione área">
+            <ion-select-option *ngFor="let area of uniqueAreas" [value]="area">{{ area }}</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-col>
+          <ion-select label="Tipo:" [(ngModel)]="selectedType" interface="popover" placeholder="seleccione tipo">
+            <ion-select-option *ngFor="let type of uniqueTypes" [value]="type">{{ type }}</ion-select-option>
+          </ion-select>
+        </ion-col>
+        <ion-buttons slot="end">
+          <ion-button size="small" shape="round" (click)="selectedArea = ''; selectedType = '';">
+            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+      <ion-list>
+        <ion-item button *ngFor="let failure of filteredFailures" (click)="SelectFail(failure)"
+          [ngClass]="{ 'selected-failure': failure.failure_id === selectedFailureId }">
+          <ion-label>
+            <h2>{{ failure.name }}</h2>
+            <p>{{ failure.type }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab-button (click)="AddNewAlert()" color="success">
+          <ion-icon name="checkmark-outline"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    </ion-content>
+  </ng-template>
+</ion-modal>

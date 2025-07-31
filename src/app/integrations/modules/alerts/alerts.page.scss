@@ -1,0 +1,19 @@
+ion-input {
+    text-align: right;
+}
+
+ion-select::part(label) {
+    color: var(--ion-color-primary);
+}
+
+ion-toggle::part(label) {
+    color: var(--ion-color-primary);
+}
+
+ion-input::part(label) {
+    color: var(--ion-color-primary);
+}
+
+.selected-failure {
+    border: 1px solid var(--ion-color-primary);
+}
