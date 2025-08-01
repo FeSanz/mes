@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonSearchbar } from '@ionic/angular/standalone';
@@ -52,11 +52,13 @@ export class AlertsPage {
   selectedMachine = 0;
   uniqueAreas: any = [];
   uniqueTypes: any[] = [];
+  timer: any;
   constructor(
     private alerts: AlertsService,
     private apiService: ApiService,
-    private endPoints: EndpointsService,
     private websocket: WebSocketService,
+    private endPoints: EndpointsService,
+    private changeDetector: ChangeDetectorRef,
     public permissions: PermissionsService,) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.company = this.userData.Company
@@ -66,11 +68,18 @@ export class AlertsPage {
   ionViewDidEnter() {
     this.GetAlerts()
   }
+  ngOnInit() {
+    this.timer = setInterval(() => {
+      this.changeDetector.detectChanges(); // Fuerza actualización del contador
+    }, 1000); // cada segundo
+  }
   GetAlerts() {
     const orgsIds = this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.apiService.GetRequestRender(`alertsByOrganizations?organizations=${orgsIds}`).then((response: any) => {
+      console.log(response.items);
+
       if (!response.errorsExistFlag) {
-        this.alertsData = response.items        
+        this.alertsData = response.items
       } else {
         this.alerts.Error(response.error)
       }
@@ -118,10 +127,33 @@ export class AlertsPage {
       this.GetAlerts()
     })
   }
-  async DeleteAlert(alertId: any) {
-    
+  async AttendAlert(alert: any) {
+    if (await this.alerts.ShowAlert("¿Deseas atender esta alerta?", "Alerta", "Atrás", "Atender")) {
+      this.apiService.PutRequestRender('alerts/' + alert.alert_id + '/attend', {}).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          this.alerts.Success("Alerta atendida")
+          alert.response_time = new Date()
+        } else {
+          this.alerts.Info(response.error)
+        }
+      })
+    }
+  }
+  async FinaliceAlert(alert: any) {
+    if (await this.alerts.ShowAlert("¿Deseas finalizar esta alerta?", "Alerta", "Atrás", "Finalizar")) {
+      this.apiService.PutRequestRender('alerts/' + alert.alert_id + '/repair', {}).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          this.alerts.Success("Alerta finalizada")
+          alert.repair_time = new Date()
+        } else {
+          this.alerts.Info(response.error)
+        }
+      })
+    }
+  }
+  async DeleteAlert(alert: any) {
     if (await this.alerts.ShowAlert("¿Deseas eliminar esta alerta?", "Alerta", "Atrás", "Eliminar")) {
-      this.apiService.DeleteRequestRender('alerts/' + alertId).then((response: any) => {
+      this.apiService.DeleteRequestRender('alerts/' + alert.alert_id).then((response: any) => {
         if (!response.errorsExistFlag) {
           this.GetAlerts()
           this.alerts.Success("Alerta eliminada")
@@ -131,6 +163,45 @@ export class AlertsPage {
       })
     }
   }
+  getElapsedTime(startDate: string | Date): string {
+    const start = new Date(startDate);
+    const now = new Date();
+    const diffMs = now.getTime() - start.getTime();
+
+    const seconds = Math.floor(diffMs / 1000) % 60;
+    const minutes = Math.floor(diffMs / (1000 * 60)) % 60;
+    const hours = Math.floor(diffMs / (1000 * 60 * 60)) % 24;
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    const parts = [];
+    if (days > 0) parts.push(`${days} día${days > 1 ? 's' : ''}`);
+    if (hours > 0) parts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
+    if (minutes > 0) parts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
+    parts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
+    //this.changeDetector.detectChanges()
+    return parts.join(' ');
+  }
+  getElapsedStartEndTime(startDate: string | Date, endDate?: string | Date): string {
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : new Date();
+    const diffMs = end.getTime() - start.getTime();
+
+    if (diffMs < 0) return '0 segundos';
+
+    const seconds = Math.floor(diffMs / 1000) % 60;
+    const minutes = Math.floor(diffMs / (1000 * 60)) % 60;
+    const hours = Math.floor(diffMs / (1000 * 60 * 60)) % 24;
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    const parts = [];
+    if (days > 0) parts.push(`${days} día${days > 1 ? 's' : ''}`);
+    if (hours > 0) parts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
+    if (minutes > 0) parts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
+    parts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
+
+    return parts.join(' ');
+  }
+
   loadFailures() {
     // después de cargar las fallas
     this.filteredFailures = this.failures;
@@ -158,5 +229,10 @@ export class AlertsPage {
   }
   SelectFail(fail: any) {
     this.selectedFailureId = fail.failure_id; // o fail.id si se llama diferente
+  }
+  ngOnDestroy() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
   }
 }

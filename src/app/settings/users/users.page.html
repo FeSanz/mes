@@ -94,8 +94,8 @@
             </td>
             <td>
               <ion-buttons>
-                <ion-toggle [checked]="item.enabled_flag == 'Y'"
-                  [disabled]="!permissions.isSuperAdmin()" (ionChange)="ChangeUserStatus($event, item)">
+                <ion-toggle [checked]="item.enabled_flag == 'Y'" [disabled]="!permissions.isSuperAdmin()"
+                  (ionChange)="ChangeUserStatus($event, item)">
                 </ion-toggle>
                 <ion-button (click)="OpenAsEditUser(item)" *ngIf="permissions.isSuperAdmin()">
                   <ion-icon color="success" slot="icon-only" name="pencil-outline"></ion-icon>

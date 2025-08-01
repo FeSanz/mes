@@ -27,21 +27,28 @@
                     <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
                   </div>
                 </th>
-                <th pSortableColumn="type" style="min-width: 9rem" class="td-center">
+                <th pSortableColumn="type" class="td-center">
                   <div class="flex justify-between items-center">
                     Tipo
                     <p-sortIcon field="type" />
                     <p-columnFilter type="text" field="type" display="menu" class="ml-auto" />
                   </div>
                 </th>
-                <th pSortableColumn="area" style="min-width: 9rem" class="td-center">
+                <th pSortableColumn="area" class="td-center">
                   <div class="flex justify-between items-center">
                     Area
                     <p-sortIcon field="area" />
                     <p-columnFilter type="text" field="area" display="menu" class="ml-auto" />
                   </div>
                 </th>
-                <th pSortableColumn="status" style="min-width: 9rem" class="td-center">
+                <th pSortableColumn="machine_name" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Máquina
+                    <p-sortIcon field="machine_name" />
+                    <p-columnFilter type="text" field="machine_name" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="status" class="td-center">
                   <div class="flex justify-between items-center">
                     Estado
                     <p-sortIcon field="status" />
@@ -80,17 +87,38 @@
                 <td class="td-center"><strong>{{ item.name }}</strong></td>
                 <td class="td-center">{{item.type}}</td>
                 <td class="td-center">{{ item.area}}</td>
-                <td class="td-center">{{ item.status == 'attend' ? 'Atender' : item.area == 'in_proccess' ? 'En proceso' : item.area == 'Finalizada' }}</td>
+                <td class="td-center">{{ item.machine_name}}</td>
+                <td class="td-center">{{ item.status == 'attend' ? 'Atender' : item.status == 'in_progress' ? 'En
+                  progreso'
+                  : item.status == 'finaliced' ? 'Finalizada' : '' }}</td>
                 <td class="td-center">{{ item.start_date | date: 'hh:mm a dd/MM/yyyy' }}</td>
-                <td class="td-center">{{ item.response_time | date: 'hh:mm a dd/MM/yyyy'}}</td>
-                <td class="td-center">{{ item.repair_time | date: 'hh:mm a dd/MM/yyyy'}}</td>
-                <td>
-                  <ion-button *ngIf="permissions.isSuperAdmin()" size="small" color="warning"> Atender </ion-button>
-                  <ion-button *ngIf="permissions.isSuperAdmin()" size="small" color="success"> Finalizar </ion-button>
-                  <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item.alert_id)">
+                <td class="td-center">
+                  <ng-container *ngIf="item.response_time; else elapsed">
+                    <!--{{ item.response_time | date: 'hh:mm a dd/MM/yyyy' }}-->
+                    {{ getElapsedStartEndTime(item.start_date, item.response_time) }}
+                  </ng-container>
+                  <ng-template #elapsed>
+                    {{ getElapsedTime(item.start_date) }}
+                  </ng-template>
+                </td>
+                <td class="td-center">
+                  <ng-container *ngIf="item.repair_time; else elapsedRepair">
+                    {{ getElapsedStartEndTime(item.response_time, item.repair_time) }}
+                    <!--{{ item.repair_time | date: 'hh:mm a dd/MM/yyyy' }}-->
+                  </ng-container>
+                  <ng-template #elapsedRepair>
+                    {{ item.response_time != null ? getElapsedTime(item.response_time) : 'En espera' }}
+                  </ng-template>
+                </td>
+                <td class="td-center">
+                  <ion-button *ngIf="permissions.isSuperAdmin() && !item.response_time" size="small" color="warning"
+                    (click)="AttendAlert(item)">
+                    Atender </ion-button>
+                  <ion-button *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time" size="small"
+                    color="success" (click)="FinaliceAlert(item)"> Finalizar </ion-button>
+                  <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item)">
                     <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                   </ion-button>
-
                 </td>
               </tr>
             </ng-template>
