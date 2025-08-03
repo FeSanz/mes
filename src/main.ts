@@ -5,6 +5,7 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 //Para PrimeNG
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
+import { MessageService } from 'primeng/api';
 //import 'primeicons/primeicons.css';
 
 //Temas PrimeNG
@@ -26,6 +27,7 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(),
     provideAnimationsAsync(), //Para PrimeNG
+    MessageService,
     providePrimeNG({//Para PrimeNG
       theme: {
         preset: Aura,

@@ -25,6 +25,8 @@ import { CommonModule } from '@angular/common';
 import { AlertsService } from './services/alerts.service';
 import { PermissionsService } from './services/permissions.service';
 
+import { Toast } from 'primeng/toast';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -33,7 +35,7 @@ import { PermissionsService } from './services/permissions.service';
   imports: [IonApp, RouterLink, IonMenu, IonToolbar, IonHeader, IonTitle, IonItem, IonIcon, IonLabel,
     IonButtons, IonButton, IonPopover, IonContent, IonList, IonMenuToggle, IonAccordionGroup, IonSplitPane, IonReorder, IonReorderGroup,
     IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid,
-    IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink]
+    IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast]
 })
 export class AppComponent {
   darkMode = false

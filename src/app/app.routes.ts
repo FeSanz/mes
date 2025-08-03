@@ -82,5 +82,10 @@ export const routes: Routes = [
     path: 'settings/machines',
     loadComponent: () => import('./settings/machines/machines.page').then( m => m.MachinesPage),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'dispatch_transaction',
+    loadComponent: () => import('./integrations/fusion/dispatchs/transaction/transaction.page').then( m => m.TransactionPage)
   }
+
 ];
