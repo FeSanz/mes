@@ -1,137 +1,161 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary">
+    <ion-title>Alertas {{userData.Company.Name}}</ion-title>
     <ion-buttons slot="start">
-      <ion-menu-button>
-      </ion-menu-button>
+      <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Alertas</ion-title>
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
+          [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
+          placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
+          [virtualScrollItemSize]="38" (onChange)="GetAlerts()" appendTo="body" />
+        <label for="organization_select">Organización</label>
+      </p-floatlabel>
+    </div>
   </ion-toolbar>
 </ion-header>
+<ion-content [fullscreen]="true" class="table-container">
 
-<ion-content [fullscreen]="true">
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12">
-        <ion-card class="stats-card">
-          <p-table #dtAlerts [value]="alertsData" dataKey="alert_id" styleClass="card-table-primeng wo-table-custom "
-            [tableStyle]="{ 'min-width': '96rem','height': '100%'}" [size]="'small'" [rowHover]="true" [rows]="5"
-            [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true"
-            [scrollHeight]="scrollHeight" sortField="ExecutionDate" [sortOrder]="1">
+  <div class="regions-wrapper">
+    <div class="region-container full-height-container">
+      <ion-card>
+        <p-table #dtAlerts [value]="alertsData" dataKey="alert_id" styleClass="card-table-primeng wo-table-custom "
+          [tableStyle]="{ 'height': '100%'}" [size]="'small'" [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
+          [globalFilterFields]="['name', 'area', 'machine_name']"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos" [showCurrentPageReport]="true"
+          [filterDelay]="0" stripedRows [scrollable]="true" [scrollHeight]="scrollHeight" sortField="ExecutionDate"
+          [sortOrder]="1">
 
-            <ng-template pTemplate="header">
-              <tr>
-                <th pSortableColumn="name" style="min-width: 9rem" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Nombre
-                    <p-sortIcon field="name" />
-                    <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th pSortableColumn="type" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Tipo
-                    <p-sortIcon field="type" />
-                    <p-columnFilter type="text" field="type" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th pSortableColumn="area" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Area
-                    <p-sortIcon field="area" />
-                    <p-columnFilter type="text" field="area" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th pSortableColumn="machine_name" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Máquina
-                    <p-sortIcon field="machine_name" />
-                    <p-columnFilter type="text" field="machine_name" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th pSortableColumn="status" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Estado
-                    <p-sortIcon field="status" />
-                    <p-columnFilter type="text" field="status" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th pSortableColumn="start_date" style="min-width: 9rem" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Inicio
-                    <p-sortIcon field="start_date" />
-                    <p-columnFilter type="text" field="start_date" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th pSortableColumn="response_time" style="min-width: 9rem" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Tiempo de respuesta
-                    <p-sortIcon field="response_time" />
-                    <p-columnFilter type="text" field="response_time" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th pSortableColumn="repair_time" style="min-width: 9rem" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Tiempo de reparación
-                    <p-sortIcon field="repair_time" />
-                    <p-columnFilter type="text" field="repair_time" display="menu" class="ml-auto" />
-                  </div>
-                </th>
-                <th style="min-width: 9rem" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Acciones
-                  </div>
-                </th>
-            </ng-template>
-            <ng-template pTemplate="body" let-item>
-              <tr>
-                <td class="td-center"><strong>{{ item.name }}</strong></td>
-                <td class="td-center">{{item.type}}</td>
-                <td class="td-center">{{ item.area}}</td>
-                <td class="td-center">{{ item.machine_name}}</td>
-                <td class="td-center">{{ item.status == 'attend' ? 'Atender' : item.status == 'in_progress' ? 'En
-                  progreso'
-                  : item.status == 'finaliced' ? 'Finalizada' : '' }}</td>
-                <td class="td-center">{{ item.start_date | date: 'hh:mm a dd/MM/yyyy' }}</td>
-                <td class="td-center">
-                  <ng-container *ngIf="item.response_time; else elapsed">
-                    <!--{{ item.response_time | date: 'hh:mm a dd/MM/yyyy' }}-->
-                    {{ getElapsedStartEndTime(item.start_date, item.response_time) }}
-                  </ng-container>
-                  <ng-template #elapsed>
-                    {{ getElapsedTime(item.start_date) }}
-                  </ng-template>
-                </td>
-                <td class="td-center">
-                  <ng-container *ngIf="item.repair_time; else elapsedRepair">
-                    {{ getElapsedStartEndTime(item.response_time, item.repair_time) }}
-                    <!--{{ item.repair_time | date: 'hh:mm a dd/MM/yyyy' }}-->
-                  </ng-container>
-                  <ng-template #elapsedRepair>
-                    {{ item.response_time != null ? getElapsedTime(item.response_time) : 'En espera' }}
-                  </ng-template>
-                </td>
-                <td class="td-center">
-                  <ion-button *ngIf="permissions.isSuperAdmin() && !item.response_time" size="small" color="warning"
-                    (click)="AttendAlert(item)">
-                    Atender </ion-button>
-                  <ion-button *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time" size="small"
-                    color="success" (click)="FinaliceAlert(item)"> Finalizar </ion-button>
-                  <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item)">
-                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                  </ion-button>
-                </td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="5">No se encontraron recursos.</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+          <ng-template #caption>
+            <div class="table-caption">
+              <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearAlerts(dtAlerts)" />
+
+              <div></div> <!-- Spacer -->
+
+              <p-iconField iconPosition="left">
+                <p-inputIcon>
+                  <i class="fas fa-search"></i>
+                </p-inputIcon>
+                <input pInputText type="text" [(ngModel)]="searchValueAl" (input)="OnFilterGlobal($event, dtAlerts)"
+                  placeholder="Buscar" />
+              </p-iconField>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="name" class="td-center">
+                <div class="flex justify-between items-center">
+                  Falla
+                  <p-sortIcon field="name" />
+                  <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+                </div>
+              </th>
+              <th pSortableColumn="type" class="td-center">
+                <div class="flex justify-between items-center">
+                  Tipo
+                  <p-sortIcon field="type" />
+                  <p-columnFilter type="text" field="type" display="menu" class="ml-auto" />
+                </div>
+              </th>
+              <th pSortableColumn="area" class="td-center">
+                <div class="flex justify-between items-center">
+                  Area
+                  <p-sortIcon field="area" />
+                  <p-columnFilter type="text" field="area" display="menu" class="ml-auto" />
+                </div>
+              </th>
+              <th pSortableColumn="machine_name" class="td-center">
+                <div class="flex justify-between items-center">
+                  Máquina
+                  <p-sortIcon field="machine_name" />
+                  <p-columnFilter type="text" field="machine_name" display="menu" class="ml-auto" />
+                </div>
+              </th>
+              <th pSortableColumn="status" class="td-center">
+                <div class="flex justify-between items-center">
+                  Estado
+                  <p-sortIcon field="status" />
+                  <p-columnFilter type="text" field="status" display="menu" class="ml-auto" />
+                </div>
+              </th>
+              <th pSortableColumn="start_date" class="td-center">
+                <div class="flex justify-between items-center">
+                  Inicio
+                  <p-sortIcon field="start_date" />
+                  <p-columnFilter type="text" field="start_date" display="menu" class="ml-auto" />
+                </div>
+              </th>
+              <th pSortableColumn="response_time" class="td-center">
+                <div class="flex justify-between items-center">
+                  Tiempo de respuesta
+                  <p-sortIcon field="response_time" />
+                  <p-columnFilter type="text" field="response_time" display="menu" class="ml-auto" />
+                </div>
+              </th>
+              <th pSortableColumn="repair_time" class="td-center">
+                <div class="flex justify-between items-center">
+                  Tiempo de reparación
+                  <p-sortIcon field="repair_time" />
+                  <p-columnFilter type="text" field="repair_time" display="menu" class="ml-auto" />
+                </div>
+              </th>
+              <th class="td-center">
+                <div class="flex justify-between items-center">
+                  Acciones
+                </div>
+              </th>
+          </ng-template>
+          <ng-template #body let-item>
+            <tr>
+              <td class="td-center"><strong>{{ item.name }}</strong></td>
+              <td class="td-center">{{item.type}}</td>
+              <td class="td-center">{{ item.area}}</td>
+              <td class="td-center">{{ item.machine_name}}</td>
+              <td class="td-center">{{ item.status == 'attend' ? 'Atender' : item.status == 'in_progress' ? 'En
+                progreso'
+                : item.status == 'finaliced' ? 'Finalizada' : '' }}</td>
+              <td class="td-center">{{ item.start_date | date: 'hh:mm a dd/MM/yyyy' }}</td>
+              <td class="td-center">
+                <ng-container *ngIf="item.response_time; else elapsed">
+                  <!--{{ item.response_time | date: 'hh:mm a dd/MM/yyyy' }}-->
+                  {{ getElapsedStartEndTime(item.start_date, item.response_time) }}
+                </ng-container>
+                <ng-template #elapsed>
+                  {{ getElapsedTime(item.start_date) }}
+                </ng-template>
+              </td>
+              <td class="td-center">
+                <ng-container *ngIf="item.repair_time; else elapsedRepair">
+                  {{ getElapsedStartEndTime(item.response_time, item.repair_time) }}
+                  <!--{{ item.repair_time | date: 'hh:mm a dd/MM/yyyy' }}-->
+                </ng-container>
+                <ng-template #elapsedRepair>
+                  {{ item.response_time != null ? getElapsedTime(item.response_time) : 'En espera' }}
+                </ng-template>
+              </td>
+              <td class="td-center">
+                <ion-button *ngIf="permissions.isSuperAdmin() && !item.response_time" size="small" color="warning"
+                  (click)="AttendAlert(item)">
+                  Atender </ion-button>
+                <ion-button *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time" size="small"
+                  color="success" (click)="FinaliceAlert(item)"> Finalizar </ion-button>
+                <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item)">
+                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5">No se encontraron recursos.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+      </ion-card>
+    </div>
+  </div>
   <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="permissions.isSuperAdmin()">
     <ion-fab-button (click)="ShowNewAlert()">
       <ion-icon name="add-outline"></ion-icon>
@@ -156,8 +180,24 @@
             }}</ion-select-option>
         </ion-select>
       </ion-item>
-      <ion-searchbar [(ngModel)]="searchTerm" placeholder="Buscar falla"></ion-searchbar>
-      <ion-item>
+      <!--ion-searchbar [(ngModel)]="searchTerm" placeholder="Buscar falla"></ion-searchbar-->
+      <p-table [value]="failures" selectionMode="single" [(selection)]="selectedFailure">
+        <ng-template #header>
+          <tr>
+            <th style="width: 60%">Falla</th>
+            <th style="width: 20%" class="td-center">Area</th>
+            <th style="width: 20%" class="td-center">Tipo</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-item let-rowIndex="rowIndex">
+          <tr [pSelectableRow]="item" [pSelectableRowIndex]="rowIndex">
+            <td>{{ item.name }}</td>
+            <td class="td-center">{{ item.area }}</td>
+            <td class="td-center">{{ item.type }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <!--ion-item>
         <ion-col>
           <ion-select label="Área:" [(ngModel)]="selectedArea" interface="popover" placeholder="seleccione área">
             <ion-select-option *ngFor="let area of uniqueAreas" [value]="area">{{ area }}</ion-select-option>
@@ -182,7 +222,7 @@
             <p>{{ failure.type }}</p>
           </ion-label>
         </ion-item>
-      </ion-list>
+      </ion-list-->
       <ion-fab slot="fixed" vertical="bottom" horizontal="end">
         <ion-fab-button (click)="AddNewAlert()" color="success">
           <ion-icon name="checkmark-outline"></ion-icon>
