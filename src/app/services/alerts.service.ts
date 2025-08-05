@@ -128,7 +128,8 @@ export class AlertsService {
       ],
     });
     await alert.present();
-    const { role } = await alert.onDidDismiss()
-    return role
+    const { role } = await alert.onDidDismiss();
+
+    return role === 'confirm'
   }
 }

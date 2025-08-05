@@ -15,18 +15,15 @@
     </div>
   </ion-toolbar>
 </ion-header>
-<ion-content [fullscreen]="true" class="table-container">
-
+<ion-content [fullscreen]="true">
   <div class="regions-wrapper">
     <div class="region-container full-height-container">
       <ion-card>
-        <p-table #dtAlerts [value]="alertsData" dataKey="alert_id" styleClass="card-table-primeng wo-table-custom "
+        <p-table #dtAlerts [value]="alertsData" dataKey="alert_id" styleClass="card-table-primeng wo-table-custom"
           [tableStyle]="{ 'height': '100%'}" [size]="'small'" [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
           [globalFilterFields]="['name', 'area', 'machine_name']"
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos" [showCurrentPageReport]="true"
-          [filterDelay]="0" stripedRows [scrollable]="true" [scrollHeight]="scrollHeight" sortField="ExecutionDate"
-          [sortOrder]="1">
-
+          [filterDelay]="0" stripedRows [scrollable]="true" [scrollHeight]="scrollHeight" [sortOrder]="1">
           <ng-template #caption>
             <div class="table-caption">
               <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearAlerts(dtAlerts)" />
@@ -135,12 +132,20 @@
                 </ng-template>
               </td>
               <td class="td-center">
-                <ion-button *ngIf="permissions.isSuperAdmin() && !item.response_time" size="small" color="warning"
+                <!--ion-button *ngIf="permissions.isSuperAdmin() && !item.response_time" size="small" color="warning"
                   (click)="AttendAlert(item)">
                   Atender </ion-button>
                 <ion-button *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time" size="small"
-                  color="success" (click)="FinaliceAlert(item)"> Finalizar </ion-button>
-                <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item)">
+                  color="success" (click)="FinaliceAlert(item)"> Finalizar </ion-button-->
+                <ion-button size="small" shape="round" color="warning" (click)="AttendAlert(item)" title="Atender"
+                  *ngIf="permissions.isSuperAdmin() && !item.response_time">
+                  <ion-icon slot="icon-only" name="hammer-outline"></ion-icon>
+                </ion-button>
+                <ion-button size="small" shape="round" color="success" (click)="FinaliceAlert(item)" title="Finalizar"
+                  *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time">
+                  <ion-icon slot="icon-only" name="checkmark-outline"></ion-icon>
+                </ion-button>
+                <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item)" title="Eliminar">
                   <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                 </ion-button>
               </td>
@@ -181,12 +186,31 @@
         </ion-select>
       </ion-item>
       <!--ion-searchbar [(ngModel)]="searchTerm" placeholder="Buscar falla"></ion-searchbar-->
-      <p-table [value]="failures" selectionMode="single" [(selection)]="selectedFailure">
-        <ng-template #header>
+      <p-table [value]="failures" selectionMode="single" [(selection)]="selectedFailure"
+        styleClass="card-table-primeng">
+        <ng-template pTemplate="header">
           <tr>
-            <th style="width: 60%">Falla</th>
-            <th style="width: 20%" class="td-center">Area</th>
-            <th style="width: 20%" class="td-center">Tipo</th>
+            <th pSortableColumn="name" style="width: 60%">
+              <div>
+                Inicio
+                <p-sortIcon field="name" />
+                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="area" style="width: 20%" class="td-center">
+              <div>
+                Área
+                <p-sortIcon field="area" />
+                <p-columnFilter type="text" field="area" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="type" style="min-width: 9rem" class="td-center">
+              <div>
+                Tipo
+                <p-sortIcon field="type" />
+                <p-columnFilter type="text" field="type" display="menu" class="ml-auto" />
+              </div>
+            </th>
           </tr>
         </ng-template>
         <ng-template #body let-item let-rowIndex="rowIndex">

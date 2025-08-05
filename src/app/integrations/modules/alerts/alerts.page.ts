@@ -20,7 +20,7 @@ import { FloatLabel } from "primeng/floatlabel";
 import { Select } from "primeng/select";
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmarkOutline, closeOutline, trashOutline } from 'ionicons/icons';
+import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline } from 'ionicons/icons';
 @Component({
   selector: 'app-alerts',
   templateUrl: './alerts.page.html',
@@ -33,7 +33,7 @@ import { addOutline, checkmarkOutline, closeOutline, trashOutline } from 'ionico
 export class AlertsPage {
   searchValueAl: string = '';
   scrollHeight: string = '90%';
-  rowsPerPage: number = 10;
+  rowsPerPage: number = 19;
   rowsPerPageOptions: number[] = [5, 10, 20];
   progressValue: number[] = [0, 100];
   userData: any = {};
@@ -63,7 +63,7 @@ export class AlertsPage {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.company = this.userData.Company
     this.organizationSelected = this.userData.Company.Organizations[1];
-    addIcons({ trashOutline, addOutline, closeOutline, checkmarkOutline });
+    addIcons({ trashOutline, addOutline, closeOutline, checkmarkOutline, hammerOutline });
   }
   ionViewDidEnter() {
     this.GetAlerts()
@@ -79,7 +79,7 @@ export class AlertsPage {
       const headerHeight = 100; // altura del header de la página
       const tableHeaderHeight = 50; // altura del header de la tabla
       const paginatorHeight = 60; // altura del paginador
-      const padding = 110; // padding extra
+      const padding = 150; // padding extra
 
       const availableHeight = viewportHeight - headerHeight - tableHeaderHeight - paginatorHeight - padding;
       const calculatedRows = Math.floor(availableHeight / rowHeight);
@@ -114,9 +114,9 @@ export class AlertsPage {
   }
   startSubscription() {
     this.websocket.SuscribeById({ organization_id: this.organizationSelected.OrganizationId }, "alerts-new", (response) => {
-      this.alertsData = [...this.alertsData, response];
+      this.alertsData = [response, ...this.alertsData];
       this.changeDetector.detectChanges()
-      this.alerts.Warning("Nueva alerta detectada")
+      this.alerts.Warning("Nueva alerta")
     }).then((ws) => {
     }).catch(err => {
       console.log(err);
@@ -138,7 +138,7 @@ export class AlertsPage {
   }
   ShowNewAlert() {
     this.isModalOpen = true
-
+    this.selectedFailure = this.failures[0]
   }
   AddNewAlert() {
     const body = {
