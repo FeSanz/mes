@@ -1,4 +1,5 @@
 <ion-app>
+  <p-toast ></p-toast >
   <ion-split-pane contentId="main-content" when="(min-width: 1800px)">
     <ion-menu contentId="main-content" type="overlay" *ngIf="showMenu">
       <ion-header>
@@ -149,7 +150,7 @@
                 </ion-menu-toggle>
 
                 <ion-menu-toggle auto-hide="false">
-                  <ion-item routerLinkActive="selected" detail="false" button color="light">
+                  <ion-item [routerLink]="['/dispatch_transaction']" routerLinkActive="selected" detail="false" button color="light">
                     <ion-icon slot="start" name="document-text-outline" color="secondary"></ion-icon>
                     <ion-label>Despachos</ion-label>
                   </ion-item>
@@ -198,6 +199,14 @@
                 </ion-menu-toggle>
 
                 <ion-menu-toggle auto-hide="false">
+                  <ion-item [routerLink]="['/settings/machines']" routerLinkActive="selected" detail="false" button
+                            color="light">
+                    <ion-icon src="assets/images/robot-arm.svg" slot="start" color="secondary"></ion-icon>
+                    <ion-label>Máquinas</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+
+                <ion-menu-toggle auto-hide="false">
                   <ion-item [routerLink]="['/fusion_connection']" routerLinkActive="selected" detail="false" button
                     color="light">
                     <ion-icon slot="start" name="git-network-outline" color="secondary"></ion-icon>
@@ -205,13 +214,7 @@
                   </ion-item>
                 </ion-menu-toggle>
 
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/settings/machines']" routerLinkActive="selected" detail="false" button
-                    color="light">
-                    <ion-icon src="assets/images/robot-arm.svg" slot="start" color="secondary"></ion-icon>
-                    <ion-label>Máquinas</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
+
               </ion-list>
             </div>
           </ion-accordion>

@@ -7,7 +7,11 @@ export class WebSocketService {
   webSocketServer = "ws://localhost:3000";
   //scmServer = "ws://localhost:3000/workorders-ws";
   //server = "wss://iot-services-rd.onrender.com";
+<<<<<<< HEAD
   // webSocketServer = "wss://iot-services-rd-ww45.onrender.com";  
+=======
+  //webSocketServer = "wss://iot-services-rd-ww45.onrender.com";  
+>>>>>>> origin
 
 
   constructor() { }

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonSearchbar } from '@ionic/angular/standalone';
@@ -12,7 +12,7 @@ import { IconField } from "primeng/iconfield";
 import { InputIcon } from "primeng/inputicon";
 import { InputText } from "primeng/inputtext";
 import { PrimeTemplate } from "primeng/api";
-import { TableModule } from "primeng/table";
+import { Table, TableModule } from "primeng/table";
 import { Tag } from "primeng/tag";
 import { ProgressBar } from "primeng/progressbar";
 import { Slider } from "primeng/slider";
@@ -20,7 +20,7 @@ import { FloatLabel } from "primeng/floatlabel";
 import { Select } from "primeng/select";
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmarkOutline, closeOutline, trashOutline } from 'ionicons/icons';
+import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline } from 'ionicons/icons';
 @Component({
   selector: 'app-alerts',
   templateUrl: './alerts.page.html',
@@ -32,8 +32,8 @@ import { addOutline, checkmarkOutline, closeOutline, trashOutline } from 'ionico
 })
 export class AlertsPage {
   searchValueAl: string = '';
-  scrollHeight: string = '550px';
-  rowsPerPage: number = 10;
+  scrollHeight: string = '90%';
+  rowsPerPage: number = 19;
   rowsPerPageOptions: number[] = [5, 10, 20];
   progressValue: number[] = [0, 100];
   userData: any = {};
@@ -43,7 +43,7 @@ export class AlertsPage {
   isModalOpen = false
   failures: any = []
   newAlert: any = {}
-  selectedFailureId: number | null = null;
+  selectedFailure: any = null;
   machines: any = []
   filteredFailures: any = [];
   searchTerm = '';
@@ -53,17 +53,17 @@ export class AlertsPage {
   uniqueAreas: any = [];
   uniqueTypes: any[] = [];
   timer: any;
+  @ViewChild('dtAlerts') table!: Table;
   constructor(
     private alerts: AlertsService,
     private apiService: ApiService,
     private websocket: WebSocketService,
-    private endPoints: EndpointsService,
-    private changeDetector: ChangeDetectorRef,
-    public permissions: PermissionsService,) {
+    public permissions: PermissionsService,
+    private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.company = this.userData.Company
-
-    addIcons({ trashOutline, addOutline, closeOutline, checkmarkOutline });
+    this.organizationSelected = this.userData.Company.Organizations[1];
+    addIcons({ trashOutline, addOutline, closeOutline, checkmarkOutline, hammerOutline });
   }
   ionViewDidEnter() {
     this.GetAlerts()
@@ -72,21 +72,35 @@ export class AlertsPage {
     this.timer = setInterval(() => {
       this.changeDetector.detectChanges(); // Fuerza actualización del contador
     }, 1000); // cada segundo
+
+    setTimeout(() => {
+      const viewportHeight = window.innerHeight;
+      const rowHeight = 46; // altura aproximada de cada fila en px (ajusta según tu diseño)
+      const headerHeight = 100; // altura del header de la página
+      const tableHeaderHeight = 50; // altura del header de la tabla
+      const paginatorHeight = 60; // altura del paginador
+      const padding = 150; // padding extra
+
+      const availableHeight = viewportHeight - headerHeight - tableHeaderHeight - paginatorHeight - padding;
+      const calculatedRows = Math.floor(availableHeight / rowHeight);
+
+      // Mínimo 5 filas, máximo razonable
+      this.rowsPerPage = Math.max(5, Math.min(calculatedRows, 50));
+    }, 100);
   }
   GetAlerts() {
-    const orgsIds = this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
+    const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.apiService.GetRequestRender(`alertsByOrganizations?organizations=${orgsIds}`).then((response: any) => {
-      console.log(response.items);
-
       if (!response.errorsExistFlag) {
         this.alertsData = response.items
       } else {
         this.alerts.Error(response.error)
       }
+      this.startSubscription()
       this.apiService.GetRequestRender(`failuresByCompany/${this.company.CompanyId}`, false).then((response: any) => {
         this.failures = response.items
         this.loadFailures()
-        const orgsIds = this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
+        const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
         this.apiService.GetRequestRender(`machinesByOrganizations?organizations=${orgsIds}`, false).then((response: any) => {
           this.machines = response.items
           this.selectedMachine = response.items[0].machine_id
@@ -98,7 +112,16 @@ export class AlertsPage {
       console.error('Error al obtener OTs:', error);
     });
   }
-
+  startSubscription() {
+    this.websocket.SuscribeById({ organization_id: this.organizationSelected.OrganizationId }, "alerts-new", (response) => {
+      this.alertsData = [response, ...this.alertsData];
+      this.changeDetector.detectChanges()
+      this.alerts.Warning("Nueva alerta")
+    }).then((ws) => {
+    }).catch(err => {
+      console.log(err);
+    });
+  }
   OnAdvanceFilter(values: number[], filterCallback: any) {
     this.progressValue = values;
     filterCallback(values);
@@ -108,23 +131,23 @@ export class AlertsPage {
     table.filterGlobal(target.value, 'contains');
   }
 
-  ClearWorkOrders(table: any) {
+  ClearAlerts(table: any) {
     table.clear();
     this.searchValueAl = '';
     this.progressValue = [0, 100];
   }
   ShowNewAlert() {
     this.isModalOpen = true
-
+    this.selectedFailure = this.failures[0]
   }
   AddNewAlert() {
     const body = {
       machine_id: this.selectedMachine,
-      failure_id: this.selectedFailureId
+      failure_id: this.selectedFailure.failure_id
     }
     this.apiService.PostRequestRender('alerts', body).then((response: any) => {
       this.isModalOpen = false
-      this.GetAlerts()
+      //this.GetAlerts()
     })
   }
   async AttendAlert(alert: any) {
@@ -227,9 +250,9 @@ export class AlertsPage {
       return matchSearch && matchArea && matchType;
     });
   }
-  SelectFail(fail: any) {
+  /*SelectFail(fail: any) {
     this.selectedFailureId = fail.failure_id; // o fail.id si se llama diferente
-  }
+  }*/
   ngOnDestroy() {
     if (this.timer) {
       clearInterval(this.timer);

@@ -85,7 +85,7 @@ export const routes: Routes = [
     loadComponent: () => import('./settings/machines/machines.page').then( m => m.MachinesPage),
     canActivate: [AuthGuard]
   },
-  {
+    {
     path: 'setup-page',
     loadComponent: () => import('./setup-page/setup-page.page').then( m => m.SetupPagePage)    
   },

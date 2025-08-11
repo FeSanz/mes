@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Capacitor, CapacitorHttp, HttpResponse } from '@capacitor/core';
 import { AlertsService } from "./alerts.service";
 import { CredentialsService } from "./credentials.service";
+import { NavController } from '@ionic/angular';
+import { logOut } from 'ionicons/icons';
 
 
 @Injectable({
@@ -10,11 +12,17 @@ import { CredentialsService } from "./credentials.service";
 export class ApiService {
   private credentials: string = '';
   private urlFusion: string = '';
+<<<<<<< HEAD
   private urlRender: string = 'http://localhost:3000/api';
   // private urlRender: string = 'https://iot-services-rd-ww45.onrender.com/api';
+=======
+  //private urlRender: string = 'http://localhost:3000/api';
+  private urlRender: string = 'https://iot-services-rd-ww45.onrender.com/api';
+>>>>>>> origin
   offset: number = 0;
 
-  constructor(public alerts: AlertsService, private credentialService: CredentialsService) {
+  constructor(public alerts: AlertsService, private credentialService: CredentialsService,
+    private navCtrl: NavController) {
     const credentialsData = this.credentialService.Fusion();
     this.urlFusion = `https://${credentialsData[0]}/fscmRestApi/resources/latest`;
     this.credentials = credentialsData[1];
@@ -130,9 +138,13 @@ export class ApiService {
   async GetRequestRender(endPoint: string, show: boolean = true) {
     try {
       if (show) await this.alerts.ShowLoading()
+      const token = localStorage.getItem('tk')
       const options = {
         url: `${this.urlRender}/${endPoint}`,
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        }
       };
       const response: HttpResponse = await CapacitorHttp.get(options);
       this.RequestStatusCode(response.status);
@@ -149,9 +161,13 @@ export class ApiService {
   async PostRequestRender(endPoint: string, payload: any, show: boolean = true) {
     try {
       if (show) await this.alerts.ShowLoading()
+      const token = localStorage.getItem('tk')
       const options = {
         url: `${this.urlRender}/${endPoint}`,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
         data: payload
       };
       const response: HttpResponse = await CapacitorHttp.post(options);
@@ -170,9 +186,13 @@ export class ApiService {
   async PutRequestRender(endPoint: string, payload: any, show: boolean = true) {
     try {
       if (show) await this.alerts.ShowLoading()
+      const token = localStorage.getItem('tk')
       const options = {
         url: `${this.urlRender}/${endPoint}`,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
         data: payload
       };
       const response: HttpResponse = await CapacitorHttp.put(options);
@@ -189,10 +209,14 @@ export class ApiService {
 
   async DeleteRequestRender(endPoint: string) {
     await this.alerts.ShowLoading();
+    const token = localStorage.getItem('tk')
     try {
       const options = {
         url: `${this.urlRender}/${endPoint}`,
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        }
       };
       const response: HttpResponse = await CapacitorHttp.delete(options);
       this.RequestStatusCode(response.status);
@@ -215,7 +239,12 @@ export class ApiService {
       this.alerts.Error("Solicitud incorrecta del cliente (400)");
     }
     else if (statusCode == 401) {
+      this.LogOut()
       this.alerts.Error("No autorizado (401)");
+    }
+    else if (statusCode == 440) {
+      this.LogOut()
+      this.alerts.Error("Sesión expirada");
     }
     else if (statusCode == 403) {
       this.alerts.Warning("Autorizado pero sin acceso a datos (403)");
@@ -233,7 +262,10 @@ export class ApiService {
       this.alerts.Error(`Error al procesar la solicitud (${statusCode})`);
     }
   }
-
+  LogOut() {
+    localStorage.setItem("isLogged", "false")
+    this.navCtrl.navigateRoot('/login');
+  }
   /*******************************Authentication************************** */
   async AuthRequestDatabase(url: string, user: string, password: string) {
     await this.alerts.ShowLoading("Autenticando...");

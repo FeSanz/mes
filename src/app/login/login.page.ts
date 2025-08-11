@@ -36,12 +36,12 @@ export class LoginPage {
 
   LogIn() {
     this.api.AuthRequestDatabase('login', this.username, this.password).then((response: any) => {//obtener resultado del intento de login
-      console.log(response);
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
         this.app.username = this.username
         localStorage.setItem("isLogged", "true")
+        localStorage.setItem("tk", response.token)
         localStorage.setItem("user", this.username)
         localStorage.setItem("userData", JSON.stringify(response.items))//Se guarda la información del usuario
         localStorage.setItem("pwd", this.password)
@@ -60,7 +60,7 @@ export class LoginPage {
     return credentials
   }
 
-  ionViewWillEnter(){
+  ionViewWillEnter() {
     this.app.showMenu = false
   }
 }

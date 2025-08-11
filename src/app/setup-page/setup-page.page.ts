@@ -147,8 +147,6 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     // Espera hasta que la instancia swiper esté disponible
     const interval = setInterval(() => {
       this.swiperInstance = swiperEl.swiper;
-      const nextBtn = document.querySelector('.swiper-button-next');
-      const prevBtn = document.querySelector('.swiper-button-prev');
 
       // if (swiperEl.swiper) {
 
@@ -156,11 +154,6 @@ export class SetupPagePage implements OnInit, AfterViewInit {
 
         this.swiperInstance.on('slideChange', () => {
           const activeIndex = this.swiperInstance.activeIndex;
-
-          nextBtn?.classList.remove('swiper-button-disabled');
-          prevBtn?.classList.remove('swiper-button-disabled');
-          this.swiperInstance.allowSlideNext = true;
-          this.swiperInstance.allowSlidePrev = true;
 
           switch (activeIndex) {
             case 1:

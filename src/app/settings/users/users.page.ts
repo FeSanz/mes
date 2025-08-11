@@ -76,15 +76,18 @@ export class UsersPage implements OnInit {
     /*const orgsIds = this.company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     console.log(orgsIds);*/
     this.apiService.GetRequestRender('users?company_id=' + this.company.CompanyId).then((response: any) => {
-      this.users = response.items
-      this.apiService.GetRequestRender('organizations/' + this.company.CompanyId).then((responseOrg: any) => {
-        this.organizations = responseOrg.items.map((org: any) => ({
-          ...org,
-          OrganizationId: Number(org.OrganizationId)
-        }));
-      })
-      if (this.users) {
-        this.users = this.users.map((item: any) => ({ ...item, selected: false }));
+      console.log(response.errorsExistFlag);
+      if (!response.errorsExistFlag) {
+        this.users = response.items
+        this.apiService.GetRequestRender('organizations/' + this.company.CompanyId).then((responseOrg: any) => {
+          this.organizations = responseOrg.items.map((org: any) => ({
+            ...org,
+            OrganizationId: Number(org.OrganizationId)
+          }));
+        })
+        if (this.users) {
+          this.users = this.users.map((item: any) => ({ ...item, selected: false }));
+        }
       }
     });
   }

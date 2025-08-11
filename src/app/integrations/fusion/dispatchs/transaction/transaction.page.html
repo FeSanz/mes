@@ -1,0 +1,60 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Despachos</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid>
+    <ion-row>
+      <ion-col>OPERACION</ion-col>
+      <ion-col>10</ion-col>
+      <ion-col>99</ion-col>
+      <ion-col>1</ion-col>
+      <ion-col>100</ion-col>
+      <ion-col>cj</ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>SALIDAS</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>CSPPBL</ion-col>
+      <ion-col>345</ion-col>
+      <ion-col>pza</ion-col>
+      <ion-col>345.6</ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>MATERIALES</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>PCBLA-002Y</ion-col>
+      <ion-col>5000</ion-col>
+      <ion-col>1100</ion-col>
+      <ion-col>kg</ion-col>
+      <ion-col>345.6</ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>RECURSOS</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col>H225C</ion-col>
+      <ion-col>7</ion-col>
+      <ion-col>h</ion-col>
+      <ion-col>1</ion-col>
+    </ion-row>
+
+
+  </ion-grid>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="OpenDispatch()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
