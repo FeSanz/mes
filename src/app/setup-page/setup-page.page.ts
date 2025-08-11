@@ -148,17 +148,15 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     const interval = setInterval(() => {
       this.swiperInstance = swiperEl.swiper;
 
-      // if (swiperEl.swiper) {
+      if (swiperEl.swiper) {
 
-      if (this.swiperInstance && nextBtn && prevBtn) {
+      // if (this.swiperInstance) {
 
         this.swiperInstance.on('slideChange', () => {
           const activeIndex = this.swiperInstance.activeIndex;
 
           switch (activeIndex) {
             case 1:
-              console.log(nextBtn);
-              nextBtn?.classList.add('swiper-button-disabled');
               this.swiperInstance.allowSlideNext = false;
               break;
             case 2:
