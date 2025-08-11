@@ -46,7 +46,7 @@ export type ChartOptions = {
   imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, CounterComponent, NumericComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
     IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule, IonRippleEffect, IonToggle]
 })
-export class MonitoringPage implements OnInit {
+export class MonitoringPage {
   sensorData: SensorData[] = [];
   isModalOpen = false;
   isDragging = false;
@@ -126,14 +126,6 @@ export class MonitoringPage implements OnInit {
     this.machines = []
     this.shouldRefresh = false;*/
   }
-  ngOnInit() {
-    document.addEventListener('visibilitychange', () => {
-      /* console.log(document.visibilityState);      
-       if (document.visibilityState === 'visible') {
-         //location.reload(); // 🔄 Fuerza recarga
-       }*/
-    });
-  }
   ionViewDidEnter() {
     this.GetDasboards()
   }
@@ -156,7 +148,6 @@ export class MonitoringPage implements OnInit {
           color: item.color,
         }
       }));
-      console.log(this.widgets);
 
       setTimeout(() => {
         this.simulateResizeForAllWidgets();
