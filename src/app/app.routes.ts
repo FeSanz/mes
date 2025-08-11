@@ -7,9 +7,9 @@ export const routes: Routes = [
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
   },
   {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
+    path: '',      
+    redirectTo: 'init',
+    pathMatch: 'full'  
   },
   {
     path: 'fusion_connection',
@@ -63,7 +63,7 @@ export const routes: Routes = [
   },
   {
     path: 'login',
-    loadComponent: () => import('./login/login.page').then( m => m.LoginPage)
+    loadComponent: () => import('./login/login.page').then( m => m.LoginPage)    
   },
   // {
   //   path: 'settings/user',
@@ -72,15 +72,25 @@ export const routes: Routes = [
   // },
   {
     path: 'fusion_production',
-    loadComponent: () => import('./integrations/fusion/monitoring/production/production.page').then( m => m.ProductionPage)
+    loadComponent: () => import('./integrations/fusion/monitoring/production/production.page').then( m => m.ProductionPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'alerts',
-    loadComponent: () => import('./integrations/modules/alerts/alerts.page').then( m => m.AlertsPage)
+    loadComponent: () => import('./integrations/modules/alerts/alerts.page').then( m => m.AlertsPage),
+    canActivate: [AuthGuard]
   },
   {
     path: 'settings/machines',
     loadComponent: () => import('./settings/machines/machines.page').then( m => m.MachinesPage),
     canActivate: [AuthGuard]
-  }
+  },
+  {
+    path: 'setup-page',
+    loadComponent: () => import('./setup-page/setup-page.page').then( m => m.SetupPagePage)    
+  },
+  {
+    path: 'init',
+    loadComponent: () => import('./init/init.page').then( m => m.InitPage)    
+  },
 ];

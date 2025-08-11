@@ -1,0 +1,343 @@
+<ion-content class="ion-padding" fullscreen>
+  <swiper-container #swiperEl pagination="true" class="login-container" [config]="{observer: true}">
+    <swiper-slide>
+      <div class="login-card">
+
+        <ion-toolbar>
+          <h1>Configuración</h1>
+        </ion-toolbar>
+
+        <ion-item lines="none" class="invisible">
+          <ion-input placeholder="Compañía" type="text" fill="outline" [(ngModel)]="company.Name" name="company">
+            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-input placeholder="Descripción" type="text" fill="outline" [(ngModel)]="company.Description"
+            name="description">
+            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-label class="toggle-label">ERP Oracle Fusion Cloud</ion-label>
+          <ion-toggle [(ngModel)]="toggleActivo" (ionChange)="toggleActivo ? goToSlide(2) : null"></ion-toggle><br />
+        </ion-item>
+
+        <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
+          <ion-input placeholder="Código organización" type="text" fill="outline"
+            [(ngModel)]="organization.OrganizationCode" name="orgCode">
+            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
+          <ion-input placeholder="Nombre organización" type="text" fill="outline"
+            [(ngModel)]="organization.OrganizationName" name="orgName">
+            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
+          <ion-input placeholder="Localización" type="text" fill="outline" [(ngModel)]="organization.Location"
+            name="location">
+            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
+          <ion-input placeholder="Método de trabajo" type="text" fill="outline" [(ngModel)]="organization.WorkMethod"
+            name="workMethod">
+            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          </ion-input>
+        </ion-item>
+      </div>
+    </swiper-slide>
+
+    <swiper-slide>
+      <div class="login-card card-user">
+
+        <ion-toolbar>
+          <h1>Configuración</h1>
+        </ion-toolbar>
+
+        <ion-item lines="none" class="invisible">
+          <ion-input placeholder="Usuario" type="text" fill="outline" [(ngModel)]="userSuperAdmin.Username"
+            name="username">
+            <ion-icon name="person-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-input placeholder="Email" type="email" fill="outline" [(ngModel)]="userSuperAdmin.Email" name="email">
+            <ion-icon name="at-circle-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-input placeholder="Contraseña" type="password" fill="outline" [(ngModel)]="userSuperAdmin.Password"
+            name="password">
+            <ion-icon name="lock-closed-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+            <ion-input-password-toggle slot="end" color="white"
+              style="--color: white; --placeholder-color: rgba(255, 255, 255, 0.5);"></ion-input-password-toggle>
+          </ion-input>
+        </ion-item>
+
+        <ion-button expand="block" class="btn-inferior" (click)="finalize()">Finalizar</ion-button>
+      </div>
+    </swiper-slide>
+
+    <swiper-slide>
+      <div class="login-card">
+
+        <ion-toolbar>
+          <ion-title>Conexión Oracle Manufacturing Cloud</ion-title>
+        </ion-toolbar>
+
+        <ion-item lines="none" class="invisible">
+          <ion-icon name="server-outline" slot="start"></ion-icon>
+          <ion-label position="floating">Servidor</ion-label>
+          <ion-input type="text" placeholder="example.fa.ocs.oraclecloud.com" [(ngModel)]="host"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-label position="floating">Usuario</ion-label>
+          <ion-input type="email" placeholder="mes.iot@example.com" [(ngModel)]="user"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-icon name="key-outline" slot="start"></ion-icon>
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input type="password" placeholder="••••••••••" [(ngModel)]="pwd"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-text [color]="statusColor">{{ statusMessage }}</ion-text>
+        </ion-item>
+        <ion-item lines="none" class="invisible">
+
+          <div>
+            <ion-button (click)="VerifyConnection()">
+              <ion-icon name="link-outline" slot="start"></ion-icon>
+              Conectar
+            </ion-button>&nbsp;
+            <ion-icon [name]="statusIcon" [color]="statusColor"></ion-icon>&nbsp;
+          </div>
+
+          <!-- <div slot="end">
+              <ion-button color="success" (click)="SaveOrUpdateConnection()" [disabled]="!canSave">
+                {{ btnSaveOrUpdate }}
+              </ion-button>
+            </div> -->
+        </ion-item>
+
+        <!-- Interface para Cards módulos Fusion -->
+        <ion-grid>
+          <ion-row class="ion-justify-content-center">
+            <ion-col size="7" *ngFor="let card of fusionCards; let i = index">
+              <ion-card class="stats-card custom-card" [disabled]="!canSave">
+                <div class="stats-content">
+                  <p class="stats-label"><ion-icon [name]="card.icon"></ion-icon> Sincronizar</p>
+                  <h4 class="stats-value">{{ card.moduleName }}</h4>
+                </div>
+                <div class="card-action">
+                  <ion-button fill="clear" style="color: darkgray;" size="large" (click)="GetOrganizations()">
+                    <ion-icon slot="icon-only" name="sync-outline"></ion-icon>
+                  </ion-button>
+                </div>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+      </div>
+    </swiper-slide>
+
+    <swiper-slide>
+      <div class="sync">
+        <div
+          style="background-color: #fd5d93; padding: 2px; display: flex; align-items: center; justify-content: space-between;">
+          <span></span>
+          <span><ion-icon name="cloud-outline" slot="start"></ion-icon> Organizaciones Fusion</span>
+          <ion-button size="small" color="primary" (click)="UploadOrganization()">CARGAR
+            <ion-icon slot="end" name="arrow-forward"></ion-icon>
+          </ion-button>
+        </div>
+        <div>
+          <p-table #dtFusion [value]="fusionData.items" [(selection)]="selectedItemsFusion" dataKey="OrganizationCode"
+            class="table-cards" [tableStyle]="{ 'min-width': '50rem' }" [size]="'small'" [rowHover]="true"
+            [rows]="rowsPerPage" [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions"
+            [paginator]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+            [filterDelay]="0" [globalFilterFields]="['OrganizationCode', 'OrganizationName', 'LocationCode']"
+            stripedRows [scrollable]="true" [scrollHeight]="GetScrollHeight()" [alwaysShowPaginator]="true">
+            <ng-template #caption>
+              <div class="table-caption">
+                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearFusion(dtFusion)" />
+
+                <div></div> <!-- Spacer -->
+
+                <p-iconField iconPosition="left">
+                  <p-inputIcon>
+                    <i class="fas fa-search"></i>
+                  </p-inputIcon>
+                  <input pInputText type="text" [(ngModel)]="searchValueFusion"
+                    (input)="OnFilterGlobal($event, dtFusion)" placeholder="Buscar" />
+                </p-iconField>
+              </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 4rem">
+                  <p-tableHeaderCheckbox />
+                </th>
+                <th pSortableColumn="OrganizationCode" style="min-width: 10rem">
+                  <div class="flex justify-between items-center">
+                    Código
+                    <p-sortIcon field="OrganizationCode" />
+                    <p-columnFilter type="text" field="OrganizationCode" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="OrganizationName" style="min-width: 14rem">
+                  <div class="flex justify-between items-center">
+                    Nombre
+                    <p-sortIcon field="OrganizationName" />
+                    <p-columnFilter type="text" field="OrganizationName" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="LocationCode" style="min-width: 10rem">
+                  <div class="flex justify-between items-center">
+                    Ubicación
+                    <p-sortIcon field="LocationCode" />
+                    <p-columnFilter field="LocationCode" matchMode="equals" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th style="min-width: 12rem">
+                  <div class="flex justify-between items-center">
+                    Manufactura
+                    <p-sortIcon field="DefaultWorkMethod" />
+                    <p-columnFilter field="DefaultWorkMethod" matchMode="equals" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+              <tr>
+                <td>
+                  <p-tableCheckbox [value]="item" />
+                </td>
+                <td>{{ item.OrganizationCode }}</td>
+                <td>{{ item.OrganizationName }}</td>
+                <td>{{ item.LocationCode }}</td>
+                <td>{{ WorkMethodFormat(item.plantParameters.items[0].DefaultWorkMethod)}}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5">No se encontraron organizaciones.</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        <div style="height: 10px;"></div>
+        <div
+          style="background-color: #B8860B; padding: 2px; display: flex; align-items: center; justify-content: space-between;">
+          <span></span>
+          <span><ion-icon name="server-outline"></ion-icon> Organizaciones DB</span>
+          <ion-button size="small" color="success" (click)="goToSlide(1)">LISTO
+            <ion-icon slot="end" name="checkmark-outline"></ion-icon>
+          </ion-button>
+          <!-- <ion-button color="#00bf9a"></ion-button> -->
+        </div>
+        <div>
+          <p-table #dtDB [value]="dbData.items" [(selection)]="selectedItemsDB" dataKey="Code"
+            styleClass="card-table-primeng" [tableStyle]="{ 'min-width': '50rem'}" [size]="'small'" [rowHover]="true"
+            [rows]="rowsPerPage" [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions"
+            [paginator]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+            [filterDelay]="0" [globalFilterFields]="['Code', 'Name', 'Location']" stripedRows [scrollable]="true"
+            [scrollHeight]="GetScrollHeight()" [alwaysShowPaginator]="true">
+            <ng-template pTemplate="caption">
+              <div class="table-caption">
+                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearDB(dtDB)" />
+
+                <div></div> <!-- Spacer -->
+
+                <p-iconField iconPosition="left">
+                  <p-inputIcon>
+                    <i class="fas fa-search"></i>
+                  </p-inputIcon>
+                  <input pInputText type="text" [(ngModel)]="searchValueDB" (input)="OnFilterGlobal($event, dtDB)"
+                    placeholder="Buscar" style="width: 250px;" />
+                </p-iconField>
+              </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 4rem">
+                  <p-tableHeaderCheckbox />
+                </th>
+                <th pSortableColumn="Code" style="min-width: 10rem">
+                  <div class="flex justify-between items-center">
+                    Código
+                    <p-sortIcon field="Code" />
+                    <p-columnFilter type="text" field="Code" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="Name" style="min-width: 14rem">
+                  <div class="flex justify-between items-center">
+                    Nombre
+                    <p-sortIcon field="Name" />
+                    <p-columnFilter type="text" field="Name" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="Location" style="min-width: 10rem">
+                  <div class="flex justify-between items-center">
+                    Ubicación
+                    <p-sortIcon field="Location" />
+                    <p-columnFilter field="Location" matchMode="equals" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th style="min-width: 12rem">
+                  <div class="flex justify-between items-center">
+                    Manufactura
+                    <p-sortIcon field="WorkMethod" />
+                    <p-columnFilter field="WorkMethod" matchMode="equals" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item>
+              <tr>
+                <td>
+                  <p-tableCheckbox [value]="item" />
+                </td>
+                <td>{{ item.Code }}</td>
+                <td>{{ item.Name }}</td>
+                <td>{{ item.Location }}</td>
+                <td>{{ item.WorkMethod || 'N/A' }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5">No se encontraron organizaciones.</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </swiper-slide>
+  </swiper-container>
+
+  <ion-button fill="clear" class="nav-button prev-button" (click)="goPrev()">
+    <ion-icon name="chevron-back-outline"></ion-icon>
+  </ion-button>
+
+  <!-- Botón Siguiente -->
+  <ion-button fill="clear" class="nav-button next-button" (click)="goNext()">
+    <ion-icon name="chevron-forward-outline"></ion-icon>
+  </ion-button>
+</ion-content>

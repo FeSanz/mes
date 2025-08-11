@@ -119,7 +119,7 @@ export class ConnectionPage implements OnInit {
   }
 
   ngOnInit() {
-    this.GetSettings();
+    this.GetSettings();         
   }
 
   GetSettings() {

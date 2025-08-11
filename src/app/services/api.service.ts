@@ -10,8 +10,8 @@ import { CredentialsService } from "./credentials.service";
 export class ApiService {
   private credentials: string = '';
   private urlFusion: string = '';
-  // private urlRender: string = 'http://localhost:3000/api';
-  private urlRender: string = 'https://iot-services-rd-ww45.onrender.com/api';
+  private urlRender: string = 'http://localhost:3000/api';
+  // private urlRender: string = 'https://iot-services-rd-ww45.onrender.com/api';
   offset: number = 0;
 
   constructor(public alerts: AlertsService, private credentialService: CredentialsService) {
@@ -256,6 +256,81 @@ export class ApiService {
     } catch (error: any) {
       console.log('Error (PG):', error);
       //await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
+      return null;
+    } finally {
+      await this.alerts.HideLoading();
+    }
+  }
+
+
+  async GetRequestFusionOnceTime(endPoint: string, credentials: String) {
+    this.offset = 0;
+    let allItems: any[] = [];
+    let totalResults = 0;
+    let hasMore = true;
+    let isFirstRequest = true;
+    await this.alerts.ShowLoading();
+
+    try {
+      while (hasMore) {
+        const url = this.offset === 0
+          ? endPoint
+          : `${endPoint}&offset=${this.offset}`;
+        const options = {
+          url: url,
+          headers: {
+            'Authorization': `Basic ${credentials}`,
+            'Content-Type': 'application/json',
+            'REST-framework-version': '4',
+            'Accept-Language': 'en-US'
+          },
+        };
+
+        const response: HttpResponse = await CapacitorHttp.get(options);
+
+        //Arrojar alerta si existe error solo en la primera petición
+        if (isFirstRequest) {
+          this.RequestStatusCode(response.status);
+          isFirstRequest = false;
+        }
+
+        const data: any = JSON.parse(response.data);
+        totalResults = data.totalResults;
+
+        console.log(`Offset ${this.offset}:`, data.hasMore);
+
+        // Acumular los items de esta página
+        if (data.items && Array.isArray(data.items)) {
+          allItems = allItems.concat(data.items);
+        }
+
+        // Mostrar progreso basado en items ya obtenidos
+        if (totalResults < 500) {
+          await this.alerts.ShowLoading(`Procesando datos [${totalResults} / ${totalResults}]`);
+        } else {
+          await this.alerts.ShowLoading(`Procesando datos [${allItems.length} / ${totalResults}]`);
+        }
+
+        // Verificar si existen más datos e incrementar offset
+        hasMore = data.hasMore || false;
+        if (hasMore) {
+          this.offset += 500;
+        }
+      }
+
+      // Construir respuesta final con todos los datos acumulados
+      const finalResponse = {
+        items: allItems,
+        totalResults: totalResults,
+        count: allItems.length,
+      };
+
+      console.log(`Total de resultados: ${totalResults}`);
+      return JSON.stringify(finalResponse);
+
+    } catch (error: any) {
+      console.log('Error:', error);
+      await this.alerts.Error(`Error de conexión: ${error.message || error}`);
       return null;
     } finally {
       await this.alerts.HideLoading();

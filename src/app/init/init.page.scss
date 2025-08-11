@@ -1,0 +1,13 @@
+ion-content {
+    --background: none; // Evita el fondo blanco por defecto
+
+    background-image: url('/assets/images/desktop.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}

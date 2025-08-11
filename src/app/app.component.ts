@@ -24,6 +24,9 @@ import { EndpointsService } from './services/endpoints.service';
 import { CommonModule } from '@angular/common';
 import { AlertsService } from './services/alerts.service';
 import { PermissionsService } from './services/permissions.service';
+import { register } from 'swiper/element/bundle';
+
+register();
 
 @Component({
   selector: 'app-root',
