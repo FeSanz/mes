@@ -30,6 +30,8 @@ register();
 
 import { Toast } from 'primeng/toast';
 
+import { Toast } from 'primeng/toast';
+
 @Component({
   selector: 'app-root',
   standalone: true,

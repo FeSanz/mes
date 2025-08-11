@@ -85,6 +85,10 @@ export const routes: Routes = [
     loadComponent: () => import('./settings/machines/machines.page').then( m => m.MachinesPage),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'dispatch_transaction',
+    loadComponent: () => import('./integrations/fusion/dispatchs/transaction/transaction.page').then( m => m.TransactionPage)
+  },
     {
     path: 'setup-page',
     loadComponent: () => import('./setup-page/setup-page.page').then( m => m.SetupPagePage)    
@@ -93,4 +97,5 @@ export const routes: Routes = [
     path: 'init',
     loadComponent: () => import('./init/init.page').then( m => m.InitPage)    
   },
+
 ];
