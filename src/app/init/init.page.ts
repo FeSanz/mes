@@ -20,9 +20,9 @@ export class InitPage implements OnInit {
 
     try {
       const response = await this.api.GetRequestRender('userNumber');
-      // const count = parseInt(response.items);
+      const count = parseInt(response.items);
       console.log(response);
-      const count = 0;
+      //const count = 0;
       const isLogged = localStorage.getItem('isLogged') === 'true';
 
       if (count === 0) {
