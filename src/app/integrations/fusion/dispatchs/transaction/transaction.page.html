@@ -8,49 +8,140 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-grid>
-    <ion-row>
-      <ion-col>OPERACION</ion-col>
-      <ion-col>10</ion-col>
-      <ion-col>99</ion-col>
-      <ion-col>1</ion-col>
-      <ion-col>100</ion-col>
-      <ion-col>cj</ion-col>
-    </ion-row>
+  <ion-modal
+    [isOpen]="isModaldispatchOpen" class="dispach-modal">
+    <ng-template>
 
-    <ion-row>
-      <ion-col>SALIDAS</ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>CSPPBL</ion-col>
-      <ion-col>345</ion-col>
-      <ion-col>pza</ion-col>
-      <ion-col>345.6</ion-col>
-    </ion-row>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{ 'Despacho Orden ' }}</ion-title>
+        </ion-toolbar>
+      </ion-header>
 
-    <ion-row>
-      <ion-col>MATERIALES</ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>PCBLA-002Y</ion-col>
-      <ion-col>5000</ion-col>
-      <ion-col>1100</ion-col>
-      <ion-col>kg</ion-col>
-      <ion-col>345.6</ion-col>
-    </ion-row>
+      <ion-content>
+        <ion-grid [fixed]="true">
+          <!-- OPERACION 30 -->
+          <ion-row class="ion-align-items-end">
+            <ion-col size="12" size-sm="3"> <strong>OPERACION 30</strong> </ion-col>
+            <ion-col size="12" size-sm="2.2">
+              <span class="p-text-secondary">FALTANTE</span><br>
+              <span style="background-color: #ffcccb; padding: 2px 8px; border-radius: 4px;">100</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2.2">
+              <span class="p-text-secondary">COMPLETO</span><br>
+              <span style="color: green;">0</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2.2">
+              <span class="p-text-secondary">META</span><br>
+              <span style="color: #007bff;">100</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2.2">
+              <strong>cj</strong>
+            </ion-col>
+          </ion-row>
 
-    <ion-row>
-      <ion-col>RECURSOS</ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col>H225C</ion-col>
-      <ion-col>7</ion-col>
-      <ion-col>h</ion-col>
-      <ion-col>1</ion-col>
-    </ion-row>
+          <ion-row>
+            <ion-col><strong>SALIDAS</strong></ion-col>
+          </ion-row>
 
+          <ion-row>
+            <ion-col size="12" size-sm="3">
+              <strong>MATERIALES</strong>
+            </ion-col>
+          </ion-row>
 
-  </ion-grid>
+          <ion-row>
+            <ion-col size="12" size-sm="3">JU19710 BL</ion-col>
+            <ion-col size="12" size-sm="2">
+              <span style="color: green;">5000</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="text" value="8.6" pSize="small" style="width: 60px;"/>
+            </ion-col>
+            <ion-col size="12" size-sm="2">kg</ion-col>
+            <ion-col size="12" size-sm="2">
+              <span style="color: #007bff;">8.6</span>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="12" size-sm="3">PPC-15217</ion-col>
+            <ion-col size="12" size-sm="2">
+              <span style="color: green;">5000</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="text" value="0.154" pSize="small" style="width: 60px;"/>
+            </ion-col>
+            <ion-col size="12" size-sm="2">m</ion-col>
+            <ion-col size="12" size-sm="2">
+              <span style="color: #007bff;">0.154</span>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="12" size-sm="3">
+              <strong>RECURSOS</strong>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="12" size-sm="3">ENCSJ6</ion-col>
+            <ion-col size="12" size-sm="2"></ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="text" value="0.835" pSize="small" style="width: 60px;"/>
+            </ion-col>
+            <ion-col size="12" size-sm="2">h</ion-col>
+            <ion-col size="12" size-sm="2">
+              <span style="color: #007bff;">0.835</span>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="12" size-sm="3">LIDER PLANTILLA</ion-col>
+            <ion-col size="12" size-sm="2"></ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="text" value="0.835" pSize="small" style="width: 60px;"/>
+            </ion-col>
+            <ion-col size="12" size-sm="2">h</ion-col>
+            <ion-col size="12" size-sm="2">
+              <span style="color: #007bff;">0.835</span>
+            </ion-col>
+          </ion-row>
+
+          <!-- Mensaje de advertencia -->
+          <ion-row>
+            <ion-col>
+              <p style="color: red; font-style: italic; text-align: center; margin-top: 20px;">
+                Sin stock suficiente en algunos materiales
+              </p>
+            </ion-col>
+          </ion-row>
+
+          <!-- Botones -->
+          <ion-row style="margin-top: 20px;">
+            <ion-col size="6">
+              <p-button
+                label="CERRAR"
+                severity="danger"
+                [style]="{'width': '100%'}"
+                styleClass="p-button-danger"
+                (click)="isModaldispatchOpen = false;">
+              </p-button>
+            </ion-col>
+            <ion-col size="6">
+              <p-button
+                label="GUARDAR"
+                severity="success"
+                [style]="{'width': '100%'}"
+                styleClass="p-button-success">
+              </p-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="OpenDispatch()">
