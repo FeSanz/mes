@@ -6,6 +6,7 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import { MessageService } from 'primeng/api';
+
 //import 'primeicons/primeicons.css';
 
 //Temas PrimeNG
@@ -17,6 +18,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
+import { register } from 'swiper/element/bundle';
+
+register(); 
 
 registerLocaleData(localeEs, 'es');
 

@@ -364,4 +364,8 @@ export class ApiService {
       await this.alerts.HideLoading();
     }
   }
+
+  getUrlRender(){
+    return this.urlRender;
+  }
 }
