@@ -6,10 +6,10 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, I
 
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
-import {AlertsService} from "../../../../services/alerts.service";
 import {HeightTable} from "../../../../models/tables.prime";
 import {addIcons} from "ionicons";
 
+import { MessageService } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -60,7 +60,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
-              private alerts: AlertsService) {
+              private messageService: MessageService) {
     addIcons({
       closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
     });
@@ -115,7 +115,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
     if(this.workCenterSelected) {
       let clause = `resourceMachines/${this.organizationSelected.OrganizationId}/${this.workCenterSelected.WorkCenterId}`;
       this.apiService.GetRequestRender(clause).then((response: any) => {
-        response.totalResults == 0 && this.alerts.Warning(response.message);
+        response.totalResults == 0 &&  this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: response.message});
         this.dbData = response;
 
         this.apiService.GetRequestFusion(this.endPoints.Path('machines', this.workCenterSelected.WorkCenterId, this.organizationSelected.Code)).then((response: any) => {
@@ -152,7 +152,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.fusionData.items) {
 
       if (this.selectedItemsFusion.length === 0) {
-        this.alerts.Warning("Seleccione algún elemento para cargar");
+        this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: 'Seleccione algún elemento para cargar'});
         return;
       }
 
@@ -172,9 +172,9 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
       this.apiService.PostRequestRender('resourceMachines', payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
-          this.alerts.Info(response.message);
+          this.messageService.add({ severity: 'info', summary: 'Info', detail: response.message});
         }else {
-          this.alerts.Success(response.message);
+          this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: response.message});
 
           setTimeout(() => {
             this.RefreshTables();
@@ -189,7 +189,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.dbData.items) {
 
       if (this.selectedItemsDB.length === 0) {
-        this.alerts.Warning("Seleccione algún elemento para eliminar");
+        this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: 'Seleccione algún elemento para eliminar'});
         return;
       }
 
@@ -205,7 +205,8 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
           }
         }
 
-        this.alerts.Success(`Eliminados exitosamente [${successCount}/ ${this.selectedItemsDB.length}]`);
+        this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: `Eliminados exitosamente [${successCount}/ ${this.selectedItemsDB.length}]`});
+
 
         // Recargar la página solo si hubo eliminaciones exitosas
         if (successCount > 0) {
@@ -216,7 +217,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
       } catch (error) {
         console.error('Error al eliminar:', error);
-        this.alerts.Error('Error al eliminar');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar'});
       }
     }
   }
@@ -234,7 +235,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
   RefreshTables() {
     let clause = `resourceMachines/${this.organizationSelected.OrganizationId}/${this.workCenterSelected.WorkCenterId}`;
     this.apiService.GetRequestRender(clause).then((response: any) => {
-      response.totalResults == 0 && this.alerts.Warning(response.message);
+      response.totalResults == 0 && this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: response.message});
       this.dbData = response;
 
       this.FilterRegisteredItems();

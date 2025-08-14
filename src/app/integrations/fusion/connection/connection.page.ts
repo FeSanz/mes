@@ -2,34 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import {
-  IonButton,
-  IonButtons, IonCard, IonCol,
-  IonContent, IonGrid,
-  IonHeader,
-  IonIcon, IonInput, IonItem, IonLabel,
-  IonMenuButton, IonRow, IonText,
-  IonTitle,
-  IonToolbar
+import { IonButton, IonButtons, IonCard, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel,
+         IonMenuButton, IonRow, IonText, IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
 
 import { ApiService } from "../../../services/api.service";
 import { EndpointsService } from "../../../services/endpoints.service";
-import { AlertsService } from "../../../services/alerts.service";
 import { addIcons } from "ionicons";
 
-import {
-  cloudOutline,
-  serverOutline,
-  personOutline,
-  keyOutline,
-  linkOutline,
-  checkmarkCircle,
-  timeOutline,
-  syncOutline,
-  globeOutline,
-  alarmOutline,
-  clipboardOutline
+import { MessageService } from 'primeng/api';
+
+import { cloudOutline, serverOutline, personOutline, keyOutline, linkOutline, checkmarkCircle, timeOutline, syncOutline,
+         globeOutline, alarmOutline, clipboardOutline
 } from 'ionicons/icons';
 import { CredentialsService } from "../../../services/credentials.service";
 
@@ -99,27 +83,17 @@ export class ConnectionPage implements OnInit {
     private apiService: ApiService,
     private credentialService: CredentialsService,
     private endPoints: EndpointsService,
-    private alerts: AlertsService,
+    private messageService: MessageService,
     private router: Router) {
 
-    addIcons({
-      cloudOutline,
-      serverOutline,
-      personOutline,
-      keyOutline,
-      linkOutline,
-      checkmarkCircle,
-      timeOutline,
-      syncOutline,
-      globeOutline,
-      alarmOutline,
-      clipboardOutline
+    addIcons({ cloudOutline, serverOutline, personOutline, keyOutline, linkOutline, checkmarkCircle, timeOutline,
+      syncOutline, globeOutline, alarmOutline, clipboardOutline
     });
     this.userData = JSON.parse(String(localStorage.getItem("userData")))
   }
 
   ngOnInit() {
-    this.GetSettings();         
+    this.GetSettings();
   }
 
   GetSettings() {
@@ -135,7 +109,7 @@ export class ConnectionPage implements OnInit {
       const credentialsParts = atob(this.credentials).split(':');
 
       if (credentialsParts.length !== 2) {
-        this.alerts.Error('Formato de credenciales inválido');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Formato de credenciales inválido'});
         return;
       }
 
@@ -149,7 +123,7 @@ export class ConnectionPage implements OnInit {
 
     } catch (error) {
       console.error('Error al decodificar credenciales:', error);
-      this.alerts.Error('Error al procesar credenciales');
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al procesar credenciales'});
     }
   }
 
@@ -166,7 +140,7 @@ export class ConnectionPage implements OnInit {
         this.user = decoded.split(':')[0];
         this.pwd = decoded.split(':')[1];
       } catch (error) {
-        this.alerts.Error('Error al decodificar credenciales guardadas');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al decodificar credenciales guardadas'});
       }
     }
   }
@@ -207,9 +181,9 @@ export class ConnectionPage implements OnInit {
     try {
       const response: any = await apiCall;
       if (response.errorsExistFlag) {
-        this.alerts.Info(response.message);
+        this.messageService.add({ severity: 'info', summary: 'Alerta', detail: response.message});
       } else {
-        this.alerts.Success(response.message);
+        this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: response.message});
       }
     } catch (error) {
       console.error('Error en SaveOrUpdateConnection:', error);
@@ -220,7 +194,7 @@ export class ConnectionPage implements OnInit {
   RequestStatusConnection(statusCode: number) {
     if (statusCode >= 200 && statusCode <= 202) {
       this.statusMessage = 'Acceso autorizado';
-      this.statusIcon = 'warning'; //checkmark-circle';
+      this.statusIcon = 'checkmark-circle';
       this.statusColor = 'success';
       this.canSave = true;
     }
@@ -283,7 +257,8 @@ export class ConnectionPage implements OnInit {
       }
     }
     else {
-      this.alerts.Warning("Acceso no autorizado. Primero verifique y guarde los datos de conexión ")
+      this.messageService.add({ severity: 'warn', summary: 'Precaución',
+        detail: 'Acceso no autorizado. Primero verifique y guarde los datos de conexión'});
     }
   }
 

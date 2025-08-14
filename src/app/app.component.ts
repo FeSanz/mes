@@ -18,14 +18,15 @@ import {
   reorderThreeOutline, reorderTwoOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline
 } from 'ionicons/icons';
 
+import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from './services/api.service';
 import { EndpointsService } from './services/endpoints.service';
 import { CommonModule } from '@angular/common';
-import { AlertsService } from './services/alerts.service';
 import { PermissionsService } from './services/permissions.service';
 
 import { Toast } from 'primeng/toast';
+import {AlertsService} from "./services/alerts.service";
 
 @Component({
   selector: 'app-root',
@@ -55,6 +56,7 @@ export class AppComponent {
   constructor(
     private router: Router,
     private api: ApiService,
+    private messageService: MessageService,
     private alerts: AlertsService,
     private navCtrl: NavController,
     private endPoints: EndpointsService,
@@ -154,7 +156,7 @@ export class AppComponent {
       if (!response.errorsExistFlag) {
         //this.alerts.Success("Dashboard eliminado")
       } else {
-        this.alerts.Error("Error al reordenar la lista, intente más tarde.")
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al reordenar la lista, intente más tarde'});
       }
     });
   }
@@ -187,7 +189,7 @@ export class AppComponent {
     this.dashboardGroupData.index = Number(this.dashboardGroups.length) + 1
     this.api.PostRequestRender('dashboardsGroup', this.dashboardGroupData).then((response: any) => {
       if (!response.errorsExistFlag) {
-        this.alerts.Success("Dashboard creado")
+        this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: 'Dashboard creado'});
         this.isModalOpen = false
         this.dashboardGroupData = {
           group_name: "",
@@ -199,7 +201,7 @@ export class AppComponent {
         this.GetDashGroup()
         this.changeDetector.detectChanges()
       } else {
-        this.alerts.Info(response.error)
+        this.messageService.add({ severity: 'info', summary: 'Info', detail: response.error});
       }
     })
   }
@@ -211,7 +213,7 @@ export class AppComponent {
         //console.log(this.dashboardGroups);
       })
     } else {
-      this.alerts.Error("No hay organizaciones relacionadas con el usuario")
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No hay organizaciones relacionadas con el usuario'});
     }
   }
   editDashGroup(dashGroup: any) {
@@ -226,9 +228,9 @@ export class AppComponent {
         if (!response.errorsExistFlag) {
           this.dashboardGroups = this.dashboardGroups.filter((dash: any) => dash.dashboard_group_id !== dashId);
           this.changeDetector.detectChanges()
-          this.alerts.Success("Dashboard eliminado")
+          this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: 'Dashboard eliminado'});
         } else {
-          this.alerts.Info(response.error)
+          this.messageService.add({ severity: 'info', summary: 'Info', detail: response.error });
         }
       })
     }
@@ -236,9 +238,9 @@ export class AppComponent {
   updateWidgetGroup() {
     this.api.PutRequestRender('dashboardsGroup/' + this.dashboardGroupData.dashboard_group_id, this.dashboardGroupData).then((response: any) => {
       if (response.errorsExistFlag) {
-        this.alerts.Info(response.message);
+        this.messageService.add({ severity: 'info', summary: 'Info', detail: response.error });
       } else {
-        this.alerts.Success("Dashboard actualizado")
+        this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: 'Dashboard actualizado'});
         this.dashboardGroupData = {
           group_name: "",
           description: "",
@@ -261,7 +263,7 @@ export class AppComponent {
     this.api.GetRequestRender('dashboardsGroup/byOrganizations/?organizations=' + orgsIds, false).then((response: any) => {
       //console.log(response);
       if (response.errorsExistFlag) {
-        this.alerts.Info(response.message);
+        this.messageService.add({ severity: 'info', summary: 'Info', detail: response.message});
       } else {
         this.permissions.reloadUserData()
         this.dashboardGroups = response.items
