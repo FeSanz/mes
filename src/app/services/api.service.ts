@@ -5,6 +5,7 @@ import { CredentialsService } from "./credentials.service";
 import { NavController } from '@ionic/angular';
 import { logOut } from 'ionicons/icons';
 
+import { MessageService } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class ApiService {
 
   offset: number = 0;
 
-  constructor(public alerts: AlertsService, private credentialService: CredentialsService,
+  constructor(public alerts: AlertsService, private messageService: MessageService, private credentialService: CredentialsService,
     private navCtrl: NavController) {
     const credentialsData = this.credentialService.Fusion();
     this.urlFusion = `https://${credentialsData[0]}/fscmRestApi/resources/latest`;
@@ -91,7 +92,7 @@ export class ApiService {
 
     } catch (error: any) {
       console.log('Error:', error);
-      await this.alerts.Error(`Error de conexión: ${error.message || error}`);
+      this.messageService.add({ severity: 'error', summary: 'Error de conexión', detail: `${error.message || error}`});
       return null;
     } finally {
       await this.alerts.HideLoading();
@@ -121,7 +122,7 @@ export class ApiService {
         return error.response.status; // Algunas versiones lo ponen en response
       }
 
-      await this.alerts.Error(`Error de conexión: ${error.message || error}`);
+      this.messageService.add({ severity: 'error', summary: 'Error de conexión', detail: `${error.message || error}`});
       return -401;
     }
     finally {
@@ -147,7 +148,7 @@ export class ApiService {
       return response.data;
     } catch (error: any) {
       console.log('Error (PG):', error);
-      await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
+      this.messageService.add({ severity: 'error', summary: 'Error de conexión render', detail: `${error.message || error}`});
       return null;
     } finally {
       if (show) await this.alerts.HideLoading()
@@ -172,7 +173,7 @@ export class ApiService {
 
     } catch (error: any) {
       console.log('Error (PG):', error);
-      await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
+      this.messageService.add({ severity: 'error', summary: 'Error de conexión render', detail: `${error.message || error}`});
       return null;
     } finally {
       if (show) await this.alerts.HideLoading()
@@ -196,7 +197,7 @@ export class ApiService {
       return response.data;
     } catch (error: any) {
       console.log('Error (PG):', error);
-      await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
+      this.messageService.add({ severity: 'error', summary: 'Error de conexión render', detail: `${error.message || error}`});
       return null;
     } finally {
       if (show) await this.alerts.HideLoading()
@@ -220,7 +221,7 @@ export class ApiService {
 
     } catch (error: any) {
       console.log('Error (PG):', error);
-      await this.alerts.Error(`Error de conexión (PG): ${error.message || error}`);
+      this.messageService.add({ severity: 'error', summary: 'Error de conexión render', detail: `${error.message || error}`});
       return null;
     } finally {
       await this.alerts.HideLoading();
@@ -232,30 +233,30 @@ export class ApiService {
       return;
     }
     else if (statusCode == 400) {
-      this.alerts.Error("Solicitud incorrecta del cliente (400)");
+      this.messageService.add({ severity: 'error', summary: 'Error 400', detail: "Solicitud incorrecta del cliente"});
     }
     else if (statusCode == 401) {
       this.LogOut()
-      this.alerts.Error("No autorizado (401)");
+      this.messageService.add({ severity: 'error', summary: 'Error 401', detail: "No autorizado"});
+    }
+    else if (statusCode == 403) {
+      this.messageService.add({ severity: 'warn', summary: 'Error 403', detail: "Autorizado pero sin acceso a datos"});
+    }
+    else if (statusCode == 404) {
+      this.messageService.add({ severity: 'error', summary: 'Error 404', detail: "Solicitud no encontrada"});
+    }
+    else if (statusCode == 405) {
+      this.messageService.add({ severity: 'error', summary: 'Error 405', detail: "Método de la solicitud no admitido"});
     }
     else if (statusCode == 440) {
       this.LogOut()
-      this.alerts.Error("Sesión expirada");
-    }
-    else if (statusCode == 403) {
-      this.alerts.Warning("Autorizado pero sin acceso a datos (403)");
-    }
-    else if (statusCode == 404) {
-      this.alerts.Error("Solicitud no encontrada (404)");
-    }
-    else if (statusCode == 405) {
-      this.alerts.Error("Método de la solicitud no admitido (405)");
+      this.messageService.add({ severity: 'error', summary: 'Error 440', detail: "Sesión expirada"});
     }
     else if (statusCode == 500) {
-      this.alerts.Error("Error interno del servidor (500)");
+      this.messageService.add({ severity: 'error', summary: 'Error 500', detail: "Error interno del servidor"});
     }
     else {
-      this.alerts.Error(`Error al procesar la solicitud (${statusCode})`);
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: `Error al procesar la solicitud (${statusCode})`});
     }
   }
   LogOut() {
@@ -358,7 +359,7 @@ export class ApiService {
 
     } catch (error: any) {
       console.log('Error:', error);
-      await this.alerts.Error(`Error de conexión: ${error.message || error}`);
+      this.messageService.add({ severity: 'error', summary: 'Error de conexión', detail: `${error.message || error}`});
       return null;
     } finally {
       await this.alerts.HideLoading();
