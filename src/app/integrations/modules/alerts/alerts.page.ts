@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonSearchbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonSearchbar } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
@@ -27,7 +27,7 @@ import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline
   styleUrls: ['./alerts.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonIcon, IonFab, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule,
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonIcon, IonFab, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule,
     Tag, ProgressBar, Slider, FloatLabel, Select, IonSearchbar]
 })
 export class AlertsPage {
@@ -38,6 +38,7 @@ export class AlertsPage {
   progressValue: number[] = [0, 100];
   userData: any = {};
   alertsData: any = []
+  finalicedAlertsData: any = []
   organizationSelected: string | any = '';
   company: any = {}
   isModalOpen = false
@@ -62,11 +63,13 @@ export class AlertsPage {
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.company = this.userData.Company
-    this.organizationSelected = this.userData.Company.Organizations[1];
+    this.userData.Company.Organizations = this.userData.Company.Organizations.filter((org: any) => org.WorkMethod != null);
+    this.organizationSelected = this.userData.Company.Organizations[0];
     addIcons({ trashOutline, addOutline, closeOutline, checkmarkOutline, hammerOutline });
   }
   ionViewDidEnter() {
     this.GetAlerts()
+    this.startSubscription()
   }
   ngOnInit() {
     this.timer = setInterval(() => {
@@ -79,7 +82,7 @@ export class AlertsPage {
       const headerHeight = 100; // altura del header de la página
       const tableHeaderHeight = 50; // altura del header de la tabla
       const paginatorHeight = 60; // altura del paginador
-      const padding = 150; // padding extra
+      const padding = 550; // padding extra
 
       const availableHeight = viewportHeight - headerHeight - tableHeaderHeight - paginatorHeight - padding;
       const calculatedRows = Math.floor(availableHeight / rowHeight);
@@ -90,33 +93,51 @@ export class AlertsPage {
   }
   GetAlerts() {
     const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
-    this.apiService.GetRequestRender(`alertsByOrganizations?organizations=${orgsIds}`).then((response: any) => {
+    this.apiService.GetRequestRender(`alertsByOrganizations/pendings?organizations=${orgsIds}`).then((response: any) => {
       if (!response.errorsExistFlag) {
         this.alertsData = response.items
       } else {
         this.alerts.Error(response.error)
       }
-      this.startSubscription()
-      this.apiService.GetRequestRender(`failuresByCompany/${this.company.CompanyId}`, false).then((response: any) => {
-        this.failures = response.items
-        this.loadFailures()
-        const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
-        this.apiService.GetRequestRender(`machinesByOrganizations?organizations=${orgsIds}`, false).then((response: any) => {
-          this.machines = response.items
-          this.selectedMachine = response.items[0].machine_id
-        })
+      this.apiService.GetRequestRender(`alertsByOrganizations/finaliced?organizations=${orgsIds}`).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          this.finalicedAlertsData = response.items
+        } else {
+          this.alerts.Error(response.error)
+        }
+        this.apiService.GetRequestRender(`failuresByCompany/${this.company.CompanyId}`, false).then((response: any) => {
+          this.failures = response.items
+          this.loadFailures()
+          const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
+          this.apiService.GetRequestRender(`machinesByOrganizations?organizations=${orgsIds}`, false).then((response: any) => {
+            this.machines = response.items
+            this.selectedMachine = response.items[0].machine_id
+          })
+        }).catch(error => {
+          console.error('Error al obtener fallas:', error);
+        });
       }).catch(error => {
-        console.error('Error al obtener fallas:', error);
+        console.error('Error al obtener OTs:', error);
       });
     }).catch(error => {
       console.error('Error al obtener OTs:', error);
     });
   }
   startSubscription() {
-    this.websocket.SuscribeById({ organization_id: this.organizationSelected.OrganizationId }, "alerts-new", (response) => {
-      this.alertsData = [response, ...this.alertsData];
-      this.changeDetector.detectChanges()
-      this.alerts.Warning("Nueva alerta")
+    this.websocket.SuscribeById({ organization_id: this.organizationSelected.OrganizationId }, "alerts", (response) => {
+      if (response.action == 'new') {
+        this.alertsData = [response, ...this.alertsData];
+        this.changeDetector.detectChanges()
+        this.alerts.Warning("Nueva alerta")
+      } else if (response.action == 'update') {
+        this.alerts.Warning('Una alerta se modificado');
+        this.GetAlerts()
+        console.log(response);
+
+      } else if (response.action == 'delete') {
+        this.alerts.Error('Una alerta se ha eliminado');
+        this.GetAlerts()
+      }
     }).then((ws) => {
     }).catch(err => {
       console.log(err);
@@ -152,7 +173,7 @@ export class AlertsPage {
   }
   async AttendAlert(alert: any) {
     if (await this.alerts.ShowAlert("¿Deseas atender esta alerta?", "Alerta", "Atrás", "Atender")) {
-      this.apiService.PutRequestRender('alerts/' + alert.alert_id + '/attend', {}).then((response: any) => {
+      this.apiService.PutRequestRender('alerts/' + alert.alert_id + '/attend', { organization_id: this.organizationSelected.OrganizationId }).then((response: any) => {
         if (!response.errorsExistFlag) {
           this.alerts.Success("Alerta atendida")
           alert.response_time = new Date()
@@ -164,10 +185,12 @@ export class AlertsPage {
   }
   async FinaliceAlert(alert: any) {
     if (await this.alerts.ShowAlert("¿Deseas finalizar esta alerta?", "Alerta", "Atrás", "Finalizar")) {
-      this.apiService.PutRequestRender('alerts/' + alert.alert_id + '/repair', {}).then((response: any) => {
+      this.apiService.PutRequestRender('alerts/' + alert.alert_id + '/repair', { organization_id: this.organizationSelected.OrganizationId }).then((response: any) => {
+        console.log(response);
+
         if (!response.errorsExistFlag) {
           this.alerts.Success("Alerta finalizada")
-          alert.repair_time = new Date()
+          //alert.repair_time = new Date()
         } else {
           this.alerts.Info(response.error)
         }
@@ -176,9 +199,8 @@ export class AlertsPage {
   }
   async DeleteAlert(alert: any) {
     if (await this.alerts.ShowAlert("¿Deseas eliminar esta alerta?", "Alerta", "Atrás", "Eliminar")) {
-      this.apiService.DeleteRequestRender('alerts/' + alert.alert_id).then((response: any) => {
+      this.apiService.DeleteRequestRender('alerts/' + alert.alert_id + '?organization_id=' + this.organizationSelected.OrganizationId).then((response: any) => {
         if (!response.errorsExistFlag) {
-          this.GetAlerts()
           this.alerts.Success("Alerta eliminada")
         } else {
           this.alerts.Info(response.error)
@@ -196,34 +218,36 @@ export class AlertsPage {
     const hours = Math.floor(diffMs / (1000 * 60 * 60)) % 24;
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    const parts = [];
+    const parts: string[] = [];
     if (days > 0) parts.push(`${days} día${days > 1 ? 's' : ''}`);
-    if (hours > 0) parts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
-    if (minutes > 0) parts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
-    parts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
-    //this.changeDetector.detectChanges()
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}min`);
+    parts.push(`${seconds}s`);
+
     return parts.join(' ');
   }
+
   getElapsedStartEndTime(startDate: string | Date, endDate?: string | Date): string {
     const start = new Date(startDate);
     const end = endDate ? new Date(endDate) : new Date();
     const diffMs = end.getTime() - start.getTime();
 
-    if (diffMs < 0) return '0 segundos';
+    if (diffMs < 0) return '0s';
 
     const seconds = Math.floor(diffMs / 1000) % 60;
     const minutes = Math.floor(diffMs / (1000 * 60)) % 60;
     const hours = Math.floor(diffMs / (1000 * 60 * 60)) % 24;
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    const parts = [];
+    const parts: string[] = [];
     if (days > 0) parts.push(`${days} día${days > 1 ? 's' : ''}`);
-    if (hours > 0) parts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
-    if (minutes > 0) parts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
-    parts.push(`${seconds} segundo${seconds > 1 ? 's' : ''}`);
+    if (hours > 0) parts.push(`${hours}h`);
+    if (minutes > 0) parts.push(`${minutes}min`);
+    parts.push(`${seconds}s`);
 
     return parts.join(' ');
   }
+
 
   loadFailures() {
     // después de cargar las fallas

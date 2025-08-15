@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, inject, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,7 @@ import { AlertsService } from 'src/app/services/alerts.service';
 import { Clipboard } from '@capacitor/clipboard';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { PermissionsService } from 'src/app/services/permissions.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-devices',
@@ -22,6 +23,7 @@ import { PermissionsService } from 'src/app/services/permissions.service';
 export class DevicesPage implements OnInit {
   organizations: any = []
   isModalOpen = false;
+  private activatedRoute = inject(ActivatedRoute);
   machine: any = {
     isNew: true,
     name: "",

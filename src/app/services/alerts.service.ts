@@ -7,6 +7,7 @@ import {
   warning,
   informationCircle
 } from "ionicons/icons";
+import { MessageService } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,9 @@ import {
 export class AlertsService {
 
 
-  constructor(public loadController: LoadingController,
+  constructor(
+    private messageService: MessageService,
+    public loadController: LoadingController,
     private alertController: AlertController,
     private toastController: ToastController) {
 
@@ -43,73 +46,21 @@ export class AlertsService {
   }
 
   async Success(message: string, duration: number = 3000): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration,
-      position: 'top',
-      color: 'success',
-      cssClass: 'alertify-toast alertify-success',
-      buttons: [
-        {
-          icon: 'checkmark-circle',
-          role: 'cancel'
-        }
-      ]
-    });
-    await toast.present();
+    this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: message });
   }
 
   async Error(message: string, duration: number = 5000): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration,
-      position: 'top',
-      color: 'danger',
-      cssClass: 'alertify-toast alertify-error',
-      buttons: [
-        {
-          icon: 'close-circle',
-          role: 'cancel'
-        }
-      ]
-    });
-    await toast.present();
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
   }
 
   async Warning(message: string, duration: number = 4000): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration,
-      position: 'top',
-      color: 'warning',
-      cssClass: 'alertify-toast alertify-warning',
-      buttons: [
-        {
-          icon: 'warning',
-          role: 'cancel'
-        }
-      ]
-    });
-    await toast.present();
+    this.messageService.add({ severity: 'warn', summary: 'Alerta', detail: message });
+
   }
 
   async Info(message: string, duration: number = 10000): Promise<void> {
-    const toast = await this.toastController.create({
-      message,
-      duration,
-      position: 'top',
-      color: 'primary',
-      cssClass: 'alertify-info-container alertify-info',
-      buttons: [
-        {
-          icon: 'information-circle',
-          role: 'cancel'
-        }
-      ]
-    });
-    await toast.present();
+    this.messageService.add({ severity: 'info', summary: 'Informativo', detail: message });
   }
-
 
   async ShowAlert(message: string, title: string = "Alerta", cancel: string = "Cancelar", confirm: string = "Aceptar") {//Alerta genérica para toma de desiciones
     const alert = await this.alertController.create({
