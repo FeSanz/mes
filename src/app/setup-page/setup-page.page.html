@@ -16,67 +16,75 @@
         <ion-item lines="none" class="invisible">
           <ion-input placeholder="Descripción" type="text" fill="outline" [(ngModel)]="company.Description"
             name="description">
-            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+            <ion-icon name="code-working-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="invisible">
           <ion-label class="toggle-label">ERP Oracle Fusion Cloud</ion-label>
-          <ion-toggle [(ngModel)]="toggleActivo" (ionChange)="toggleActivo ? goToSlide(2) : null"></ion-toggle><br />
+          <ion-toggle [(ngModel)]="toggleActivo" (ionChange)="toggleActivo ? goToSlide(2) : null"
+            [disabled]="!company.Name?.trim() || !company.Description?.trim()"></ion-toggle>
         </ion-item>
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
-          <ion-input placeholder="Código organización" type="text" fill="outline"
-            [(ngModel)]="organization.OrganizationCode" name="orgCode">
+          <ion-input placeholder="Código organización" type="text" fill="outline" [(ngModel)]="organization.Code"
+            name="orgCode" [disabled]="!company.Name?.trim() || !company.Description?.trim()">
             <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
-          <ion-input placeholder="Nombre organización" type="text" fill="outline"
-            [(ngModel)]="organization.OrganizationName" name="orgName">
-            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          <ion-input placeholder="Nombre organización" type="text" fill="outline" [(ngModel)]="organization.Name"
+            name="orgName" [disabled]="!company.Name?.trim() || !company.Description?.trim()">
+            <ion-icon name="code-working-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
-          <ion-input placeholder="Localización" type="text" fill="outline" [(ngModel)]="organization.Location"
-            name="location">
-            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
+          <ion-input placeholder="Ubicación" type="text" fill="outline" [(ngModel)]="organization.Location"
+            name="location" [disabled]="!company.Name?.trim() || !company.Description?.trim()">
+            <ion-icon name="location-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
-          <ion-input placeholder="Método de trabajo" type="text" fill="outline" [(ngModel)]="organization.WorkMethod"
-            name="workMethod">
-            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
-          </ion-input>
+          <ion-select [(ngModel)]="organization.WorkMethod" name="WorkMethod" interface="popover"
+            placeholder="Método de trabajo" [disabled]="!company.Name?.trim() || !company.Description?.trim()">
+            <ion-select-option value="PROCESS_MANUFACTURING">Manufactura por procesos</ion-select-option>
+            <ion-select-option value="DISCRETE_MANUFACTURING">Manufactura discreta</ion-select-option>
+            <ion-icon name="options-outline" slot="start" aria-hidden="true"
+              style="color:white; padding-left: 15px;"></ion-icon>
+          </ion-select>
+
         </ion-item>
       </div>
     </swiper-slide>
 
     <swiper-slide>
-      <div class="login-card card-user">
+      <div class="login-card">
 
         <ion-toolbar>
           <h1>Configuración</h1>
         </ion-toolbar>
 
         <ion-item lines="none" class="invisible">
-          <ion-input placeholder="Usuario" type="text" fill="outline" [(ngModel)]="userSuperAdmin.Username"
-            name="username">
+          <ion-input placeholder="Usuario" type="text" fill="outline" [(ngModel)]="userSuperAdmin.name" name="username">
             <ion-icon name="person-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="invisible">
-          <ion-input placeholder="Email" type="email" fill="outline" [(ngModel)]="userSuperAdmin.Email" name="email">
+          <ion-input placeholder="Email" type="email" fill="outline" [(ngModel)]="userSuperAdmin.email" name="email"
+            #emailInput="ngModel" required email>
             <ion-icon name="at-circle-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
         </ion-item>
+        <ion-note color="danger" *ngIf="emailInput.invalid && emailInput.touched">
+          Ingrese un correo electrónico válido.
+        </ion-note>
 
         <ion-item lines="none" class="invisible">
-          <ion-input placeholder="Contraseña" type="password" fill="outline" [(ngModel)]="userSuperAdmin.Password"
+          <ion-input placeholder="Contraseña" type="password" fill="outline" [(ngModel)]="userSuperAdmin.password"
             name="password">
             <ion-icon name="lock-closed-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
             <ion-input-password-toggle slot="end" color="white"
@@ -84,7 +92,8 @@
           </ion-input>
         </ion-item>
 
-        <ion-button expand="block" class="btn-inferior" (click)="finalize()">Finalizar</ion-button>
+        <ion-button class="btn-inferior" (click)="finalize()"
+          [disabled]="!userSuperAdmin.name?.trim() || !userSuperAdmin.email?.trim() || !userSuperAdmin.password?.trim()">Finalizar</ion-button>
       </div>
     </swiper-slide>
 
@@ -119,7 +128,7 @@
         <ion-item lines="none" class="invisible">
 
           <div>
-            <ion-button (click)="VerifyConnection()">
+            <ion-button (click)="VerifyConnection()" [disabled]="!host?.trim() || !user?.trim() || !pwd?.trim()">
               <ion-icon name="link-outline" slot="start"></ion-icon>
               Conectar
             </ion-button>&nbsp;
@@ -176,7 +185,7 @@
               <div class="table-caption">
                 <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearFusion(dtFusion)" />
 
-                <div></div> <!-- Spacer -->
+                <div></div>
 
                 <p-iconField iconPosition="left">
                   <p-inputIcon>
@@ -247,10 +256,10 @@
           style="background-color: #B8860B; padding: 2px; display: flex; align-items: center; justify-content: space-between;">
           <span></span>
           <span><ion-icon name="server-outline"></ion-icon> Organizaciones DB</span>
-          <ion-button size="small" color="success" (click)="goToSlide(1)">LISTO
+          <ion-button size="small" color="success" (click)="goToSlide(1)" [disabled]="!(dbData?.items?.length)">LISTO
             <ion-icon slot="end" name="checkmark-outline"></ion-icon>
           </ion-button>
-          <!-- <ion-button color="#00bf9a"></ion-button> -->
+
         </div>
         <div>
           <p-table #dtDB [value]="dbData.items" [(selection)]="selectedItemsDB" dataKey="Code"
@@ -263,7 +272,7 @@
               <div class="table-caption">
                 <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearDB(dtDB)" />
 
-                <div></div> <!-- Spacer -->
+                <div></div>
 
                 <p-iconField iconPosition="left">
                   <p-inputIcon>
@@ -277,9 +286,6 @@
 
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 4rem">
-                  <p-tableHeaderCheckbox />
-                </th>
                 <th pSortableColumn="Code" style="min-width: 10rem">
                   <div class="flex justify-between items-center">
                     Código
@@ -312,9 +318,6 @@
             </ng-template>
             <ng-template pTemplate="body" let-item>
               <tr>
-                <td>
-                  <p-tableCheckbox [value]="item" />
-                </td>
                 <td>{{ item.Code }}</td>
                 <td>{{ item.Name }}</td>
                 <td>{{ item.Location }}</td>
@@ -332,12 +335,11 @@
     </swiper-slide>
   </swiper-container>
 
-  <ion-button fill="clear" class="nav-button prev-button" (click)="goPrev()">
+  <ion-button id="prevBtn" fill="clear" class="nav-button prev-button" (click)="goPrev()">
     <ion-icon name="chevron-back-outline"></ion-icon>
   </ion-button>
 
-  <!-- Botón Siguiente -->
-  <ion-button fill="clear" class="nav-button next-button" (click)="goNext()">
+  <ion-button id="nextBtn" fill="clear" class="nav-button next-button" (click)="goNext()">
     <ion-icon name="chevron-forward-outline"></ion-icon>
   </ion-button>
 </ion-content>

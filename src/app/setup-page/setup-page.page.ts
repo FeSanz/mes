@@ -4,13 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import {
   IonText, IonButton, IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonCheckbox,
-  IonInput, IonItem, IonIcon, IonMenuButton, IonButtons, IonInputPasswordToggle, IonToggle
+  IonInput, IonItem, IonIcon, IonMenuButton, IonButtons, IonInputPasswordToggle, IonToggle, IonSelect
 } from '@ionic/angular/standalone';
 import {
   businessOutline, eyeOffOutline, lockClosed, lockClosedOutline, personOutline,
   arrowForwardOutline, atCircleOutline, cloudOutline, serverOutline, keyOutline, linkOutline,
   checkmarkCircle, timeOutline, syncOutline, globeOutline, alarmOutline, clipboardOutline, trash,
-  arrowForward, chevronDownOutline, closeOutline, checkmarkOutline, chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
+  arrowForward, chevronDownOutline, closeOutline, checkmarkOutline, chevronBackOutline, chevronForwardOutline, optionsOutline, codeWorkingOutline, locationOutline } from 'ionicons/icons';
 import { ApiService } from '../services/api.service';
 import { NavController } from '@ionic/angular';
 import { EndpointsService } from '../services/endpoints.service';
@@ -34,7 +34,6 @@ import { InputIconModule } from 'primeng/inputicon';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 
-
 @Component({
   selector: 'app-setup-page',
   templateUrl: './setup-page.page.html',
@@ -44,14 +43,15 @@ import { MultiSelectModule } from 'primeng/multiselect';
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons,
     IonButton, IonMenuButton, IonCardContent, IonCardHeader, IonCardTitle, IonInput, IonCard,
     IonItem, IonIcon, IonInputPasswordToggle, IonText, IonToggle, MultiSelectModule,
-    DropdownModule, InputIconModule, IconFieldModule, InputTextModule, ButtonModule, TagModule, TableModule
+    DropdownModule, InputIconModule, IconFieldModule, InputTextModule, ButtonModule, TagModule, TableModule,
+    IonSelect
   ],
   // encapsulation: ViewEncapsulation.None
 })
 
 export class SetupPagePage implements OnInit, AfterViewInit {
   @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
-  // @ViewChild('dtFusion') table!: Table;
+
   private resizeObserver!: ResizeObserver;
   scrollHeight: string = '550px';
   rowsPerPage: number = 50;
@@ -88,25 +88,32 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     "Description": "",
     "EnabledFlag": "Y"
   }
+  company_id: number = 0;
 
   userSuperAdmin = {
-    "Username": "",
-    "Password": "",
-    "Email": ""
+    "role": "SuperAdmin",
+    "name": "",
+    "type": "USER",
+    "password": "",
+    "email": "",
+    "enabled_flag": "Y",
+    "organizations": [{}]
   }
 
   organization = {
-    "OrganizationCode": "",
-    "OrganizationName": "",
+    "CompanyId": 0,
+    "Code": "",
+    "Name": "",
     "Location": "",
     "WorkMethod": "",
-    "BuId": "",
+    "BUId": 0,
     "Coordinates": ""
   }
 
-  orgs = { items: [] };
+  orgs = [];
   toggleActivo: boolean = false;
   @ViewChild('swiperEl', { static: false }) swiperEl!: ElementRef;
+
   swiperInstance: any;
   isNextDisabled: boolean = false;
 
@@ -131,7 +138,7 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     private router: Router, private cdr: ChangeDetectorRef,
     private zone: NgZone
   ) {
-    addIcons({businessOutline,personOutline,atCircleOutline,lockClosedOutline,serverOutline,keyOutline,linkOutline,syncOutline,cloudOutline,arrowForward,checkmarkOutline,chevronBackOutline,chevronForwardOutline,trash,arrowForwardOutline,checkmarkCircle,timeOutline,globeOutline,alarmOutline,clipboardOutline});
+    addIcons({businessOutline,codeWorkingOutline,locationOutline,optionsOutline,personOutline,atCircleOutline,lockClosedOutline,serverOutline,keyOutline,linkOutline,syncOutline,cloudOutline,arrowForward,checkmarkOutline,chevronBackOutline,chevronForwardOutline,trash,arrowForwardOutline,checkmarkCircle,timeOutline,globeOutline,alarmOutline,clipboardOutline});
 
     // this.userData = JSON.parse(String(localStorage.getItem("userData")))
   }
@@ -143,6 +150,8 @@ export class SetupPagePage implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.ObserveResize();
     const swiperEl = this.swiperEl.nativeElement;
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
 
     // Espera hasta que la instancia swiper esté disponible
     const interval = setInterval(() => {
@@ -150,24 +159,32 @@ export class SetupPagePage implements OnInit, AfterViewInit {
 
       if (swiperEl.swiper) {
 
-      // if (this.swiperInstance) {
+        // if (this.swiperInstance) {
 
         this.swiperInstance.on('slideChange', () => {
           const activeIndex = this.swiperInstance.activeIndex;
 
           switch (activeIndex) {
             case 1:
-              this.swiperInstance.allowSlideNext = false;
+              nextBtn!.classList.add('disabled');
               break;
             case 2:
+              prevBtn!.classList.add('disabled');
+              nextBtn!.classList.add('disabled');
+              break;
+            case 3:
+              // prevBtn!.classList.add('disabled');
+              nextBtn!.classList.add('disabled');
               break;
             default:
+              prevBtn!.classList.remove('disabled');
+              nextBtn!.classList.remove('disabled');
               break;
           }
           this.swiperInstance.update();
         });
 
-        clearInterval(interval); // Detiene el intervalo al encontrar swiper
+        clearInterval(interval);
       }
     }, 100);
   }
@@ -191,10 +208,84 @@ export class SetupPagePage implements OnInit, AfterViewInit {
   }
 
   async finalize() {
-    console.log('Registrar compañia: ' + JSON.stringify(this.company, null, 2));
-    console.log('Registrar organización: ' + JSON.stringify(this.organization, null, 2));
-    console.log('Registrar usuario: ' + JSON.stringify(this.userSuperAdmin, null, 2));
-    // await this.api.PostRequestRender('companies', payload);
+
+    let payloadOrg: any;
+
+    if (this.company.Name !== '' && this.company.Description !== '' &&
+      this.userSuperAdmin.name !== '' && this.userSuperAdmin.password !== '' && this.userSuperAdmin.email !== '' &&
+      ((this.organization.Code !== '' && this.organization.Name !== '') ||
+        (this.dbData && Array.isArray(this.dbData.items) && this.dbData.items.length > 0)
+      )
+    ) {
+
+      await this.apiService.PostRequestRender('companies', this.company).then(async (response: any) => {
+        this.company_id = response.result?.company_id;
+
+        if (this.company_id !== 0) {
+          if (this.toggleActivo) {
+
+            this.dbData.items.forEach((item: any) => {
+              item.CompanyId = this.company_id;
+            });
+
+            payloadOrg = this.dbData;
+
+            await this.apiService.PostRequestRender('organizations', payloadOrg).then(async (response: any) => {
+              this.orgs = response.insertedIds;
+
+              await this.apiService.PostRequestRender('getToken', payloadOrg).then(async (response: any) => {
+                localStorage.setItem('tk', response.token);
+
+                this.userSuperAdmin.organizations = this.orgs.map(id => ({ org_id: id }));
+                this.userSuperAdmin.password = btoa(this.userSuperAdmin.password);
+
+                console.log(JSON.stringify(this.userSuperAdmin, null, 2));
+
+                await this.apiService.PostRequestRender('users', this.userSuperAdmin).then((response: any) => {
+                  this.SaveOrUpdateConnection();
+                  this.router.navigate([`/login`]);
+                });
+              });
+
+            });
+
+          } else {
+            this.organization.CompanyId = this.company_id;
+            this.organization.WorkMethod = this.WorkMethodFormat(this.organization.WorkMethod);
+            payloadOrg = { items: [this.organization]};
+            
+            await this.apiService.PostRequestRender('organizations', payloadOrg).then(async (response: any) => {
+              this.orgs = response.insertedIds;
+
+              await this.apiService.PostRequestRender('getToken', payloadOrg).then(async (response: any) => {
+                localStorage.setItem('tk', response.token);
+
+                this.userSuperAdmin.organizations = this.orgs.map(id => ({ org_id: id }));
+                this.userSuperAdmin.password = btoa(this.userSuperAdmin.password);
+
+                await this.apiService.PostRequestRender('users', this.userSuperAdmin).then((response: any) => {                  
+                  this.router.navigate([`/login`]);
+                });
+
+              });
+
+            });
+          }
+
+        }
+
+      });
+    } else {
+      if (this.company.Name === '' || this.company.Description === '') {
+        this.alerts.Info('Datos de compañía requeridos');
+      } else if (this.userSuperAdmin.name === '' || this.userSuperAdmin.password === '' || this.userSuperAdmin.email === '') {
+        this.alerts.Info('Datos de usuario requeridos');
+      } else if ((this.organization.Code === '' || this.organization.Name === '') ||
+        (!this.dbData || Array.isArray(!this.dbData.items) || this.dbData.items.length === 0)) {
+        this.alerts.Info('Datos de organización requeridos');
+      }
+
+    }
   }
 
   async VerifyConnection() {
@@ -212,8 +303,8 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     const isUpdate = this.btnSaveOrUpdate === "Actualizar";
 
     const payload = {
-      CompanyId: this.userData.Company.CompanyId,
-      User: this.userData.Name,
+      CompanyId: this.company_id,
+      User: this.userSuperAdmin.name,
       items: [
         {
           Name: "FUSION_URL",
@@ -227,7 +318,8 @@ export class SetupPagePage implements OnInit, AfterViewInit {
         }
       ]
     };
-    console.log(payload);
+
+    console.log(JSON.stringify(payload, null, 2));
 
     const apiCall = isUpdate
       ? await this.apiService.PutRequestRender('settingsFusion', payload)
@@ -379,7 +471,7 @@ export class SetupPagePage implements OnInit, AfterViewInit {
       }
 
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        CompanyId: 0,//this.userData.Company.CompanyId,
+        CompanyId: this.company_id,
         Code: item.OrganizationCode,
         Name: item.OrganizationName,
         Location: item.LocationCode,
@@ -413,41 +505,6 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     return mfgType === 'PROCESS_MANUFACTURING' ? 'PROCESOS' : mfgType === 'DISCRETE_MANUFACTURING' ? 'DISCRETA' : 'NA';
   }
 
-  //Metodo para eliminar organizaciones seleccionadas de DB
-  async DeleteOrganizations() {
-    if (this.dbData.items) {
-      if (this.selectedItemsDB.length === 0) {
-        this.alerts.Warning("Seleccione algún elemento para eliminar");
-        return;
-      }
-
-      try {
-        let successCount = 0;
-
-        // Eliminar uno por uno (secuencial)
-        for (const item of this.selectedItemsDB) {
-          const response = await this.apiService.DeleteRequestRender('organizations/' + item.OrganizationId);
-
-          if (!response.errorsExistFlag) {
-            successCount++;
-          }
-        }
-
-        this.alerts.Success(`Organizaciones eliminadas [${successCount}/ ${this.selectedItemsDB.length}]`);
-
-        // Recargar la página solo si hubo eliminaciones exitosas
-        if (successCount > 0) {
-          setTimeout(() => {
-            this.RefreshTables();
-          }, 1500);
-        }
-
-      } catch (error) {
-        console.error('Error al eliminar organizaciones:', error);
-        this.alerts.Error('Error al eliminar las organizaciones');
-      }
-    }
-  }
 
   ClearFusion(table: any) {
     table.clear();
@@ -475,5 +532,4 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     this.selectedItemsDB = [];
 
   }
-
 }
