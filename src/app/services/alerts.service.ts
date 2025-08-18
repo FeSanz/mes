@@ -1,12 +1,8 @@
 import { Injectable } from '@angular/core';
 import { LoadingController, AlertController, ToastController } from '@ionic/angular';
 import { addIcons } from "ionicons";
-import {
-  checkmarkCircle,
-  closeCircle,
-  warning,
-  informationCircle
-} from "ionicons/icons";
+import { checkmarkCircle,  closeCircle,  warning, informationCircle } from "ionicons/icons";
+
 import { MessageService } from 'primeng/api';
 
 @Injectable({
@@ -18,8 +14,7 @@ export class AlertsService {
   constructor(
     private messageService: MessageService,
     public loadController: LoadingController,
-    private alertController: AlertController,
-    private toastController: ToastController) {
+    private alertController: AlertController) {
 
     addIcons({ checkmarkCircle, closeCircle, warning, informationCircle })
   }
@@ -45,21 +40,64 @@ export class AlertsService {
     }
   }
 
-  async Success(message: string, duration: number = 3000): Promise<void> {
-    this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: message });
+  async Success(message: string, header: string = 'Exitoso', duration: number = 3000, sticky: boolean = false): Promise<void> {
+    this.messageService.add({
+      severity: 'success',
+      summary: header,
+      detail: message,
+      life: duration,
+      sticky: sticky, //Cierre automático
+    });
   }
 
-  async Error(message: string, duration: number = 5000): Promise<void> {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: message });
+  async Error(message: string, header: string = 'Error', duration: number = 4000, sticky: boolean = false): Promise<void> {
+    this.messageService.add({
+      severity: 'error',
+      summary: header,
+      detail: message,
+      life: duration,
+      sticky: sticky, //Cierre automático
+    });
   }
 
-  async Warning(message: string, duration: number = 4000): Promise<void> {
-    this.messageService.add({ severity: 'warn', summary: 'Alerta', detail: message });
-
+  async Warning(message: string, header: string = 'Precaución', duration: number = 3000, sticky: boolean = false): Promise<void> {
+    this.messageService.add({
+      severity: 'warn',
+      summary: header,
+      detail: message,
+      life: duration,
+      sticky: sticky, //Cierre automático
+    });
   }
 
-  async Info(message: string, duration: number = 10000): Promise<void> {
-    this.messageService.add({ severity: 'info', summary: 'Informativo', detail: message });
+  async Info(message: string, header: string = 'Info', duration: number = 10000, sticky: boolean = false): Promise<void> {
+    this.messageService.add({
+      severity: 'info',
+      summary: header,
+      detail: message,
+      life: duration,
+      sticky: sticky, //Cierre automático
+    });
+  }
+
+  async Secondary(message: string, header: string = 'Alerta', duration: number = 5000, sticky: boolean = false): Promise<void> {
+    this.messageService.add({
+      severity: 'secondary',
+      summary: header,
+      detail: message,
+      life: duration,
+      sticky: sticky, //Cierre automático
+    });
+  }
+
+  async Contrast(message: string, header: string = 'Alerta', duration: number = 5000, sticky: boolean = false): Promise<void> {
+    this.messageService.add({
+      severity: 'contrast',
+      summary: header,
+      detail: message,
+      life: duration,
+      sticky: sticky, //Cierre automático
+    });
   }
 
   async ShowAlert(message: string, title: string = "Alerta", cancel: string = "Cancelar", confirm: string = "Aceptar") {//Alerta genérica para toma de desiciones

@@ -5,11 +5,11 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, I
          IonToolbar } from '@ionic/angular/standalone';
 
 import {ApiService} from "../../../../services/api.service";
+import {AlertsService} from "../../../../services/alerts.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {HeightTable} from "../../../../models/tables.prime";
 import {addIcons} from "ionicons";
 
-import { MessageService } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -60,7 +60,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
-              private messageService: MessageService) {
+              private alerts: AlertsService) {
     addIcons({
       closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
     });
@@ -118,7 +118,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
 
           this.itemType.items.push(additionalType);
         } else {
-          this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: 'No se encontraron tipos de articulos'});
+          this.alerts.Warning('No se encontraron tipos de articulos');
           this.itemType = [];
         }
 
@@ -130,7 +130,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
     if(this.itemTypeSelected) {
       let clause = `items/${this.dbOrganizations.Company.CompanyId}/${this.itemTypeSelected.Meaning}`;
       this.apiService.GetRequestRender(clause).then((response: any) => {
-        response.totalResults == 0 && this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: response.message});
+        response.totalResults == 0 && this.alerts.Warning(response.message);
         this.dbData = response;
 
         const path = this.itemTypeSelected.LookupCode === 'all'
@@ -171,7 +171,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.fusionData.items) {
 
       if (this.selectedItemsFusion.length === 0) {
-        this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: 'Seleccione algún elemento para cargar'});
+        this.alerts.Warning("Seleccione algún elemento para cargar");
         return;
       }
 
@@ -190,9 +190,9 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
 
       this.apiService.PostRequestRender('items', payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
-          this.messageService.add({ severity: 'info', summary: 'Info', detail: response.message});
+          this.alerts.Info(response.message);
         }else {
-          this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: response.message});
+          this.alerts.Success(response.message);
           setTimeout(() => {
             this.RefreshTables();
           }, 1500);
@@ -206,7 +206,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.dbData.items) {
 
       if (this.selectedItemsDB.length === 0) {
-        this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: 'Seleccione algún elemento para eliminar'});
+        this.alerts.Warning("Seleccione algún elemento para eliminar");
         return;
       }
 
@@ -222,7 +222,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
           }
         }
 
-        this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: `Eliminados exitosamente [${successCount}/ ${this.selectedItemsDB.length}]`});
+        this.alerts.Success(`Eliminados exitosamente [${successCount}/ ${this.selectedItemsDB.length}]`);
 
         // Recargar la página solo si hubo eliminaciones exitosas
         if (successCount > 0) {
@@ -233,7 +233,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
 
       } catch (error) {
         console.error('Error al eliminar:', error);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar'});
+        this.alerts.Error('Error al eliminar');
       }
     }
   }
@@ -263,7 +263,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
   RefreshTables() {
     let clause = `items/${this.dbOrganizations.Company.CompanyId}/${this.itemTypeSelected.Meaning}`;
     this.apiService.GetRequestRender(clause).then((response: any) => {
-      response.totalResults == 0 && this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: response.message});
+      response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
 
       this.FilterRegisteredItems();

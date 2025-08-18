@@ -6,10 +6,10 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, I
 
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
+import {AlertsService} from "../../../../services/alerts.service";
 import {HeightTable} from "../../../../models/tables.prime";
 import {addIcons} from "ionicons";
 
-import { MessageService } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -58,7 +58,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
-              private messageService: MessageService) {
+              private alerts: AlertsService) {
     addIcons({
       closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
     });
@@ -105,7 +105,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
     if(this.organizationSelected) {
       let clause = `shifts/${this.organizationSelected.OrganizationId}`;
       this.apiService.GetRequestRender(clause).then((response: any) => {
-        response.totalResults == 0 && this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: response.message});
+        response.totalResults == 0 && this.alerts.Warning(response.message);
         this.dbData = response;
 
         this.apiService.GetRequestFusion(this.endPoints.Path('shifts')).then((response: any) => {
@@ -125,7 +125,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.fusionData.items) {
 
       if (this.selectedItemsFusion.length === 0) {
-        this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: 'Seleccione algún elemento para cargar'});
+        this.alerts.Warning("Seleccione algún elemento para cargar");
         return;
       }
 
@@ -144,9 +144,9 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
 
       this.apiService.PostRequestRender('shifts', payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
-          this.messageService.add({ severity: 'info', summary: 'Info', detail: response.message});
+          this.alerts.Info(response.message);
         }else {
-          this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: response.message});
+          this.alerts.Success(response.message);
 
           setTimeout(() => {
             this.RefreshTables();
@@ -161,7 +161,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
     if (this.dbData.items) {
 
       if (this.selectedItemsDB.length === 0) {
-        this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: 'Seleccione algún elemento para eliminar'});
+        this.alerts.Warning("Seleccione algún elemento para eliminar");
         return;
       }
 
@@ -177,7 +177,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
           }
         }
 
-        this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: `Eliminados exitosamente [${successCount}/ ${this.selectedItemsDB.length}]`});
+        this.alerts.Success(`Eliminados exitosamente [${successCount}/ ${this.selectedItemsDB.length}]`);
 
         // Recargar la página solo si hubo eliminaciones exitosas
         if (successCount > 0) {
@@ -188,7 +188,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
 
       } catch (error) {
         console.error('Error al eliminar:', error);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al eliminar'});
+        this.alerts.Error('Error al eliminar');
       }
     }
   }
@@ -206,7 +206,7 @@ export class ShiftsPage implements OnInit, AfterViewInit, OnDestroy {
   RefreshTables() {
     let clause = `shifts/${this.organizationSelected.OrganizationId}`;
     this.apiService.GetRequestRender(clause).then((response: any) => {
-      response.totalResults == 0 && this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: response.message});;
+      response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
 
     });

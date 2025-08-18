@@ -2,24 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonButton,
-  IonButtons, IonCol,
-  IonContent, IonFab, IonFabButton,
-  IonGrid,
-  IonHeader, IonIcon, IonInput, IonItem, IonLabel,
-  IonMenuButton, IonModal, IonRow,
-  IonTitle,
-  IonToolbar
+  IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonInput, IonItem,
+  IonLabel, IonMenuButton, IonModal, IonRow, IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
+
 import {FloatLabel} from "primeng/floatlabel";
 import {Select} from "primeng/select";
-import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import {InputText, InputTextModule} from 'primeng/inputtext';
 import {Button} from "primeng/button";
 import {Divider} from "primeng/divider";
 import {Card} from "primeng/card";
 import {Dialog} from "primeng/dialog";
+import {AlertsService} from "../../../../services/alerts.service";
 
 @Component({
   selector: 'app-transaction',
@@ -111,7 +106,7 @@ export class TransactionPage implements OnInit {
     }
   ];
 
-  constructor(private messageService: MessageService) { }
+  constructor(private alerts: AlertsService) { }
 
   ngOnInit() {
     console.log('ngOnInit');
@@ -119,12 +114,7 @@ export class TransactionPage implements OnInit {
 
   OpenDispatch() {
     this.isModaldispatchOpen = true;
-    this.messageService.add({ severity: 'success', summary: 'Exitoso', detail: 'Mensaje exitoso'});
-    this.messageService.add({ severity: 'info', summary: 'Informativo', detail: 'Mensaje informativo con una descripción un poco larga pero sirve para ver cuanto puede contener'});
-    this.messageService.add({ severity: 'warn', summary: 'Precaución', detail: 'Mensaje de alerta'});
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Mensaje de error'});
-    this.messageService.add({ severity: 'secondary', summary: 'Secundario', detail: 'Mensaje sencundario'});
-    this.messageService.add({ severity: 'contrast', summary: 'Constraste', detail: 'Mensaje de contraste'});
+    this.alerts.Success('Dados actualizado');
   }
 
   onCloseModal() {
