@@ -2,8 +2,24 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonInput, IonItem,
-  IonLabel, IonMenuButton, IonModal, IonRow, IonTitle, IonToolbar
+  IonButton,
+  IonButtons,
+  IonCol,
+  IonContent,
+  IonFab,
+  IonFabButton,
+  IonFooter,
+  IonGrid,
+  IonHeader,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonMenuButton,
+  IonModal,
+  IonRow,
+  IonTitle,
+  IonToolbar
 } from '@ionic/angular/standalone';
 
 import {FloatLabel} from "primeng/floatlabel";
@@ -22,7 +38,7 @@ import {AlertsService} from "../../../../services/alerts.service";
   styleUrls: ['./transaction.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, FloatLabel, IonButtons, IonMenuButton,
-    Select, IonGrid, IonRow, IonCol, Toast, IonFab, IonFabButton, IonIcon, IonModal, IonButton, IonInput, IonItem, InputText, IonLabel, Button, Divider, Card, Dialog]
+    Select, IonGrid, IonRow, IonCol, Toast, IonFab, IonFabButton, IonIcon, IonModal, IonButton, IonInput, IonItem, InputText, IonLabel, Button, Divider, Card, Dialog, IonFooter]
 })
 export class TransactionPage implements OnInit {
 

@@ -13,50 +13,89 @@
     <ng-template>
 
       <ion-header>
-        <ion-toolbar color="primary">
-          <ion-title>{{ 'Despacho Orden ' }}</ion-title>
+        <ion-toolbar color="secondary">
+          <ion-title slot="start">{{ 'OT 123' }}</ion-title>
+          <ion-title slot="end">{{ 'Avance 0 / 100' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
       <ion-content>
         <ion-grid [fixed]="true">
-          <!-- OPERACION 30 -->
-          <ion-row class="ion-align-items-end">
-            <ion-col size="12" size-sm="3"> <strong>OPERACION 30</strong> </ion-col>
-            <ion-col size="12" size-sm="2.2">
-              <span class="p-text-secondary">FALTANTE</span><br>
-              <span style="background-color: #ffcccb; padding: 2px 8px; border-radius: 4px;">100</span>
+          <!-- Encabezado Operacion -->
+          <ion-row style="text-align: center; font-weight: bold; font-size: 14px; color: grey">
+            <ion-col size="12" size-sm="3"></ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>FALTANTE</span>
             </ion-col>
-            <ion-col size="12" size-sm="2.2">
-              <span class="p-text-secondary">COMPLETO</span><br>
-              <span style="color: green;">0</span>
+            <ion-col size="12" size-sm="2">
+              <span>DESPERDICIO</span>
             </ion-col>
-            <ion-col size="12" size-sm="2.2">
-              <span class="p-text-secondary">META</span><br>
-              <span style="color: #007bff;">100</span>
+            <ion-col size="12" size-sm="2">
+              <span>RECHAZO</span>
             </ion-col>
-            <ion-col size="12" size-sm="2.2">
+            <ion-col size="12" size-sm="2">
+              <span>COMPLETO</span>
+            </ion-col>
+            <ion-col size="12" size-sm="1">
+              <strong></strong>
+            </ion-col>
+          </ion-row>
+
+          <ion-row style="background-color: var(--ion-color-medium-shade); border-radius: 5px; align-items: center;" >
+            <ion-col size="12" size-sm="3">
+              <strong>OPERACION 30</strong>
+            </ion-col>
+            <ion-col size="12" size-sm="2" style="text-align: center; color: red; font-weight: bold">
+              <span>100</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="text" value="0.835" pSize="small" [disabled]="true" style="width: 100%; text-align: center; border: none;  outline: none; color: orange; font-weight: bold"/>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="text" value="0.835" pSize="small" [disabled]="true" style="width: 100%; text-align: center;  border: none;  outline: none; color: #6030ff; font-weight: bold"/>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="text" value="0.835" pSize="small" [disabled]="true" style="width: 100%; text-align: center;  border: none;  outline: none; color: green; font-weight: bold"/>
+            </ion-col>
+            <ion-col size="12" size-sm="1">
               <strong>cj</strong>
             </ion-col>
           </ion-row>
 
-          <ion-row>
-            <ion-col><strong>SALIDAS</strong></ion-col>
+          <!-- Salidas -->
+          <ion-row style="align-items: center;">
+            <ion-col><br><strong>SALIDAS</strong></ion-col>
           </ion-row>
 
-          <ion-row>
-            <ion-col size="12" size-sm="3">
-              <strong>MATERIALES</strong>
+          <ion-row style="align-items: center;">
+            <ion-col size="12" size-sm="3">CNPPBL01</ion-col>
+            <ion-col size="12" size-sm="2"></ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="text" value="0.835" pSize="small" [disabled]="true" style="width: 100%; text-align: center;"/>
+            </ion-col>
+            <ion-col size="12" size-sm="2">pza</ion-col>
+            <ion-col size="12" size-sm="2">
+              <span style="color: #007bff;">0.835</span>
             </ion-col>
           </ion-row>
 
-          <ion-row>
+          <!-- Materiales de produccion -->
+          <ion-row style="align-items: center;">
+            <ion-col size="12" size-md="3">
+              <br><strong>MATERIALES</strong>
+            </ion-col>
+            <ion-col size="12" size-md="9" style="color: red">
+              <br>Sin stock suficiente en algunos materiales
+            </ion-col>
+          </ion-row>
+
+          <ion-row style="align-items: center;">
             <ion-col size="12" size-sm="3">JU19710 BL</ion-col>
             <ion-col size="12" size-sm="2">
               <span style="color: green;">5000</span>
             </ion-col>
             <ion-col size="12" size-sm="2">
-              <input pInputText type="text" value="8.6" pSize="small" style="width: 60px;"/>
+              <input pInputText type="text" value="8.6" pSize="small" style="width: 100%; text-align: center;"/>
             </ion-col>
             <ion-col size="12" size-sm="2">kg</ion-col>
             <ion-col size="12" size-sm="2">
@@ -64,31 +103,18 @@
             </ion-col>
           </ion-row>
 
-          <ion-row>
-            <ion-col size="12" size-sm="3">PPC-15217</ion-col>
-            <ion-col size="12" size-sm="2">
-              <span style="color: green;">5000</span>
-            </ion-col>
-            <ion-col size="12" size-sm="2">
-              <input pInputText type="text" value="0.154" pSize="small" style="width: 60px;"/>
-            </ion-col>
-            <ion-col size="12" size-sm="2">m</ion-col>
-            <ion-col size="12" size-sm="2">
-              <span style="color: #007bff;">0.154</span>
-            </ion-col>
-          </ion-row>
-
-          <ion-row>
+          <!-- Recursos de producción -->
+          <ion-row style="align-items: center;">
             <ion-col size="12" size-sm="3">
-              <strong>RECURSOS</strong>
+              <br><strong>EQUIPOS</strong>
             </ion-col>
           </ion-row>
 
-          <ion-row>
-            <ion-col size="12" size-sm="3">ENCSJ6</ion-col>
+          <ion-row style="align-items: center;">
+            <ion-col size="12" size-sm="3">MF-H2225A</ion-col>
             <ion-col size="12" size-sm="2"></ion-col>
             <ion-col size="12" size-sm="2">
-              <input pInputText type="text" value="0.835" pSize="small" style="width: 60px;"/>
+              <input pInputText type="text" value="0.835" pSize="small" style="width: 100%; text-align: center;"/>
             </ion-col>
             <ion-col size="12" size-sm="2">h</ion-col>
             <ion-col size="12" size-sm="2">
@@ -96,50 +122,50 @@
             </ion-col>
           </ion-row>
 
-          <ion-row>
+          <ion-row style="align-items: center;">
+            <ion-col size="12" size-sm="3">
+              <br><strong>PERSONAL</strong>
+            </ion-col>
+          </ion-row>
+
+          <ion-row style="align-items: center;">
             <ion-col size="12" size-sm="3">LIDER PLANTILLA</ion-col>
             <ion-col size="12" size-sm="2"></ion-col>
             <ion-col size="12" size-sm="2">
-              <input pInputText type="text" value="0.835" pSize="small" style="width: 60px;"/>
+              <input pInputText type="text" value="0.835" pSize="small" style="width: 100%; text-align: center;"/>
             </ion-col>
             <ion-col size="12" size-sm="2">h</ion-col>
             <ion-col size="12" size-sm="2">
               <span style="color: #007bff;">0.835</span>
-            </ion-col>
-          </ion-row>
-
-          <!-- Mensaje de advertencia -->
-          <ion-row>
-            <ion-col>
-              <p style="color: red; font-style: italic; text-align: center; margin-top: 20px;">
-                Sin stock suficiente en algunos materiales
-              </p>
-            </ion-col>
-          </ion-row>
-
-          <!-- Botones -->
-          <ion-row style="margin-top: 20px;">
-            <ion-col size="6">
-              <p-button
-                label="CERRAR"
-                severity="danger"
-                [style]="{'width': '100%'}"
-                styleClass="p-button-danger"
-                (click)="isModaldispatchOpen = false;">
-              </p-button>
-            </ion-col>
-            <ion-col size="6">
-              <p-button
-                label="GUARDAR"
-                severity="success"
-                [style]="{'width': '100%'}"
-                styleClass="p-button-success">
-              </p-button>
             </ion-col>
           </ion-row>
         </ion-grid>
 
       </ion-content>
+
+      <!-- Botones -->
+      <ion-footer style="background-color: var(--ion-color-back)">
+        <ion-row>
+          <ion-col size="6">
+            <p-button
+              label="CERRAR"
+              severity="danger"
+              [style]="{'width': '100%'}"
+              styleClass="p-button-danger"
+              (click)="isModaldispatchOpen = false;">
+            </p-button>
+          </ion-col>
+          <ion-col size="6">
+            <p-button
+              label="GUARDAR"
+              severity="success"
+              [style]="{'width': '100%'}"
+              styleClass="p-button-success">
+            </p-button>
+          </ion-col>
+        </ion-row>
+      </ion-footer>
+
     </ng-template>
   </ion-modal>
 
