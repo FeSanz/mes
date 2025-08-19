@@ -25,11 +25,12 @@ import { CommonModule } from '@angular/common';
 import { PermissionsService } from './services/permissions.service';
 
 import { Toast } from 'primeng/toast';
-import {AlertsService} from "./services/alerts.service";
+import { AlertsService } from "./services/alerts.service";
 
 @Component({
-  selector: 'app-root',
   standalone: true,
+  selector: 'app-root',
+  styleUrls: ['app.component.scss'],
   templateUrl: 'app.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [IonApp, RouterLink, IonMenu, IonToolbar, IonHeader, IonTitle, IonItem, IonIcon, IonLabel,
@@ -165,12 +166,6 @@ export class AppComponent {
       },
       replaceUrl: true
     });
-
-    /*this.router.navigateByUrl('/monitoring/', { skipLocationChange: true }).then(() => {
-      this.router.navigate(['/monitoring/' + dash.dashboard_group_id], {
-        state: { dash }
-      });
-    });*/
   }
   setOpen(isOpen: boolean) {//abrir modal para nuevo grupo de tableros
     this.isModalOpen = isOpen

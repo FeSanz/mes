@@ -1,5 +1,5 @@
 <ion-app>
-  <p-toast ></p-toast >
+  <p-toast></p-toast>
   <ion-split-pane contentId="main-content" when="(min-width: 1800px)">
     <ion-menu contentId="main-content" type="overlay" *ngIf="showMenu">
       <ion-header>
@@ -73,8 +73,8 @@
               <ion-list lines="none">
                 <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($event)">
                   <ion-menu-toggle auto-hide="false" *ngFor="let dashGroup of dashboardGroups; trackBy: trackByGroup"
-                    (click)="GoToDashboards(dashGroup)">
-                    <ion-item routerLinkActive="selected" detail="false" button color="light">
+                    (click)="GoToDashboards(dashGroup)" [routerLink]="['/monitoring', dashGroup.dashboard_group_id]">
+                    <ion-item routerLinkActive="selected" detail="false" button color="light" class="selected">
                       <ion-icon slot="start" name="stats-chart-outline" color="secondary"></ion-icon>
                       <ion-label>
                         <ion-text>{{ dashGroup.group_name }}</ion-text>
@@ -108,6 +108,13 @@
                       </ng-template>
                     </ion-popover>
                   </ion-menu-toggle>
+                  <ion-menu-toggle auto-hide="false">
+                    <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button
+                      color="light">
+                      <ion-icon slot="start" name="hardware-chip-outline" color="secondary"></ion-icon>
+                      <ion-label>Dispositivos</ion-label>
+                    </ion-item>
+                  </ion-menu-toggle>
                 </ion-reorder-group>
                 <ion-menu-toggle auto-hide="false" (click)="setOpen(true)" *ngIf="!permissions.isViewer()">
                   <ion-item routerLinkActive="selected" detail="false" button color="light">
@@ -118,7 +125,7 @@
               </ion-list>
             </div>
           </ion-accordion>
-          <ion-accordion value="iot" *ngIf="!permissions.isViewer()">
+          <ion-accordion value="iot">
             <ion-item slot="header" lines="full" color="secondary" button>
               <ion-icon slot="start" name="radio-outline"></ion-icon>
               <ion-label><strong>Sensores</strong></ion-label>
@@ -126,9 +133,9 @@
             <div slot="content" style="padding-left: 16px; padding-right: 4px;">
               <ion-list lines="none">
                 <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button color="light">
+                  <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button>
                     <ion-icon slot="start" name="hardware-chip-outline" color="secondary"></ion-icon>
-                    <ion-label>Dispositivos</ion-label>
+                    <ion-label>Dispositivoss</ion-label>
                   </ion-item>
                 </ion-menu-toggle>
               </ion-list>
@@ -150,7 +157,8 @@
                 </ion-menu-toggle>
 
                 <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/dispatch_transaction']" routerLinkActive="selected" detail="false" button color="light">
+                  <ion-item [routerLink]="['/dispatch_transaction']" routerLinkActive="selected" detail="false" button
+                    color="light">
                     <ion-icon slot="start" name="document-text-outline" color="secondary"></ion-icon>
                     <ion-label>Despachos</ion-label>
                   </ion-item>
@@ -166,8 +174,7 @@
             <div slot="content" style="padding-left: 16px;  padding-right: 4px;">
               <ion-list lines="none">
                 <ion-menu-toggle auto-hide="false">
-                  <ion-item routerLinkActive="selected" detail="false" button color="light"
-                    [routerLink]="['/alerts']">
+                  <ion-item routerLinkActive="selected" detail="false" button color="light" [routerLink]="['/alerts']">
                     <ion-icon slot="start" name="warning-outline" color="secondary"></ion-icon>
                     <ion-label>Alertas</ion-label>
                   </ion-item>
@@ -200,7 +207,7 @@
 
                 <ion-menu-toggle auto-hide="false">
                   <ion-item [routerLink]="['/settings/machines']" routerLinkActive="selected" detail="false" button
-                            color="light">
+                    color="light">
                     <ion-icon src="assets/images/robot-arm.svg" slot="start" color="secondary"></ion-icon>
                     <ion-label>Máquinas</ion-label>
                   </ion-item>
