@@ -17,7 +17,7 @@ import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
 import { addCircleOutline, addOutline, checkmark, contractOutline, expandOutline, menuOutline } from 'ionicons/icons';
 import { EndpointsService } from 'src/app/services/endpoints.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { ResizeEvent, ResizableModule } from 'angular-resizable-element';
@@ -82,24 +82,30 @@ export class MonitoringPage {
   machines: any = []
   dashboardData: any = {}
   shouldRefresh = false;
+  id: any = null
   constructor(
     private api: ApiService,
     private router: Router,
+    private route: ActivatedRoute,
     private alerts: AlertsService,
-    private endPoints: EndpointsService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
     addIcons({ checkmark, addOutline, addCircleOutline, menuOutline, contractOutline, expandOutline })
     this.user = JSON.parse(String(localStorage.getItem("userData")))
     const nav = this.router.getCurrentNavigation();
     const state: any = nav?.extras?.state;
+
+    this.id = this.route.snapshot.paramMap.get('groupId');
     //this.activatedRoute.snapshot.paramMap.get('id') as string;
-    if (state?.dash) {
+    /*if (state?.dash) {
       this.dashboardData = state?.dash
+      console.log(this.dashboardData);
+
       localStorage.setItem('dashData', JSON.stringify(state?.dash))
     } else {
+      const id = this.route.snapshot.paramMap.get('groupId');
       this.dashboardData = JSON.parse(localStorage.getItem('dashData') || '{}');
-    }
+    }*/
     /*
     this.sensorData = [];
     this.isModalOpen = false;
@@ -130,7 +136,12 @@ export class MonitoringPage {
     this.GetDasboards()
   }
   GetDasboards() {
-    this.api.GetRequestRender('dashboards/group/' + this.dashboardData.dashboard_group_id, false).then((response: any) => {
+    this.api.GetRequestRender('dashboards/group/' + this.id + '?user_id=' + this.user.UserId, false).then((response: any) => {
+      if(response.errorsExistFlag === true){
+        this.api.LogOut()
+        return
+      }
+      this.dashboardData = response.dashboardData
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
         id: item.dashboard_id,
@@ -148,7 +159,6 @@ export class MonitoringPage {
           color: item.color,
         }
       }));
-
       setTimeout(() => {
         this.simulateResizeForAllWidgets();
       }, 100);
@@ -236,7 +246,7 @@ export class MonitoringPage {
       "name": this.newWidgetData.name,
       "border_flag": this.newWidgetData.borderFlag,
       "dateRange": 'last7days',
-      "dashboard_group_id": this.dashboardData.dashboard_group_id,
+      "dashboard_group_id": this.id,
       "parameters": {
         "widgetType": this.newWidgetData.widgetType,
         "chartType": this.newWidgetData.chartType,
@@ -254,7 +264,7 @@ export class MonitoringPage {
         "index": Number(this.widgets.length) + 1,
         "name": this.newWidgetData.name,
         "dateRange": 'today',
-        "dashboard_group_id": this.dashboardData.dashboard_group_id,
+        "dashboard_group_id": this.id,
         "parameters": {
           "widgetType": this.newWidgetData.widgetType,
           "chartType": this.newWidgetData.chartType,
@@ -268,7 +278,7 @@ export class MonitoringPage {
         "user_id": this.user.UserId,
         "index": Number(this.widgets.length) + 1,
         "name": this.newWidgetData.name,
-        "dashboard_group_id": this.dashboardData.dashboard_group_id,
+        "dashboard_group_id": this.id,
         "color": this.newWidgetData.color,
         "parameters": {
           "widgetType": this.newWidgetData.widgetType

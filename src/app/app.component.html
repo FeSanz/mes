@@ -70,11 +70,12 @@
               </ion-buttons>
             </ion-item>
             <div slot="content" style="padding-left: 16px; padding-right: 4px;">
-              <ion-list lines="none">
-                <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($event)">
-                  <ion-menu-toggle auto-hide="false" *ngFor="let dashGroup of dashboardGroups; trackBy: trackByGroup"
-                    (click)="GoToDashboards(dashGroup)" [routerLink]="['/monitoring', dashGroup.dashboard_group_id]">
-                    <ion-item routerLinkActive="selected" detail="false" button color="light" class="selected">
+              <ion-list>
+                <ion-menu-toggle auto-hide="false">
+                  <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($event)">
+                    <ion-item routerLinkActive="selected" detail="false" button color="light"
+                      *ngFor="let dashGroup of dashboardGroups; trackBy: trackByGroup"
+                      (click)="GoToDashboards(dashGroup)" [routerLink]="['/monitoring', dashGroup.dashboard_group_id]">
                       <ion-icon slot="start" name="stats-chart-outline" color="secondary"></ion-icon>
                       <ion-label>
                         <ion-text>{{ dashGroup.group_name }}</ion-text>
@@ -89,33 +90,26 @@
                       </ion-buttons>
                       <ion-reorder slot="end" *ngIf="editDashOrder" class="custom-reorder-icon">
                       </ion-reorder>
+                      <ion-popover trigger="popover-${{dashGroup['dashboard_group_id']}}" [dismissOnSelect]="true"
+                        showBackdrop="false">
+                        <ng-template>
+                          <ion-content>
+                            <ion-list>
+                              <ion-item [button]="true" [detail]="false" (click)="editDashGroup(dashGroup)">Editar
+                                <ion-icon slot="start" name="pencil-outline" color="success"></ion-icon>
+                              </ion-item>
+                              <ion-item [button]="true" [detail]="false"
+                                (click)="deleteDashGroup(dashGroup.dashboard_group_id)"
+                                *ngIf="permissions.isSuperAdmin()">Eliminar
+                                <ion-icon slot="start" name="trash-outline" color="danger"></ion-icon>
+                              </ion-item>
+                            </ion-list>
+                          </ion-content>
+                        </ng-template>
+                      </ion-popover>
                     </ion-item>
-                    <ion-popover trigger="popover-${{dashGroup['dashboard_group_id']}}" [dismissOnSelect]="true"
-                      showBackdrop="false">
-                      <ng-template>
-                        <ion-content>
-                          <ion-list>
-                            <ion-item [button]="true" [detail]="false" (click)="editDashGroup(dashGroup)">Editar
-                              <ion-icon slot="start" name="pencil-outline" color="success"></ion-icon>
-                            </ion-item>
-                            <ion-item [button]="true" [detail]="false"
-                              (click)="deleteDashGroup(dashGroup.dashboard_group_id)"
-                              *ngIf="permissions.isSuperAdmin()">Eliminar
-                              <ion-icon slot="start" name="trash-outline" color="danger"></ion-icon>
-                            </ion-item>
-                          </ion-list>
-                        </ion-content>
-                      </ng-template>
-                    </ion-popover>
-                  </ion-menu-toggle>
-                  <ion-menu-toggle auto-hide="false">
-                    <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button
-                      color="light">
-                      <ion-icon slot="start" name="hardware-chip-outline" color="secondary"></ion-icon>
-                      <ion-label>Dispositivos</ion-label>
-                    </ion-item>
-                  </ion-menu-toggle>
-                </ion-reorder-group>
+                  </ion-reorder-group>
+                </ion-menu-toggle>
                 <ion-menu-toggle auto-hide="false" (click)="setOpen(true)" *ngIf="!permissions.isViewer()">
                   <ion-item routerLinkActive="selected" detail="false" button color="light">
                     <ion-icon slot="start" name="add-outline" color="secondary"></ion-icon>
@@ -125,7 +119,7 @@
               </ion-list>
             </div>
           </ion-accordion>
-          <ion-accordion value="iot">
+          <ion-accordion value="iot" *ngIf="!permissions.isViewer()">
             <ion-item slot="header" lines="full" color="secondary" button>
               <ion-icon slot="start" name="radio-outline"></ion-icon>
               <ion-label><strong>Sensores</strong></ion-label>
@@ -133,7 +127,7 @@
             <div slot="content" style="padding-left: 16px; padding-right: 4px;">
               <ion-list lines="none">
                 <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button>
+                  <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button color="light">
                     <ion-icon slot="start" name="hardware-chip-outline" color="secondary"></ion-icon>
                     <ion-label>Dispositivoss</ion-label>
                   </ion-item>
