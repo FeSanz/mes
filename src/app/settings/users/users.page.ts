@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonFab, IonFabButton, IonModal, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
@@ -76,7 +75,7 @@ export class UsersPage implements OnInit {
     /*const orgsIds = this.company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     console.log(orgsIds);*/
     this.apiService.GetRequestRender('users?company_id=' + this.company.CompanyId).then((response: any) => {
-      console.log(response.errorsExistFlag);
+      //console.log(response.errorsExistFlag);
       if (!response.errorsExistFlag) {
         this.users = response.items
         this.apiService.GetRequestRender('organizations/' + this.company.CompanyId).then((responseOrg: any) => {

@@ -9,8 +9,6 @@ import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexDataLabels, A
 import { NgxColorsModule } from 'ngx-colors';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from 'src/app/services/api.service';
-//import { WebSocketService } from 'src/app/services/web-socket.service';
-import { IonicModule } from '@ionic/angular';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { addIcons } from 'ionicons';

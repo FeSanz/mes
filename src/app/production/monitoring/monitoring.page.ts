@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, IonRippleEffect, IonToggle } from '@ionic/angular/standalone';
 import { WebSocketService } from 'src/app/services/web-socket.service';
@@ -16,7 +15,6 @@ import { ThermometerComponent } from 'src/app/components/thermometer/thermometer
 import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
 import { addCircleOutline, addOutline, checkmark, contractOutline, expandOutline, menuOutline } from 'ionicons/icons';
-import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PermissionsService } from 'src/app/services/permissions.service';
@@ -80,7 +78,10 @@ export class MonitoringPage {
   user: any = {}
   widgets: any = []
   machines: any = []
-  dashboardData: any = {}
+  dashboardData: any = {
+    group_name: "",
+    organization_name: ""
+  }
   shouldRefresh = false;
   id: any = null
   constructor(
@@ -137,11 +138,11 @@ export class MonitoringPage {
   }
   GetDasboards() {
     this.api.GetRequestRender('dashboards/group/' + this.id + '?user_id=' + this.user.UserId, false).then((response: any) => {
-      if(response.errorsExistFlag === true){
+      if (response.errorsExistFlag === true) {
         this.api.LogOut()
         return
       }
-      this.dashboardData = response.dashboardData
+      this.dashboardData = response.dashboardData      
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
         id: item.dashboard_id,

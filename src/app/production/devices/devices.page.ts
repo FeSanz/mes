@@ -1,5 +1,4 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, inject, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption } from '@ionic/angular/standalone';

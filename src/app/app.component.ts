@@ -4,7 +4,7 @@ import {
   IonAccordion, IonAccordionGroup, IonApp, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonItem, IonLabel,
   IonList, IonMenu, IonMenuToggle, IonNote, IonPopover, IonRouterOutlet, IonTitle, IonToolbar, IonToggle, IonAvatar, IonCol,
   IonGrid, IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonSplitPane, IonRouterLink,
-  IonReorder, IonReorderGroup, ItemReorderEventDetail, ReorderEndCustomEvent, IonText
+  IonReorder, IonReorderGroup, ItemReorderEventDetail, IonText
 } from '@ionic/angular/standalone';
 
 import { NavController } from '@ionic/angular';
@@ -139,16 +139,7 @@ export class AppComponent {
     event.detail.complete();
     this.saveDashboardOrder()
   }
-
-  handleReorderEnd(event: ReorderEndCustomEvent) {
-    // The `from` and `to` properties contain the index of the item
-    // when the drag started and ended, respectively
-
-    // Finish the reorder and position the item in the DOM based on
-    // where the gesture ended. This method can also be called directly
-    // by the reorder group.
-    event.detail.complete();
-  }
+  
   trackByGroup(index: number, item: any): number {
     return item.dashboard_group_id;
   }
@@ -211,7 +202,6 @@ export class AppComponent {
       const orgsIds = this.user.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
       this.api.GetRequestRender('dashboardsGroup/byOrganizations/?organizations=' + orgsIds, false).then((response: any) => {
         this.dashboardGroups = response.items
-        console.log(this.dashboardGroups);
       })
     } else {
       this.alerts.Error("No hay organizaciones relacionadas con el usuario");
