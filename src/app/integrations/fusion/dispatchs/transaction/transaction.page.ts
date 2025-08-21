@@ -1,25 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonButton,
-  IonButtons,
-  IonCol,
-  IonContent,
-  IonFab,
-  IonFabButton,
-  IonFooter,
-  IonGrid,
-  IonHeader,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonMenuButton,
-  IonModal,
-  IonRow,
-  IonTitle,
-  IonToolbar
+import { IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonFooter, IonGrid, IonHeader,
+  IonIcon, IonInput, IonItem, IonLabel, IonMenuButton, IonModal, IonRow, IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
 
 import {FloatLabel} from "primeng/floatlabel";
@@ -44,81 +27,161 @@ export class TransactionPage implements OnInit {
 
   isModaldispatchOpen : boolean = false;
 
-  operaciones: any = [
+  selectedWorkOrder: any = null;
+
+  workOrder: any = [
     {
-      numero: 30,
-      faltante: 100,
-      completo: 0,
-      meta: 100,
-      unidad: 'cj',
-      materiales: [
-        {
-          codigo: 'JU19710 BL',
-          disponible: 5000,
-          requerido: 8.6,
-          unidad: 'kg',
-          meta: 8.6
-        },
-        {
-          codigo: 'PPC-15217',
-          disponible: 5000,
-          requerido: 0.154,
-          unidad: 'm',
-          meta: 0.154
-        }
-      ],
-      recursos: [
-        {
-          nombre: 'ENCSJ6',
-          requerido: 0.835,
-          unidad: 'h',
-          meta: 0.835
-        },
-        {
-          nombre: 'LIDER PLANTILLA',
-          requerido: 0.835,
-          unidad: 'h',
-          meta: 0.835
-        }
-      ],
-      salidas: []
-    },
-    {
-      numero: 50,
-      faltante: 100,
-      completo: 0,
-      meta: 100,
-      unidad: 'cj',
-      materiales: [
-        {
-          codigo: 'CWGRWOW-10',
-          disponible: 5000,
-          requerido: 10,
-          unidad: 'pza',
-          meta: 10
-        }
-      ],
-      recursos: [
-        {
-          nombre: 'AUXILIAR GENERAL A',
-          requerido: 0.835,
-          unidad: 'h',
-          meta: 0.835
-        },
-        {
-          nombre: 'ENCSJ6-EMP',
-          requerido: 0.835,
-          unidad: 'h',
-          meta: 0.835
-        }
-      ],
-      salidas: [
-        {
-          codigo: 'JU197G0.BL C',
-          cantidad: 10,
-          unidad: 'cj'
-        }
-      ]
+      WorkOrderId: 1,
+      WorkOrderNumber: "4461",
+      PrimaryProductQuantity: 360,
+      CompletedQuantity: 0,
+      ScrappedQuantity: 0,
+      RejectedQuantity: 0,
+      UOMCode: "cj",
+      WorkDefinitionId: 14726,
+      Operation: {
+        items: [
+          {
+            OperationSequenceNumber: 10,
+            OperationName: "MEZCLADO",
+            ReadyQuantity: 0,
+            CompletedQuantity: 92,
+            ScrappedQuantity: null,
+            RejectedQuantity: null,
+            UOMCode: "pza"
+          },
+          {
+            OperationSequenceNumber: 20,
+            OperationName: "EMPAQUE",
+            ReadyQuantity: 408,
+            CompletedQuantity: 92,
+            ScrappedQuantity: null,
+            RejectedQuantity: null,
+            UOMCode: "cj"
+          }
+        ]
+      },
+      Output: {
+        items: [
+          {
+            OperationSequenceNumber: 10,
+            OutputSequenceNumber: 10,
+            ItemNumber: "KSPSNG",
+            OutputType: "PRODUCT",
+            OutputQuantity: 360000,
+            CompletedQuantity: 0,
+            UOMCode: "pza",
+            PrimaryFlag: false,
+            ComplSubinventoryCode: "IPRHD"
+          },
+          {
+            OperationSequenceNumber: 20,
+            OutputSequenceNumber: 10,
+            ItemNumber: "KSPSNG03",
+            OutputType: "PRODUCT",
+            OutputQuantity: 360,
+            CompletedQuantity: 0,
+            UOMCode: "cj",
+            PrimaryFlag: true,
+            ComplSubinventoryCode: "PT"
+          }
+        ]
+      },
+      Material: {
+        items: [
+          {
+            OperationSequenceNumber: 10,
+            MaterialSequenceNumber: 10,
+            ItemNumber: "PGNEG-001",
+            SupplySubinventory: "MP",
+            Quantity: 15.9984,
+            UOMCode: "kg"
+          },
+          {
+            OperationSequenceNumber: 10,
+            MaterialSequenceNumber: 20,
+            ItemNumber: "PS-AI BL-MO",
+            SupplySubinventory: "MP",
+            Quantity: 479.952,
+            UOMCode: "kg"
+          },
+          {
+            OperationSequenceNumber: 10,
+            MaterialSequenceNumber: 30,
+            ItemNumber: "PS-CR-MO",
+            SupplySubinventory: "MP",
+            Quantity: 1103.8896,
+            UOMCode: "kg"
+          },
+          {
+            OperationSequenceNumber: 20,
+            MaterialSequenceNumber: 10,
+            ItemNumber: "CWGRWOW-12",
+            SupplySubinventory: "IPRHD",
+            Quantity: 360,
+            UOMCode: "pza"
+          },
+          {
+            OperationSequenceNumber: 20,
+            MaterialSequenceNumber: 20,
+            ItemNumber: "BWCUWOW-03-4",
+            SupplySubinventory: "IPRHD",
+            Quantity: 14400,
+            UOMCode: "pza"
+          },
+        ]
+      },
+      Resource: {
+        Items: [
+          {
+            OperationSequenceNumber: 10,
+            ResourceSequenceNumber: 10,
+            ResourceCode: "MF-H225D",
+            ResourceName: "H225D",
+            ResourceType: "EQUIPMENT",
+            RequiredUsage: 23.436,
+            UOMCode: "h"
+          },
+          {
+
+            OperationSequenceNumber: 10,
+            ResourceSequenceNumber: 20,
+            ResourceCode: "MF-MOL-KUSO32A",
+            ResourceName: "KUSO32A",
+            ResourceType: "EQUIPMENT",
+            RequiredUsage: 23.436,
+            UOMCode: "h"
+          },
+          {
+
+            OperationSequenceNumber: 10,
+            ResourceSequenceNumber: 30,
+            ResourceCode: "MF-LIP",
+            ResourceName: "LIDER PLANTILLA",
+            ResourceType: "LABOR",
+            RequiredUsage: 23.436,
+            UOMCode: "h"
+          },
+          {
+            OperationSequenceNumber: 20,
+            ResourceSequenceNumber: 40,
+            ResourceCode: "MF-H225D-EMP",
+            ResourceName: "H225D-EMP",
+            ResourceType: "EQUIPMENT",
+            RequiredUsage: 23.436,
+            UOMCode: "h"
+          },
+          {
+            OperationSequenceNumber: 20,
+            ResourceSequenceNumber: 50,
+            ResourceCode: "MF-AG A",
+            ResourceName: "AUXILIAR GENERAL A",
+            ResourceType: "LABOR",
+            RequiredUsage: 23.436,
+            UOMCode: "h"
+          }
+        ]
+      }
     }
   ];
 
@@ -129,6 +192,7 @@ export class TransactionPage implements OnInit {
   }
 
   OpenDispatch() {
+    this.selectedWorkOrder = this.workOrder[0];
     this.isModaldispatchOpen = true;
     this.alerts.Success('Dados actualizado');
   }
@@ -143,21 +207,41 @@ export class TransactionPage implements OnInit {
     this.isModaldispatchOpen = false;
   }
 
-
-  trackByOperacion(index: number, operacion: any): number {
-    return operacion.numero;
+  // Obtiene las operaciones de la orden de trabajo seleccionada
+  getOperations() {
+    return this.selectedWorkOrder?.Operation?.items || [];
   }
 
-  trackByMaterial(index: number, material: any): string {
-    return material.codigo;
+  // Obtiene las salidas para una operación específica
+  getOutputsForOperation(operationSequence: number) {
+    return this.selectedWorkOrder?.Output?.items?.filter(
+      (output: any) => output.OperationSequenceNumber === operationSequence
+    ) || [];
   }
 
-  trackByRecurso(index: number, recurso: any): string {
-    return recurso.nombre;
+  // Obtiene los materiales para una operación específica
+  getMaterialsForOperation(operationSequence: number) {
+    return this.selectedWorkOrder?.Material?.items?.filter(
+      (material: any) => material.OperationSequenceNumber === operationSequence
+    ) || [];
   }
 
-  trackBySalida(index: number, salida: any): string {
-    return salida.codigo;
+  // Obtiene los recursos de equipo para una operación específica
+  getEquipmentResourcesForOperation(operationSequence: number) {
+    return this.selectedWorkOrder?.Resource?.Items?.filter(
+      (resource: any) =>
+        resource.OperationSequenceNumber === operationSequence &&
+        resource.ResourceType === "EQUIPMENT"
+    ) || [];
+  }
+
+  // Obtiene los recursos de personal para una operación específica
+  getLaborResourcesForOperation(operationSequence: number) {
+    return this.selectedWorkOrder?.Resource?.Items?.filter(
+      (resource: any) =>
+        resource.OperationSequenceNumber === operationSequence &&
+        resource.ResourceType === "LABOR"
+    ) || [];
   }
 
 }
