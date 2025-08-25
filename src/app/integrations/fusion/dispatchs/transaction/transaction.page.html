@@ -4,13 +4,173 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected"
+                  inputId="organization_select"
+                  [options]="userData.Company.Organizations"
+                  optionLabel="Name"
+                  [filter]="true"
+                  filterBy="Name"
+                  placeholder="Seleccione una organización"
+                  styleClass="w-full"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="38"
+                  (onChange)="GetWorkOrders()"
+                  appendTo="body"/>
+        <label for="organization_select">Organización</label>
+      </p-floatlabel>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-grid>
 
+    <!-- Tabla de despachos -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-card class="stats-card">
+          <p-table #dtWorkOrders
+                   [value]="workOrdersToDispatch.items"
+                   dataKey="WorkOrderNumber"
+                   styleClass="card-table-primeng wo-table-custom "
+                   [tableStyle]="{ 'min-width': '96rem','height': '100%'}"
+                   [size]="'small'"
+                   [rowHover]="true"
+                   [rows]="rowsPerPage"
+                   [showCurrentPageReport]="true"
+                   [paginator]="true"
+                   currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+                   [filterDelay]="0"
+                   [globalFilterFields]="['WorkOrderNumber', 'ResourceCode', 'ItemNumber']"
+                   stripedRows
+                   [scrollable]="true"
+                   [scrollHeight]="scrollHeight"
+                   [alwaysShowPaginator]="true"
+                   sortField="WorkOrderNumber"
+                   [sortOrder]="1"
+          >
+            <ng-template #caption>
+              <div class="table-caption">
+                <p-button
+                  [outlined]="true"
+                  icon="pi pi-filter-slash"
+                  label="Limpiar"
+                  (click)="ClearWorkOrders(dtWorkOrders)"/>
 
-  <ion-modal
+                <div></div> <!-- Spacer -->
+
+                <p-iconField iconPosition="left">
+                  <p-inputIcon>
+                    <i class="fas fa-search"></i>
+                  </p-inputIcon>
+                  <input pInputText type="text"
+                         [(ngModel)]="searchValueWO"
+                         (input)="OnFilterGlobal($event, dtWorkOrders)"
+                         placeholder="Buscar" />
+                </p-iconField>
+              </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    O.T.
+                    <p-sortIcon field="WorkOrderNumber" />
+                    <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="ResourceCode" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Máquina
+                    <p-sortIcon field="ResourceCode" />
+                    <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="ItemNumber" style="min-width: 9rem">
+                  <div class="flex justify-between items-center">
+                    Producto
+                    <p-sortIcon field="ItemNumber" />
+                    <p-columnFilter field="ItemNumber" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="Description" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Descripción
+                    <p-sortIcon field="Description" />
+                    <p-columnFilter field="Description" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="WorkCenter" style="min-width: 7rem">
+                  <div class="flex justify-between items-center">
+                    C. T.
+                    <p-sortIcon field="WorkCenter" />
+                    <p-columnFilter field="WorkCenter" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="PlannedQuantity" style="min-width:7rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Meta
+                    <p-sortIcon field="PlannedQuantity" />
+                    <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="CompletedQuantity" style="min-width: 7rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Completo
+                    <p-sortIcon field="CompletedQuantity" />
+                    <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th pSortableColumn="DispatchedQuantity" style="min-width: 7rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Pendiente
+                    <p-sortIcon field="DispatchedQuantity" />
+                    <p-columnFilter field="DispatchedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
+                <th class="td-center">
+                  <div class="flex justify-between items-center">
+                    Acciones
+                  </div>
+                </th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-item let-rowgroup="rowgroup" let-rowspan="rowspan">
+              <tr>
+                <td class="td-center">
+                  <p-tag
+                    [value]="item.WorkOrderNumber"
+                    [severity]="'contrast'"/>
+                </td>
+                <td>{{ item.ResourceCode }}</td>
+                <td>{{ item.ItemNumber }}</td>
+                <td>{{ item.Description }}</td>
+                <td>{{ item.WorkCenter }}</td>
+                <td class="td-center">{{ item.PlannedQuantity }}</td>
+                <td class="td-center">{{ item.CompletedQuantity }}</td>
+                <td class="td-center">{{ item.DispatchPending }}</td>
+                <td class="td-center">
+                  <ion-button size="small" shape="round" color="warning" (click)="OpenDispatch(item)" title="Despachar">
+                    <ion-icon slot="icon-only" name="cloud-upload-outline"></ion-icon>
+                  </ion-button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5">No se encontraron datos.</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ion-card>
+      </ion-col>
+
+    </ion-row>
+    </ion-grid>
+    <ion-modal
     [isOpen]="isModaldispatchOpen" class="dispach-modal">
     <ng-template>
 
@@ -192,9 +352,4 @@
     </ng-template>
   </ion-modal>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="OpenDispatch()">
-      <ion-icon name="add-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 </ion-content>

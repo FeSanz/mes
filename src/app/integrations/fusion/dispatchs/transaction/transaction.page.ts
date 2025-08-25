@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonFooter, IonGrid, IonHeader,
+import {
+  IonButton, IonButtons, IonCard, IonCol, IonContent, IonFab, IonFabButton, IonFooter, IonGrid, IonHeader,
   IonIcon, IonInput, IonItem, IonLabel, IonMenuButton, IonModal, IonRow, IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
 
@@ -14,6 +15,21 @@ import {Divider} from "primeng/divider";
 import {Card} from "primeng/card";
 import {Dialog} from "primeng/dialog";
 import {AlertsService} from "../../../../services/alerts.service";
+import {IconField} from "primeng/iconfield";
+import {InputIcon} from "primeng/inputicon";
+import {PrimeTemplate} from "primeng/api";
+import {ProgressBar} from "primeng/progressbar";
+import {Slider} from "primeng/slider";
+import {TableModule} from "primeng/table";
+import {Tag} from "primeng/tag";
+
+import {ApiService} from "../../../../services/api.service";
+import {EndpointsService} from "../../../../services/endpoints.service";
+import {Platform} from "@ionic/angular";
+import {HeightTable} from "../../../../models/tables.prime";
+import { cloudUploadOutline
+} from 'ionicons/icons';
+import {addIcons} from "ionicons";
 
 @Component({
   selector: 'app-transaction',
@@ -21,9 +37,15 @@ import {AlertsService} from "../../../../services/alerts.service";
   styleUrls: ['./transaction.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, FloatLabel, IonButtons, IonMenuButton,
-    Select, IonGrid, IonRow, IonCol, Toast, IonFab, IonFabButton, IonIcon, IonModal, IonButton, IonInput, IonItem, InputText, IonLabel, Button, Divider, Card, Dialog, IonFooter]
+    Select, IonGrid, IonRow, IonCol, Toast, IonFab, IonFabButton, IonIcon, IonModal, IonButton, IonInput, IonItem, InputText, IonLabel, Button, Divider, Card, Dialog, IonFooter, IconField, InputIcon, IonCard, PrimeTemplate, ProgressBar, Slider, TableModule, Tag]
 })
 export class TransactionPage implements OnInit {
+  scrollHeight: string = '550px';
+  rowsPerPage: number = 10;
+  rowsPerPageOptions: number[] = [5, 10, 20];
+  userData: any = {};
+  organizationSelected: string | any = '';
+  searchValueWO: string = '';
 
   isModaldispatchOpen : boolean = false;
 
@@ -185,16 +207,66 @@ export class TransactionPage implements OnInit {
     }
   ];
 
-  constructor(private alerts: AlertsService) { }
+  workOrdersToDispatch: any = { items: [] };
 
-  ngOnInit() {
-    console.log('ngOnInit');
+  constructor(private apiService: ApiService,
+              private endPoints: EndpointsService,
+              private alerts: AlertsService,
+              private platform: Platform,) {
+    addIcons({cloudUploadOutline});
   }
 
-  OpenDispatch() {
+  ngOnInit() {
+    this.userData = JSON.parse(String(localStorage.getItem("userData")));
+    console.log(this.userData);
+    if (this.userData && this.userData.Company && this.userData.Company.Organizations) {
+
+      const organizations = this.userData.Company.Organizations;
+
+      // Validar si hay organizaciones
+      if (organizations && Array.isArray(organizations) && organizations.length > 0) {
+        const sortedOrganizations = organizations.sort((a, b) => a.OrganizationId - b.OrganizationId);
+        this.organizationSelected = sortedOrganizations[0];
+        this.GetWorkOrders();
+      }else{
+        this.alerts.Warning("No se encontraron organizaciones");
+      }
+    }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.UpdateScrollHeight();
+  }
+
+  private UpdateScrollHeight() {
+    this.scrollHeight = HeightTable(this.platform.height());
+  }
+
+
+  GetWorkOrders(){
+    this.workOrdersToDispatch = { items: [] };
+    this.apiService.GetRequestRender(`dispatchPending/${this.organizationSelected.OrganizationId}`).then((response: any) => {
+      this.workOrdersToDispatch = response;
+
+      if (this.workOrdersToDispatch.items && Array.isArray(this.workOrdersToDispatch.items)) {
+        console.log(this.workOrdersToDispatch);
+      }
+
+    }).catch(error => {
+      console.error('Error al obtener OTs:', error);
+    });
+  }
+
+  OpenDispatch(woSelected: any) {
+    this.alerts.Contrast(woSelected.WorkOrderNumber);
     this.selectedWorkOrder = this.workOrder[0];
     this.isModaldispatchOpen = true;
-    this.alerts.Success('Dados actualizado');
+  }
+
+  GetWorkOrderFusion()
+  {
+
   }
 
   onCloseModal() {
@@ -244,4 +316,13 @@ export class TransactionPage implements OnInit {
     ) || [];
   }
 
+  OnFilterGlobal(event: Event, table: any) {
+    const target = event.target as HTMLInputElement;
+    table.filterGlobal(target.value, 'contains');
+  }
+
+  ClearWorkOrders(table: any) {
+    table.clear();
+    this.searchValueWO = '';
+  }
 }
