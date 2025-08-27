@@ -23,26 +23,26 @@
         <ion-item lines="none" class="invisible">
           <ion-label class="toggle-label">ERP Oracle Fusion Cloud</ion-label>
           <ion-toggle [(ngModel)]="toggleActivo" (ionChange)="toggleActivo ? goToSlide(2) : null"
-            [disabled]="!company.Name?.trim() || !company.Description?.trim()"></ion-toggle>
+            [disabled]="!company.Name.trim() || !company.Description.trim()"></ion-toggle>
         </ion-item>
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
           <ion-input placeholder="Código organización" type="text" fill="outline" [(ngModel)]="organization.Code"
-            name="orgCode" [disabled]="!company.Name?.trim() || !company.Description?.trim()">
+            name="orgCode" [disabled]="!company.Name.trim() || !company.Description.trim()">
             <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
           <ion-input placeholder="Nombre organización" type="text" fill="outline" [(ngModel)]="organization.Name"
-            name="orgName" [disabled]="!company.Name?.trim() || !company.Description?.trim()">
+            name="orgName" [disabled]="!company.Name.trim() || !company.Description.trim()">
             <ion-icon name="code-working-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
           <ion-input placeholder="Ubicación" type="text" fill="outline" [(ngModel)]="organization.Location"
-            name="location" [disabled]="!company.Name?.trim() || !company.Description?.trim()" (click)="openLocationSelector()">
+            name="location" [disabled]="!company.Name.trim() || !company.Description.trim()" (click)="openLocationSelector()">
             <ion-icon name="location-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
           <!--  [value]="formatCoordinates()"        -->
@@ -50,7 +50,7 @@
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
           <ion-select [(ngModel)]="organization.WorkMethod" name="WorkMethod" interface="popover"
-            placeholder="Método de trabajo" [disabled]="!company.Name?.trim() || !company.Description?.trim()">
+            placeholder="Método de trabajo" [disabled]="!company.Name.trim() || !company.Description.trim()">
             <ion-select-option value="PROCESS_MANUFACTURING">Manufactura por procesos</ion-select-option>
             <ion-select-option value="DISCRETE_MANUFACTURING">Manufactura discreta</ion-select-option>
             <ion-icon name="options-outline" slot="start" aria-hidden="true"
@@ -94,7 +94,7 @@
         </ion-item>
 
         <ion-button class="btn-inferior" (click)="finalize()"
-          [disabled]="!userSuperAdmin.name?.trim() || !userSuperAdmin.email?.trim() || !userSuperAdmin.password?.trim()">Finalizar</ion-button>
+          [disabled]="!userSuperAdmin.name.trim() || !userSuperAdmin.email.trim() || !userSuperAdmin.password.trim()">Finalizar</ion-button>
       </div>
     </swiper-slide>
 
@@ -128,7 +128,7 @@
 
         <ion-item lines="none" class="invisible" >
           <div>
-            <ion-button (click)="VerifyConnection()" [disabled]="!host?.trim() || !user?.trim() || !pwd?.trim()">
+            <ion-button (click)="VerifyConnection()" [disabled]="!host.trim() || !user.trim() || !pwd.trim()">
               <ion-icon name="link-outline" slot="start"></ion-icon>
               Conectar
             </ion-button>&nbsp;
