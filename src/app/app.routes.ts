@@ -93,5 +93,8 @@ export const routes: Routes = [
     path: 'init',
     loadComponent: () => import('./init/init.page').then(m => m.InitPage)
   },
-
+    {
+    path: 'select-location-modal',
+    loadComponent: () => import('./select-location-modal/select-location-modal.page').then( m => m.SelectLocationModalPage)
+  }
 ];

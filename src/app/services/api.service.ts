@@ -11,7 +11,7 @@ import { logOut } from 'ionicons/icons';
 export class ApiService {
   private credentials: string = '';
   private urlFusion: string = '';
-  //private urlRender: string = 'http://localhost:3000/api';
+  // private urlRender: string = 'http://localhost:3000/api';
   private urlRender: string = 'https://iot-services-rd-ww45.onrender.com/api';
 
   offset: number = 0;

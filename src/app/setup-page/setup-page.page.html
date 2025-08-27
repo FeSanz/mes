@@ -42,9 +42,10 @@
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
           <ion-input placeholder="Ubicación" type="text" fill="outline" [(ngModel)]="organization.Location"
-            name="location" [disabled]="!company.Name?.trim() || !company.Description?.trim()">
+            name="location" [disabled]="!company.Name?.trim() || !company.Description?.trim()" (click)="openLocationSelector()">
             <ion-icon name="location-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
+          <!--  [value]="formatCoordinates()"        -->
         </ion-item>
 
         <ion-item lines="none" class="invisible" *ngIf="!toggleActivo">
@@ -105,41 +106,35 @@
         </ion-toolbar>
 
         <ion-item lines="none" class="invisible">
-          <ion-icon name="server-outline" slot="start"></ion-icon>
-          <ion-label position="floating">Servidor</ion-label>
-          <ion-input type="text" placeholder="example.fa.ocs.oraclecloud.com" [(ngModel)]="host"></ion-input>
+          <ion-input type="text" placeholder="example.fa.ocs.oraclecloud.com" [(ngModel)]="host" fill="outline">
+            <ion-icon name="server-outline" slot="start"></ion-icon>
+            <ion-label>Servidor</ion-label>
+          </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="invisible">
-          <ion-icon name="person-outline" slot="start"></ion-icon>
-          <ion-label position="floating">Usuario</ion-label>
-          <ion-input type="email" placeholder="mes.iot@example.com" [(ngModel)]="user"></ion-input>
+          <ion-input type="email" placeholder="mes.iot@example.com" [(ngModel)]="user" fill="outline">
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+            <ion-label>Usuario</ion-label>
+          </ion-input>
         </ion-item>
 
         <ion-item lines="none" class="invisible">
-          <ion-icon name="key-outline" slot="start"></ion-icon>
-          <ion-label position="floating">Contraseña</ion-label>
-          <ion-input type="password" placeholder="••••••••••" [(ngModel)]="pwd"></ion-input>
+          <ion-input type="password" placeholder="••••••••••" [(ngModel)]="pwd" fill="outline">
+            <ion-icon name="key-outline" slot="start"></ion-icon>
+            <ion-label>Contraseña</ion-label>
+          </ion-input>
         </ion-item>
 
-        <ion-item lines="none" class="invisible">
-          <ion-text [color]="statusColor">{{ statusMessage }}</ion-text>
-        </ion-item>
-        <ion-item lines="none" class="invisible">
-
+        <ion-item lines="none" class="invisible" >
           <div>
             <ion-button (click)="VerifyConnection()" [disabled]="!host?.trim() || !user?.trim() || !pwd?.trim()">
               <ion-icon name="link-outline" slot="start"></ion-icon>
               Conectar
             </ion-button>&nbsp;
-            <ion-icon [name]="statusIcon" [color]="statusColor"></ion-icon>&nbsp;
+            <ion-icon [name]="statusIcon" [color]="statusColor" style="vertical-align: middle;"></ion-icon>
+            <ion-text [color]="statusColor"> {{ statusMessage }}</ion-text>&nbsp;
           </div>
-
-          <!-- <div slot="end">
-              <ion-button color="success" (click)="SaveOrUpdateConnection()" [disabled]="!canSave">
-                {{ btnSaveOrUpdate }}
-              </ion-button>
-            </div> -->
         </ion-item>
 
         <!-- Interface para Cards módulos Fusion -->

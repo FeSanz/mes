@@ -1,0 +1,16 @@
+.leaflet-control-geosearch .results {
+  background-color: white !important;
+  color: black !important;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  z-index: 9999;
+}
+
+.leaflet-control-geosearch .results > * {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.leaflet-control-geosearch .results > *:hover {
+  background-color: #eee;
+}

@@ -1,0 +1,18 @@
+<ion-header> 
+  <ion-toolbar> 
+    <ion-title>Seleccionar ubicación</ion-title> 
+    <ion-buttons slot="end"> 
+      <ion-button (click)="close()">Cerrar</ion-button> 
+    </ion-buttons> 
+  </ion-toolbar> 
+</ion-header>
+
+<ion-content scroll="false" class="ion-padding">
+  <div #mapContainer id="map-container">
+    <div #map id="map"></div>
+    <ion-button id="floating-button" (click)="confirmSelection()" [disabled]="!selectedCoords" shape="round"
+      fill="solid" color="primary">
+      Confirmar
+    </ion-button>
+  </div>
+</ion-content>

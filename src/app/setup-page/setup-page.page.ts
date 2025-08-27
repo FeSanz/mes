@@ -1,16 +1,17 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import {
-  IonText, IonButton, IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonCheckbox,
-  IonInput, IonItem, IonIcon, IonMenuButton, IonButtons, IonInputPasswordToggle, IonToggle, IonSelect
+  IonText, IonButton, IonCard, IonInput, IonItem, IonIcon, IonInputPasswordToggle, IonToggle, IonSelect
 } from '@ionic/angular/standalone';
 import {
-  businessOutline, eyeOffOutline, lockClosed, lockClosedOutline, personOutline,
+  businessOutline, lockClosedOutline, personOutline,
   arrowForwardOutline, atCircleOutline, cloudOutline, serverOutline, keyOutline, linkOutline,
   checkmarkCircle, timeOutline, syncOutline, globeOutline, alarmOutline, clipboardOutline, trash,
-  arrowForward, chevronDownOutline, closeOutline, checkmarkOutline, chevronBackOutline, chevronForwardOutline, optionsOutline, codeWorkingOutline, locationOutline } from 'ionicons/icons';
+  arrowForward, checkmarkOutline, chevronBackOutline, chevronForwardOutline, optionsOutline,
+  codeWorkingOutline, locationOutline
+} from 'ionicons/icons';
 import { ApiService } from '../services/api.service';
 import { NavController } from '@ionic/angular';
 import { EndpointsService } from '../services/endpoints.service';
@@ -23,7 +24,6 @@ import { CredentialsService } from "../services/credentials.service";
 import { Router } from '@angular/router';
 import { HeightTable } from "../models/tables.prime";
 import { TableModule } from 'primeng/table';
-import { Capacitor, CapacitorHttp, HttpResponse } from '@capacitor/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { NgZone } from '@angular/core';
 import { TagModule } from 'primeng/tag';
@@ -33,6 +33,8 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { ModalController, MenuController, IonicModule } from '@ionic/angular';
+import { SelectLocationModalPage } from '../select-location-modal/select-location-modal.page'
 
 @Component({
   selector: 'app-setup-page',
@@ -40,11 +42,11 @@ import { MultiSelectModule } from 'primeng/multiselect';
   styleUrls: ['./setup-page.page.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons,
-    IonButton, IonMenuButton, IonCardContent, IonCardHeader, IonCardTitle, IonInput, IonCard,
-    IonItem, IonIcon, IonInputPasswordToggle, IonText, IonToggle, MultiSelectModule,
+  imports: [
+    CommonModule, FormsModule, MultiSelectModule, IonicModule,
     DropdownModule, InputIconModule, IconFieldModule, InputTextModule, ButtonModule, TagModule, TableModule,
-    IonSelect
+    // IonContent, IonToolbar, IonItem, IonInput, IonIcon, IonToggle, IonInputPasswordToggle, IonText, IonTitle,
+    // IonCard, IonButton, IonSelect
   ],
   // encapsulation: ViewEncapsulation.None
 })
@@ -107,7 +109,7 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     "Location": "",
     "WorkMethod": "",
     "BUId": 0,
-    "Coordinates": ""
+    "Coordinates": null as { lng: any, lat: any } | null
   }
 
   orgs = [];
@@ -130,20 +132,22 @@ export class SetupPagePage implements OnInit, AfterViewInit {
   rowDataFS = [];
   rowDataDB = [];
 
-
   constructor(private navCtrl: NavController,
     private endPoints: EndpointsService, private alerts: AlertsService,
     private app: AppComponent, private apiService: ApiService,
     private credentialService: CredentialsService,
     private router: Router, private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone, private modalCtrl: ModalController,
+    private menuCtrl: MenuController
   ) {
-    addIcons({businessOutline,codeWorkingOutline,locationOutline,optionsOutline,personOutline,atCircleOutline,lockClosedOutline,serverOutline,keyOutline,linkOutline,syncOutline,cloudOutline,arrowForward,checkmarkOutline,chevronBackOutline,chevronForwardOutline,trash,arrowForwardOutline,checkmarkCircle,timeOutline,globeOutline,alarmOutline,clipboardOutline});
+    addIcons({ businessOutline, codeWorkingOutline, locationOutline, optionsOutline, personOutline, atCircleOutline, lockClosedOutline, serverOutline, keyOutline, linkOutline, syncOutline, cloudOutline, arrowForward, checkmarkOutline, chevronBackOutline, chevronForwardOutline, trash, arrowForwardOutline, checkmarkCircle, timeOutline, globeOutline, alarmOutline, clipboardOutline });
 
     // this.userData = JSON.parse(String(localStorage.getItem("userData")))
   }
 
-
+  ionViewWillEnter() {
+    this.menuCtrl.swipeGesture(false);
+  }
   ngOnInit() {
   }
 
@@ -219,9 +223,9 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     ) {
 
       await this.apiService.PostRequestRender('companies', this.company).then(async (response: any) => {
-        this.company_id = response.result?.company_id;
+        if (response.errorsExistFlag === false) {
+          this.company_id = response.result?.company_id;
 
-        if (this.company_id !== 0) {
           if (this.toggleActivo) {
 
             this.dbData.items.forEach((item: any) => {
@@ -229,60 +233,58 @@ export class SetupPagePage implements OnInit, AfterViewInit {
             });
 
             payloadOrg = this.dbData;
+            console.log(JSON.stringify(payloadOrg, null, 2));
 
             await this.apiService.PostRequestRender('organizations', payloadOrg).then(async (response: any) => {
               this.orgs = response.insertedIds;
 
-              await this.apiService.PostRequestRender('getToken', payloadOrg).then(async (response: any) => {
-                localStorage.setItem('tk', response.token);
+              this.userSuperAdmin.organizations = this.orgs.map(id => ({ org_id: id }));
+              this.userSuperAdmin.password = btoa(this.userSuperAdmin.password);
 
-                this.userSuperAdmin.organizations = this.orgs.map(id => ({ org_id: id }));
-                this.userSuperAdmin.password = btoa(this.userSuperAdmin.password);
-
-                console.log(JSON.stringify(this.userSuperAdmin, null, 2));
-
-                await this.apiService.PostRequestRender('users', this.userSuperAdmin).then((response: any) => {
-                  this.SaveOrUpdateConnection();
-                  this.router.navigate([`/login`]);
-                });
+              await this.apiService.PostRequestRender('users', this.userSuperAdmin).then((response: any) => {
+                this.SaveOrUpdateConnection();
+                this.router.navigate([`/login`]);
               });
 
             });
 
           } else {
-            this.organization.CompanyId = this.company_id;
-            this.organization.WorkMethod = this.WorkMethodFormat(this.organization.WorkMethod);
-            payloadOrg = { items: [this.organization]};
-            
-            await this.apiService.PostRequestRender('organizations', payloadOrg).then(async (response: any) => {
-              this.orgs = response.insertedIds;
 
-              await this.apiService.PostRequestRender('getToken', payloadOrg).then(async (response: any) => {
-                localStorage.setItem('tk', response.token);
+            this.apiService.PostRequestRender('getToken', payloadOrg).then(async (response: any) => {
+              localStorage.setItem('tk', response.token);
+
+              this.organization.CompanyId = this.company_id;
+              this.organization.WorkMethod = this.WorkMethodFormat(this.organization.WorkMethod);
+              payloadOrg = { items: [this.organization] };
+              
+
+              await this.apiService.PostRequestRender('organizations', payloadOrg).then(async (response: any) => {
+                this.orgs = response.insertedIds;
 
                 this.userSuperAdmin.organizations = this.orgs.map(id => ({ org_id: id }));
                 this.userSuperAdmin.password = btoa(this.userSuperAdmin.password);
 
-                await this.apiService.PostRequestRender('users', this.userSuperAdmin).then((response: any) => {                  
+                await this.apiService.PostRequestRender('users', this.userSuperAdmin).then((response: any) => {
                   this.router.navigate([`/login`]);
                 });
 
               });
-
             });
           }
 
-        }
+        } else {
+            this.alerts.Error(response.message);
+          }
 
-      });
+        });
     } else {
       if (this.company.Name === '' || this.company.Description === '') {
-        this.alerts.Info('Datos de compañía requeridos');
+        this.alerts.Error('Datos de compañía requeridos');
       } else if (this.userSuperAdmin.name === '' || this.userSuperAdmin.password === '' || this.userSuperAdmin.email === '') {
-        this.alerts.Info('Datos de usuario requeridos');
+        this.alerts.Error('Datos de usuario requeridos');
       } else if ((this.organization.Code === '' || this.organization.Name === '') ||
         (!this.dbData || Array.isArray(!this.dbData.items) || this.dbData.items.length === 0)) {
-        this.alerts.Info('Datos de organización requeridos');
+        this.alerts.Error('Datos de organización requeridos');
       }
 
     }
@@ -419,23 +421,28 @@ export class SetupPagePage implements OnInit, AfterViewInit {
   }
 
   GetOrganizations() {
+    let payloadOrg: any;
 
     const params = 'limit=500&totalResults=true&onlyData=true&links=canonical';
     const endPoint = '/inventoryOrganizations?' + params +
       '&fields=OrganizationId,OrganizationCode,OrganizationName,LocationCode,ManagementBusinessUnitId,Status;plantParameters:DefaultWorkMethod' +
       '&q=ManufacturingPlantFlag=true';
 
-    this.apiService.GetRequestRender(`organizations/0`).then((response: any) => {
-      this.dbData = response;
-      this.apiService.GetRequestFusionOnceTime(this.server + endPoint, this.credentials).then((response: any) => {
-        this.fusionData = JSON.parse(response);
-        this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original        
+    this.apiService.PostRequestRender('getToken', payloadOrg).then(async (response: any) => {
+      localStorage.setItem('tk', response.token);
 
-        this.FilterRegisteredItems();
+      this.apiService.GetRequestRender(`organizations/0`).then((response: any) => {
+        this.dbData = response;
+        this.apiService.GetRequestFusionOnceTime(this.server + endPoint, this.credentials).then((response: any) => {
+          this.fusionData = JSON.parse(response);
+          this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original        
 
-        this.goToSlide(3);
+          this.FilterRegisteredItems();
 
-        this.cdr.detectChanges();
+          this.goToSlide(3);
+
+          this.cdr.detectChanges();
+        });
       });
     });
 
@@ -486,18 +493,6 @@ export class SetupPagePage implements OnInit, AfterViewInit {
 
       this.dbData = payload;
       this.cdr.detectChanges();
-      console.log(payload);
-      // this.apiService.PostRequestRender('organizations', payload).then(async (response: any) => {
-      //   if (response.errorsExistFlag) {
-      //     this.alerts.Info(response.message);
-      //   } else {
-      //     this.alerts.Success(response.message);
-
-      //     setTimeout(() => {
-      //       this.RefreshTables();
-      //     }, 1500);
-      //   }
-      // });
     }
   }
 
@@ -532,4 +527,36 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     this.selectedItemsDB = [];
 
   }
+
+
+  async openLocationSelector() {
+    const modal = await this.modalCtrl.create({
+      component: SelectLocationModalPage
+    });
+
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    // console.log(JSON.stringify( data, null, 2));
+
+    if (data) {
+      // this.organization.Coordinates =  `(${data.coordinates.lng}, ${data.coordinates.lat})`;
+      this.organization.Coordinates = {
+        lng: data.coordinates.lng,
+        lat: data.coordinates.lat
+      }
+      this.organization.Location = data.address;
+    } else {
+      this.organization.Coordinates = null; // si se canceló el modal
+      this.organization.Location = "";
+    }
+  }
+
+  // formatCoordinates(): string {
+  //   if (this.organization.Coordinates) {
+  //     const { lat, lng } = this.organization.Coordinates;
+  //     return `${lat}, ${lng}`;
+  //   }
+  //   return '';
+  // }
 }
+

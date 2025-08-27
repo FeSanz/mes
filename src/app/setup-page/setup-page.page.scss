@@ -112,30 +112,34 @@ ion-content::before {
     --ripple-color: transparent;
 }
 
-swiper-container {
-    --swiper-pagination-bullet-inactive-color: var(--ion-text-color-step-800, #cccccc);
-    --swiper-pagination-color: var(--ion-color-primary, #0054e9);
-    --swiper-pagination-progressbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.25);
-    --swiper-scrollbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.1);
-    --swiper-scrollbar-drag-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.5);
-}
+// swiper-container {
+//     --swiper-pagination-bullet-inactive-color: var(--ion-text-color-step-800, #cccccc);
+//     --swiper-pagination-color: var(--ion-color-primary, #0054e9);
+//     --swiper-pagination-progressbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.25);
+//     --swiper-scrollbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.1);
+//     --swiper-scrollbar-drag-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.5);
+// }
 
-swiper-slide {
-    display: flex;
-    position: relative;
+// swiper-slide {
+//     display: flex;
+//     position: relative;
 
-    flex-direction: column;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
+//     flex-direction: column;
+//     flex-shrink: 0;
+//     align-items: center;
+//     justify-content: center;
 
-    width: 100%;
-    height: 100%;
+//     width: 100%;
+//     height: 100%;
 
-    font-size: 18px;
+//     font-size: 18px;
 
-    text-align: center;
-    box-sizing: border-box;
+//     text-align: center;
+//     box-sizing: border-box;
+// }
+
+swiper-container::part(pagination) {
+  bottom: 50px !important;
 }
 
 // swiper-slide img {
@@ -145,11 +149,11 @@ swiper-slide {
 //     max-height: 100%;
 // }
 
-ion-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+// ion-item {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+// }
 
 .scrollable-div {
     max-height: 700px;
@@ -225,16 +229,19 @@ ion-item {
 }
 
 ion-select {
-    color: darkgray;
+    color: white;
     --background: transparent;
     margin-bottom: 16px;
     --background: rgba(255, 255, 255, 0.1);
     --padding-start: 0;
     --padding-end: 0;
     --min-height: 44px;
-
-    // display: flex;
     line-height: 1;
     align-items: center;    
 
+}
+
+
+::ng-deep .p-table {
+  background-color: #f5f5f5;
 }
