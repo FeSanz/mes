@@ -37,7 +37,8 @@ import {addIcons} from "ionicons";
   styleUrls: ['./transaction.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, FloatLabel, IonButtons, IonMenuButton,
-    Select, IonGrid, IonRow, IonCol, Toast, IonFab, IonFabButton, IonIcon, IonModal, IonButton, IonInput, IonItem, InputText, IonLabel, Button, Divider, Card, Dialog, IonFooter, IconField, InputIcon, IonCard, PrimeTemplate, ProgressBar, Slider, TableModule, Tag]
+    Select, IonGrid, IonRow, IonCol, IonIcon, IonModal, IonButton, InputText, Button, IonFooter, IconField, InputIcon,
+    IonCard, PrimeTemplate, TableModule, Tag]
 })
 export class TransactionPage implements OnInit {
   scrollHeight: string = '550px';
@@ -50,7 +51,6 @@ export class TransactionPage implements OnInit {
   isModaldispatchOpen : boolean = false;
 
   selectedWorkOrder: any = null;
-
   workOrder: any = [
     {
       WorkOrderId: 1,
@@ -206,8 +206,51 @@ export class TransactionPage implements OnInit {
       }
     }
   ];
-
   workOrdersToDispatch: any = { items: [] };
+  fusionOriginalData: any = {};
+
+  private dataTransformers: { [key: string]: (data: any) => any } = {
+    'PROCESOS': (data: any) => ({
+      WorkOrderId: data.WorkOrderId,
+      WorkOrderNumber: data.WorkOrderNumber,
+      WorkDefinitionId: data.WorkDefinitionId,
+      ItemId: data.PrimaryProductId,
+      ItemNumber:data.ItemNumber,
+      Description: data.Description,
+      UoM: data.PrimaryProductUOMCode,
+      PlannedQuantity: data.PrimaryProductQuantity,
+      CompletedQuantity: data.CompletedQuantity,
+      Scrap: data.ScrappedQuantity,
+      Reject: data.RejectedQuantity,
+      StartDate: data.PlannedStartDate,
+      CompletionDate: data.PlannedCompletionDate,
+      StatusCode: data.WorkOrderSystemStatusCode,
+      Operations: data.Operation,
+      Materials: data.ProcessWorkOrderMaterial,
+      Resources: data.ProcessWorkOrderResource,
+      Outputs: data.ProcessWorkOrderOutput
+    }),
+
+    'DISCRETA': (data: any) => ({
+      WorkOrderId: data.WorkOrderId,
+      WorkOrderNumber: data.WorkOrderNumber,
+      WorkDefinitionId: data.WorkDefinitionId,
+      ItemId: data.InventoryItemId,
+      ItemNumber:data.ItemNumber,
+      Description: data.Description,
+      UoM: data.UOMCode,
+      PlannedQuantity: data.PlannedStartQuantity,
+      CompletedQuantity: data.CompletedQuantity,
+      Scrap: data.ScrappedQuantity,
+      Reject: data.RejectedQuantity,
+      StartDate: data.PlannedStartDate,
+      CompletionDate: data.PlannedCompletionDate,
+      StatusCode: data.WorkOrderSystemStatusCode,
+      Operations: data.WorkOrderOperation,
+      Materials: data.WorkOrderMaterial,
+      Resources: data.WorkOrderResource
+    })
+  };
 
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
@@ -218,7 +261,6 @@ export class TransactionPage implements OnInit {
 
   ngOnInit() {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
-    console.log(this.userData);
     if (this.userData && this.userData.Company && this.userData.Company.Organizations) {
 
       const organizations = this.userData.Company.Organizations;
@@ -247,10 +289,9 @@ export class TransactionPage implements OnInit {
   GetWorkOrders(){
     this.workOrdersToDispatch = { items: [] };
     this.apiService.GetRequestRender(`dispatchPending/${this.organizationSelected.OrganizationId}`).then((response: any) => {
-      this.workOrdersToDispatch = response;
 
-      if (this.workOrdersToDispatch.items && Array.isArray(this.workOrdersToDispatch.items)) {
-        console.log(this.workOrdersToDispatch);
+      if (response.items && Array.isArray(response.items)) {
+        this.workOrdersToDispatch = response;
       }
 
     }).catch(error => {
@@ -259,14 +300,31 @@ export class TransactionPage implements OnInit {
   }
 
   OpenDispatch(woSelected: any) {
+    console.log(woSelected);
     this.alerts.Contrast(woSelected.WorkOrderNumber);
     this.selectedWorkOrder = this.workOrder[0];
     this.isModaldispatchOpen = true;
   }
 
-  GetWorkOrderFusion()
-  {
+  GetWorkOrderFusion(WOType: string) {
+    const path = WOType === 'P' ? 'wo_process_dispatch' : 'wo_discrete_dispatch';
+    this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code)).then(async (response: any) => {
+      const data = JSON.parse(response);
+      this.fusionOriginalData = JSON.parse(JSON.stringify(data)); // Guardar estructura original
 
+      //Para manufactura por PROCESOS O DISCRETA
+      const transformer = this.dataTransformers[this.organizationSelected.WorkMethod];
+      if (!transformer) {
+        this.alerts.Warning('Tipo de manufactura no identificada');
+        return;
+      }
+
+      // Transformar y asignar datos
+      const restructuredData = data.items.map((item: any) => transformer(item));
+
+      const objRestructured = { items: restructuredData };
+
+    });
   }
 
   onCloseModal() {

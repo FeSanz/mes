@@ -46,6 +46,21 @@ export class EndpointsService {
     'wo_discrete': '/workOrders?' + this._params +
                     '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,Description,UOMCode,PlannedStartQuantity,CompletedQuantity,PlannedStartDate,PlannedCompletionDate;WorkOrderResource:ResourceCode' +
                     '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\'',
+
+    'wo_process_dispatch': '/processWorkOrders?' + this._params +
+                          '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,Description,PrimaryProductQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,PrimaryProductUOMCode,PlannedStartDate,PlannedCompletionDate;' +
+                                  'WorkOrderOperation:OperationSequenceNumber,OperationName,ReadyQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,UnitOfMeasure;' +
+                                  'ProcessWorkOrderMaterial:OperationSequenceNumber,MaterialSequenceNumber,ItemNumber,SupplySubinventory,Quantity,UOMCode;' +
+                                  'ProcessWorkOrderResource:OperationSequenceNumber,ResourceSequenceNumber,ResourceCode,ResourceName,ResourceType,RequiredUsage,UOMCode;' +
+                                  'ProcessWorkOrderOutput:OperationSequenceNumber,OutputSequenceNumber,ItemNumber,OutputType,OutputQuantity,CompletedQuantity,UOMCode,PrimaryFlag,ComplSubinventoryCode' +
+                          '&q=OrganizationCode=\'{0}\' and WorkOrderNumber=\'{1}\'',
+
+    'wo_discrete_dispatch': '/workOrders?' + this._params +
+                          '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,Description,PlannedStartQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,UOMCode,PlannedStartDate,PlannedCompletionDate;' +
+                                  'Operation:OperationSequenceNumber,OperationName,ReadyQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,UnitOfMeasure;' +
+                                  'WorkOrderMaterial:OperationSequenceNumber,MaterialSequenceNumber,ItemNumber,SupplySubinventory,Quantity,UOMCode;' +
+                                  'WorkOrderResource:OperationSequenceNumber,ResourceSequenceNumber,ResourceCode,ResourceName,ResourceType,RequiredUsage,UOMCode;' +
+                          '&q=OrganizationCode=\'{0}\' and WorkOrderNumber=\'{1}\'',
   };
 
   constructor() { }
