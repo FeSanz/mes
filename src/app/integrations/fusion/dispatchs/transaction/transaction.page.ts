@@ -27,6 +27,7 @@ import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {Platform} from "@ionic/angular";
 import {HeightTable} from "../../../../models/tables.prime";
+import {Round, Truncate} from "../../../../models/math.operations";
 import { cloudUploadOutline
 } from 'ionicons/icons';
 import {addIcons} from "ionicons";
@@ -50,167 +51,24 @@ export class TransactionPage implements OnInit {
 
   isModaldispatchOpen : boolean = false;
 
-  selectedWorkOrder: any = null;
-  workOrder: any = [
-    {
-      WorkOrderId: 1,
-      WorkOrderNumber: "4461",
-      PrimaryProductQuantity: 360,
-      CompletedQuantity: 0,
-      ScrappedQuantity: 0,
-      RejectedQuantity: 0,
-      UOMCode: "cj",
-      WorkDefinitionId: 14726,
-      Operation: {
-        items: [
-          {
-            OperationSequenceNumber: 10,
-            OperationName: "MEZCLADO",
-            ReadyQuantity: 0,
-            CompletedQuantity: 92,
-            ScrappedQuantity: null,
-            RejectedQuantity: null,
-            UOMCode: "pza"
-          },
-          {
-            OperationSequenceNumber: 20,
-            OperationName: "EMPAQUE",
-            ReadyQuantity: 408,
-            CompletedQuantity: 92,
-            ScrappedQuantity: null,
-            RejectedQuantity: null,
-            UOMCode: "cj"
-          }
-        ]
-      },
-      Output: {
-        items: [
-          {
-            OperationSequenceNumber: 10,
-            OutputSequenceNumber: 10,
-            ItemNumber: "KSPSNG",
-            OutputType: "PRODUCT",
-            OutputQuantity: 360000,
-            CompletedQuantity: 0,
-            UOMCode: "pza",
-            PrimaryFlag: false,
-            ComplSubinventoryCode: "IPRHD"
-          },
-          {
-            OperationSequenceNumber: 20,
-            OutputSequenceNumber: 10,
-            ItemNumber: "KSPSNG03",
-            OutputType: "PRODUCT",
-            OutputQuantity: 360,
-            CompletedQuantity: 0,
-            UOMCode: "cj",
-            PrimaryFlag: true,
-            ComplSubinventoryCode: "PT"
-          }
-        ]
-      },
-      Material: {
-        items: [
-          {
-            OperationSequenceNumber: 10,
-            MaterialSequenceNumber: 10,
-            ItemNumber: "PGNEG-001",
-            SupplySubinventory: "MP",
-            Quantity: 15.9984,
-            UOMCode: "kg"
-          },
-          {
-            OperationSequenceNumber: 10,
-            MaterialSequenceNumber: 20,
-            ItemNumber: "PS-AI BL-MO",
-            SupplySubinventory: "MP",
-            Quantity: 479.952,
-            UOMCode: "kg"
-          },
-          {
-            OperationSequenceNumber: 10,
-            MaterialSequenceNumber: 30,
-            ItemNumber: "PS-CR-MO",
-            SupplySubinventory: "MP",
-            Quantity: 1103.8896,
-            UOMCode: "kg"
-          },
-          {
-            OperationSequenceNumber: 20,
-            MaterialSequenceNumber: 10,
-            ItemNumber: "CWGRWOW-12",
-            SupplySubinventory: "IPRHD",
-            Quantity: 360,
-            UOMCode: "pza"
-          },
-          {
-            OperationSequenceNumber: 20,
-            MaterialSequenceNumber: 20,
-            ItemNumber: "BWCUWOW-03-4",
-            SupplySubinventory: "IPRHD",
-            Quantity: 14400,
-            UOMCode: "pza"
-          },
-        ]
-      },
-      Resource: {
-        Items: [
-          {
-            OperationSequenceNumber: 10,
-            ResourceSequenceNumber: 10,
-            ResourceCode: "MF-H225D",
-            ResourceName: "H225D",
-            ResourceType: "EQUIPMENT",
-            RequiredUsage: 23.436,
-            UOMCode: "h"
-          },
-          {
-
-            OperationSequenceNumber: 10,
-            ResourceSequenceNumber: 20,
-            ResourceCode: "MF-MOL-KUSO32A",
-            ResourceName: "KUSO32A",
-            ResourceType: "EQUIPMENT",
-            RequiredUsage: 23.436,
-            UOMCode: "h"
-          },
-          {
-
-            OperationSequenceNumber: 10,
-            ResourceSequenceNumber: 30,
-            ResourceCode: "MF-LIP",
-            ResourceName: "LIDER PLANTILLA",
-            ResourceType: "LABOR",
-            RequiredUsage: 23.436,
-            UOMCode: "h"
-          },
-          {
-            OperationSequenceNumber: 20,
-            ResourceSequenceNumber: 40,
-            ResourceCode: "MF-H225D-EMP",
-            ResourceName: "H225D-EMP",
-            ResourceType: "EQUIPMENT",
-            RequiredUsage: 23.436,
-            UOMCode: "h"
-          },
-          {
-            OperationSequenceNumber: 20,
-            ResourceSequenceNumber: 50,
-            ResourceCode: "MF-AG A",
-            ResourceName: "AUXILIAR GENERAL A",
-            ResourceType: "LABOR",
-            RequiredUsage: 23.436,
-            UOMCode: "h"
-          }
-        ]
-      }
-    }
-  ];
   workOrdersToDispatch: any = { items: [] };
+  selectedWorkOrder: any = {
+    WorkOrderNumber: '',
+    Operations: { items: [] },
+    Materials: { items: [] },
+    Resources: { items: [] },
+    Outputs: { items: [] }
+  };
   fusionOriginalData: any = {};
 
+  completeGlobal: number = 0;
+  scrapGlobal: number = 0;
+  rejectGlobal: number = 0;
+
+  totalGlobal: number = 0;
+
   private dataTransformers: { [key: string]: (data: any) => any } = {
-    'PROCESOS': (data: any) => ({
+    'P': (data: any) => ({
       WorkOrderId: data.WorkOrderId,
       WorkOrderNumber: data.WorkOrderNumber,
       WorkDefinitionId: data.WorkDefinitionId,
@@ -231,7 +89,7 @@ export class TransactionPage implements OnInit {
       Outputs: data.ProcessWorkOrderOutput
     }),
 
-    'DISCRETA': (data: any) => ({
+    'D': (data: any) => ({
       WorkOrderId: data.WorkOrderId,
       WorkOrderNumber: data.WorkOrderNumber,
       WorkDefinitionId: data.WorkDefinitionId,
@@ -299,21 +157,25 @@ export class TransactionPage implements OnInit {
     });
   }
 
-  OpenDispatch(woSelected: any) {
-    console.log(woSelected);
-    this.alerts.Contrast(woSelected.WorkOrderNumber);
-    this.selectedWorkOrder = this.workOrder[0];
+  OpenDispatch(WOSelected: any) {
+    this.GetWorkOrderFusion(WOSelected);
     this.isModaldispatchOpen = true;
   }
 
-  GetWorkOrderFusion(WOType: string) {
-    const path = WOType === 'P' ? 'wo_process_dispatch' : 'wo_discrete_dispatch';
-    this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code)).then(async (response: any) => {
+  GetWorkOrderFusion(WOSelectedData: any) {
+    this.completeGlobal = WOSelectedData.DispatchPending || 0;
+    this.scrapGlobal = WOSelectedData.ScrapPending || 0;
+    this.rejectGlobal = WOSelectedData.RejectPending || 0;
+
+    this.totalGlobal = this.completeGlobal + this.scrapGlobal + this.rejectGlobal;
+
+    const path = WOSelectedData.Type === 'P' ? 'wo_process_dispatch' : 'wo_discrete_dispatch';
+    this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code, WOSelectedData.WorkOrderNumber)).then(async (response: any) => {
       const data = JSON.parse(response);
       this.fusionOriginalData = JSON.parse(JSON.stringify(data)); // Guardar estructura original
 
       //Para manufactura por PROCESOS O DISCRETA
-      const transformer = this.dataTransformers[this.organizationSelected.WorkMethod];
+      const transformer = this.dataTransformers[WOSelectedData.Type];
       if (!transformer) {
         this.alerts.Warning('Tipo de manufactura no identificada');
         return;
@@ -322,56 +184,81 @@ export class TransactionPage implements OnInit {
       // Transformar y asignar datos
       const restructuredData = data.items.map((item: any) => transformer(item));
 
-      const objRestructured = { items: restructuredData };
-
+      this.selectedWorkOrder = restructuredData[0] || {};
+      console.log(this.selectedWorkOrder);
     });
   }
 
-  onCloseModal() {
-    this.isModaldispatchOpen = false;
-  }
-
-  onSaveDispatch() {
+  OnSaveDispatch() {
     // Implementar lógica de guardado
     console.log('Guardando despacho...');
     this.isModaldispatchOpen = false;
   }
 
-  // Obtiene las operaciones de la orden de trabajo seleccionada
-  getOperations() {
-    return this.selectedWorkOrder?.Operation?.items || [];
+// Mantén tu código que funciona, solo agregamos el campo Standard
+  Operations() {
+    return this.selectedWorkOrder?.Operations?.items || [];
   }
 
-  // Obtiene las salidas para una operación específica
-  getOutputsForOperation(operationSequence: number) {
-    return this.selectedWorkOrder?.Output?.items?.filter(
-      (output: any) => output.OperationSequenceNumber === operationSequence
-    ) || [];
+// Método helper para obtener PlannedQuantity de forma segura
+  private getPlannedQuantity(): number {
+    return this.selectedWorkOrder?.PlannedQuantity || 1;
   }
 
-  // Obtiene los materiales para una operación específica
-  getMaterialsForOperation(operationSequence: number) {
-    return this.selectedWorkOrder?.Material?.items?.filter(
-      (material: any) => material.OperationSequenceNumber === operationSequence
-    ) || [];
+  OutputsForOperation(operationSequence: number) {
+    const outputs = this.selectedWorkOrder?.Outputs?.items || [];
+    const filtered = outputs.filter((output: any) => output.OperationSequenceNumber === operationSequence);
+    const plannedQuantity = this.getPlannedQuantity();
+
+    // Agregar campo Standard a cada output
+    filtered.forEach((output: any) => {
+      output.Standard = (output.OutputQuantity || 0) / plannedQuantity;
+    });
+
+    return filtered;
   }
 
-  // Obtiene los recursos de equipo para una operación específica
-  getEquipmentResourcesForOperation(operationSequence: number) {
-    return this.selectedWorkOrder?.Resource?.Items?.filter(
-      (resource: any) =>
-        resource.OperationSequenceNumber === operationSequence &&
-        resource.ResourceType === "EQUIPMENT"
-    ) || [];
+  MaterialsForOperation(operationSequence: number) {
+    const materials = this.selectedWorkOrder?.Materials?.items || [];
+    const filtered = materials.filter((material: any) => material.OperationSequenceNumber === operationSequence);
+    const plannedQuantity = this.getPlannedQuantity();
+
+    // Agregar campo Standard a cada material
+    filtered.forEach((material: any) => {
+      material.Standard = (material.Quantity || 0) / plannedQuantity;
+    });
+
+    return filtered;
   }
 
-  // Obtiene los recursos de personal para una operación específica
-  getLaborResourcesForOperation(operationSequence: number) {
-    return this.selectedWorkOrder?.Resource?.Items?.filter(
-      (resource: any) =>
-        resource.OperationSequenceNumber === operationSequence &&
-        resource.ResourceType === "LABOR"
-    ) || [];
+  EquipmentResourcesForOperation(operationSequence: number) {
+    const resources = this.selectedWorkOrder?.Resources?.items || [];
+    const filtered = resources.filter((resource: any) =>
+      resource.OperationSequenceNumber === operationSequence && resource.ResourceType === "EQUIPMENT"
+    );
+    const plannedQuantity = this.getPlannedQuantity();
+
+    // Agregar campo Standard a cada equipment
+    filtered.forEach((equipment: any) => {
+      equipment.Standard = (equipment.RequiredUsage || 0) / plannedQuantity;
+    });
+
+    return filtered;
+  }
+
+  LaborResourcesForOperation(operationSequence: number) {
+    const resources = this.selectedWorkOrder?.Resources?.items || [];
+    const filtered = resources.filter((resource: any) =>
+      resource.OperationSequenceNumber === operationSequence && resource.ResourceType === "LABOR"
+    );
+    const plannedQuantity = this.getPlannedQuantity();
+
+    // Agregar campo Standard a cada labor
+    filtered.forEach((labor: any) => {
+      labor.Standard = (labor.RequiredUsage || 0) / plannedQuantity;
+    });
+
+    return filtered;
   }
 
   OnFilterGlobal(event: Event, table: any) {
@@ -383,4 +270,6 @@ export class TransactionPage implements OnInit {
     table.clear();
     this.searchValueWO = '';
   }
+
+  protected readonly Truncate = Truncate;
 }

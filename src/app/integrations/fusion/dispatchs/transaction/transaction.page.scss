@@ -32,32 +32,16 @@ ion-modal.dispach-modal::part(content) {
   align-items: center;
 }
 
+.data-center{
+  text-align: center;
+  align-items: center;
+}
+
 /* Inputs con estilos específicos */
-.input-waste {
+.input-operation {
   width: 100%;
-  text-align: center;
-  border: none;
-  outline: none;
-  color: orange;
   font-weight: bold;
-}
-
-.input-reject {
-  width: 100%;
   text-align: center;
-  border: none;
-  outline: none;
-  color: #6030ff;
-  font-weight: bold;
-}
-
-.input-complete {
-  width: 100%;
-  text-align: center;
-  border: none;
-  outline: none;
-  color: green;
-  font-weight: bold;
 }
 
 .input-standard {
@@ -71,12 +55,31 @@ ion-modal.dispach-modal::part(content) {
   font-weight: bold;
 }
 
+.text-orange {
+  color: orange;
+  font-weight: bold;
+}
+
+.text-purple {
+  color: purple;
+  font-weight: bold;
+}
+
 .text-green {
   color: green;
+  font-weight: bold;
 }
 
 .text-blue {
   color: #007bff;
+  font-size: 13px;
+}
+
+.text-opname {
+  color: #f3dd8b;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
 }
 
 .line-divider{
@@ -86,7 +89,13 @@ ion-modal.dispach-modal::part(content) {
 }
 
 .text-list{
-  font-size: 16px;
+  font-size: 15px;
+}
+
+.std-consume{
+  font-size: 13px;
+  text-align: center;
+  align-items: center;
 }
 
 /* Footer */

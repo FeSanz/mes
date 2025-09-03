@@ -68,7 +68,7 @@
                   <input pInputText type="text"
                          [(ngModel)]="searchValueWO"
                          (input)="OnFilterGlobal($event, dtWorkOrders)"
-                         placeholder="Buscar" />
+                         placeholder="Buscar"/>
                 </p-iconField>
               </div>
             </ng-template>
@@ -78,56 +78,56 @@
                 <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     O.T.
-                    <p-sortIcon field="WorkOrderNumber" />
-                    <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
+                    <p-sortIcon field="WorkOrderNumber"/>
+                    <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="ResourceCode" style="min-width: 9rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Máquina
-                    <p-sortIcon field="ResourceCode" />
-                    <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto" />
+                    <p-sortIcon field="ResourceCode"/>
+                    <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="ItemNumber" style="min-width: 9rem">
                   <div class="flex justify-between items-center">
                     Producto
-                    <p-sortIcon field="ItemNumber" />
+                    <p-sortIcon field="ItemNumber"/>
                     <p-columnFilter field="ItemNumber" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="Description" style="min-width: 9rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Descripción
-                    <p-sortIcon field="Description" />
+                    <p-sortIcon field="Description"/>
                     <p-columnFilter field="Description" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="WorkCenter" style="min-width: 7rem">
                   <div class="flex justify-between items-center">
                     C. T.
-                    <p-sortIcon field="WorkCenter" />
+                    <p-sortIcon field="WorkCenter"/>
                     <p-columnFilter field="WorkCenter" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="PlannedQuantity" style="min-width:7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Meta
-                    <p-sortIcon field="PlannedQuantity" />
+                    <p-sortIcon field="PlannedQuantity"/>
                     <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="CompletedQuantity" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Completo
-                    <p-sortIcon field="CompletedQuantity" />
+                    <p-sortIcon field="CompletedQuantity"/>
                     <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="DispatchedQuantity" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Pendiente
-                    <p-sortIcon field="DispatchedQuantity" />
+                    <p-sortIcon field="DispatchedQuantity"/>
                     <p-columnFilter field="DispatchedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
@@ -169,8 +169,10 @@
       </ion-col>
 
     </ion-row>
-    </ion-grid>
-    <ion-modal
+  </ion-grid>
+
+  <!-- Modal para despacho OT -->
+  <ion-modal
     [isOpen]="isModaldispatchOpen" class="dispach-modal">
     <ng-template>
 
@@ -178,151 +180,195 @@
         <ion-toolbar color="secondary">
           <ion-title slot="start">OT
             <strong>
-              {{ (selectedWorkOrder[0]?.WorkOrderNumber || '123') }}
+              {{ selectedWorkOrder?.WorkOrderNumber || 'N/A' }}
             </strong>
           </ion-title>
           <ion-title slot="end">Avance
             <strong>
-              {{(selectedWorkOrder[0]?.CompletedQuantity || 0) + ' / ' + (selectedWorkOrder[0]?.PrimaryProductQuantity || '100') }}
+              {{ (selectedWorkOrder?.CompletedQuantity || 0) + ' / ' + (selectedWorkOrder?.PlannedQuantity || 0) }}
             </strong>
           </ion-title>
         </ion-toolbar>
       </ion-header>
 
       <ion-content>
-        <div *ngFor="let operation of getOperations(); last as isLast">
-        <ion-grid [fixed]="true">
-          <!-- Encabezado Operacion -->
-          <ion-row class="section-header">
-            <ion-col size="12" size-sm="3"></ion-col>
-            <ion-col size="12" size-sm="2">
-              <span>FALTANTE</span>
-            </ion-col>
-            <ion-col size="12" size-sm="2">
-              <span>DESPERDICIO</span>
-            </ion-col>
-            <ion-col size="12" size-sm="2">
-              <span>RECHAZO</span>
-            </ion-col>
-            <ion-col size="12" size-sm="2">
-              <span>COMPLETO</span>
-            </ion-col>
-            <ion-col size="12" size-sm="1">
-              <strong></strong>
-            </ion-col>
-          </ion-row>
-
-          <ion-row class="operation-row">
-            <ion-col size="12" size-sm="3">
-              <strong>OPERACION {{ operation.OperationSequenceNumber }}</strong>
-            </ion-col>
-            <ion-col size="12" size-sm="2" class="section-header">
-              <span class="text-red">{{ operation.ReadyQuantity }}</span>
-            </ion-col>
-            <ion-col size="12" size-sm="2">
-              <input pInputText type="text" [value]="operation.ScrappedQuantity || 0" pSize="small" [disabled]="true" class="input-waste"/>
-            </ion-col>
-            <ion-col size="12" size-sm="2">
-              <input pInputText type="text" [value]="operation.RejectedQuantity || 0" pSize="small" [disabled]="true" class="input-reject"/>
-            </ion-col>
-            <ion-col size="12" size-sm="2">
-              <input pInputText type="text" [value]="operation.CompletedQuantity || 0" pSize="small" [disabled]="true" class="input-complete"/>
-            </ion-col>
-            <ion-col size="12" size-sm="1">
-              <strong>{{ operation.UOMCode }}</strong>
-            </ion-col>
-          </ion-row>
-
-          <!-- Salidas -->
-          <ng-container *ngIf="getOutputsForOperation(operation.OperationSequenceNumber).length > 0">
-          <ion-row class="data-row">
-            <ion-col><br><strong class="section-title">SALIDAS</strong></ion-col>
-          </ion-row>
-
-            <ion-row class="data-row" *ngFor="let output of getOutputsForOperation(operation.OperationSequenceNumber)">
-              <ion-col size="12" size-sm="5" class="text-list">{{ output.ItemNumber }}</ion-col>
+        <div *ngFor="let operation of Operations(); last as isLast">
+          <ion-grid [fixed]="true">
+            <!-- Encabezado Operacion -->
+            <ion-row class="section-header">
+              <ion-col size="12" size-sm="3"></ion-col>
               <ion-col size="12" size-sm="2">
-                <input pInputText type="text" [value]="output.CompletedQuantity || 0" pSize="small" [disabled]="true" class="input-standard"/>
+                <span>FALTANTE</span><br>
+                <span class="text-red">[ {{ operation.ReadyQuantity }} ]</span>
               </ion-col>
-              <ion-col size="12" size-sm="2">{{ output.UOMCode }}</ion-col>
               <ion-col size="12" size-sm="2">
-                <span class="text-blue">{{ output.OutputQuantity }}</span>
+                <span>DESPERDICIO</span><br>
+                <span class="text-orange">[ {{ operation.ScrappedQuantity || 0 }} ]</span>
+              </ion-col>
+              <ion-col size="12" size-sm="2">
+                <span>RECHAZO</span><br>
+                <span class="text-purple">[ {{operation.RejectedQuantity || 0}} ]</span>
+              </ion-col>
+              <ion-col size="12" size-sm="2">
+                <span>COMPLETO</span><br>
+                 <span class="text-green">[ {{operation.CompletedQuantity || 0}} ]</span>
+              </ion-col>
+              <ion-col size="12" size-sm="1">
+                <strong></strong>
               </ion-col>
             </ion-row>
-          </ng-container>
 
-          <div class="line-divider"></div>
-
-          <!-- Materiales de produccion -->
-          <ng-container *ngIf="getMaterialsForOperation(operation.OperationSequenceNumber).length > 0">
-          <ion-row class="data-row">
-            <ion-col size="12" size-md="3">
-              <br><strong class="section-title">MATERIALES</strong>
-            </ion-col>
-            <ion-col size="12" size-md="9" class="text-red">
-              <br>Sin stock suficiente en algunos materiales
-            </ion-col>
-          </ion-row>
-
-            <ion-row class="data-row" *ngFor="let material of getMaterialsForOperation(operation.OperationSequenceNumber)">
-              <ion-col size="12" size-sm="3" class="text-list">{{ material.ItemNumber }}</ion-col>
-              <ion-col size="12" size-sm="2">
-                <span class="text-green">5000</span>
-              </ion-col>
-              <ion-col size="12" size-sm="2">
-                <input pInputText type="text" [value]="material.Quantity" pSize="small" class="input-standard"/>
-              </ion-col>
-              <ion-col size="12" size-sm="2">{{ material.UOMCode }}</ion-col>
-              <ion-col size="12" size-sm="2">
-                <span class="text-blue">{{ material.Quantity }}</span>
-              </ion-col>
-            </ion-row>
-          </ng-container>
-
-          <div class="line-divider"></div>
-
-          <!-- Recursos de producción EQUIPOS -->
-          <ng-container *ngIf="getEquipmentResourcesForOperation(operation.OperationSequenceNumber).length > 0">
-            <ion-row class="data-row">
+            <ion-row class="operation-row">
               <ion-col size="12" size-sm="3">
-                <br><strong class="section-title">EQUIPOS</strong>
+                <strong>OPERACION {{ operation.OperationSequenceNumber }}</strong>
+              </ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <strong class="text-opname">{{ operation.OperationName }}</strong>
+              </ion-col>
+              <ion-col size="12" size-sm="2">
+                <input pInputText
+                        type="text"
+                        [value]="scrapGlobal"
+                        pSize="small"
+                        [disabled]="true"
+                        class="input-operation"/>
+              </ion-col>
+              <ion-col size="12" size-sm="2">
+                <input pInputText
+                       type="text"
+                       [value]="rejectGlobal"
+                       pSize="small"
+                       [disabled]="true"
+                       class="input-operation"/>
+              </ion-col>
+              <ion-col size="12" size-sm="2">
+                <input pInputText
+                       type="text"
+                       [value]="completeGlobal"
+                       pSize="small"
+                       [disabled]="true"
+                       class="input-operation"/>
+              </ion-col>
+              <ion-col size="12" size-sm="1">
+                <strong>{{ operation.UnitOfMeasure  }}</strong>
               </ion-col>
             </ion-row>
 
-            <ion-row class="data-row" *ngFor="let equipment of getEquipmentResourcesForOperation(operation.OperationSequenceNumber)">
-              <ion-col size="12" size-sm="5" class="text-list">{{ equipment.ResourceName }}</ion-col>
-              <ion-col size="12" size-sm="2">
-                <input pInputText type="text" [value]="equipment.RequiredUsage" pSize="small" class="input-standard"/>
-              </ion-col>
-              <ion-col size="12" size-sm="2">{{ equipment.UOMCode }}</ion-col>
-              <ion-col size="12" size-sm="2">
-                <span class="text-blue">{{ equipment.RequiredUsage }}</span>
-              </ion-col>
-            </ion-row>
-          </ng-container>
+            <!-- Salidas -->
+            <ng-container *ngIf="OutputsForOperation(operation.OperationSequenceNumber).length > 0">
+              <ion-row class="data-row">
+                <ion-col><br><strong class="section-title">SALIDAS</strong></ion-col>
+              </ion-row>
 
-          <div class="line-divider"></div>
+              <ion-row class="data-row"
+                       *ngFor="let output of OutputsForOperation(operation.OperationSequenceNumber)">
+                <ion-col size="12" size-sm="4" class="text-list">{{ output.ItemNumber }}</ion-col>
+                <ion-col size="12" size-sm="2" class="data-center">
+                  <span class="std-consume">[ {{ output.Standard }} ]</span>
+                </ion-col>
+                <ion-col size="12" size-sm="2">
+                  <input pInputText type="text"
+                         [value]="output.CompletedQuantity || 0"
+                         pSize="small"
+                         [disabled]="true"
+                         class="input-standard"/>
+                </ion-col>
+                <ion-col size="12" size-sm="1">{{ output.UOMCode }}</ion-col>
+                <ion-col size="12" size-sm="3" class="data-center">
+                  <span class="text-blue">
+                    [ {{Truncate(output.CompletedQuantity)}} / {{ Truncate(output.OutputQuantity) }} ]
+                  </span>
+                </ion-col>
+              </ion-row>
+            </ng-container>
 
-          <!-- Recursos de producción PERSONAL -->
-          <ng-container *ngIf="getLaborResourcesForOperation(operation.OperationSequenceNumber).length > 0">
-            <ion-row class="data-row">
-              <ion-col size="12" size-sm="3">
-                <br><strong class="section-title">PERSONAL</strong>
-              </ion-col>
-            </ion-row>
+            <div class="line-divider"></div>
 
-            <ion-row class="data-row" *ngFor="let labor of getLaborResourcesForOperation(operation.OperationSequenceNumber)">
-              <ion-col size="12" size-sm="5" class="text-list">{{ labor.ResourceName }}</ion-col>
-              <ion-col size="12" size-sm="2">
-                <input pInputText type="text" [value]="labor.RequiredUsage" pSize="small" class="input-standard"/>
-              </ion-col>
-              <ion-col size="12" size-sm="2">{{ labor.UOMCode }}</ion-col>
-              <ion-col size="12" size-sm="2">
-                <span class="text-blue">{{ labor.RequiredUsage }}</span>
-              </ion-col>
-            </ion-row>
-          </ng-container>
-        </ion-grid>
+            <!-- Materiales de produccion -->
+            <ng-container *ngIf="MaterialsForOperation(operation.OperationSequenceNumber).length > 0">
+              <ion-row class="data-row">
+                <ion-col size="12" size-md="2">
+                  <br><strong class="section-title">MATERIALES</strong>
+                </ion-col>
+                <ion-col size="12" size-md="8" class="text-red text-list">
+                  <br>Sin stock suficiente en algunos materiales
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="data-row"
+                       *ngFor="let material of MaterialsForOperation(operation.OperationSequenceNumber)">
+                <ion-col size="12" size-sm="4" class="text-list">{{ material.ItemNumber }}</ion-col>
+                <ion-col size="12" size-sm="2" class="data-center">
+                  <span class="std-consume text-green">[ {{900}} / {{material.Standard}} ] </span>
+                </ion-col>
+                <ion-col size="12" size-sm="2">
+                  <input pInputText type="text" [value]="material.Quantity" pSize="small" class="input-standard"/>
+                </ion-col>
+                <ion-col size="12" size-sm="1">{{ material.UOMCode }}</ion-col>
+                <ion-col size="12" size-sm="3" class="data-center">
+                  <span class="text-blue">
+                   [ {{Truncate(material.IssuedQuantity)}} / {{ Truncate(material.Quantity) }} ]
+                  </span>
+                </ion-col>
+              </ion-row>
+            </ng-container>
+
+            <div class="line-divider"></div>
+
+            <!-- Recursos de producción EQUIPOS -->
+            <ng-container *ngIf="EquipmentResourcesForOperation(operation.OperationSequenceNumber).length > 0">
+              <ion-row class="data-row">
+                <ion-col size="12" size-sm="3">
+                  <br><strong class="section-title">EQUIPOS</strong>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="data-row"
+                       *ngFor="let equipment of EquipmentResourcesForOperation(operation.OperationSequenceNumber)">
+                <ion-col size="12" size-sm="4" class="text-list">{{ equipment.ResourceName }}</ion-col>
+                <ion-col size="12" size-sm="2" class="data-center">
+                  <span class="std-consume">[ {{equipment.Standard}} ] </span>
+                </ion-col>
+                <ion-col size="12" size-sm="2">
+                  <input pInputText type="text" [value]="equipment.RequiredUsage" pSize="small" class="input-standard"/>
+                </ion-col>
+                <ion-col size="12" size-sm="1">{{ equipment.UOMCode }}</ion-col>
+                <ion-col size="12" size-sm="3" class="data-center">
+                  <span class="text-blue">
+                   [ {{Truncate(equipment.ActualResourceUsage)}} / {{ Truncate(equipment.RequiredUsage) }} ]
+                  </span>
+                </ion-col>
+              </ion-row>
+            </ng-container>
+
+            <div class="line-divider"></div>
+
+            <!-- Recursos de producción PERSONAL -->
+            <ng-container *ngIf="LaborResourcesForOperation(operation.OperationSequenceNumber).length > 0">
+              <ion-row class="data-row">
+                <ion-col size="12" size-sm="3">
+                  <br><strong class="section-title">PERSONAL</strong>
+                </ion-col>
+              </ion-row>
+
+              <ion-row class="data-row"
+                       *ngFor="let labor of LaborResourcesForOperation(operation.OperationSequenceNumber)">
+                <ion-col size="12" size-sm="4" class="text-list">{{ labor.ResourceName }}</ion-col>
+                <ion-col size="12" size-sm="2" class="data-center">
+                  <span class="std-consume">[ {{labor.Standard}} ] </span>
+                </ion-col>
+                <ion-col size="12" size-sm="2">
+                  <input pInputText type="text" [value]="labor.RequiredUsage" pSize="small" class="input-standard"/>
+                </ion-col>
+                <ion-col size="12" size-sm="1">{{ labor.UOMCode }}</ion-col>
+                <ion-col size="12" size-sm="3" class="data-center">
+                  <span class="text-blue">
+                   [ {{Truncate(labor.ActualResourceUsage)}} / {{ Truncate(labor.RequiredUsage) }} ]
+                  </span>
+                </ion-col>
+              </ion-row>
+            </ng-container>
+          </ion-grid>
         </div>
       </ion-content>
 
