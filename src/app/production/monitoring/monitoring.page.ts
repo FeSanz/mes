@@ -14,7 +14,7 @@ import { CounterComponent } from 'src/app/components/counter/counter.component';
 import { ThermometerComponent } from 'src/app/components/thermometer/thermometer.component';
 import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
-import { addCircleOutline, addOutline, checkmark, contractOutline, expandOutline, menuOutline } from 'ionicons/icons';
+import { addCircleOutline, addOutline, checkmark, contractOutline, expandOutline, menuOutline, trashOutline, pencilOutline } from 'ionicons/icons';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PermissionsService } from 'src/app/services/permissions.service';
@@ -46,6 +46,12 @@ export type ChartOptions = {
 })
 export class MonitoringPage {
   sensorData: SensorData[] = [];
+  general = {
+    color: "#198bfd",
+    borderFlag: 'N',
+    sensorColor: "#c2185b"
+  }
+  isGeneralModalOpen = false
   isModalOpen = false;
   isDragging = false;
   newWidgetData: any = {
@@ -91,12 +97,15 @@ export class MonitoringPage {
     private alerts: AlertsService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
-    addIcons({ checkmark, addOutline, addCircleOutline, menuOutline, contractOutline, expandOutline })
+    addIcons({ menuOutline, pencilOutline, addCircleOutline, trashOutline, checkmark, addOutline, contractOutline, expandOutline });
     this.user = JSON.parse(String(localStorage.getItem("userData")))
     const nav = this.router.getCurrentNavigation();
     const state: any = nav?.extras?.state;
 
     this.id = this.route.snapshot.paramMap.get('groupId');
+    this.general.color = '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+    this.general.sensorColor = '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+    this.general.borderFlag = 'N'
     //this.activatedRoute.snapshot.paramMap.get('id') as string;
     /*if (state?.dash) {
       this.dashboardData = state?.dash
@@ -142,7 +151,7 @@ export class MonitoringPage {
         this.api.LogOut()
         return
       }
-      this.dashboardData = response.dashboardData      
+      this.dashboardData = response.dashboardData
       this.widgets = response.items.map((item: any, index: number) => ({
         index: index,
         id: item.dashboard_id,
@@ -537,5 +546,40 @@ export class MonitoringPage {
     } else {
       this.exitFullScreen();
     }
+  }
+  UpdateAllColors() {
+    this.widgets.forEach((widget: any) => {
+      // Color para cada widget
+      widget.jsonParams.color = this.general.color;
+      // BorderFlag
+      widget.jsonParams.borderFlag = this.general.borderFlag;
+      // Si existen sensores, recorrerlos
+      if (widget.jsonParams.sensors && Array.isArray(widget.jsonParams.sensors)) {
+        widget.jsonParams.sensors.forEach((sensor: any) => {
+          sensor.color = this.general.sensorColor; // Color para cada sensor
+          sensor.minColor = this.general.sensorColor; // Color para cada sensor
+          sensor.maxColor = this.general.sensorColor; // Color para cada sensor
+        });
+      }
+    });    
+    const body = {
+      updated_by: this.user.UserId,
+      widgets: this.widgets.map((w: any) => ({
+        dashboard_id: w.id, // o w.jsonParams.dashboard_id si quieres ese
+        color: this.general.color,   // aquí puedes poner estático o venir de w.jsonParams.color
+        border_flag: this.general.borderFlag,   // estático
+        parameters: w.jsonParams // puedes enviar todo el objeto jsonParams o un subset
+      }))
+    }
+
+    this.api.PutRequestRender('dashboards/multiple', body, false).then((response: any) => {
+      if (!response.errorsExistFlag) {
+        this.isGeneralModalOpen = false
+        this.changeDetector.detectChanges()
+        this.alerts.Success("Actualizado")
+      } else {
+        this.alerts.Error("Error al reordenar los widgets, intente más tarde.")
+      }
+    })
   }
 }

@@ -84,7 +84,27 @@ export class ChartsComponent implements OnInit {
           show: true,
           tools: {
             download: window.innerWidth > 768,
-            selection: true
+            selection: true,
+          },
+          export: {
+            csv: {
+              categoryFormatter(value?: number): string {
+                if (!value) return '';
+                const date = new Date(value);
+                if (isNaN(date.getTime())) {
+                  return value.toString();
+                }
+                return date.toLocaleString('es-MX', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: false
+                });
+              }
+            }
           }
         },
         zoom: {
@@ -128,6 +148,7 @@ export class ChartsComponent implements OnInit {
       }
     };
   }
+
   ngOnInit() {
     this.widgetData = this.data
     this.initializeChart();

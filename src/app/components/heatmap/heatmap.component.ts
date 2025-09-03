@@ -66,7 +66,34 @@ export class HeatmapComponent implements OnInit {
       colors: ["#fd9800ff"],
       chart: {
         height: 350,
-        type: "heatmap"
+        type: "heatmap",
+        toolbar: {
+          show: true,
+          tools: {
+            download: window.innerWidth > 768,
+            selection: true,
+          },
+          export: {
+            csv: {
+              categoryFormatter(value?: number): string {
+                if (!value) return '';
+                const date = new Date(value);
+                if (isNaN(date.getTime())) {
+                  return value.toString();
+                }
+                return date.toLocaleString('es-MX', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: false
+                });
+              }
+            }
+          }
+        },
       },
       xaxis: {
         type: "category",
@@ -215,7 +242,7 @@ export class HeatmapComponent implements OnInit {
       const newRow: { x: string, y: number }[] = [];
 
       for (let h = 0; h < 24; h++) {
-        const hLabel = formatHour(h); 
+        const hLabel = formatHour(h);
         // Si es la hora del nuevo dato, usar el valor, sino 0
         const value = h === hour ? val : 0;
         newRow.push({ x: hLabel, y: parseFloat(value.toFixed(2)) });
