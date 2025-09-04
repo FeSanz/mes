@@ -163,11 +163,12 @@ export class TransactionPage implements OnInit {
   }
 
   GetWorkOrderFusion(WOSelectedData: any) {
-    this.completeGlobal = WOSelectedData.DispatchPending || 0;
-    this.scrapGlobal = WOSelectedData.ScrapPending || 0;
-    this.rejectGlobal = WOSelectedData.RejectPending || 0;
+    this.completeGlobal = parseFloat(WOSelectedData.DispatchPending) || 0;
+    this.scrapGlobal = parseFloat(WOSelectedData.ScrapPending) || 0;
+    this.rejectGlobal = parseFloat(WOSelectedData.RejectPending) || 0;
 
     this.totalGlobal = this.completeGlobal + this.scrapGlobal + this.rejectGlobal;
+    console.log(this.totalGlobal);
 
     const path = WOSelectedData.Type === 'P' ? 'wo_process_dispatch' : 'wo_discrete_dispatch';
     this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code, WOSelectedData.WorkOrderNumber)).then(async (response: any) => {
@@ -195,12 +196,11 @@ export class TransactionPage implements OnInit {
     this.isModaldispatchOpen = false;
   }
 
-// Mantén tu código que funciona, solo agregamos el campo Standard
   Operations() {
     return this.selectedWorkOrder?.Operations?.items || [];
   }
 
-// Método helper para obtener PlannedQuantity de forma segura
+//Metodo helper para obtener PlannedQuantity de forma segura
   private getPlannedQuantity(): number {
     return this.selectedWorkOrder?.PlannedQuantity || 1;
   }
@@ -213,6 +213,7 @@ export class TransactionPage implements OnInit {
     // Agregar campo Standard a cada output
     filtered.forEach((output: any) => {
       output.Standard = (output.OutputQuantity || 0) / plannedQuantity;
+      output.StandardReal = (output.Standard || 0) * (this.totalGlobal|| 0);
     });
 
     return filtered;
@@ -226,6 +227,7 @@ export class TransactionPage implements OnInit {
     // Agregar campo Standard a cada material
     filtered.forEach((material: any) => {
       material.Standard = (material.Quantity || 0) / plannedQuantity;
+      material.StandardReal = (material.Standard || 0) * (this.totalGlobal|| 0);
     });
 
     return filtered;
@@ -241,6 +243,7 @@ export class TransactionPage implements OnInit {
     // Agregar campo Standard a cada equipment
     filtered.forEach((equipment: any) => {
       equipment.Standard = (equipment.RequiredUsage || 0) / plannedQuantity;
+      equipment.StandardReal = (equipment.Standard || 0) * (this.totalGlobal|| 0);
     });
 
     return filtered;
@@ -256,6 +259,7 @@ export class TransactionPage implements OnInit {
     // Agregar campo Standard a cada labor
     filtered.forEach((labor: any) => {
       labor.Standard = (labor.RequiredUsage || 0) / plannedQuantity;
+      labor.StandardReal = (labor.Standard || 0) * (this.totalGlobal|| 0);
     });
 
     return filtered;

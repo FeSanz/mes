@@ -264,14 +264,17 @@
                        *ngFor="let output of OutputsForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ output.ItemNumber }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume">[ {{ output.Standard }} ]</span>
+                  <span class="std-consume">[ {{ Truncate(output.Standard) }} ]</span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
-                  <input pInputText type="text"
-                         [value]="output.CompletedQuantity || 0"
-                         pSize="small"
-                         [disabled]="true"
-                         class="input-standard"/>
+                  <p-floatlabel variant="on">
+                    <input pInputText type="text"
+                           [value]="output.StandardReal || 0"
+                           pSize="small"
+                           [disabled]="false"
+                           class="input-standard"/>
+                    <label for="std_output">{{ Truncate(output.StandardReal) || 0}}</label>
+                  </p-floatlabel>
                 </ion-col>
                 <ion-col size="12" size-sm="1">{{ output.UOMCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
@@ -299,10 +302,17 @@
                        *ngFor="let material of MaterialsForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ material.ItemNumber }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume text-green">[ {{900}} / {{material.Standard}} ] </span>
+                  <span class="std-consume text-green">[ {{900}} / {{ Truncate(material.Standard) }} ] </span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
-                  <input pInputText type="text" [value]="material.Quantity" pSize="small" class="input-standard"/>
+                  <p-floatlabel variant="on">
+                    <input pInputText
+                           type="text"
+                           [value]="material.StandardReal"
+                           pSize="small"
+                           class="input-standard"/>
+                    <label for="std_material">{{ Truncate(material.StandardReal) || 0}}</label>
+                  </p-floatlabel>
                 </ion-col>
                 <ion-col size="12" size-sm="1">{{ material.UOMCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
@@ -327,10 +337,17 @@
                        *ngFor="let equipment of EquipmentResourcesForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ equipment.ResourceName }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume">[ {{equipment.Standard}} ] </span>
+                  <span class="std-consume">[ {{ Truncate(equipment.Standard) }} ] </span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
-                  <input pInputText type="text" [value]="equipment.RequiredUsage" pSize="small" class="input-standard"/>
+                  <p-floatlabel variant="on">
+                    <input pInputText
+                           type="text"
+                           [value]="equipment.StandardReal"
+                           pSize="small"
+                           class="input-standard"/>
+                    <label for="std_equipment">{{ Truncate(equipment.StandardReal) || 0}}</label>
+                  </p-floatlabel>
                 </ion-col>
                 <ion-col size="12" size-sm="1">{{ equipment.UOMCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
@@ -355,10 +372,17 @@
                        *ngFor="let labor of LaborResourcesForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ labor.ResourceName }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume">[ {{labor.Standard}} ] </span>
+                  <span class="std-consume">[ {{ Truncate(labor.Standard) }} ] </span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
-                  <input pInputText type="text" [value]="labor.RequiredUsage" pSize="small" class="input-standard"/>
+                  <p-floatlabel variant="on">
+                    <input pInputText
+                           type="text"
+                           [value]="labor.StandardReal"
+                           pSize="small"
+                           class="input-standard"/>
+                    <label for="std_labor">{{ Truncate(labor.StandardReal) || 0}}</label>
+                  </p-floatlabel>
                 </ion-col>
                 <ion-col size="12" size-sm="1">{{ labor.UOMCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
