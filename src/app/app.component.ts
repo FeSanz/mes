@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { addIcons } from 'ionicons';
 import {
   IonAccordion, IonAccordionGroup, IonApp, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonItem, IonLabel,
@@ -25,7 +25,9 @@ import { PermissionsService } from './services/permissions.service';
 
 import { Toast } from 'primeng/toast';
 import { AlertsService } from "./services/alerts.service";
-
+import { ActionPerformed, PushNotificationSchema, PushNotifications, Token, } from '@capacitor/push-notifications';
+import { Platform } from '@ionic/angular';
+import { WebSocketService } from './services/web-socket.service';
 @Component({
   selector: 'app-root',
   styleUrls: ['app.component.scss'],
@@ -36,8 +38,9 @@ import { AlertsService } from "./services/alerts.service";
     IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid,
     IonRow, IonModal, IonInput, IonTextarea, IonText, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   darkMode = false
+  remoteServer = true
   username = "Inicie sesión"
   dashboardGroups: any = []
   dashboardGroupData: any = {
@@ -54,9 +57,10 @@ export class AppComponent {
   constructor(
     private router: Router,
     private api: ApiService,
+    private platform: Platform,
+    private ws: WebSocketService,
     private alerts: AlertsService,
     private navCtrl: NavController,
-    private endPoints: EndpointsService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef,
   ) {
@@ -68,6 +72,7 @@ export class AppComponent {
     });
 
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false
+    this.remoteServer = localStorage.getItem('remoteServer') == 'false' ? false : true
     //console.log(isLogged);
     const rawData = localStorage.getItem("userData");
     try {
@@ -94,11 +99,73 @@ export class AppComponent {
         this.showMenu = !event.url.includes('login');
       }
     });
+
+    if (this.platform.is('capacitor')) {
+      PushNotifications.requestPermissions().then(result => {
+        if (result.receive === 'granted') {
+          // Register with Apple / Google to receive push via APNS/FCM
+          PushNotifications.register();
+        } else {
+          // Show some error
+        }
+      });
+    }
   }
 
+  initPush(user_id: any) {
+    // On success, we should be able to receive notifications
+    PushNotifications.addListener('registration',
+      (token: Token) => {
+        const body = {
+          user_id: user_id,
+          token: token.value
+        }
+        this.api.PostRequestRender('registerPushToken', body, false).then((response: any) => {
+          if (!response.errorsExistFlag) {
+            this.changeDetector.detectChanges()
+          } else {
+            //this.alerts.Info(response.error)
+          }
+        })
+      }
+    );
+
+    // Some issue with our setup and push will not work
+    PushNotifications.addListener('registrationError',
+      (error: any) => {
+        console.log(error);
+      }
+    );
+
+    // Show us the notification payload if the app is open on our device
+    PushNotifications.addListener('pushNotificationReceived',
+      (notification: PushNotificationSchema) => {
+        const data = notification.data;
+        if (data?.route) {
+          this.router.navigateByUrl(data.route);
+        }
+        //alert('Push received: ' + JSON.stringify(notification));
+      }
+    );
+
+    // Method called when tapping on a notification
+    PushNotifications.addListener('pushNotificationActionPerformed',
+      (notification: ActionPerformed) => {
+        const data = notification.notification.data;
+        if (data?.route) {
+          this.router.navigateByUrl(data.route);
+        }
+      }
+    );
+  }
   ChangeColorMode() {
     this.ApplyTheme(this.darkMode);
     localStorage.setItem('theme', String(this.darkMode));
+  }
+  ChangeServerMode() {
+    localStorage.setItem('remoteServer', String(this.remoteServer));
+    this.api.setUrlRender(this.remoteServer)
+    this.ws.setSocketServer(this.remoteServer)
   }
 
   ApplyTheme(isDark: boolean) {
@@ -139,7 +206,7 @@ export class AppComponent {
     event.detail.complete();
     this.saveDashboardOrder()
   }
-  
+
   trackByGroup(index: number, item: any): number {
     return item.dashboard_group_id;
   }
@@ -252,6 +319,9 @@ export class AppComponent {
 
     const orgsIds = this.user?.Company?.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.api.GetRequestRender('dashboardsGroup/byOrganizations/?organizations=' + orgsIds, false).then((response: any) => {
+      if (this.platform.is('capacitor')) {
+        this.initPush(user.UserId)
+      }
       //console.log(response);
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
@@ -274,5 +344,20 @@ export class AppComponent {
         }
       }
     })
+  }
+
+  async ngOnInit() {
+
+    try {
+      const response = await this.api.GetRequestRender('userNumber');
+      const count = parseInt(response.items);
+
+      if (count === 0) {
+        this.router.navigateByUrl('/setup-page');
+      }
+    } catch (error) {
+      console.log(error);
+
+    }
   }
 }

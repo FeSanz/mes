@@ -143,11 +143,10 @@ export class HeatmapComponent implements OnInit {
     const sensorIDsString = sensors.map((sensor: any) => sensor.sensor_id).join(',');
     try {
       const response: any = await this.api.GetRequestRender(
-        `sensorsData/?sensors=${sensorIDsString}&start=${startStr}&end=${endStr}`, false
+        `sensorsDataHM/?sensors=${sensorIDsString}&start=${startStr}&end=${endStr}`, false
       );
       const series = this.generateHeatmapMatrix(response.items[0].data);
       this.chartOptions.series = series
-      //console.log(this.chartOptions.series);
       this.startSubscriptions()
       this.adjustColorScale()
       if (this.chart && this.chart.updateOptions) {

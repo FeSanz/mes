@@ -183,7 +183,7 @@ export class ChartsComponent implements OnInit {
           }))
         };
       });
-      this.chartOptions.series = data;
+      this.chartOptions.series = data;      
       this.ajustarYaxis();
       if (this.chart && this.chart.updateOptions) {
         //console.log("UPDATE chart");

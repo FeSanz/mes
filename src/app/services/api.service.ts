@@ -3,7 +3,7 @@ import { Capacitor, CapacitorHttp, HttpResponse } from '@capacitor/core';
 import { AlertsService } from "./alerts.service";
 import { CredentialsService } from "./credentials.service";
 import { NavController } from '@ionic/angular';
-import { logOut } from 'ionicons/icons';
+import { logOut, server } from 'ionicons/icons';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +21,11 @@ export class ApiService {
     const credentialsData = this.credentialService.Fusion();
     this.urlFusion = `https://${credentialsData[0]}/fscmRestApi/resources/latest`;
     this.credentials = credentialsData[1];
+
+    const remoteServer = localStorage.getItem('remoteServer') == 'false' ? false : true
+    //console.log(remoteServer);
+    
+    this.urlRender = remoteServer ? 'https://iot-services-rd-ww45.onrender.com/api' : 'http://localhost:3000/api';
   }
   /******************* HttpRequest FUSION Capacitor *******************/
   async GetRequestFusion(endPoint: string) {
@@ -364,7 +369,10 @@ export class ApiService {
     }
   }
 
-  getUrlRender(){
+  getUrlRender() {
     return this.urlRender;
+  }
+  setUrlRender(remoteServer: boolean) {
+    this.urlRender = remoteServer ? 'https://iot-services-rd-ww45.onrender.com/api' : 'http://localhost:3000/api';
   }
 }

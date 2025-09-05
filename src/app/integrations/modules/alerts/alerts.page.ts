@@ -27,8 +27,8 @@ import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline
   styleUrls: ['./alerts.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonIcon, IonFab, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule,
-    Tag, ProgressBar, Slider, FloatLabel, Select, IonSearchbar]
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonIcon, IonFab, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonModal, IonSelect, IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule,
+    Tag, FloatLabel, Select]
 })
 export class AlertsPage {
   searchValueAl: string = '';
@@ -132,7 +132,7 @@ export class AlertsPage {
       } else if (response.action == 'update') {
         this.alerts.Warning('Una alerta se modificado');
         this.GetAlerts()
-        console.log(response);
+        //console.log(response);
 
       } else if (response.action == 'delete') {
         this.alerts.Error('Una alerta se ha eliminado');
@@ -186,7 +186,7 @@ export class AlertsPage {
   async FinaliceAlert(alert: any) {
     if (await this.alerts.ShowAlert("¿Deseas finalizar esta alerta?", "Alerta", "Atrás", "Finalizar")) {
       this.apiService.PutRequestRender('alerts/' + alert.alert_id + '/repair', { organization_id: this.organizationSelected.OrganizationId }).then((response: any) => {
-        console.log(response);
+        //console.log(response);
 
         if (!response.errorsExistFlag) {
           this.alerts.Success("Alerta finalizada")

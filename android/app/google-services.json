@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "997379619754",
+    "project_id": "pushnoti-b5b48",
+    "storage_bucket": "pushnoti-b5b48.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997379619754:android:4efcb857870b2ff90489d3",
+        "android_client_info": {
+          "package_name": "com.brandroid.test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo863Hd8VWnt1eivqI4-_avD2AeOWxHZ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997379619754:android:b69c472d5b79956d0489d3",
+        "android_client_info": {
+          "package_name": "com.space.mes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo863Hd8VWnt1eivqI4-_avD2AeOWxHZ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

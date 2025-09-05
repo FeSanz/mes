@@ -30,6 +30,7 @@
     "@capacitor/haptics": "7.0.1",
     "@capacitor/ios": "7.2.0",
     "@capacitor/keyboard": "7.0.1",
+    "@capacitor/push-notifications": "^7.0.2",
     "@capacitor/status-bar": "7.0.1",
     "@fortawesome/fontawesome-free": "^7.0.0",
     "@googlemaps/js-api-loader": "^1.16.10",

@@ -7,9 +7,10 @@ export class WebSocketService {
   // webSocketServer = "ws://localhost:3000";
   webSocketServer = "wss://iot-services-rd-ww45.onrender.com";
 
-
-
-  constructor() { }
+  constructor() {
+    const remoteServer = localStorage.getItem('remoteServer') == 'false' ? false : true
+    this.webSocketServer = remoteServer ? "wss://iot-services-rd-ww45.onrender.com" : "ws://localhost:3000";
+  }
 
   SuscribeById(id: any, typews: string, onMessage: (data: any) => void): Promise<WebSocket> {
     return new Promise((resolve, reject) => {
@@ -41,5 +42,8 @@ export class WebSocketService {
         //console.log(`WebSocket ${typews} cerrado:`, event.code, event.reason);
       };
     });
+  }
+  setSocketServer(remoteServer: boolean) {
+    this.webSocketServer = remoteServer ? "wss://iot-services-rd-ww45.onrender.com" : "ws://localhost:3000";
   }
 }
