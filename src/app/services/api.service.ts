@@ -24,7 +24,7 @@ export class ApiService {
 
     const remoteServer = localStorage.getItem('remoteServer') == 'false' ? false : true
     //console.log(remoteServer);
-    
+
     this.urlRender = remoteServer ? 'https://iot-services-rd-ww45.onrender.com/api' : 'http://localhost:3000/api';
   }
   /******************* HttpRequest FUSION Capacitor *******************/
@@ -99,6 +99,32 @@ export class ApiService {
       return null;
     } finally {
       await this.alerts.HideLoading();
+    }
+  }
+
+  async PostRequestFusion(endPoint: string, payload: any) {
+    try {
+      await this.alerts.ShowLoading()
+      const options = {
+        url: `${this.urlFusion}/${endPoint}`,
+        headers: {
+          'Authorization': `Basic ${this.credentials}`,
+          'Content-Type': 'application/json',
+          'REST-framework-version': '4',
+          'Accept-Language': 'en-US'
+        },
+        data: payload
+      };
+      const response: HttpResponse = await CapacitorHttp.post(options);
+      this.RequestStatusCode(response.status);
+      return response.data;
+
+    } catch (error: any) {
+      console.log('Error:', error);
+      await this.alerts.Error(`Error de conexión: ${error.message || error}`);
+      return null;
+    } finally {
+      await this.alerts.HideLoading()
     }
   }
 

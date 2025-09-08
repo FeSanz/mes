@@ -228,9 +228,41 @@ export class TransactionPage implements OnInit {
     filtered.forEach((material: any) => {
       material.Standard = (material.Quantity || 0) / plannedQuantity;
       material.StandardReal = (material.Standard || 0) * (this.totalGlobal|| 0);
+
+      //material.QuantityOnhand = material.QuantityOnhand || 0;
+      //material.AvailableToTransact = material.AvailableToTransact || 0;
+      //material.OnHandMessage = material.OnHandMessage || 'Cargando...';
+
+      //this.LoadMaterialOnHand(material);
     });
 
     return filtered;
+  }
+
+  private async LoadMaterialOnHand(material: any) {
+    const payload = {
+      OrganizationCode: this.organizationSelected.Code,
+      ItemNumber: material.ItemNumber,
+      SupplySubinventory: material.SupplySubinventory
+    };
+
+    try {
+      const response: any = await this.apiService.PostRequestFusion('availableQuantityDetails', payload);
+
+      if (response.ReturnStatus === 'SUCCESS') {
+        material.QuantityOnhand = response.QuantityOnhand;
+        material.AvailableToTransact = response.AvailableToTransact;
+        material.OnHandMessage = response.ReturnStatus;
+      } else {
+        material.QuantityOnhand = response.QuantityOnhand || 0;
+        material.AvailableToTransact = response.AvailableToTransact || 0;
+        material.OnHandMessage = response.ReturnStatus;
+      }
+    } catch (error: any) {
+      material.QuantityOnhand = 0;
+      material.AvailableToTransact = 0;
+      material.OnHandMessage = `Error: ${error.message || error}`;
+    }
   }
 
   EquipmentResourcesForOperation(operationSequence: number) {
