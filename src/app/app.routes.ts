@@ -92,5 +92,9 @@ export const routes: Routes = [
   {
     path: 'select-location-modal',
     loadComponent: () => import('./select-location-modal/select-location-modal.page').then(m => m.SelectLocationModalPage)
+  },  {
+    path: 'costs',
+    loadComponent: () => import('./integrations/fusion/monitoring/costs/costs.page').then( m => m.CostsPage)
   }
+
 ];

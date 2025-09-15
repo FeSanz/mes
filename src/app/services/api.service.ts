@@ -28,13 +28,13 @@ export class ApiService {
     this.urlRender = remoteServer ? 'https://iot-services-rd-ww45.onrender.com/api' : 'http://localhost:3000/api';
   }
   /******************* HttpRequest FUSION Capacitor *******************/
-  async GetRequestFusion(endPoint: string) {
+  async GetRequestFusion(endPoint: string, show: boolean = true) {
     this.offset = 0;
     let allItems: any[] = [];
     let totalResults = 0;
     let hasMore = true;
     let isFirstRequest = true;
-    await this.alerts.ShowLoading();
+    if (show) { await this.alerts.ShowLoading(); }
 
     try {
       while (hasMore) {
@@ -70,10 +70,12 @@ export class ApiService {
         }
 
         // Mostrar progreso basado en items ya obtenidos
-        if (totalResults < 500) {
-          await this.alerts.ShowLoading(`Procesando datos [${totalResults} / ${totalResults}]`);
-        } else {
-          await this.alerts.ShowLoading(`Procesando datos [${allItems.length} / ${totalResults}]`);
+        if (show) {
+          if (totalResults < 500) {
+            await this.alerts.ShowLoading(`Procesando datos [${totalResults} / ${totalResults}]`);
+          } else {
+            await this.alerts.ShowLoading(`Procesando datos [${allItems.length} / ${totalResults}]`);
+          }
         }
 
         // Verificar si existen más datos e incrementar offset
@@ -98,7 +100,7 @@ export class ApiService {
       await this.alerts.Error(`Error de conexión: ${error.message || error}`);
       return null;
     } finally {
-      await this.alerts.HideLoading();
+      if (show) { await this.alerts.HideLoading(); }
     }
   }
 

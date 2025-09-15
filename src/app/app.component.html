@@ -157,6 +157,14 @@
                     <ion-label>Despachos</ion-label>
                   </ion-item>
                 </ion-menu-toggle>
+
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item [routerLink]="['/costs']" routerLinkActive="selected" detail="false" button
+                            color="light">
+                    <ion-icon slot="start" name="cash-outline" color="secondary"></ion-icon>
+                    <ion-label>Costos</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
               </ion-list>
             </div>
           </ion-accordion>
