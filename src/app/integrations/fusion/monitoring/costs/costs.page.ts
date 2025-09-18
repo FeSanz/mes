@@ -28,10 +28,11 @@ import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {Platform} from "@ionic/angular";
 import {HeightTable} from "../../../../models/tables.prime";
-import {Round, Truncate} from "../../../../models/math.operations";
+import {TruncatePoint} from "../../../../models/math.operations";
 import { cloudUploadOutline, readerOutline
 } from 'ionicons/icons';
 import {addIcons} from "ionicons";
+import {TodayDateForFusion} from "../../../../models/date.format";
 
 
 @Component({
@@ -188,6 +189,31 @@ export class CostsPage implements OnInit {
       this.workOrdersCost = {
         items: [...processItems, ...discreteItems]
       };
+
+      const filters = this.FilterItemsAndResources();
+      const today: string = TodayDateForFusion();
+
+      const [itemsCostResponse, resorcesCostResponse] = await Promise.all([
+        this.apiService.GetRequestFusion(this.endPoints.Path('standard_costs',
+                                  'COST_PLANTA1', filters.itemNumberFilter,
+                                        today), false),
+        this.apiService.GetRequestFusion(this.endPoints.Path('resource_rates',
+                                  'COST_PLANTA1', filters.resourceCodeFilter,
+                                        today), false),
+      ]);
+
+
+      // Validar que las respuestas no sean null
+      if (!itemsCostResponse || !resorcesCostResponse) {
+        this.alerts.Warning('Error al obtener datos de órdenes de trabajo');
+        return;
+      }
+
+      const dataCostItems = JSON.parse(itemsCostResponse);
+      const dataCostResources = JSON.parse(resorcesCostResponse);
+
+      this.CombineCostData(dataCostItems, dataCostResources);
+
       await this.alerts.HideLoading();
 
     } catch (error) {
@@ -196,7 +222,216 @@ export class CostsPage implements OnInit {
     }
   }
 
-  OpenDispatch(WOSelected: any) {
+  FilterItemsAndResources(): { itemNumberFilter: string, resourceCodeFilter: string } {
+    const itemNumbers = new Set<string>();
+    const resourceCodes = new Set<string>();
+
+    // Recorrer todas las órdenes de trabajo
+    this.workOrdersCost.items.forEach((workOrder: any) => {
+
+      // Agregar ItemNumber de la orden principal
+      if (workOrder.ItemNumber) {
+        itemNumbers.add(workOrder.ItemNumber);
+      }
+
+      // Extraer ItemNumbers de Materials
+      if (workOrder.Materials && workOrder.Materials.items) {
+        workOrder.Materials.items.forEach((material: any) => {
+          if (material.ItemNumber) {
+            itemNumbers.add(material.ItemNumber);
+          }
+        });
+      }
+
+      // Extraer ItemNumbers de Outputs
+      if (workOrder.Outputs && workOrder.Outputs.items) {
+        workOrder.Outputs.items.forEach((output: any) => {
+          if (output.ItemNumber) {
+            itemNumbers.add(output.ItemNumber);
+          }
+        });
+      }
+
+      // Extraer ResourceCodes de Resources
+      if (workOrder.Resources && workOrder.Resources.items) {
+        workOrder.Resources.items.forEach((resource: any) => {
+          if (resource.ResourceCode) {
+            resourceCodes.add(resource.ResourceCode);
+          }
+        });
+      }
+    });
+
+    // Construir cadenas de filtro
+    const itemNumberFilter = Array.from(itemNumbers)
+      .map(item => `ItemNumber='${item}'`)
+      .join(' or ');
+
+    const resourceCodeFilter = Array.from(resourceCodes)
+      .map(resource => `ResourceCode='${resource}'`)
+      .join(' or ');
+
+    return {
+      itemNumberFilter,
+      resourceCodeFilter
+    };
+  }
+
+// Función corregida para agregar TotalStandardCost dentro de cada elemento del array
+  private CombineCostData(dataCostItems: any, dataCostResources: any) {
+
+    // Combinar datos con workOrdersCost
+    this.workOrdersCost.items.forEach((workOrder: any) => {
+
+      // Agregar costos del item principal de la WorkOrder
+      const workOrderCosts = dataCostItems?.items?.filter((item: any) =>
+        item.ItemNumber === workOrder.ItemNumber) || [];
+
+      if (workOrderCosts.length > 0) {
+        workOrder.CostData = {
+          items: workOrderCosts.map((cost: any) => ({
+            TotalCost: cost.TotalCost || 0,
+            CurrencyCode: cost.CurrencyCode || 'MXN',
+            EffectiveStartDate: cost.EffectiveStartDate,
+            EffectiveEndDate: cost.EffectiveEndDate,
+            ScenarioNumber: cost.ScenarioNumber,
+            CostBookCode: cost.CostBookCode,
+            TotalStandardCost: (workOrder.PlannedQuantity || 0) * (cost.TotalCost || 0)
+          }))
+        };
+      } else {
+        workOrder.CostData = { items: [] };
+      }
+
+      // Agregar costos en Materials
+      if (workOrder.Materials?.items) {
+        workOrder.Materials.items.forEach((material: any) => {
+          const matchingCosts = dataCostItems?.items?.filter((item: any) =>
+            item.ItemNumber === material.ItemNumber) || [];
+
+          if (matchingCosts.length > 0) {
+            material.CostData = {
+              items: matchingCosts.map((cost: any) => ({
+                TotalCost: cost.TotalCost || 0,
+                CurrencyCode: cost.CurrencyCode || 'MXN',
+                EffectiveStartDate: cost.EffectiveStartDate,
+                EffectiveEndDate: cost.EffectiveEndDate,
+                ScenarioNumber: cost.ScenarioNumber,
+                CostBookCode: cost.CostBookCode,
+                TotalStandardCost: (material.Quantity || 0) * (cost.TotalCost || 0)
+              }))
+            };
+          } else {
+            material.CostData = { items: [] };
+          }
+        });
+      }
+
+      // Agregar costos en Outputs
+      if (workOrder.Outputs?.items) {
+        workOrder.Outputs.items.forEach((output: any) => {
+          const matchingCosts = dataCostItems?.items?.filter((item: any) =>
+            item.ItemNumber === output.ItemNumber) || [];
+
+          if (matchingCosts.length > 0) {
+            output.CostData = {
+              items: matchingCosts.map((cost: any) => ({
+                TotalCost: cost.TotalCost || 0,
+                CurrencyCode: cost.CurrencyCode || 'MXN',
+                EffectiveStartDate: cost.EffectiveStartDate,
+                EffectiveEndDate: cost.EffectiveEndDate,
+                ScenarioNumber: cost.ScenarioNumber,
+                CostBookCode: cost.CostBookCode,
+                TotalStandardCost: (output.OutputQuantity || 0) * (cost.TotalCost || 0)
+              }))
+            };
+          } else {
+            output.CostData = { items: [] };
+          }
+        });
+      }
+
+      // Agregar costos en Resources
+      if (workOrder.Resources?.items) {
+        workOrder.Resources.items.forEach((resource: any) => {
+          const matchingRates = dataCostResources?.items?.filter((resourceCost: any) =>
+            resourceCost.ResourceCode === resource.ResourceCode) || [];
+
+          if (matchingRates.length > 0) {
+            resource.RateData = {
+              items: matchingRates.map((rate: any) => ({
+                TotalRate: rate.TotalRate || 0,
+                CurrencyCode: rate.CurrencyCode || 'MXN',
+                EffectiveStartDate: rate.EffectiveStartDate,
+                EffectiveEndDate: rate.EffectiveEndDate,
+                ScenarioNumber: rate.ScenarioNumber,
+                CostBookCode: rate.CostBookCode,
+                TotalStandardCost: (resource.RequiredUsage || 0) * (rate.TotalRate || 0)
+              }))
+            };
+          } else {
+            resource.RateData = { items: [] };
+          }
+        });
+      }
+    });
+
+    // Calcular totales de costos estándar por WorkOrder
+    this.CalculateWorkOrderCostTotals();
+    console.log('Datos combinados con costos:', this.workOrdersCost);
+  }
+
+// Función para calcular totales de costos estándar por WorkOrder
+  private CalculateWorkOrderCostTotals() {
+    this.workOrdersCost.items.forEach((workOrder: any) => {
+      // Calcular BOMCost en Materials - primer elemento del array CostData
+      if (workOrder.Materials?.items) {
+        let bomCost = 0;
+        workOrder.Materials.items.forEach((material: any) => {
+          if (material.CostData && material.CostData.items && material.CostData.items.length > 0) {
+            bomCost += material.CostData.items[0].TotalStandardCost || 0;
+          }
+        });
+        workOrder.Materials.BOMCost = bomCost;
+      }
+
+      // Calcular OutputCost en Outputs - primer elemento del array CostData
+      if (workOrder.Outputs?.items) {
+        let outputCost = 0;
+        workOrder.Outputs.items.forEach((output: any) => {
+          if (output.CostData && output.CostData.items && output.CostData.items.length > 0) {
+            outputCost += output.CostData.items[0].TotalStandardCost || 0;
+          }
+        });
+        workOrder.Outputs.OutputCost = outputCost;
+      }
+
+      // Calcular LaborCost y EquipmentCost en Resources - primer elemento del array RateData
+      if (workOrder.Resources?.items) {
+        let laborCost = 0;
+        let equipmentCost = 0;
+
+        workOrder.Resources.items.forEach((resource: any) => {
+          if (resource.RateData && resource.RateData.items && resource.RateData.items.length > 0) {
+            const totalStandardCost = resource.RateData.items[0].TotalStandardCost || 0;
+
+            if (resource.ResourceType === 'LABOR') {
+              laborCost += totalStandardCost;
+            } else if (resource.ResourceType === 'EQUIPMENT') {
+              equipmentCost += totalStandardCost;
+            }
+          }
+        });
+
+        workOrder.Resources.LaborCost = laborCost;
+        workOrder.Resources.EquipmentCost = equipmentCost;
+        workOrder.Resources.ResoucesCost = equipmentCost + laborCost;
+      }
+    });
+  }
+
+  OpenWOCostDetail(WOSelected: any) {
+    this.selectedWorkOrder = WOSelected || {};
     this.isModaldispatchOpen = true;
   }
 
@@ -233,40 +468,9 @@ export class CostsPage implements OnInit {
       material.Standard = (material.Quantity || 0) / plannedQuantity;
       material.StandardReal = (material.Standard || 0) * (this.totalGlobal|| 0);
 
-      //material.QuantityOnhand = material.QuantityOnhand || 0;
-      //material.AvailableToTransact = material.AvailableToTransact || 0;
-      //material.OnHandMessage = material.OnHandMessage || 'Cargando...';
-
-      //this.LoadMaterialOnHand(material);
     });
 
     return filtered;
-  }
-
-  private async LoadMaterialOnHand(material: any) {
-    const payload = {
-      OrganizationCode: this.organizationSelected.Code,
-      ItemNumber: material.ItemNumber,
-      SupplySubinventory: material.SupplySubinventory
-    };
-
-    try {
-      const response: any = await this.apiService.PostRequestFusion('availableQuantityDetails', payload);
-
-      if (response.ReturnStatus === 'SUCCESS') {
-        material.QuantityOnhand = response.QuantityOnhand;
-        material.AvailableToTransact = response.AvailableToTransact;
-        material.OnHandMessage = response.ReturnStatus;
-      } else {
-        material.QuantityOnhand = response.QuantityOnhand || 0;
-        material.AvailableToTransact = response.AvailableToTransact || 0;
-        material.OnHandMessage = response.ReturnStatus;
-      }
-    } catch (error: any) {
-      material.QuantityOnhand = 0;
-      material.AvailableToTransact = 0;
-      material.OnHandMessage = `Error: ${error.message || error}`;
-    }
   }
 
   EquipmentResourcesForOperation(operationSequence: number) {
@@ -301,6 +505,76 @@ export class CostsPage implements OnInit {
     return filtered;
   }
 
+  // Agregar estas funciones a tu clase CostsPage
+
+// Función para calcular costo total de materiales por operación
+  GetMaterialsCostByOperation(operationSequence: number): number {
+    const materials = this.MaterialsForOperation(operationSequence);
+    let totalCost = 0;
+
+    materials.forEach((material: any) => {
+      if (material.CostData?.items && material.CostData.items.length > 0) {
+        totalCost += material.CostData.items[0].TotalStandardCost || 0;
+      }
+    });
+
+    return totalCost;
+  }
+
+// Función para calcular costo total de equipos por operación
+  GetEquipmentCostByOperation(operationSequence: number): number {
+    const equipment = this.EquipmentResourcesForOperation(operationSequence);
+    let totalCost = 0;
+
+    equipment.forEach((equip: any) => {
+      if (equip.RateData?.items && equip.RateData.items.length > 0) {
+        totalCost += equip.RateData.items[0].TotalStandardCost || 0;
+      }
+    });
+
+    return totalCost;
+  }
+
+// Función para calcular costo total de personal por operación
+  GetLaborCostByOperation(operationSequence: number): number {
+    const labor = this.LaborResourcesForOperation(operationSequence);
+    let totalCost = 0;
+
+    labor.forEach((lab: any) => {
+      if (lab.RateData?.items && lab.RateData.items.length > 0) {
+        totalCost += lab.RateData.items[0].TotalStandardCost || 0;
+      }
+    });
+
+    return totalCost;
+  }
+
+// Función para calcular costo total de outputs por operación
+  GetOutputsCostByOperation(operationSequence: number): number {
+    const outputs = this.OutputsForOperation(operationSequence);
+    let totalCost = 0;
+
+    outputs.forEach((output: any) => {
+      if (output.CostData?.items && output.CostData.items.length > 0) {
+        totalCost += output.CostData.items[0].TotalStandardCost || 0;
+      }
+    });
+
+    return totalCost;
+  }
+
+// Función para calcular costo total de recursos (equipos + personal) por operación
+  GetResourcesCostByOperation(operationSequence: number): number {
+    return this.GetEquipmentCostByOperation(operationSequence) +
+      this.GetLaborCostByOperation(operationSequence);
+  }
+
+// Función para calcular costo total de operación (materiales + recursos)
+  GetTotalOperationCost(operationSequence: number): number {
+    return this.GetMaterialsCostByOperation(operationSequence) +
+      this.GetResourcesCostByOperation(operationSequence);
+  }
+
   OnFilterGlobal(event: Event, table: any) {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
@@ -311,5 +585,6 @@ export class CostsPage implements OnInit {
     this.searchValueWO = '';
   }
 
-  protected readonly Truncate = Truncate;
+  //protected readonly Truncate = Truncate;
+  protected readonly TruncatePoint = TruncatePoint;
 }

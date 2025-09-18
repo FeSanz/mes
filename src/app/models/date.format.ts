@@ -1,3 +1,4 @@
+//Cambiar zona horaria de ISO58601 a CDMX
 export function ISOToCDMX(iso8601: string): string{
   if (!iso8601) return '';
 
@@ -19,6 +20,7 @@ export function ISOToCDMX(iso8601: string): string{
   return timeWithMs.replace(' ', 'T') + '-06:00';
 }
 
+//Mostrar fecha acotada DD/MM/YY hh:mm de zona horaria CDMX
 export function FormatForDisplayFromCDMX(iso8601CDMX: string, sec: boolean = false): string {
   if(!iso8601CDMX) return '';
 
@@ -46,8 +48,19 @@ export function FormatForDisplayFromCDMX(iso8601CDMX: string, sec: boolean = fal
   return baseFormat;
 }
 
+//Mostrar fecha acotada DD/MM/YY hh:mm de ISO8601
 export function FormatForDisplayFromISO(iso8601: string, sec: boolean = false): string {
   if (!iso8601) return '';
   const dateCDMX= ISOToCDMX(iso8601);
   return FormatForDisplayFromCDMX(dateCDMX, sec);
+}
+
+//Obtener fecha actual en formato YYYY-MM-DD
+export function TodayDateForFusion(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 }

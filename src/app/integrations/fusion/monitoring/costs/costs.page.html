@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" xmlns="http://www.w3.org/1999/html">
   <ion-toolbar>
     <ion-title>Costos</ion-title>
     <ion-buttons slot="start">
@@ -112,14 +112,14 @@
                 </th>
                 <th pSortableColumn="MachineCost" style="min-width: 10rem" class="td-center">
                   <div class="flex justify-between items-center">
-                    Maquinaria
+                    Equipo
                     <p-sortIcon field="MachineCost"/>
                     <p-columnFilter field="MachineCost" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="LaborCost" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
-                    M.O.
+                    Personal
                     <p-sortIcon field="LaborCost"/>
                     <p-columnFilter field="LaborCost" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
@@ -169,17 +169,18 @@
                 <td>{{ item.ItemNumber }}</td>
                 <td>{{ item.Description }}</td>
                 <td class="td-center">{{ item.PlannedQuantity }}</td>
-                <td class="td-center">${{  0 }}</td>
-                <td class="td-center">${{  0  }}</td>
-                <td class="td-center">${{  0  }}</td>
-                <td class="td-center">${{  0  }}</td>
-                <td class="td-center">${{ 0  }}</td>
-                <td class="td-center">${{ 0 }}</td>
+                <td class="td-center">${{ TruncatePoint(item.Materials?.BOMCost || 0) }}</td>
+                <td class="td-center">${{ TruncatePoint(item.Resources?.EquipmentCost || 0) }}</td>
+                <td class="td-center">${{ TruncatePoint(item.Resources?.LaborCost || 0) }}</td>
+                <td class="td-center">${{ TruncatePoint((item.Materials?.BOMCost || 0) + (item.Resources?.ResoucesCost || 0)) }}</td>
+                <td class="td-center">${{ TruncatePoint(item.CostData?.items?.[0]?.TotalStandardCost || 0) }}</td>
+                <td class="td-center">${{ TruncatePoint((item.CostData?.items?.[0]?.TotalStandardCost || 0) - ((item.Materials?.BOMCost || 0) + (item.Resources?.ResoucesCost || 0))) }}</td>
                 <td class="td-center">{{ item.ManufactureType }}</td>
                 <td class="td-center">
-                  <ion-button size="small" shape="round" color="secondary" (click)="OpenDispatch(item)" title="Detalles">
+                  <ion-button size="small" shape="round" color="secondary" (click)="OpenWOCostDetail(item)" title="Detalles">
                     <ion-icon slot="icon-only" name="reader-outline"></ion-icon>
                   </ion-button>
+                  <!-- <p-button icon="pi pi-eye" class="mr-2" [rounded]="true" [outlined]="true" (click)="OpenDispatch(item)"/> -->
                 </td>
               </tr>
             </ng-template>
@@ -207,72 +208,96 @@
               {{ selectedWorkOrder?.WorkOrderNumber || 'N/A' }}
             </strong>
           </ion-title>
-          <ion-title slot="end">Avance
+          <ion-title slot="end">Meta
             <strong>
-              {{ (selectedWorkOrder?.CompletedQuantity || 0) + ' / ' + (selectedWorkOrder?.PlannedQuantity || 0) }}
+              {{ (selectedWorkOrder?.PlannedQuantity || 0) }} {{selectedWorkOrder?.UoM}}
             </strong>
           </ion-title>
         </ion-toolbar>
       </ion-header>
 
       <ion-content>
+
+        <ion-grid [fixed]="true">
+          <!-- Encabezado Totales -->
+          <ion-row class="section-header">
+            <ion-col size="12" size-sm="3">
+              <span>PT</span><br>
+              <span class="text-red">$ [ {{ TruncatePoint(selectedWorkOrder.CostData?.items?.[0]?.TotalStandardCost || 0)  }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>SALIDAS</span><br>
+              <span class="text-opname">$ [ {{ TruncatePoint(selectedWorkOrder?.Outputs.OutputCost || 0)  }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>MATERIALES</span><br>
+              <span class="text-orange">$ [ {{ TruncatePoint(selectedWorkOrder?.Materials.BOMCost || 0) }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>EQUIPOS</span><br>
+              <span class="text-purple">$ [ {{ TruncatePoint(selectedWorkOrder?.Resources.EquipmentCost || 0) }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>PERSONAL</span><br>
+              <span class="text-green">$ [ {{ TruncatePoint(selectedWorkOrder?.Resources.LaborCost || 0) }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="1">
+              <strong></strong>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
         <div *ngFor="let operation of Operations(); last as isLast">
           <ion-grid [fixed]="true">
             <!-- Encabezado Operacion -->
-            <ion-row class="section-header">
-              <ion-col size="12" size-sm="3"></ion-col>
-              <ion-col size="12" size-sm="2">
-                <span>FALTANTE</span><br>
-                <span class="text-red">[ {{ operation.ReadyQuantity }} ]</span>
-              </ion-col>
-              <ion-col size="12" size-sm="2">
-                <span>DESPERDICIO</span><br>
-                <span class="text-orange">[ {{ operation.ScrappedQuantity || 0 }} ]</span>
-              </ion-col>
-              <ion-col size="12" size-sm="2">
-                <span>RECHAZO</span><br>
-                <span class="text-purple">[ {{operation.RejectedQuantity || 0}} ]</span>
-              </ion-col>
-              <ion-col size="12" size-sm="2">
-                <span>COMPLETO</span><br>
-                <span class="text-green">[ {{operation.CompletedQuantity || 0}} ]</span>
-              </ion-col>
-              <ion-col size="12" size-sm="1">
-                <strong></strong>
-              </ion-col>
-            </ion-row>
-
-            <ion-row class="operation-row">
+               <ion-row class="operation-row">
               <ion-col size="12" size-sm="3">
                 <strong>OPERACION {{ operation.OperationSequenceNumber }}</strong>
               </ion-col>
-              <ion-col size="12" size-sm="2" class="data-center">
-                <strong class="text-opname">{{ operation.OperationName }}</strong>
-              </ion-col>
-              <ion-col size="12" size-sm="2">
-                <input pInputText
-                       type="text"
-                       [value]="scrapGlobal"
-                       pSize="small"
-                       [disabled]="true"
-                       class="input-operation"/>
-              </ion-col>
-              <ion-col size="12" size-sm="2">
-                <input pInputText
-                       type="text"
-                       [value]="rejectGlobal"
-                       pSize="small"
-                       [disabled]="true"
-                       class="input-operation"/>
-              </ion-col>
-              <ion-col size="12" size-sm="2">
-                <input pInputText
-                       type="text"
-                       [value]="completeGlobal"
-                       pSize="small"
-                       [disabled]="true"
-                       class="input-operation"/>
-              </ion-col>
+                 <ion-col size="12" size-sm="2">
+                   <p-floatlabel variant="on">
+                     <input pInputText
+                            type="text"
+                            [value]="TruncatePoint(GetOutputsCostByOperation(operation.OperationSequenceNumber))"
+                            pSize="small"
+                            [disabled]="true"
+                            class="input-operation"/>
+                     <label for="materials_cost">Salidas</label>
+                   </p-floatlabel>
+                 </ion-col>
+                 <ion-col size="12" size-sm="2">
+                   <p-floatlabel variant="on">
+                     <input pInputText
+                            type="text"
+                            [value]="TruncatePoint(GetMaterialsCostByOperation(operation.OperationSequenceNumber))"
+                            pSize="small"
+                            [disabled]="true"
+                            class="input-operation"/>
+                     <label for="materials_cost">Materiales</label>
+                   </p-floatlabel>
+                 </ion-col>
+                 <ion-col size="12" size-sm="2">
+                   <p-floatlabel variant="on">
+                     <input pInputText
+                            type="text"
+                            [value]="TruncatePoint(GetEquipmentCostByOperation(operation.OperationSequenceNumber))"
+                            pSize="small"
+                            [disabled]="true"
+                            class="input-operation"/>
+                     <label for="equipment_cost">Equipos</label>
+                   </p-floatlabel>
+                 </ion-col>
+                 <ion-col size="12" size-sm="2">
+                   <p-floatlabel variant="on">
+                     <input pInputText
+                            type="text"
+                            [value]="TruncatePoint(GetLaborCostByOperation(operation.OperationSequenceNumber))"
+                            pSize="small"
+                            [disabled]="true"
+                            class="input-operation"/>
+                     <label for="labor_cost">Personal</label>
+                   </p-floatlabel>
+                 </ion-col>
               <ion-col size="12" size-sm="1">
                 <strong>{{ operation.UnitOfMeasure  }}</strong>
               </ion-col>
@@ -288,22 +313,19 @@
                        *ngFor="let output of OutputsForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ output.ItemNumber }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume">[ {{ Truncate(output.Standard) }} ]</span>
+                  <span class="std-consume text-green">$ [ <strong>{{ TruncatePoint(output.CostData?.items[0].TotalCost) }}</strong> ]</span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
-                  <p-floatlabel variant="on">
                     <input pInputText type="text"
-                           [value]="output.StandardReal || 0"
+                           [value]="TruncatePoint(output.CostData?.items[0].TotalStandardCost) || 0"
                            pSize="small"
-                           [disabled]="false"
+                           [disabled]="true"
                            class="input-standard"/>
-                    <label for="std_output">{{ Truncate(output.StandardReal) || 0}}</label>
-                  </p-floatlabel>
                 </ion-col>
-                <ion-col size="12" size-sm="1">{{ output.UOMCode }}</ion-col>
+                <ion-col size="12" size-sm="1">{{ output.CostData?.items[0].CurrencyCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
                   <span class="text-blue">
-                    [ {{Truncate(output.CompletedQuantity)}} / {{ Truncate(output.OutputQuantity) }} ]
+                    [<strong> {{ TruncatePoint(output.OutputQuantity) }} </strong> ] {{output.UOMCode}}
                   </span>
                 </ion-col>
               </ion-row>
@@ -317,31 +339,26 @@
                 <ion-col size="12" size-md="2">
                   <br><strong class="section-title">MATERIALES</strong>
                 </ion-col>
-                <ion-col size="12" size-md="8" class="text-red text-list">
-                  <br>Sin stock suficiente en algunos materiales
-                </ion-col>
               </ion-row>
 
               <ion-row class="data-row"
                        *ngFor="let material of MaterialsForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ material.ItemNumber }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume text-green">[ {{900}} / {{ Truncate(material.Standard) }} ] </span>
+                  <span class="std-consume text-green">$ [ <strong>{{ TruncatePoint(material.CostData?.items[0].TotalCost) }}</strong> ]</span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
-                  <p-floatlabel variant="on">
                     <input pInputText
                            type="text"
-                           [value]="material.StandardReal"
+                           [value]="TruncatePoint(material.CostData?.items[0].TotalStandardCost) || 0"
                            pSize="small"
+                           [disabled]="true"
                            class="input-standard"/>
-                    <label for="std_material">{{ Truncate(material.StandardReal) || 0}}</label>
-                  </p-floatlabel>
                 </ion-col>
-                <ion-col size="12" size-sm="1">{{ material.UOMCode }}</ion-col>
+                <ion-col size="12" size-sm="1">{{ material.CostData?.items[0].CurrencyCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
                   <span class="text-blue">
-                   [ {{Truncate(material.IssuedQuantity)}} / {{ Truncate(material.Quantity) }} ]
+                    [<strong> {{ TruncatePoint(material.Quantity) }} </strong> ] {{material.UOMCode}}
                   </span>
                 </ion-col>
               </ion-row>
@@ -361,22 +378,20 @@
                        *ngFor="let equipment of EquipmentResourcesForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ equipment.ResourceName }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume">[ {{ Truncate(equipment.Standard) }} ] </span>
+                  <span class="std-consume text-green">$ [ <strong>{{ TruncatePoint(equipment.RateData?.items[0].TotalRate) }}</strong> ]</span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
-                  <p-floatlabel variant="on">
                     <input pInputText
                            type="text"
-                           [value]="equipment.StandardReal"
+                           [value]="TruncatePoint(equipment.RateData?.items[0].TotalStandardCost) || 0"
                            pSize="small"
+                           [disabled]="true"
                            class="input-standard"/>
-                    <label for="std_equipment">{{ Truncate(equipment.StandardReal) || 0}}</label>
-                  </p-floatlabel>
                 </ion-col>
-                <ion-col size="12" size-sm="1">{{ equipment.UOMCode }}</ion-col>
+                <ion-col size="12" size-sm="1">{{ equipment.RateData?.items[0].CurrencyCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
                   <span class="text-blue">
-                   [ {{Truncate(equipment.ActualResourceUsage)}} / {{ Truncate(equipment.RequiredUsage) }} ]
+                    [<strong> {{ TruncatePoint(equipment.RequiredUsage) }} </strong> ] {{equipment.UOMCode}}
                   </span>
                 </ion-col>
               </ion-row>
@@ -396,22 +411,20 @@
                        *ngFor="let labor of LaborResourcesForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ labor.ResourceName }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume">[ {{ Truncate(labor.Standard) }} ] </span>
+                  <span class="std-consume text-green">$ [ <strong>{{ TruncatePoint(labor.RateData?.items[0].TotalRate) }}</strong> ]</span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
-                  <p-floatlabel variant="on">
                     <input pInputText
                            type="text"
-                           [value]="labor.StandardReal"
+                           [value]="TruncatePoint(labor.RateData?.items[0].TotalStandardCost) || 0"
                            pSize="small"
+                           [disabled]="true"
                            class="input-standard"/>
-                    <label for="std_labor">{{ Truncate(labor.StandardReal) || 0}}</label>
-                  </p-floatlabel>
                 </ion-col>
-                <ion-col size="12" size-sm="1">{{ labor.UOMCode }}</ion-col>
+                <ion-col size="12" size-sm="1">{{ labor.RateData?.items[0].CurrencyCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
                   <span class="text-blue">
-                   [ {{Truncate(labor.ActualResourceUsage)}} / {{ Truncate(labor.RequiredUsage) }} ]
+                    [<strong> {{ TruncatePoint(labor.RequiredUsage) }} </strong> ] {{labor.UOMCode}}
                   </span>
                 </ion-col>
               </ion-row>

@@ -78,11 +78,11 @@ export class EndpointsService {
                         '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\'',
 
     'standard_costs': '/standardCosts?' + this._params +
-                      '&fields=ScenarioNumber,CostOrgName,CostBookCode,ItemNumber,ItemDescription,TotalCost,CurrencyCode,UOMCode,StatusCode,CostType,EffectiveStartDate,EffectiveEndDate' +
+                      '&fields=ScenarioNumber,CostBookCode,ItemNumber,TotalCost,CurrencyCode,EffectiveStartDate,EffectiveEndDate' +
                       '&q=CostOrgName=\'{0}\' and ({1}) and StatusCode=\'PUBLISHED\' and EffectiveEndDate > \'{2}\'',
 
     'resource_rates': '/resourceRates?' + this._params +
-                      '&fields=ScenarioNumber,CostOrgName,CostBookCode,ResourceName,ResourceCode,TotalRate,UOM,CurrencyCode,StatusCode,EffectiveStartDate,EffectiveEndDate' +
+                      '&fields=ScenarioNumber,CostBookCode,ResourceCode,TotalRate,CurrencyCode,EffectiveStartDate,EffectiveEndDate' +
                       '&q=CostOrgName=\'{0}\' and ({1}) and StatusCode=\'PUBLISHED\' and EffectiveEndDate > \'{2}\'',
   };
 

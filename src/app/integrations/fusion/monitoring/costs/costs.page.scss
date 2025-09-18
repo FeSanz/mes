@@ -1,0 +1,109 @@
+ion-modal.dispach-modal::part(content) {
+  width: 40%;
+  //max-width: 10%;
+  height: 90%;
+  max-height: auto;
+}
+/* ==========================================================================
+   DESPACHOS PAGE STYLES - Estilos exactos del HTML original
+   ========================================================================== */
+
+/* Headers de sección */
+.section-header {
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: grey;
+}
+
+.section-title {
+  font-weight: bold;
+}
+
+/* Fila de operación */
+.operation-row {
+  background-color: var(--ion-color-medium-shade);
+  border-radius: 5px;
+  align-items: center;
+}
+
+/* Fila de datos */
+.data-row {
+  align-items: center;
+}
+
+.data-center{
+  text-align: center;
+  align-items: center;
+}
+
+/* Inputs con estilos específicos */
+.input-operation {
+  width: 100%;
+  font-weight: bold;
+  text-align: center;
+}
+
+.input-standard {
+  width: 100%;
+  text-align: center;
+}
+
+/* Colores de texto específicos */
+.text-red {
+  color: red;
+  font-weight: bold;
+}
+
+.text-orange {
+  color: orange;
+  font-weight: bold;
+}
+
+.text-purple {
+  color: purple;
+  font-weight: bold;
+}
+
+.text-green {
+  color: green;
+  font-weight: bold;
+}
+
+.text-blue {
+  color: #007bff;
+  font-size: 13px;
+}
+
+.text-opname {
+  color: #f3dd8b;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.line-divider{
+  border-bottom: 1px solid #ccc;
+  margin-top: 5px;
+  margin-bottom: 2px;
+}
+
+.text-list{
+  font-size: 15px;
+}
+
+.std-consume{
+  font-size: 13px;
+  text-align: center;
+  align-items: center;
+}
+
+/* Footer */
+.footer-style {
+  background-color: var(--ion-color-back);
+}
+
+/* Botón styles */
+.button-full-width {
+  width: 100%;
+}
