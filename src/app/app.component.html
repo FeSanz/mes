@@ -143,6 +143,15 @@
             <div slot="content" style="padding-left: 16px;  padding-right: 4px;">
               <ion-list lines="none">
                 <ion-menu-toggle auto-hide="false">
+                  <ion-item [routerLink]="['/production-campaign']" routerLinkActive="selected" detail="false" button
+                    color="light">
+                    <ion-icon slot="start" name="calendar-outline" color="secondary"></ion-icon>
+                    <ion-label>
+                      Campañas de producción
+                    </ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+                <ion-menu-toggle auto-hide="false">
                   <ion-item [routerLink]="['/fusion_production']" routerLinkActive="selected" detail="false" button
                     color="light">
                     <ion-icon slot="start" name="trending-up-outline" color="secondary"></ion-icon>
@@ -159,8 +168,7 @@
                 </ion-menu-toggle>
 
                 <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/costs']" routerLinkActive="selected" detail="false" button
-                            color="light">
+                  <ion-item [routerLink]="['/costs']" routerLinkActive="selected" detail="false" button color="light">
                     <ion-icon slot="start" name="cash-outline" color="secondary"></ion-icon>
                     <ion-label>Costos</ion-label>
                   </ion-item>
@@ -177,11 +185,17 @@
               <ion-list lines="none">
                 <ion-menu-toggle auto-hide="false">
                   <ion-item routerLinkActive="selected" detail="false" button color="light" [routerLink]="['/alerts']">
-                    <ion-icon slot="start" name="warning-outline" color="secondary"></ion-icon>
+                    <ion-icon slot="start" name="notifications-outline" color="secondary"></ion-icon>
                     <ion-label>Alertas</ion-label>
                   </ion-item>
                 </ion-menu-toggle>
-
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLinkActive="selected" detail="false" button color="light"
+                    [routerLink]="['/failures']">
+                    <ion-icon slot="start" name="warning-outline" color="secondary"></ion-icon>
+                    <ion-label>Fallas</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
                 <ion-menu-toggle auto-hide="false">
                   <ion-item routerLinkActive="selected" detail="false" button color="light">
                     <ion-icon slot="start" name="time-outline" color="secondary"></ion-icon>
@@ -232,7 +246,8 @@
       <ion-footer class="no-shadow">
         <ion-toolbar>
           <ion-item lines="none">
-            <ion-toggle [(ngModel)]="remoteServer" (ionChange)="ChangeServerMode()" color="primary">Servidor remoto</ion-toggle>
+            <ion-toggle [(ngModel)]="remoteServer" (ionChange)="ChangeServerMode()" color="primary">Servidor
+              remoto</ion-toggle>
           </ion-item>
           <ion-item lines="none">
             <ion-toggle [(ngModel)]="darkMode" (ionChange)="ChangeColorMode()" color="primary">Modo oscuro</ion-toggle>

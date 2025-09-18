@@ -92,9 +92,14 @@ export const routes: Routes = [
   {
     path: 'select-location-modal',
     loadComponent: () => import('./select-location-modal/select-location-modal.page').then(m => m.SelectLocationModalPage)
-  },  {
+  },
+  {
     path: 'costs',
-    loadComponent: () => import('./integrations/fusion/monitoring/costs/costs.page').then( m => m.CostsPage)
+    loadComponent: () => import('./integrations/fusion/monitoring/costs/costs.page').then(m => m.CostsPage)
+  },
+  {
+    path: 'production-campaign',
+    loadComponent: () => import('./integrations/fusion/modules/production-campaign/production-campaign.page').then(m => m.ProductionCampaignPage)
   }
 
 ];

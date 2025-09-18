@@ -1,0 +1,105 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Fallas {{userData.Company.Name}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12">
+        <ion-card>
+          <ion-card-title>
+            Tipos de fallas
+          </ion-card-title>
+          <p-table #dtFailures [value]="failuresArray" dataKey="failure_id"
+            styleClass="card-table-primeng wo-table-custom" [tableStyle]="{ 'height': '100%'}" [size]="'small'"
+            [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
+            [globalFilterFields]="['name', 'area', 'machine_name']"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+            [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true"
+            [scrollHeight]="scrollHeight" [sortOrder]="1">
+            <ng-template #caption>
+              <div class="table-caption">
+                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
+                  (click)="ClearAlerts(dtFailures)" />
+
+                <div></div> <!-- Spacer -->
+
+                <p-iconField iconPosition="left">
+                  <p-inputIcon>
+                    <i class="fas fa-search"></i>
+                  </p-inputIcon>
+                  <input pInputText type="text" [(ngModel)]="searchValueAl" (input)="OnFilterGlobal($event, dtFailures)"
+                    placeholder="Buscar" />
+                </p-iconField>
+              </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+              <tr>
+                <th pSortableColumn="name" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Falla
+                    <p-sortIcon field="name" />
+                    <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="type" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Tipo
+                    <p-sortIcon field="type" />
+                    <p-columnFilter type="text" field="type" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th pSortableColumn="area" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Area
+                    <p-sortIcon field="area" />
+                    <p-columnFilter type="text" field="area" display="menu" class="ml-auto" />
+                  </div>
+                </th>
+                <th class="td-center">
+                  <div class="flex justify-between items-center">
+                    Acciones
+                  </div>
+                </th>
+            </ng-template>
+            <ng-template #body let-item>
+              <tr>
+                <td class="td-center"><strong>{{ item.name }}</strong></td>
+                <td class="td-center">{{item.type}}</td>
+                <td class="td-center">{{ item.area}}</td>
+                <td class="td-center">
+                  <!--ion-button *ngIf="permissions.isSuperAdmin() && !item.response_time" size="small" color="warning"
+                  (click)="AttendAlert(item)">
+                  Atender </ion-button>
+                <ion-button *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time" size="small"
+                  color="success" (click)="FinaliceAlert(item)"> Finalizar </ion-button-->
+                  <ion-button size="small" shape="round" color="success" (click)="EdithFailure(item)" title="Editar"
+                    *ngIf="permissions.isSuperAdmin()">
+                    <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+                  </ion-button>
+                  <ion-button size="small" shape="round" color="danger" (click)="DeleteFailure(item)" title="Eliminar"
+                    *ngIf="permissions.isSuperAdmin()">
+                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                  </ion-button>
+                  <ion-button size="small" shape="round" color="tertiary" (click)="ShowFailure(item)" title="Ver"
+                    *ngIf="permissions.isSuperAdmin()">
+                    <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
+                  </ion-button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="5">No se encontraron fallas.</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

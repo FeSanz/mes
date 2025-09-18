@@ -1,0 +1,152 @@
+.drag-handle {
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.clickable-text {
+  cursor: pointer;
+}
+
+ion-input {
+  text-align: right;
+}
+
+ion-select::part(label) {
+  color: var(--ion-color-primary);
+}
+
+/* Estilos para la tabla con drag & drop */
+.orders-table-custom {
+  .selected-row {
+    background-color: rgba(var(--ion-color-primary-rgb), 0.1) !important;
+    border-left: 3px solid var(--ion-color-primary);
+    transition: all 0.2s ease;
+
+    &.draggable-row {
+      &:hover .draggable-cell {
+        background-color: rgba(var(--ion-color-primary-rgb), 0.05);
+      }
+    }
+  }
+
+  /* Celdas arrastrables - excluir checkbox y botones */
+  .draggable-cell {
+    transition: background-color 0.2s ease;
+  }
+
+  /* Filas arrastrables */
+  .draggable-row {
+    .draggable-cell {
+      cursor: move;
+
+      &:hover {
+        background-color: rgba(var(--ion-color-success-rgb), 0.05);
+      }
+    }
+  }
+
+  /* Estado durante arrastre */
+  &.dragging-state {
+    .selected-row {
+      opacity: 0.8;
+      border-left-color: var(--ion-color-success);
+    }
+
+    tr:not(.selected-row) {
+      opacity: 0.6;
+    }
+  }
+
+  /* Indicador de drop */
+  .drop-indicator {
+    height: 3px;
+    background: linear-gradient(90deg, var(--ion-color-success), var(--ion-color-success-shade));
+    position: absolute;
+    z-index: 1000;
+    border-radius: 2px;
+    box-shadow: 0 0 6px var(--ion-color-success);
+  }
+}
+
+/* Estado global durante arrastre */
+body.dragging-active {
+  .orders-table-custom {
+    .selected-row {
+      background-color: rgba(var(--ion-color-success-rgb), 0.15) !important;
+      border-left-color: var(--ion-color-success);
+    }
+
+    .p-datatable-tbody>tr:not(.selected-row) {
+      opacity: 0.6;
+      transition: opacity 0.2s ease;
+    }
+  }
+
+  /* Prevenir selección de texto durante drag */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Estilos para los controles de selección */
+.table-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+
+  .selection-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .selection-info {
+      background: rgba(var(--ion-color-primary-rgb), 0.1);
+      color: var(--ion-color-primary);
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+  }
+}
+
+/* Animaciones suaves */
+.p-datatable-tbody>tr {
+  transition: all 0.2s ease;
+}
+
+/* Mejorar la apariencia del checkbox header */
+.p-datatable-thead th:first-child {
+  text-align: center;
+}
+
+/* Hover en filas cuando hay selección activa */
+.orders-table-custom .draggable-row:hover .draggable-cell {
+  background-color: rgba(var(--ion-color-primary-rgb), 0.05);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .table-caption {
+    flex-direction: column;
+    align-items: stretch;
+
+    .selection-controls {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+
+  /* En móviles, hacer el cursor más obvio */
+  .orders-table-custom .draggable-row .draggable-cell {
+    cursor: grab;
+  }
+}

@@ -15,7 +15,9 @@ import {
   statsChartOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline,
   gitNetworkOutline, closeOutline, barChartOutline, pieChartOutline, addOutline, checkmark, pencilOutline, trashOutline,
   reorderThreeOutline, reorderTwoOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline,
-  cashOutline
+  cashOutline,
+  notificationsOutline,
+  calendarOutline
 } from 'ionicons/icons';
 
 import { FormsModule } from '@angular/forms';
@@ -69,7 +71,7 @@ export class AppComponent implements OnInit {
       ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline,
       reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline,
       timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline,
-      person, homeOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline, cashOutline
+      person, homeOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline, cashOutline, notificationsOutline, calendarOutline
     });
 
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false

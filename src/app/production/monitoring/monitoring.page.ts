@@ -173,7 +173,7 @@ export class MonitoringPage {
         this.simulateResizeForAllWidgets();
       }, 100);
       this.changeDetector.detectChanges()
-      this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + this.dashboardData.organization_id).then((response: any) => {
+      this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + this.dashboardData.organization_id, false).then((response: any) => {
         if (response.items.length > 0) {
           this.machines = response.items
           this.newWidgetData.machine = response.items[0].machineId + ""
@@ -561,7 +561,7 @@ export class MonitoringPage {
           sensor.maxColor = this.general.sensorColor; // Color para cada sensor
         });
       }
-    });    
+    });
     const body = {
       updated_by: this.user.UserId,
       widgets: this.widgets.map((w: any) => ({
