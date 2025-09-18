@@ -1,26 +1,32 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
 import {
-  IonButton, IonButtons, IonCard, IonCol, IonContent, IonFab, IonFabButton, IonFooter, IonGrid, IonHeader,
-  IonIcon, IonInput, IonItem, IonLabel, IonMenuButton, IonModal, IonRow, IonTitle, IonToolbar
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCol,
+  IonContent,
+  IonFooter,
+  IonGrid,
+  IonHeader,
+  IonIcon,
+  IonMenuButton,
+  IonModal,
+  IonRow,
+  IonTitle,
+  IonToolbar
 } from '@ionic/angular/standalone';
 
 import {FloatLabel} from "primeng/floatlabel";
 import {Select} from "primeng/select";
-import { Toast } from 'primeng/toast';
-import {InputText, InputTextModule} from 'primeng/inputtext';
+import {InputText} from 'primeng/inputtext';
 import {Button} from "primeng/button";
-import {Divider} from "primeng/divider";
-import {Card} from "primeng/card";
-import {Dialog} from "primeng/dialog";
 import {AlertsService} from "../../../../services/alerts.service";
 import {IconField} from "primeng/iconfield";
 import {InputIcon} from "primeng/inputicon";
 import {PrimeTemplate} from "primeng/api";
-import {ProgressBar} from "primeng/progressbar";
-import {Slider} from "primeng/slider";
 import {TableModule} from "primeng/table";
 import {Tag} from "primeng/tag";
 
@@ -29,10 +35,10 @@ import {EndpointsService} from "../../../../services/endpoints.service";
 import {Platform} from "@ionic/angular";
 import {HeightTable} from "../../../../models/tables.prime";
 import {TruncatePoint} from "../../../../models/math.operations";
-import { cloudUploadOutline, readerOutline
-} from 'ionicons/icons';
+import {cloudUploadOutline, readerOutline} from 'ionicons/icons';
 import {addIcons} from "ionicons";
 import {TodayDateForFusion} from "../../../../models/date.format";
+import {Badge} from "primeng/badge";
 
 
 @Component({
@@ -42,13 +48,13 @@ import {TodayDateForFusion} from "../../../../models/date.format";
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, FloatLabel, IonButtons, IonMenuButton,
     Select, IonGrid, IonRow, IonCol, IonIcon, IonModal, IonButton, InputText, Button, IonFooter, IconField, InputIcon,
-    IonCard, PrimeTemplate, TableModule, Tag]
+    IonCard, PrimeTemplate, TableModule, Tag, Badge]
 })
 export class CostsPage implements OnInit {
 
   scrollHeight: string = '550px';
-  rowsPerPage: number = 10;
-  rowsPerPageOptions: number[] = [5, 10, 20];
+  rowsPerPage: number = 15;
+  rowsPerPageOptions: number[] = [5, 15, 20];
   userData: any = {};
   organizationSelected: string | any = '';
   searchValueWO: string = '';
@@ -63,13 +69,6 @@ export class CostsPage implements OnInit {
     Resources: { items: [] },
     Outputs: { items: [] }
   };
-  fusionOriginalData: any = {};
-
-  completeGlobal: number = 0;
-  scrapGlobal: number = 0;
-  rejectGlobal: number = 0;
-
-  totalGlobal: number = 0;
 
   private dataTransformers: { [key: string]: (data: any) => any } = {
     'P': (data: any) => ({
@@ -110,7 +109,8 @@ export class CostsPage implements OnInit {
       StatusCode: data.WorkOrderSystemStatusCode,
       Operations: data.WorkOrderOperation,
       Materials: data.WorkOrderMaterial,
-      Resources: data.WorkOrderResource
+      Resources: data.WorkOrderResource,
+      Outputs: { items: [] }
     })
   };
 
@@ -177,12 +177,12 @@ export class CostsPage implements OnInit {
       // Transformar datos
       const processItems = dataProcess.items.map((item: any) => ({
         ...this.dataTransformers['P'](item),
-        ManufactureType: 'PROCESOS'
+        ManufactureType: 'P'
       }));
 
       const discreteItems = dataDiscrete.items.map((item: any) => ({
         ...this.dataTransformers['D'](item),
-        ManufactureType: 'DISCRETA'
+        ManufactureType: 'D'
       }));
 
       // Combinar todos los items
@@ -277,7 +277,7 @@ export class CostsPage implements OnInit {
     };
   }
 
-// Función corregida para agregar TotalStandardCost dentro de cada elemento del array
+// Función para agregar datos de costos dentro de cada elemento
   private CombineCostData(dataCostItems: any, dataCostResources: any) {
 
     // Combinar datos con workOrdersCost
@@ -303,7 +303,7 @@ export class CostsPage implements OnInit {
         workOrder.CostData = { items: [] };
       }
 
-      // Agregar costos en Materials
+      // Agregar costos de Materials
       if (workOrder.Materials?.items) {
         workOrder.Materials.items.forEach((material: any) => {
           const matchingCosts = dataCostItems?.items?.filter((item: any) =>
@@ -327,7 +327,7 @@ export class CostsPage implements OnInit {
         });
       }
 
-      // Agregar costos en Outputs
+      // Agregar costos de Outputs
       if (workOrder.Outputs?.items) {
         workOrder.Outputs.items.forEach((output: any) => {
           const matchingCosts = dataCostItems?.items?.filter((item: any) =>
@@ -351,7 +351,7 @@ export class CostsPage implements OnInit {
         });
       }
 
-      // Agregar costos en Resources
+      // Agregar costos de Resources
       if (workOrder.Resources?.items) {
         workOrder.Resources.items.forEach((resource: any) => {
           const matchingRates = dataCostResources?.items?.filter((resourceCost: any) =>
@@ -376,15 +376,15 @@ export class CostsPage implements OnInit {
       }
     });
 
-    // Calcular totales de costos estándar por WorkOrder
     this.CalculateWorkOrderCostTotals();
+
     console.log('Datos combinados con costos:', this.workOrdersCost);
   }
 
-// Función para calcular totales de costos estándar por WorkOrder
+// Función para calcular totales de costos por WorkOrder
   private CalculateWorkOrderCostTotals() {
     this.workOrdersCost.items.forEach((workOrder: any) => {
-      // Calcular BOMCost en Materials - primer elemento del array CostData
+      // Calcular costo de BOM Global
       if (workOrder.Materials?.items) {
         let bomCost = 0;
         workOrder.Materials.items.forEach((material: any) => {
@@ -395,7 +395,7 @@ export class CostsPage implements OnInit {
         workOrder.Materials.BOMCost = bomCost;
       }
 
-      // Calcular OutputCost en Outputs - primer elemento del array CostData
+      // Calcular costo de SALIDAS Global
       if (workOrder.Outputs?.items) {
         let outputCost = 0;
         workOrder.Outputs.items.forEach((output: any) => {
@@ -404,9 +404,12 @@ export class CostsPage implements OnInit {
           }
         });
         workOrder.Outputs.OutputCost = outputCost;
+      }else {
+        // Inicializar Outputs si no existe (para órdenes discretas)
+        workOrder.Outputs = { items: [], OutputCost: 0 };
       }
 
-      // Calcular LaborCost y EquipmentCost en Resources - primer elemento del array RateData
+      // Calcular sotos de RECURSOS Global
       if (workOrder.Resources?.items) {
         let laborCost = 0;
         let equipmentCost = 0;
@@ -439,75 +442,31 @@ export class CostsPage implements OnInit {
     return this.selectedWorkOrder?.Operations?.items || [];
   }
 
-//Metodo helper para obtener PlannedQuantity de forma segura
-  private getPlannedQuantity(): number {
-    return this.selectedWorkOrder?.PlannedQuantity || 1;
-  }
-
   OutputsForOperation(operationSequence: number) {
     const outputs = this.selectedWorkOrder?.Outputs?.items || [];
-    const filtered = outputs.filter((output: any) => output.OperationSequenceNumber === operationSequence);
-    const plannedQuantity = this.getPlannedQuantity();
-
-    // Agregar campo Standard a cada output
-    filtered.forEach((output: any) => {
-      output.Standard = (output.OutputQuantity || 0) / plannedQuantity;
-      output.StandardReal = (output.Standard || 0) * (this.totalGlobal|| 0);
-    });
-
-    return filtered;
+    return outputs.filter((output: any) => output.OperationSequenceNumber === operationSequence);
   }
 
   MaterialsForOperation(operationSequence: number) {
     const materials = this.selectedWorkOrder?.Materials?.items || [];
-    const filtered = materials.filter((material: any) => material.OperationSequenceNumber === operationSequence);
-    const plannedQuantity = this.getPlannedQuantity();
-
-    // Agregar campo Standard a cada material
-    filtered.forEach((material: any) => {
-      material.Standard = (material.Quantity || 0) / plannedQuantity;
-      material.StandardReal = (material.Standard || 0) * (this.totalGlobal|| 0);
-
-    });
-
-    return filtered;
+    return materials.filter((material: any) => material.OperationSequenceNumber === operationSequence);
   }
 
   EquipmentResourcesForOperation(operationSequence: number) {
     const resources = this.selectedWorkOrder?.Resources?.items || [];
-    const filtered = resources.filter((resource: any) =>
+    return resources.filter((resource: any) =>
       resource.OperationSequenceNumber === operationSequence && resource.ResourceType === "EQUIPMENT"
     );
-    const plannedQuantity = this.getPlannedQuantity();
-
-    // Agregar campo Standard a cada equipment
-    filtered.forEach((equipment: any) => {
-      equipment.Standard = (equipment.RequiredUsage || 0) / plannedQuantity;
-      equipment.StandardReal = (equipment.Standard || 0) * (this.totalGlobal|| 0);
-    });
-
-    return filtered;
   }
 
   LaborResourcesForOperation(operationSequence: number) {
     const resources = this.selectedWorkOrder?.Resources?.items || [];
-    const filtered = resources.filter((resource: any) =>
+    return resources.filter((resource: any) =>
       resource.OperationSequenceNumber === operationSequence && resource.ResourceType === "LABOR"
     );
-    const plannedQuantity = this.getPlannedQuantity();
-
-    // Agregar campo Standard a cada labor
-    filtered.forEach((labor: any) => {
-      labor.Standard = (labor.RequiredUsage || 0) / plannedQuantity;
-      labor.StandardReal = (labor.Standard || 0) * (this.totalGlobal|| 0);
-    });
-
-    return filtered;
   }
 
-  // Agregar estas funciones a tu clase CostsPage
-
-// Función para calcular costo total de materiales por operación
+  // Función para calcular costo total de materiales por operación
   GetMaterialsCostByOperation(operationSequence: number): number {
     const materials = this.MaterialsForOperation(operationSequence);
     let totalCost = 0;
@@ -551,6 +510,9 @@ export class CostsPage implements OnInit {
 
 // Función para calcular costo total de outputs por operación
   GetOutputsCostByOperation(operationSequence: number): number {
+    if (!this.selectedWorkOrder?.Outputs?.items) {
+      return 0;
+    }
     const outputs = this.OutputsForOperation(operationSequence);
     let totalCost = 0;
 
@@ -584,6 +546,19 @@ export class CostsPage implements OnInit {
     table.clear();
     this.searchValueWO = '';
   }
+
+  DifferenceCostSeverity(saldo: any) {
+    if (saldo === 0) return 'warn';
+    else if (saldo < 0) return 'danger';
+    else return 'success';
+  }
+
+  MfgType(mfg: any) {
+      if (mfg === 'P') return 'info';
+      else if (mfg === 'D') return 'warn';
+      else return 'contrast';
+    }
+
 
   //protected readonly Truncate = Truncate;
   protected readonly TruncatePoint = TruncatePoint;

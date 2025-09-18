@@ -96,6 +96,13 @@
                     <p-columnFilter field="Description" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
+                <th pSortableColumn="ManufactureType" style="min-width: 7rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Tipo
+                    <p-sortIcon field="ManufactureType"/>
+                    <p-columnFilter field="ManufactureType" matchMode="equals" display="menu" class="ml-auto"/>
+                  </div>
+                </th>
                 <th pSortableColumn="PlannedQuantity" style="min-width:7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Meta
@@ -117,7 +124,7 @@
                     <p-columnFilter field="MachineCost" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
-                <th pSortableColumn="LaborCost" style="min-width: 7rem" class="td-center">
+                <th pSortableColumn="LaborCost" style="min-width: 9rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Personal
                     <p-sortIcon field="LaborCost"/>
@@ -145,13 +152,6 @@
                     <p-columnFilter field="BalanceCost" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
-                <th pSortableColumn="ManufactureType" style="min-width: 7rem" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Tipo
-                    <p-sortIcon field="ManufactureType"/>
-                    <p-columnFilter field="ManufactureType" matchMode="equals" display="menu" class="ml-auto"/>
-                  </div>
-                </th>
                 <th class="td-center">
                   <div class="flex justify-between items-center">
                     Detalle
@@ -168,14 +168,28 @@
                 </td>
                 <td>{{ item.ItemNumber }}</td>
                 <td>{{ item.Description }}</td>
+                <td class="td-center">
+                  <p-badge [value]="item.ManufactureType"
+                           [severity]="MfgType(item.ManufactureType)" />
+                </td>
                 <td class="td-center">{{ item.PlannedQuantity }}</td>
                 <td class="td-center">${{ TruncatePoint(item.Materials?.BOMCost || 0) }}</td>
                 <td class="td-center">${{ TruncatePoint(item.Resources?.EquipmentCost || 0) }}</td>
                 <td class="td-center">${{ TruncatePoint(item.Resources?.LaborCost || 0) }}</td>
-                <td class="td-center">${{ TruncatePoint((item.Materials?.BOMCost || 0) + (item.Resources?.ResoucesCost || 0)) }}</td>
-                <td class="td-center">${{ TruncatePoint(item.CostData?.items?.[0]?.TotalStandardCost || 0) }}</td>
-                <td class="td-center">${{ TruncatePoint((item.CostData?.items?.[0]?.TotalStandardCost || 0) - ((item.Materials?.BOMCost || 0) + (item.Resources?.ResoucesCost || 0))) }}</td>
-                <td class="td-center">{{ item.ManufactureType }}</td>
+                <td class="td-center">
+                  <p-tag
+                    [value]="'$' + TruncatePoint((item.Materials?.BOMCost || 0) + (item.Resources?.ResoucesCost || 0))"
+                    [severity]="'warn'"/>
+                </td>
+                <td class="td-center">
+                  <p-tag
+                    [value]="'$' + TruncatePoint(item.CostData?.items?.[0]?.TotalStandardCost || 0)"
+                    [severity]="'renewal'"/>
+                </td>
+                <td class="td-center">
+                  <p-badge [value]="'$' + TruncatePoint((item.CostData?.items?.[0]?.TotalStandardCost || 0) - ((item.Materials?.BOMCost || 0) + (item.Resources?.ResoucesCost || 0)))"
+                           [severity]="DifferenceCostSeverity((item.CostData?.items?.[0]?.TotalStandardCost || 0) - ((item.Materials?.BOMCost || 0) + (item.Resources?.ResoucesCost || 0)))" />
+                </td>
                 <td class="td-center">
                   <ion-button size="small" shape="round" color="secondary" (click)="OpenWOCostDetail(item)" title="Detalles">
                     <ion-icon slot="icon-only" name="reader-outline"></ion-icon>
@@ -221,28 +235,29 @@
         <ion-grid [fixed]="true">
           <!-- Encabezado Totales -->
           <ion-row class="section-header">
-            <ion-col size="12" size-sm="3">
+            <ion-col size="12" size-sm="2">
               <span>PT</span><br>
-              <span class="text-red">$ [ {{ TruncatePoint(selectedWorkOrder.CostData?.items?.[0]?.TotalStandardCost || 0)  }} ]</span>
+              <span class="text-green">$ [ {{ TruncatePoint(selectedWorkOrder.CostData?.items?.[0]?.TotalStandardCost || 0)  }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>FABRICACION</span><br>
+              <span class="text-red">$ [ {{ TruncatePoint((selectedWorkOrder?.Materials?.BOMCost || 0) + (selectedWorkOrder?.Resources?.ResoucesCost || 0)) }} ]</span>
             </ion-col>
             <ion-col size="12" size-sm="2">
               <span>SALIDAS</span><br>
-              <span class="text-opname">$ [ {{ TruncatePoint(selectedWorkOrder?.Outputs.OutputCost || 0)  }} ]</span>
+              <span class="text-blue">$ [ {{ TruncatePoint(selectedWorkOrder?.Outputs?.OutputCost || 0)  }} ]</span>
             </ion-col>
             <ion-col size="12" size-sm="2">
               <span>MATERIALES</span><br>
-              <span class="text-orange">$ [ {{ TruncatePoint(selectedWorkOrder?.Materials.BOMCost || 0) }} ]</span>
+              <span class="text-orange">$ [ {{ TruncatePoint(selectedWorkOrder?.Materials?.BOMCost || 0) }} ]</span>
             </ion-col>
             <ion-col size="12" size-sm="2">
               <span>EQUIPOS</span><br>
-              <span class="text-purple">$ [ {{ TruncatePoint(selectedWorkOrder?.Resources.EquipmentCost || 0) }} ]</span>
+              <span class="text-orange">$ [ {{ TruncatePoint(selectedWorkOrder?.Resources?.EquipmentCost || 0) }} ]</span>
             </ion-col>
             <ion-col size="12" size-sm="2">
               <span>PERSONAL</span><br>
-              <span class="text-green">$ [ {{ TruncatePoint(selectedWorkOrder?.Resources.LaborCost || 0) }} ]</span>
-            </ion-col>
-            <ion-col size="12" size-sm="1">
-              <strong></strong>
+              <span class="text-orange">$ [ {{ TruncatePoint(selectedWorkOrder?.Resources?.LaborCost || 0) }} ]</span>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -299,7 +314,7 @@
                    </p-floatlabel>
                  </ion-col>
               <ion-col size="12" size-sm="1">
-                <strong>{{ operation.UnitOfMeasure  }}</strong>
+                <strong>MXN</strong>
               </ion-col>
             </ion-row>
 
