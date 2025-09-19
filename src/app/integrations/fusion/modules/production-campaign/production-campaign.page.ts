@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonModal, IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea,
-  IonBreadcrumb, IonBreadcrumbs, IonCol
+  IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
@@ -16,6 +16,8 @@ import { FloatLabel } from "primeng/floatlabel";
 import { pencilOutline, trashOutline, eyeOutline, reorderThreeOutline, addOutline, checkmark, moveOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Tag } from "primeng/tag";
+import { ButtonModule } from "primeng/button";
+import { InputText } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-production-campaign',
@@ -24,7 +26,8 @@ import { Tag } from "primeng/tag";
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
-    IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol]
+    IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol, ButtonModule, IonButtons, IonButton
+    , InputText]
 })
 export class ProductionCampaignPage implements OnInit {
   campaignsArray: any = []
@@ -32,6 +35,7 @@ export class ProductionCampaignPage implements OnInit {
   freeWorkOrdersArray: any = []
   userData: any = {};
   isModalOpen = false
+  isModalFreeOrdersOpen = false
   rowsPerPage: number = 19;
   rowsPerPageOptions: number[] = [5, 10, 20];
   scrollHeight: string = '90%';
@@ -63,6 +67,7 @@ export class ProductionCampaignPage implements OnInit {
   selectedProducts: any[] = [];
 
   selectedOrders: any[] = [];
+  selectedFreeOrders: any[] = [];
   isDragging: boolean = false;
   draggedItems: any[] = [];
   dropIndicatorVisible: boolean = false;
@@ -75,12 +80,6 @@ export class ProductionCampaignPage implements OnInit {
     this.organizationSelected = this.userData.Company.Organizations[1];
     addIcons({ addOutline, pencilOutline, trashOutline, eyeOutline, moveOutline, reorderThreeOutline, checkmark });
   }
-
-  products = [
-    { code: 'P100', name: 'Laptop', category: 'Electronics' },
-    { code: 'P200', name: 'Mouse', category: 'Accessories' },
-    { code: 'P300', name: 'Keyboard', category: 'Accessories' }
-  ];
 
   ngOnInit() {
   }
@@ -104,9 +103,6 @@ export class ProductionCampaignPage implements OnInit {
     })
   }
   GetCurrentWO() {
-
-  }
-  GetCurrentCampaign() {
 
   }
   ClearCampaigns(table: any) {
@@ -139,23 +135,50 @@ export class ProductionCampaignPage implements OnInit {
   ViewOrder(wo: any) {
 
   }
-  AddToCurrentCampaign(wo: any) {
-    const payload = {
-      "campaign_id": this.currentCampaign.campaign_id,
-      "work_order_ids": [wo.work_order_id]
-    }
+  SaveSelectedFreeOrdersToCampaign() {
+    const payload = this.buildAssignPayload(
+      this.currentCampaign.campaign_id,
+      this.currentCampaign,
+      this.selectedFreeOrders
+    );
     this.changeDetector.detectChanges()
+    console.log(payload)
     this.apiService.PutRequestRender('work-orders/assign-campaign', payload).then(async (response: any) => {
       if (response.errorsExistFlag) {
         //this.alerts.Info(response.message);
       } else {
-        this.alerts.Success("WO: " + wo.code + " agregada a " + this.currentCampaign.code);
-        this.freeWorkOrdersArray = this.freeWorkOrdersArray.filter((w: any) => w.work_order_id != wo.work_order_id);
-        this.currentCampaign.work_orders.push(wo)
+        this.alerts.Success("Orden(s) de trabajo agregada(s)");
+        //this.GetCompleteOrder(this.currentCampaign.campaign_id)
         this.changeDetector.detectChanges()
+        this.isModalFreeOrdersOpen = false
       }
     });
+    /*this.freeWorkOrdersArray = this.freeWorkOrdersArray.filter((w: any) => w.work_order_id != wo.work_order_id);*/
   }
+  buildAssignPayload(campaign_id: number, currentCampaign: any, selectedFreeOrders: any[]) {
+    // Última secuencia de la campaña actual
+    let lastSequence = 0;
+    if (currentCampaign.work_orders?.length) {
+      // Busca el máximo valor de secuencia existente en la campaña
+      lastSequence = Math.max(...currentCampaign.work_orders.map((wo: any) => wo.sequence || 0));
+    }
+    // Empieza a sumar desde el último + 10
+    let sequenceCounter = lastSequence + 10;
+    // Construir payload
+    const work_orders = selectedFreeOrders.map((wo: any) => {
+      const payloadItem = {
+        work_order_id: parseInt(wo.work_order_id, 10),
+        sequence: sequenceCounter
+      };
+      sequenceCounter += 10; // incrementar de 10 en 10
+      return payloadItem;
+    });
+    return {
+      campaign_id,
+      work_orders
+    };
+  }
+
   SaveCampaign() {
     const payload = {
       organization_id: this.organizationSelected.OrganizationId,
@@ -186,20 +209,14 @@ export class ProductionCampaignPage implements OnInit {
         this.alerts.Info(response.message);
       } else {
         this.currentCampaign = response
-        console.log(response);
-
       }
     })
     this.apiService.GetRequestRender(`work-orders/without-campaign/${this.organizationSelected.OrganizationId}`, false).then((response: any) => {
-
       this.freeWorkOrdersArray = response.items
-
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
         this.workOrdersArray = response.items
-        console.log(this.workOrdersArray);
-
       }
     })
     this.showCampaign = true
@@ -276,7 +293,17 @@ export class ProductionCampaignPage implements OnInit {
 
   // Mostrar indicador de drop
   showDropIndicator(event: DragEvent, rowIndex: number) {
-    // Lógica para mostrar donde se va a insertar la fila
+    const targetItem = this.currentCampaign.work_orders[rowIndex];
+
+    // 🚫 Si el target está seleccionado, no muestres la línea
+    if (this.isSelected(targetItem)) {
+      this.removeDropIndicator();
+      return;
+    }
+
+    // Limpiar indicador previo
+    this.removeDropIndicator();
+
     const targetRow = event.currentTarget as HTMLElement;
     const rect = targetRow.getBoundingClientRect();
     const mouseY = event.clientY;
@@ -285,9 +312,27 @@ export class ProductionCampaignPage implements OnInit {
     // Determinar si insertar antes o después
     const insertAfter = mouseY > rowMiddle;
 
-    // Aquí puedes agregar lógica visual para mostrar la línea indicadora
-    this.dropIndicatorVisible = true;
+    // Crear línea indicadora
+    const indicator = document.createElement('div');
+    indicator.className = 'drop-indicator-temp';
+    indicator.style.position = 'absolute';
+    indicator.style.height = '2px';
+    indicator.style.background = 'red';
+    indicator.style.left = rect.left + 'px';
+    indicator.style.width = rect.width + 'px';
+    indicator.style.top = insertAfter ? rect.bottom + 'px' : rect.top + 'px';
+    indicator.style.zIndex = '9999';
+    indicator.style.pointerEvents = 'none';
+
+    document.body.appendChild(indicator);
   }
+
+  // 👇 función auxiliar para limpiar
+  removeDropIndicator() {
+    const old = document.querySelector('.drop-indicator-temp');
+    if (old) old.remove();
+  }
+
 
   // Mover filas seleccionadas a nueva posición
   moveSelectedRowsToPosition(targetIndex: number) {
@@ -306,11 +351,13 @@ export class ProductionCampaignPage implements OnInit {
 
     // Calcular nueva posición considerando elementos removidos
     let adjustedTargetIndex = targetIndex;
-    for (const selectedIndex of selectedIndices) {
+    /*for (const selectedIndex of selectedIndices) {
       if (selectedIndex < targetIndex) {
         adjustedTargetIndex--;
+        console.log(selectedIndex);
+        
       }
-    }
+    }*/
 
     // Insertar elementos en la nueva posición
     filteredArray.splice(adjustedTargetIndex, 0, ...selectedItems);
@@ -330,10 +377,10 @@ export class ProductionCampaignPage implements OnInit {
     // Guardar en el backend
     this.saveOrderSequence();
 
-    console.log('Secuencias actualizadas:', this.currentCampaign.work_orders.map((o: any) => ({
+    /*console.log('Secuencias actualizadas:', this.currentCampaign.work_orders.map((o: any) => ({
       work_order_number: o.work_order_number,
       sequence: o.sequence
-    })));
+    })));*/
   }
 
   // Función para rastrear filas (mejora el performance)
@@ -360,8 +407,23 @@ export class ProductionCampaignPage implements OnInit {
 
   // Guardar el nuevo orden en el backend
   saveOrderSequence() {
-    console.log('Guardando nueva secuencia...');
+    // Construir payload con secuencia basada en el orden actual
+    const payload = {
+      workOrders: this.currentCampaign.work_orders.map((order: any) => ({
+        work_order_id: order.work_order_id,
+        sequence: order.sequence
+      }))
+    };
+    this.apiService.PutRequestRender('work-orders/update-sequence', payload).then(async (response: any) => {
+      console.log(response);
 
+      if (response.errorsExistFlag) {
+        //this.alerts.Info(response.message);
+      } else {
+        this.alerts.Success("Secuencia actualizada");
+        this.changeDetector.detectChanges()
+      }
+    });
     // Ejemplo de implementación:
     // const sequenceData = this.currentCampaign.work_orders.map(order => ({
     //   work_order_number: order.work_order_number,

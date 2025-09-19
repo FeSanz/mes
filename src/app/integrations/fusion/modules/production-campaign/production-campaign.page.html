@@ -4,13 +4,22 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
+    <!--div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
           [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
           placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
           [virtualScrollItemSize]="38" (onChange)="GetCampaigns()" appendTo="body" />
         <label for="organization_select">Organización</label>
+      </p-floatlabel>
+    </div-->
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
+          [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
+          placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
+          [virtualScrollItemSize]="38" (onChange)="GetCampaigns()" appendTo="body" />
+        <label for="organization_select">Centro de trabajo</label>
       </p-floatlabel>
     </div>
   </ion-toolbar>
@@ -152,19 +161,17 @@
             <!-- Filtros / Buscador -->
             <ng-template #caption>
               <div class="table-caption">
-                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearOrders(dtOrders)" />
-                <div style="font-size: 25px;">Campaña de producción: <strong
-                    style="color: var(--ion-color-primary);">{{currentCampaign.code}}</strong></div>
-                <!-- Controles de selección -->
-                <div class="selection-controls">
-                  <p-button [outlined]="true" icon="pi pi-check-square" label="Seleccionar Todo" (click)="selectAll()"
-                    [disabled]="selectedOrders?.length === currentCampaign.work_orders?.length" />
-                  <p-button [outlined]="true" icon="pi pi-square" label="Deseleccionar" (click)="clearSelection()"
-                    [disabled]="!selectedOrders?.length" />
-                  <span *ngIf="selectedOrders?.length" class="selection-info">
-                    {{selectedOrders.length}} fila(s) seleccionada(s)
-                  </span>
+                <div class="table-caption-left">
+                  <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
+                    (click)="ClearOrders(dtOrders)" />
+                  <p-button class="btn-add" [outlined]="true" icon="pi pi-plus-circle" label="Agregar"
+                    variant="outlined" severity="info" (click)="isModalFreeOrdersOpen = true;" />
+                  <div style="font-size: 25px;">
+                    Campaña de producción:
+                    <strong style="color: var(--ion-color-primary);">{{currentCampaign.code}}</strong>
+                  </div>
                 </div>
+
                 <p-iconField iconPosition="left">
                   <p-inputIcon>
                     <i class="fas fa-search"></i>
@@ -175,6 +182,7 @@
               </div>
             </ng-template>
 
+
             <!-- Encabezado -->
             <ng-template pTemplate="header">
               <tr>
@@ -183,6 +191,8 @@
                 </th>
                 <th pSortableColumn="work_order_number" class="td-center">Orden #<p-sortIcon
                     field="work_order_number" /></th>
+                <th pSortableColumn="machine_name" class="td-center">Seq.</th>
+                <th pSortableColumn="machine_name" class="td-center">Lote</th>
                 <th pSortableColumn="item_number" class="td-center">Item <p-sortIcon field="item_number" /></th>
                 <th pSortableColumn="item_description" class="td-center">Descripción <p-sortIcon
                     field="item_description" /></th>
@@ -197,26 +207,29 @@
             </ng-template>
 
             <!-- Cuerpo -->
-            <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <ng-template pTemplate="body" let-item let-rowIndex="rowIndex" let-index="rowIndex">
               <tr [class.selected-row]="isSelected(item)" [class.draggable-row]="selectedOrders.length > 0"
-                [draggable]="selectedOrders.length > 0 && isSelected(item)" (dragstart)="onDragStart($event, item)"
-                (dragover)="onDragOver($event, rowIndex)" (drop)="onDrop($event, rowIndex)"
-                (dragend)="onDragEnd($event)"
-                [style.cursor]="selectedOrders.length > 0 && isSelected(item) ? 'move' : 'default'">
+                [pSelectableRow]="item" [draggable]="selectedOrders.length > 0 && isSelected(item)"
+                (dragstart)="onDragStart($event, item)" (dragover)="onDragOver($event, rowIndex)"
+                (drop)="onDrop($event, rowIndex)" (dragend)="onDragEnd($event)"
+                [style.cursor]="selectedOrders.length > 0 && isSelected(item) ? 'move' : 'default'"
+                [pSelectableRowDisabled]="false">
 
-                <td (click)="$event.stopPropagation()">
+                <td>
                   <p-tableCheckbox [value]="item"></p-tableCheckbox>
                 </td>
-                <td class="td-center draggable-cell">
+                <td class="td-center">
                   <p-tag [value]="item.work_order_number" [severity]="'contrast'" />
                 </td>
-                <td class="td-center draggable-cell">{{ item.item_number }}</td>
-                <td class="td-center draggable-cell">{{ item.item_description }}</td>
-                <td class="td-center draggable-cell"><strong>{{ item.planned_quantity + ' ' + item.uom }}</strong></td>
-                <td class="td-center draggable-cell">{{ item.machine_name }}</td>
-                <td class="td-center draggable-cell">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
-                <td class="td-center draggable-cell">{{ item.end_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
-                <td class="td-center draggable-cell">
+                <td class="td-center">{{ item.sequence }}</td>
+                <td class="td-center"><strong>NJ{{ item.work_order_number }}</strong></td>
+                <td class="td-center">{{ item.item_number }}</td>
+                <td class="td-center">{{ item.item_description }}</td>
+                <td class="td-center"><strong>{{ item.planned_quantity + ' ' + item.uom }}</strong></td>
+                <td class="td-center">{{ item.machine_name }}</td>
+                <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
+                <td class="td-center">{{ item.end_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
+                <td class="td-center">
                   <p-tag
                     [value]="item.status === 'RELEASED' ? 'Liberada' : item.status === 'IN_PROCESS' ? 'En proceso' : item.status === 'COMPLETED' ? 'Completada' : ''"
                     [severity]="item.status === 'RELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
@@ -233,88 +246,7 @@
             <!-- Mensaje vacío -->
             <ng-template pTemplate="emptymessage">
               <tr>
-                <td colspan="10">No se encontraron órdenes de producción.</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </ion-card>
-        <ion-card *ngIf="showCampaign">
-          <p-table #dtOrders [value]="freeWorkOrdersArray" dataKey="order"
-            styleClass="card-table-primeng orders-table-custom" [tableStyle]="{ 'height': '100%'}" [size]="'small'"
-            [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
-            [globalFilterFields]="['campaign','order','componentItemDescription','itemDescription','status']"
-            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-            [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true"
-            [scrollHeight]="scrollHeight" [sortOrder]="1">
-            <!-- Filtros / Buscador -->
-            <ng-template #caption>
-              <div class="table-caption">
-                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearOrders(dtOrders)" />
-
-                <div style="font-size: 25px;">Órdenes de trabajo sin campaña</div> <!-- Spacer -->
-
-                <p-iconField iconPosition="left">
-                  <p-inputIcon>
-                    <i class="fas fa-search"></i>
-                  </p-inputIcon>
-                  <input pInputText type="text" [(ngModel)]="searchOrders" (input)="OnFilterGlobal($event, dtOrders)"
-                    placeholder="Buscar" />
-                </p-iconField>
-              </div>
-            </ng-template>
-            <!-- Encabezado -->
-            <ng-template pTemplate="header">
-              <tr>
-                <!--th> </th>
-                <th pSortableColumn="seq">Seq # <p-sortIcon field="seq" /></th-->
-                <th pSortableColumn="work_order_number" class="td-center">Orden #<p-sortIcon
-                    field="work_order_number" />
-                </th>
-                <th pSortableColumn="item_number" class="td-center">Item <p-sortIcon field="order" /></th>
-                <th pSortableColumn="item_description" class="td-center">Descripción
-                  <p-sortIcon field="item_description" />
-                </th>
-                <th pSortableColumn="planned_quantity" class="td-center">Cantidad planeada <p-sortIcon
-                    field="coilLot" /></th>
-                <th pSortableColumn="machine_name" class="td-center">Máquina <p-sortIcon field="materialStatus" /></th>
-                <th pSortableColumn="start_date" class="td-center">Fecha inicio <p-sortIcon field="coilLocation" /></th>
-                <th pSortableColumn="end_date" class="td-center">Fecha fin <p-sortIcon field="innerDiameter" /></th>
-                <th pSortableColumn="status" class="td-center">Estado <p-sortIcon field="status" /></th>
-                <th class="td-center">Acciones</th>
-              </tr>
-            </ng-template>
-            <!-- Cuerpo -->
-            <ng-template pTemplate="body" let-item>
-              <tr>
-                <!--td class="td-center"><ion-icon class="drag-handle" name="reorder-three-outline"
-                    size="large"></ion-icon>
-                </td>
-                < td class="td-center">{{ item.secuence }}</td-->
-                <td class="td-center">{{ item.work_order_number }}</td>
-                <td class="td-center">{{ item.item_number }}</td>
-                <td class="td-center">{{ item.item_description }}</td>
-                <td class="td-center"><strong>{{ item.planned_quantity + ' ' + item.uom }}</strong></td>
-                <td class="td-center">{{ item.machine_name }}</td>
-                <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
-                <td class="td-center">{{ item.end_date | date: 'dd/MM/yyyy hh:mm a' }}</td>
-                <td class="td-center">
-                  <p-tag
-                    [value]="item.status === 'RELEASED' ? 'Liberada' : item.status === 'IN_PROCESS' ? 'En proceso' : item.status === 'COMPLETED' ? 'Completada' : ''"
-                    [severity]="item.status === 'RELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
-                  </p-tag>
-                </td>
-                <td class="td-center">
-                  <ion-button size="small" shape="round" color="primary" (click)="AddToCurrentCampaign(item)"
-                    title="Agregar a la campaña">
-                    <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-                  </ion-button>
-                </td>
-              </tr>
-            </ng-template>
-            <!-- Mensaje vacío -->
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="17">No se encontraron órdenes de producción.</td>
+                <td colspan="10">No se encontraron órdenes de trabajo.</td>
               </tr>
             </ng-template>
           </p-table>
@@ -416,6 +348,102 @@
         </ion-fab>
 
       </ion-content>
+    </ng-template>
+  </ion-modal>
+  <ion-modal [isOpen]="isModalFreeOrdersOpen" (ionModalWillDismiss)="isModalFreeOrdersOpen = false" [focusTrap]="false">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Órdenes de trabajo sin campaña</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="isModalFreeOrdersOpen = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding"><p-table #dtOrders [value]="freeWorkOrdersArray" [(selection)]="selectedFreeOrders"
+          dataKey="work_order_number" selectionMode="multiple" styleClass="card-table-primeng orders-table-custom"
+          [tableStyle]="{ 'height': '100%'}" [size]="'small'" [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
+          [globalFilterFields]="['campaign','order','componentItemDescription','itemDescription','status']"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+          [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true" [scrollHeight]="scrollHeight"
+          [sortOrder]="1">
+
+          <!-- Filtros / Buscador -->
+          <ng-template #caption>
+            <div class="table-caption">
+              <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearOrders(dtOrders)" />
+              <p-iconField iconPosition="left">
+                <p-inputIcon>
+                  <i class="fas fa-search"></i>
+                </p-inputIcon>
+                <input pInputText type="text" [(ngModel)]="searchOrders" (input)="OnFilterGlobal($event, dtOrders)"
+                  placeholder="Buscar" />
+              </p-iconField>
+            </div>
+          </ng-template>
+
+          <!-- Encabezado -->
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3rem"></th> <!-- columna de selección -->
+              <th pSortableColumn="work_order_number" class="td-center">
+                Orden #<p-sortIcon field="work_order_number" />
+              </th>
+              <th pSortableColumn="item_number" class="td-center">
+                Item <p-sortIcon field="item_number" />
+              </th>
+              <th pSortableColumn="machine_name" class="td-center">
+                Máquina <p-sortIcon field="machine_name" />
+              </th>
+              <th pSortableColumn="status" class="td-center">
+                Estado <p-sortIcon field="status" />
+              </th>
+            </tr>
+          </ng-template>
+
+          <!-- Cuerpo -->
+          <ng-template pTemplate="body" let-item>
+            <tr [pSelectableRow]="item">
+              <td>
+                <p-tableCheckbox [value]="item"></p-tableCheckbox>
+              </td>
+              <td class="td-center">{{ item.work_order_number }}</td>
+              <td class="td-center">{{ item.item_number }}</td>
+              <td class="td-center">{{ item.machine_name }}</td>
+              <td class="td-center">
+                <p-tag
+                  [value]="item.status === 'RELEASED' ? 'Liberada' : item.status === 'IN_PROCESS' ? 'En proceso' : item.status === 'COMPLETED' ? 'Completada' : ''"
+                  [severity]="item.status === 'RELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
+                </p-tag>
+              </td>
+            </tr>
+          </ng-template>
+
+          <!-- Mensaje vacío -->
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5">No se encontraron órdenes de trabajo.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+      </ion-content>
+
+      <ion-footer class="footer-style">
+        <ion-row>
+          <ion-col size="6">
+            <ion-button expand="block" color="danger" (click)="isModalFreeOrdersOpen = false">
+              CERRAR
+            </ion-button>
+          </ion-col>
+          <ion-col size="6">
+            <ion-button expand="block" color="success" (click)="SaveSelectedFreeOrdersToCampaign()">
+              GUARDAR
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-footer>
     </ng-template>
   </ion-modal>
 

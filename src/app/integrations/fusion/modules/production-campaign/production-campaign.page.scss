@@ -18,6 +18,11 @@ ion-select::part(label) {
   color: var(--ion-color-primary);
 }
 
+.drop-indicator-temp {
+  z-index: 9999;
+  pointer-events: none;
+}
+
 /* Estilos para la tabla con drag & drop */
 .orders-table-custom {
   .selected-row {
@@ -92,31 +97,6 @@ body.dragging-active {
   -ms-user-select: none;
 }
 
-/* Estilos para los controles de selección */
-.table-caption {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1rem;
-  border-bottom: 1px solid #e9ecef;
-
-  .selection-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    .selection-info {
-      background: rgba(var(--ion-color-primary-rgb), 0.1);
-      color: var(--ion-color-primary);
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-  }
-}
 
 /* Animaciones suaves */
 .p-datatable-tbody>tr {
@@ -133,20 +113,23 @@ body.dragging-active {
   background-color: rgba(var(--ion-color-primary-rgb), 0.05);
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .table-caption {
-    flex-direction: column;
-    align-items: stretch;
+.table-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* separación entre izquierda y derecha */
+  gap: 1rem;
+  flex-wrap: wrap;
+  /* evita desbordes */
+}
 
-    .selection-controls {
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-  }
-
-  /* En móviles, hacer el cursor más obvio */
-  .orders-table-custom .draggable-row .draggable-cell {
-    cursor: grab;
-  }
+.table-caption-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* separación entre botones */
+}
+/* Footer */
+.footer-style {
+  background-color: var(--ion-color-back);
 }
