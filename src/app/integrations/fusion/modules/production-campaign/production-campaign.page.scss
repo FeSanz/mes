@@ -129,7 +129,34 @@ body.dragging-active {
   gap: 0.5rem;
   /* separación entre botones */
 }
+
+.table-caption-right {
+  display: flex;
+  justify-content: flex-end;
+  /* Alinea al final, es decir, a la derecha */
+  align-items: center;
+  /* Opcional: centra verticalmente */
+}
+
 /* Footer */
 .footer-style {
   background-color: var(--ion-color-back);
+}
+
+.center-select {
+  display: flex;
+  justify-content: center;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.clickable-row:hover {
+  background-color: #f0f4ff;
+  /* azul clarito al pasar el mouse */
+}
+ion-datetime-button::part(native) {
+    background-color: var(--ion-color-secondary);
 }

@@ -15,11 +15,10 @@
     </div-->
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
-        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
-          [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
-          placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
-          [virtualScrollItemSize]="38" (onChange)="GetCampaigns()" appendTo="body" />
-        <label for="organization_select">Centro de trabajo</label>
+        <p-select [(ngModel)]="workCenter" inputId="workCenter" [options]="workCenters" optionLabel="WorkAreaName"
+          [filter]="true" filterBy="WorkCenterId" placeholder="Seleccione centro de trabajo" styleClass="w-full"
+          [virtualScroll]="true" [virtualScrollItemSize]="38" (onChange)="GetCampaigns()" appendTo="body" />
+        <label for="workCenter">Centro de trabajo</label>
       </p-floatlabel>
     </div>
   </ion-toolbar>
@@ -27,7 +26,7 @@
 <ion-content [fullscreen]="true">
   <ion-breadcrumbs>
     <ion-breadcrumb (click)="GetCampaigns()" style="cursor: pointer;">Campañas</ion-breadcrumb>
-    <ion-breadcrumb (click)="GetCompleteOrder(currentCampaign)" *ngIf="currentCampaign.campaign_id"
+    <ion-breadcrumb (click)="GetCompleteCampaign(currentCampaign)" *ngIf="currentCampaign.campaign_id"
       style="cursor: pointer;">{{currentCampaign.code}}</ion-breadcrumb>
     <ion-breadcrumb (click)="GetCurrentWO()" *ngIf="currentWO.work_order_number"
       style="cursor: pointer;">{{currentWO.work_order_number}}</ion-breadcrumb>
@@ -39,7 +38,7 @@
           <p-table #dtCampaigns [value]="campaignsArray" dataKey="campaign"
             styleClass="card-table-primeng wo-table-custom" [tableStyle]="{ 'height': '100%'}" [size]="'small'"
             [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
-            [globalFilterFields]="['campaignName', 'status', 'workArea']"
+            [globalFilterFields]="['code', 'name', 'status_telegram', 'coils']"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true"
             [scrollHeight]="scrollHeight" [sortOrder]="1">
@@ -47,18 +46,24 @@
             <!-- Encabezado con buscador -->
             <ng-template #caption>
               <div class="table-caption">
-                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
-                  (click)="ClearCampaigns(dtCampaigns)" />
-
-                <div style="font-size: 25px;">Campañas de producción</div> <!-- Spacer -->
-
-                <p-iconField iconPosition="left">
-                  <p-inputIcon>
-                    <i class="fas fa-search"></i>
-                  </p-inputIcon>
-                  <input pInputText type="text" [(ngModel)]="searchValueAl"
-                    (input)="OnFilterGlobal($event, dtCampaigns)" placeholder="Buscar" />
-                </p-iconField>
+                <div class="table-caption-left">
+                  <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
+                    (click)="ClearCampaigns(dtCampaigns)" />
+                  <p-button [outlined]="true" icon="pi pi-plus-circle" label="Nueva campaña" variant="outlined"
+                    severity="info" (click)="ShowNewCampaign()" />
+                  <div style="font-size: 25px;">
+                    Campañas de producción
+                  </div>
+                </div>
+                <div class="table-caption-right">
+                  <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                      <i class="fas fa-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" [(ngModel)]="searchValueAl"
+                      (input)="OnFilterGlobal($event, dtCampaigns)" placeholder="Buscar" />
+                  </p-iconField>
+                </div>
               </div>
             </ng-template>
 
@@ -81,13 +86,6 @@
                     <p-columnFilter type="text" field="campaignName" display="menu" class="ml-auto" />
                   </div>
                 </th>
-                <th pSortableColumn="status" class="td-center">
-                  <div class="flex justify-between items-center">
-                    Status
-                    <p-sortIcon field="status" />
-                    <p-columnFilter type="text" field="status" display="menu" class="ml-auto" />
-                  </div>
-                </th>
                 <th pSortableColumn="scheduledCoils" class="td-center">
                   <div class="flex justify-between items-center">
                     Coils
@@ -107,33 +105,39 @@
                     <p-sortIcon field="estimate" />
                   </div>
                 </th>
+                <th pSortableColumn="status" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Status
+                    <p-sortIcon field="status" />
+                    <p-columnFilter type="text" field="status" display="menu" class="ml-auto" />
+                  </div>
+                </th>
                 <th class="td-center">Acciones</th>
               </tr>
             </ng-template>
 
             <!-- Cuerpo -->
             <ng-template pTemplate="body" let-item>
-              <tr>
-                <td class="td-center" style="cursor: pointer;">
-                  <p-tag [value]="item.code" [severity]="'contrast'" (click)="GetCompleteOrder(item)" />
+              <tr class="clickable-row" (click)="GetCompleteCampaign(item)">
+                <td class="td-center">
+                  <p-tag [value]="item.code" severity="contrast"></p-tag>
                 </td>
                 <td class="td-center"><strong>{{ item.name }}</strong></td>
-                <td class="td-center">{{ item.status_telegram }}</td>
-                <td class="td-center">{{ item.coils }}</td>
-                <td class="td-center">{{ item.start_date }}</td>
-                <td class="td-center">{{ item.end_date }}</td>
+                <td class="td-center"><strong>{{ item.coils }}</strong></td>
+                <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a' }}</td>
+                <td class="td-center">{{ item.end_date | date: 'dd/MM/yyyy hh:mm a' }}</td>
                 <td class="td-center">
-                  <ion-button size="small" shape="round" color="primary" (click)="AddWoToCampaign(item)" title="Añadir">
-                    <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-                  </ion-button>
-                  <ion-button size="small" shape="round" color="success" (click)="EditCampaign(item)" title="Editar">
-                    <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
-                  </ion-button>
-                  <ion-button size="small" shape="round" color="danger" (click)="DeleteCampaign(item)" title="Eliminar">
+                  <p-tag [value]="item.status_telegram === 'Unschedule' ? 'Unschedule' : 
+                 item.status_telegram === 'Published' ? 'Published' : 
+                 item.status_telegram === 'Publish' ? 'Publish' : '?'" [severity]="item.status_telegram === 'Unschedule' ? 'warn' : 
+                    item.status_telegram === 'Published' ? 'info' : 
+                    item.status_telegram === 'Publish' ? 'success' : 'danger'">
+                  </p-tag>
+                </td>
+                <td class="td-center">
+                  <ion-button size="small" shape="round" color="danger"
+                    (click)="$event.stopPropagation(); DeleteCampaign(item)" title="Eliminar">
                     <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-                  </ion-button>
-                  <ion-button size="small" shape="round" color="tertiary" (click)="ViewCampaign(item)" title="Ver">
-                    <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
                   </ion-button>
                 </td>
               </tr>
@@ -152,7 +156,7 @@
           <p-table #dtOrders [value]="currentCampaign.work_orders" dataKey="work_order_number"
             styleClass="card-table-primeng orders-table-custom" [tableStyle]="{ 'height': '100%'}" [size]="'small'"
             [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
-            [globalFilterFields]="['campaign','order','componentItemDescription','itemDescription','status']"
+            [globalFilterFields]="['work_order_number','item_number','item_description','planned_quantity','machine_name', 'status']"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true"
             [scrollHeight]="scrollHeight" [sortOrder]="1" [selection]="selectedOrders" [selectionMode]="'multiple'"
@@ -171,14 +175,17 @@
                     <strong style="color: var(--ion-color-primary);">{{currentCampaign.code}}</strong>
                   </div>
                 </div>
-
-                <p-iconField iconPosition="left">
-                  <p-inputIcon>
-                    <i class="fas fa-search"></i>
-                  </p-inputIcon>
-                  <input pInputText type="text" [(ngModel)]="searchOrders" (input)="OnFilterGlobal($event, dtOrders)"
-                    placeholder="Buscar" />
-                </p-iconField>
+                <div class="table-caption-right">
+                  <p-button class="btn-add" [outlined]="true" icon="pi pi-delete-left" label="Eliminar"
+                    *ngIf="selectedOrders.length > 0" variant="outlined" severity="danger" (click)="DeleteOrders()" />
+                  <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                      <i class="fas fa-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" [(ngModel)]="searchOrders" (input)="OnFilterGlobal($event, dtOrders)"
+                      placeholder="Buscar" />
+                  </p-iconField>
+                </div>
               </div>
             </ng-template>
 
@@ -191,8 +198,8 @@
                 </th>
                 <th pSortableColumn="work_order_number" class="td-center">Orden #<p-sortIcon
                     field="work_order_number" /></th>
-                <th pSortableColumn="machine_name" class="td-center">Seq.</th>
-                <th pSortableColumn="machine_name" class="td-center">Lote</th>
+                <th pSortableColumn="sequence" class="td-center">Seq.</th>
+                <th class="td-center">Lote</th>
                 <th pSortableColumn="item_number" class="td-center">Item <p-sortIcon field="item_number" /></th>
                 <th pSortableColumn="item_description" class="td-center">Descripción <p-sortIcon
                     field="item_description" /></th>
@@ -222,7 +229,15 @@
                   <p-tag [value]="item.work_order_number" [severity]="'contrast'" />
                 </td>
                 <td class="td-center">{{ item.sequence }}</td>
-                <td class="td-center"><strong>NJ{{ item.work_order_number }}</strong></td>
+                <td class="td-center center-select" (click)="$event.stopPropagation()">
+                  <ion-select [(ngModel)]="item.selectedLot" aria-label="Lote" interface="popover"
+                    (ionChange)="SaveLotOnWO($event, item)" (click)="$event.stopPropagation()"
+                    (ionFocus)="GetItemLots(item)" placeholder="Seleccione lote">
+                    <ion-select-option [value]="lot.name" *ngFor="let lot of item.lots">
+                      {{lot.name}}
+                    </ion-select-option>
+                  </ion-select>
+                </td>
                 <td class="td-center">{{ item.item_number }}</td>
                 <td class="td-center">{{ item.item_description }}</td>
                 <td class="td-center"><strong>{{ item.planned_quantity + ' ' + item.uom }}</strong></td>
@@ -231,8 +246,8 @@
                 <td class="td-center">{{ item.end_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
                 <td class="td-center">
                   <p-tag
-                    [value]="item.status === 'RELEASED' ? 'Liberada' : item.status === 'IN_PROCESS' ? 'En proceso' : item.status === 'COMPLETED' ? 'Completada' : ''"
-                    [severity]="item.status === 'RELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
+                    [value]="item.status === 'UNRELEASED' ? 'Sin liberar' : item.status === 'IN_PROCESS' ? 'En proceso' : item.status === 'COMPLETED' ? 'Completada' : ''"
+                    [severity]="item.status === 'UNRELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
                   </p-tag>
                 </td>
                 <td class="td-center" (click)="$event.stopPropagation()">
@@ -254,100 +269,107 @@
       </ion-col>
     </ion-row>
   </ion-grid>
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="!showCampaign">
-    <ion-fab-button (click)="ShowNewCampaign()">
-      <ion-icon name="add-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 
   <ion-modal [isOpen]="isModalNewCampaign" (ionModalWillDismiss)="isModalNewCampaign = false" [focusTrap]="false">
     <ng-template>
       <ion-header>
         <ion-toolbar color="primary">
           <ion-title>Nueva campaña</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="isModalNewCampaign = false">Cerrar</ion-button>
-          </ion-buttons>
         </ion-toolbar>
       </ion-header>
 
       <ion-content class="ion-padding">
-
         <!-- Código -->
-        <ion-item color="light">
+        <ion-item>
           <ion-input type="text" placeholder="Ej: CMP-001" [(ngModel)]="campaignObj.code">
             <div slot="label"><ion-text color="primary">Código:</ion-text></div>
           </ion-input>
         </ion-item>
-
         <!-- Nombre -->
-        <ion-item color="light">
+        <ion-item>
           <ion-input type="text" placeholder="Ej: Campaña Julio 2025" [(ngModel)]="campaignObj.name">
             <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
           </ion-input>
         </ion-item>
-
         <!-- Descripción -->
-        <ion-item color="light">
+        <ion-item>
           <ion-input type="text" placeholder="Descripción de la campaña" [(ngModel)]="campaignObj.description">
             <div slot="label"><ion-text color="primary">Descripción:</ion-text></div>
           </ion-input>
         </ion-item>
-
+        <ion-item>
+          <ion-label slot="start" color="primary">Centro de trabajo:</ion-label>
+          <ion-label slot="end" style="text-align: right;">{{workCenter.WorkAreaName}}</ion-label>
+        </ion-item>
         <!-- Fechas -->
-        <ion-item color="light">
-          <ion-text color="primary">Inicio:</ion-text>
-          <ion-datetime-button datetime="plannedStartDate"></ion-datetime-button>
-          <ion-text color="primary" slot="end">Fin:</ion-text>
+        <ion-item>
+          <ion-label style="color: var(--ion-color-primary);">Fecha de inicio:</ion-label>
+          <ion-datetime-button datetime="plannedStartDate" slot="end"></ion-datetime-button>
+        </ion-item>
+        <ion-item>
+          <ion-label style="color: var(--ion-color-primary);">Fecha de finalización:</ion-label>
           <ion-datetime-button datetime="plannedEndDate" slot="end"></ion-datetime-button>
         </ion-item>
-
         <!-- Modal inicio -->
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
             <ion-datetime id="plannedStartDate" [(ngModel)]="campaignObj.plannedStartDate" locale="es-MX"
-              hourCycle="h12" presentation="date-time" show-default-buttons="true" cancel-text="Cancelar"
-              done-text="Confirmar">
+              hourCycle="h12" presentation="date-time" show-default-buttons="true" [min]="todayDate"
+              [max]="campaignObj.plannedEndDate" cancel-text="Cancelar" done-text="Confirmar">
               <span slot="title">Fecha de inicio</span>
             </ion-datetime>
           </ng-template>
         </ion-modal>
-
         <!-- Modal fin -->
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
             <ion-datetime id="plannedEndDate" [(ngModel)]="campaignObj.plannedEndDate" locale="es-MX" hourCycle="h12"
-              presentation="date-time" show-default-buttons="true" cancel-text="Cancelar" done-text="Confirmar">
+              presentation="date-time" show-default-buttons="true" [min]="campaignObj.plannedStartDate"
+              cancel-text="Cancelar" done-text="Confirmar">
               <span slot="title">Fecha de fin</span>
             </ion-datetime>
           </ng-template>
         </ion-modal>
 
         <!-- Estado inicial -->
-        <ion-item color="light">
+        <!--ion-item color="light">
           <ion-select label="Estado:" placeholder="Selecciona estado" [(ngModel)]="campaignObj.status_telegram">
-            <ion-select-option value="CREATED">CREATED</ion-select-option>
-            <ion-select-option value="PLANNED">PLANNED</ion-select-option>
-            <ion-select-option value="RUNNING">RUNNING</ion-select-option>
-            <ion-select-option value="CLOSED">CLOSED</ion-select-option>
+            <ion-select-option value="Unschedule">Unschedule</ion-select-option>
+            <ion-select-option value="Published">Published to MES</ion-select-option>
+            <ion-select-option value="Publish">Publish to L2</ion-select-option>
           </ion-select>
-        </ion-item>
+        </ion-item-->
 
         <!-- Habilitada -->
-        <ion-item color="light">
+        <!--ion-item color="light">
           <ion-toggle [(ngModel)]="campaignObj.enabled_flag" [checked]="true"
             (ionChange)="campaignObj.enabled_flag = $event.detail.checked ? 'Y' : 'N'">Habilitada:
           </ion-toggle>
-        </ion-item>
+        </ion-item-->
 
         <!-- Botón guardar -->
-        <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+        <!--ion-fab slot="fixed" vertical="bottom" horizontal="end">
           <ion-fab-button color="success" (click)="SaveCampaign()">
             <ion-icon name="checkmark"></ion-icon>
           </ion-fab-button>
-        </ion-fab>
+        </ion-fab-->
 
       </ion-content>
+      <ion-footer class="footer-style">
+        <ion-row>
+          <ion-col size="6">
+            <ion-button expand="block" color="danger" (click)="isModalNewCampaign = false">
+              CERRAR
+            </ion-button>
+          </ion-col>
+          <ion-col size="6">
+            <ion-button expand="block" color="success" (click)="SaveCampaign()"
+              [disabled]="campaignObj.code == '' || campaignObj.name == ''">
+              GUARDAR
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-footer>
     </ng-template>
   </ion-modal>
   <ion-modal [isOpen]="isModalFreeOrdersOpen" (ionModalWillDismiss)="isModalFreeOrdersOpen = false" [focusTrap]="false">
@@ -355,20 +377,17 @@
       <ion-header>
         <ion-toolbar color="primary">
           <ion-title>Órdenes de trabajo sin campaña</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="isModalFreeOrdersOpen = false">Cerrar</ion-button>
-          </ion-buttons>
         </ion-toolbar>
       </ion-header>
 
-      <ion-content class="ion-padding"><p-table #dtOrders [value]="freeWorkOrdersArray" [(selection)]="selectedFreeOrders"
-          dataKey="work_order_number" selectionMode="multiple" styleClass="card-table-primeng orders-table-custom"
-          [tableStyle]="{ 'height': '100%'}" [size]="'small'" [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
-          [globalFilterFields]="['campaign','order','componentItemDescription','itemDescription','status']"
+      <ion-content class="ion-padding"><p-table #dtOrders [value]="freeWorkOrdersArray"
+          [(selection)]="selectedFreeOrders" dataKey="work_order_number" selectionMode="multiple"
+          styleClass="card-table-primeng orders-table-custom" [tableStyle]="{ 'height': '100%'}" [size]="'small'"
+          [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
+          [globalFilterFields]="['work_order_number','item_number','machine_name','itemDescription','status']"
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
           [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true" [scrollHeight]="scrollHeight"
           [sortOrder]="1">
-
           <!-- Filtros / Buscador -->
           <ng-template #caption>
             <div class="table-caption">
@@ -382,7 +401,6 @@
               </p-iconField>
             </div>
           </ng-template>
-
           <!-- Encabezado -->
           <ng-template pTemplate="header">
             <tr>
@@ -401,7 +419,6 @@
               </th>
             </tr>
           </ng-template>
-
           <!-- Cuerpo -->
           <ng-template pTemplate="body" let-item>
             <tr [pSelectableRow]="item">
@@ -413,13 +430,12 @@
               <td class="td-center">{{ item.machine_name }}</td>
               <td class="td-center">
                 <p-tag
-                  [value]="item.status === 'RELEASED' ? 'Liberada' : item.status === 'IN_PROCESS' ? 'En proceso' : item.status === 'COMPLETED' ? 'Completada' : ''"
-                  [severity]="item.status === 'RELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
+                  [value]="item.status === 'UNRELEASED' ? 'Sin liberar' : item.status === 'IN_PROCESS' ? 'En proceso' : item.status === 'COMPLETED' ? 'Completada' : ''"
+                  [severity]="item.status === 'UNRELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
                 </p-tag>
               </td>
             </tr>
           </ng-template>
-
           <!-- Mensaje vacío -->
           <ng-template pTemplate="emptymessage">
             <tr>
@@ -427,9 +443,7 @@
             </tr>
           </ng-template>
         </p-table>
-
       </ion-content>
-
       <ion-footer class="footer-style">
         <ion-row>
           <ion-col size="6">
@@ -447,66 +461,11 @@
     </ng-template>
   </ion-modal>
 
-  <ion-modal [isOpen]="isModalNewWO" (ionModalWillDismiss)="isModalNewWO = false" [focusTrap]="false">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar color="primary">
-          <ion-title>Nueva Work Order</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="isModalNewWO = false">Cerrar</ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-
-      <ion-content class="ion-padding">
-        <ion-item color="light">
-          <ion-input type="text" placeholder="Ej: WO12345" [(ngModel)]="woObj.order_number">
-            <div slot="label"><ion-text color="primary">Número WO:</ion-text></div>
-          </ion-input>
-        </ion-item>
-        <ion-item color="light">
-          <ion-input type="text" placeholder="Ej: NC1000823" [(ngModel)]="woObj.component_item">
-            <div slot="label"><ion-text color="primary">Componente:</ion-text></div>
-          </ion-input>
-        </ion-item>
-        <ion-item color="light">
-          <ion-input type="text" placeholder="Ej: N10138928" [(ngModel)]="woObj.coil_lot">
-            <div slot="label"><ion-text color="primary">Coil Lot:</ion-text></div>
-          </ion-input>
-        </ion-item>
-        <ion-item color="light">
-          <ion-input type="number" placeholder="Ej: 25000" [(ngModel)]="woObj.quantity">
-            <div slot="label"><ion-text color="primary">Cantidad:</ion-text></div>
-          </ion-input>
-        </ion-item>
-        <ion-item color="light">
-          <ion-select placeholder="Selccione el item">
-            <div slot="label"><ion-text color="primary">Item:</ion-text></div>
-            <ion-select-option value="CC1001969">CC1001969</ion-select-option>
-            <ion-select-option value="CC10019025">CC10019025</ion-select-option>
-            <ion-select-option value="CP1001969">CP1001969</ion-select-option>
-          </ion-select>
-        </ion-item>
-        <!--ion-item>
-          <ion-datetime displayFormat="YYYY-MM-DD HH:mm" [(ngModel)]="woObj.start_time">
-            <div slot="label"><ion-text color="primary">Inicio estimado:</ion-text></div>
-          </ion-datetime>
-        </ion-item-->
-
-        <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-          <ion-fab-button color="success">
-            <ion-icon name="checkmark"></ion-icon>
-          </ion-fab-button>
-        </ion-fab>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
-
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="showCampaign">
+  <!--ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="showCampaign">
     <ion-fab-button (click)="ShowNewWO()">
       <ion-icon name="add-outline"></ion-icon>
     </ion-fab-button>
-  </ion-fab>
+  </ion-fab-->
 
   <!--p-table [value]="products" [(selection)]="selectedProducts" selectionMode="multiple" [reorderableRows]="true"
     (onRowReorder)="onRowReorder($event)">

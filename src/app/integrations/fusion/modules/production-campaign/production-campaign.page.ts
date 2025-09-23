@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonModal, IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea,
-  IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton
+  IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton,
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
@@ -26,10 +26,10 @@ import { InputText } from 'primeng/inputtext';
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
-    IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol, ButtonModule, IonButtons, IonButton
-    , InputText]
+    IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
+    ButtonModule, IonButtons, IonButton, InputText,]
 })
-export class ProductionCampaignPage implements OnInit {
+export class ProductionCampaignPage {
   campaignsArray: any = []
   workOrdersArray: any = []
   freeWorkOrdersArray: any = []
@@ -57,38 +57,66 @@ export class ProductionCampaignPage implements OnInit {
     code: '',
     name: '',
     description: '',
-    status_telegram: 'CREATED',
+    status_telegram: 'Unschedule',
     enabled_flag: 'Y',
     plannedStartDate: '2025-09-11T13:34:49',
     plannedEndDate: '2025-09-11T13:34:49'
   }
+  todayDate: any = {}
   woObj: any = {}
   organizationSelected: string | any = '';
   selectedProducts: any[] = [];
-
+  workCenter: any = {}
+  workCenters: any = []
   selectedOrders: any[] = [];
   selectedFreeOrders: any[] = [];
   isDragging: boolean = false;
   draggedItems: any[] = [];
   dropIndicatorVisible: boolean = false;
+  /*lots = [
+    { id: 1, name: 'Lote A', available: 120 },
+    { id: 2, name: 'Lote B', available: 50 },
+    { id: 3, name: 'Lote C', available: 0 }
+  ];*/
   constructor(
     private alerts: AlertsService,
     private apiService: ApiService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
-    this.organizationSelected = this.userData.Company.Organizations[1];
+    this.organizationSelected = this.userData.Company.Organizations[2];
     addIcons({ addOutline, pencilOutline, trashOutline, eyeOutline, moveOutline, reorderThreeOutline, checkmark });
   }
 
-  ngOnInit() {
+  formatLocalISO(date: Date): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T` +
+      `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   }
-
   ionViewDidEnter() {
-    this.GetCampaigns()
+    this.todayDate = this.formatLocalISO(new Date())
+    this.campaignObj.plannedStartDate = this.formatLocalISO(
+      new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
+    );
+    this.campaignObj.plannedEndDate = this.formatLocalISO(
+      new Date(new Date(new Date().setDate(new Date().getDate() + 7)).setHours(12, 0, 0, 0))
+    );
+    this.GetWorkCenters()
+  }
+  GetWorkCenters() {
+    this.apiService.GetRequestFusion(`/workCenters?limit=50&fields=WorkCenterId,WorkCenterCode,WorkCenterName,WorkCenterDescription,WorkAreaCode,WorkAreaName&onlyData=true&links=canonical&q=OrganizationCode='${this.organizationSelected.Code}'`).then((response: any) => {
+      const data = JSON.parse(response)
+      if (!data.items) {
+        this.alerts.Info(response.message);
+      } else {
+        this.workCenters = data.items
+        this.workCenter = data.items[0]
+        this.GetCampaigns()
+      }
+    })
   }
   GetCampaigns() {
-    this.apiService.GetRequestRender(`campaigns/${this.organizationSelected.OrganizationId}`).then((response: any) => {
+    this.apiService.GetRequestRender(`campaigns/1`/*${this.workCenter.WorkCenterId}`*/).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
@@ -98,6 +126,7 @@ export class ProductionCampaignPage implements OnInit {
           name: "",
           code: ""
         }
+        this.selectedOrders = []
         this.campaignsArray = response.items
       }
     })
@@ -120,8 +149,17 @@ export class ProductionCampaignPage implements OnInit {
   AddWoToCampaign(wo: any) {
 
   }
-  DeleteCampaign(wo: any) {
-
+  async DeleteCampaign(cmp: any) {
+    if (await this.alerts.ShowAlert("¿Deseas eliminar esta campaña?", "Alerta", "Atrás", "Eliminar")) {
+      this.apiService.DeleteRequestRender('campaigns/' + cmp.campaign_id).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          this.alerts.Success("Campaña eliminada");
+          this.GetCampaigns()
+        } else {
+          this.alerts.Info(response.error);
+        }
+      })
+    }
   }
   ViewCampaign(wo: any) {
 
@@ -129,8 +167,39 @@ export class ProductionCampaignPage implements OnInit {
   EditOrder(wo: any) {
 
   }
-  DeleteOrder(wo: any) {
-
+  async DeleteOrder(wo: any) {
+    if (await this.alerts.ShowAlert("¿Deseas desasociar esta orden?", "Alerta", "Atrás", "Eliminar")) {
+      this.apiService.DeleteRequestRender('work-orders/unassign/' + wo.work_order_id).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          this.alerts.Success("Orden eliminada");
+          this.freeWorkOrdersArray.push(wo)
+          this.currentCampaign.work_orders = this.currentCampaign.work_orders.filter((w: any) => w.work_order_id != wo.work_order_id);
+        } else {
+          this.alerts.Info(response.error);
+        }
+      })
+    }
+  }
+  async DeleteOrders() {
+    const orgsIds = this.selectedOrders.map((wo: any) => wo.work_order_id).join(',');//IDs separados por coma (,)
+    if (await this.alerts.ShowAlert("¿Deseas desasociar las órdenes seleccionadas?", "Alerta", "Atrás", "Eliminar")) {
+      this.apiService.DeleteRequestRender('work-orders/unassign/' + orgsIds).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          this.alerts.Success("Orden(es) eliminada(s)");
+          this.currentCampaign.work_orders = this.currentCampaign.work_orders.filter(
+            (w: any) => !this.selectedOrders.some(s => s.work_order_id === w.work_order_id)
+          );
+          this.freeWorkOrdersArray = [
+            ...(this.freeWorkOrdersArray || []),
+            ...this.selectedOrders
+          ];
+          this.selectedOrders = [];
+          this.changeDetector.detectChanges()
+        } else {
+          this.alerts.Info(response.error);
+        }
+      })
+    }
   }
   ViewOrder(wo: any) {
 
@@ -141,16 +210,21 @@ export class ProductionCampaignPage implements OnInit {
       this.currentCampaign,
       this.selectedFreeOrders
     );
-    this.changeDetector.detectChanges()
-    console.log(payload)
     this.apiService.PutRequestRender('work-orders/assign-campaign', payload).then(async (response: any) => {
       if (response.errorsExistFlag) {
         //this.alerts.Info(response.message);
       } else {
         this.alerts.Success("Orden(s) de trabajo agregada(s)");
-        //this.GetCompleteOrder(this.currentCampaign.campaign_id)
-        this.changeDetector.detectChanges()
         this.isModalFreeOrdersOpen = false
+        this.freeWorkOrdersArray = this.freeWorkOrdersArray.filter(
+          (w: any) => !this.selectedFreeOrders.some(s => s.work_order_id === w.work_order_id)
+        );
+        this.currentCampaign.work_orders = [
+          ...(this.currentCampaign.work_orders || []),
+          ...this.selectedFreeOrders
+        ];
+        this.selectedFreeOrders = [];
+        this.changeDetector.detectChanges()
       }
     });
     /*this.freeWorkOrdersArray = this.freeWorkOrdersArray.filter((w: any) => w.work_order_id != wo.work_order_id);*/
@@ -170,6 +244,7 @@ export class ProductionCampaignPage implements OnInit {
         work_order_id: parseInt(wo.work_order_id, 10),
         sequence: sequenceCounter
       };
+      wo.sequence = sequenceCounter
       sequenceCounter += 10; // incrementar de 10 en 10
       return payloadItem;
     });
@@ -188,13 +263,16 @@ export class ProductionCampaignPage implements OnInit {
       start_date: this.campaignObj.plannedEndDate,
       end_date: this.campaignObj.plannedStartDate,
       status_telegram: this.campaignObj.status_telegram,
-      enabled_flag: this.campaignObj.enabled_flag
+      enabled_flag: this.campaignObj.enabled_flag,
+      work_center: this.workCenter.WorkCenterId
     }
     this.apiService.PostRequestRender('campaigns', payload).then(async (response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
-        this.alerts.Success(response.message);;
+        this.alerts.Success(response.message);
+        this.isModalNewCampaign = false
+        this.GetCampaigns()
       }
     });
   }
@@ -202,24 +280,79 @@ export class ProductionCampaignPage implements OnInit {
     table.clear();
     this.searchValueAl = '';
   }
-  GetCompleteOrder(campaign: any) {
+  GetCompleteCampaign(campaign: any) {
     this.currentCampaign = campaign
     this.apiService.GetRequestRender(`campaign/${campaign.campaign_id}`).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
         this.currentCampaign = response
+        console.log(this.currentCampaign);
+        let query = ""
+        this.currentCampaign.work_orders.forEach((item: any) => {
+          query += " OR ItemNumber='" + item.item_number + "'"
+        });
+        console.log(query);
+
+        /*this.apiService.GetRequestFusion(`/inventoryOnhandBalances?limit=100&totalResults=true&onlyData=true&fields=lots:LotNumber,PrimaryQuantity&expand=all&q=OrganizationCode='${this.organizationSelected.Code}' and ItemNumber='${item.item_number}'&links=canonical`, true).then((response: any) => {
+          const data = JSON.parse(response)
+          if (!data.items) {
+            this.alerts.Info(response.message);
+          } else {
+            
+          }
+        })*/
+        /*this.currentCampaign.work_orders = this.currentCampaign.work_orders.map((wo: any) => {
+          wo.selectedLot = Math.floor(Math.random() * 3) + 1; // Inicialmente no hay lote seleccionado
+          return wo;
+        });*/
       }
     })
-    this.apiService.GetRequestRender(`work-orders/without-campaign/${this.organizationSelected.OrganizationId}`, false).then((response: any) => {
-      this.freeWorkOrdersArray = response.items
+    this.apiService.GetRequestRender(`work-orders/without-campaign/1`/*${this.organizationSelected.OrganizationId}`*/, false).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
-        this.workOrdersArray = response.items
+        //this.workOrdersArray = response.items
+        this.freeWorkOrdersArray = response.items
       }
     })
     this.showCampaign = true
+  }
+  GetItemLots(item: any) {
+    if (!item.lots || item.lots.length === 0) {
+      this.apiService.GetRequestFusion(`/inventoryOnhandBalances?limit=100&totalResults=true&onlyData=true&fields=lots:LotNumber,PrimaryQuantity&expand=all&q=OrganizationCode='${this.organizationSelected.Code}' and ItemNumber='${item.item_number}'&links=canonical`, true).then((response: any) => {
+        const data = JSON.parse(response)
+        if (!data.items) {
+          this.alerts.Info(response.message);
+        } else {
+          if (data.items.length > 0) {
+            item.lots = data.items
+              .map((obj: any) => ({
+                name: obj.lots.items[0].LotNumber,
+                PrimaryQuantity: obj.lots.items[0].PrimaryQuantity
+              }))
+              .filter((value: any, index: any, self: any) =>
+                index === self.findIndex((t: any) => t.name === value.name)
+              );
+          } else {
+            item.lots = [{
+              name: "Sin lote", PrimaryQuantity: 0
+            }]
+          }
+        }
+      })
+    }
+  }
+  SaveLotOnWO(event: any, item: any) {
+    const selectedLot = event.detail.value;
+    this.apiService.PutRequestRender(`work-orders/update-lot/${Number(item.work_order_id)}`, { lot_number: selectedLot }).then(async (response: any) => {
+      if (response.errorsExistFlag) {
+        //this.alerts.Info(response.message);
+      } else {
+        this.alerts.Success("Lote actualizado");
+        this.changeDetector.detectChanges()
+      }
+    });
   }
   ShowNewWO() {
     this.isModalNewWO = true
@@ -415,8 +548,6 @@ export class ProductionCampaignPage implements OnInit {
       }))
     };
     this.apiService.PutRequestRender('work-orders/update-sequence', payload).then(async (response: any) => {
-      console.log(response);
-
       if (response.errorsExistFlag) {
         //this.alerts.Info(response.message);
       } else {
