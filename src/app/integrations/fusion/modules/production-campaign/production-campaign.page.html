@@ -26,7 +26,7 @@
 <ion-content [fullscreen]="true">
   <ion-breadcrumbs>
     <ion-breadcrumb (click)="GetCampaigns()" style="cursor: pointer;">Campañas</ion-breadcrumb>
-    <ion-breadcrumb (click)="GetCompleteCampaign(currentCampaign)" *ngIf="currentCampaign.campaign_id"
+    <ion-breadcrumb (click)="GetCurrentCampaign(currentCampaign)" *ngIf="currentCampaign.campaign_id"
       style="cursor: pointer;">{{currentCampaign.code}}</ion-breadcrumb>
     <ion-breadcrumb (click)="GetCurrentWO()" *ngIf="currentWO.work_order_number"
       style="cursor: pointer;">{{currentWO.work_order_number}}</ion-breadcrumb>
@@ -118,7 +118,7 @@
 
             <!-- Cuerpo -->
             <ng-template pTemplate="body" let-item>
-              <tr class="clickable-row" (click)="GetCompleteCampaign(item)">
+              <tr class="clickable-row" (click)="GetCurrentCampaign(item)">
                 <td class="td-center">
                   <p-tag [value]="item.code" severity="contrast"></p-tag>
                 </td>
@@ -138,6 +138,10 @@
                   <ion-button size="small" shape="round" color="danger"
                     (click)="$event.stopPropagation(); DeleteCampaign(item)" title="Eliminar">
                     <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                  </ion-button>
+                  <ion-button size="small" shape="round" color="success"
+                    (click)="$event.stopPropagation(); EditCampaign(item)" title="Editar">
+                    <ion-icon slot="icon-only" name="checkmark-outline"></ion-icon>
                   </ion-button>
                 </td>
               </tr>
@@ -221,7 +225,6 @@
                 (drop)="onDrop($event, rowIndex)" (dragend)="onDragEnd($event)"
                 [style.cursor]="selectedOrders.length > 0 && isSelected(item) ? 'move' : 'default'"
                 [pSelectableRowDisabled]="false">
-
                 <td>
                   <p-tableCheckbox [value]="item"></p-tableCheckbox>
                 </td>
@@ -229,16 +232,24 @@
                   <p-tag [value]="item.work_order_number" [severity]="'contrast'" />
                 </td>
                 <td class="td-center">{{ item.sequence }}</td>
-                <td class="td-center center-select" (click)="$event.stopPropagation()">
-                  <ion-select [(ngModel)]="item.selectedLot" aria-label="Lote" interface="popover"
-                    (ionChange)="SaveLotOnWO($event, item)" (click)="$event.stopPropagation()"
-                    (ionFocus)="GetItemLots(item)" placeholder="Seleccione lote">
-                    <ion-select-option [value]="lot.name" *ngFor="let lot of item.lots">
-                      {{lot.name}}
-                    </ion-select-option>
-                  </ion-select>
+                <td class="td-center" (click)="$event.stopPropagation()">
+                  <ion-button id="lot-popover-{{item.work_order_id}}" expand="block" fill="outline"
+                    [color]="item.selectedlot ? 'secondary' : 'medium'" shape="round" size="small">
+                    {{ item.selectedlot || 'Seleccione lote' }}
+                  </ion-button>
+                  <ion-popover trigger="lot-popover-{{item.work_order_id}}" [dismissOnSelect]="true">
+                    <ng-template>
+                      <ion-list>
+                        <ion-item button *ngFor="let lot of item.lots" (click)="SaveLotOnWO(lot.name, item)"
+                          [color]="item.selectedlot === lot.name ? 'secondary' : ''"> {{ lot.name }}
+                          <ion-icon *ngIf="item.selectedlot === lot.name" name="checkmark" slot="end">
+                          </ion-icon>
+                        </ion-item>
+                      </ion-list>
+                    </ng-template>
+                  </ion-popover>
                 </td>
-                <td class="td-center">{{ item.item_number }}</td>
+                <td class="td-center" (click)="$event.stopPropagation()">{{ item.item_number }}</td>
                 <td class="td-center">{{ item.item_description }}</td>
                 <td class="td-center"><strong>{{ item.planned_quantity + ' ' + item.uom }}</strong></td>
                 <td class="td-center">{{ item.machine_name }}</td>
@@ -274,7 +285,7 @@
     <ng-template>
       <ion-header>
         <ion-toolbar color="primary">
-          <ion-title>Nueva campaña</ion-title>
+          <ion-title>{{campaignObj.isNew ? 'Nueva campaña' : 'Editar campaña'}} </ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -304,18 +315,18 @@
         <!-- Fechas -->
         <ion-item>
           <ion-label style="color: var(--ion-color-primary);">Fecha de inicio:</ion-label>
-          <ion-datetime-button datetime="plannedStartDate" slot="end"></ion-datetime-button>
+          <ion-datetime-button datetime="end_date" slot="end"></ion-datetime-button>
         </ion-item>
         <ion-item>
           <ion-label style="color: var(--ion-color-primary);">Fecha de finalización:</ion-label>
-          <ion-datetime-button datetime="plannedEndDate" slot="end"></ion-datetime-button>
+          <ion-datetime-button datetime="start_date" slot="end"></ion-datetime-button>
         </ion-item>
         <!-- Modal inicio -->
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
-            <ion-datetime id="plannedStartDate" [(ngModel)]="campaignObj.plannedStartDate" locale="es-MX"
-              hourCycle="h12" presentation="date-time" show-default-buttons="true" [min]="todayDate"
-              [max]="campaignObj.plannedEndDate" cancel-text="Cancelar" done-text="Confirmar">
+            <ion-datetime id="end_date" [(ngModel)]="campaignObj.end_date" locale="es-MX"
+              hourCycle="h12" presentation="date-time" show-default-buttons="true"
+              [max]="campaignObj.start_date" cancel-text="Cancelar" done-text="Confirmar">
               <span slot="title">Fecha de inicio</span>
             </ion-datetime>
           </ng-template>
@@ -323,8 +334,8 @@
         <!-- Modal fin -->
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
-            <ion-datetime id="plannedEndDate" [(ngModel)]="campaignObj.plannedEndDate" locale="es-MX" hourCycle="h12"
-              presentation="date-time" show-default-buttons="true" [min]="campaignObj.plannedStartDate"
+            <ion-datetime id="start_date" [(ngModel)]="campaignObj.start_date" locale="es-MX" hourCycle="h12"
+              presentation="date-time" show-default-buttons="true" [min]="campaignObj.end_date"
               cancel-text="Cancelar" done-text="Confirmar">
               <span slot="title">Fecha de fin</span>
             </ion-datetime>
@@ -363,9 +374,10 @@
             </ion-button>
           </ion-col>
           <ion-col size="6">
-            <ion-button expand="block" color="success" (click)="SaveCampaign()"
+            <ion-button expand="block" color="success"
+              (click)="campaignObj.isNew ? SaveCampaign() : SaveCampaignChanges()"
               [disabled]="campaignObj.code == '' || campaignObj.name == ''">
-              GUARDAR
+              {{campaignObj.isNew ? 'GUARDAR' : 'GUARDAR CAMBIOS'}}
             </ion-button>
           </ion-col>
         </ion-row>

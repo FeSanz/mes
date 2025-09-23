@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonModal, IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea,
-  IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton,
+  IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton, IonPopover, IonList
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
@@ -13,7 +13,7 @@ import { PrimeTemplate } from "primeng/api";
 import { Table, TableModule } from "primeng/table";
 import { Select } from "primeng/select";
 import { FloatLabel } from "primeng/floatlabel";
-import { pencilOutline, trashOutline, eyeOutline, reorderThreeOutline, addOutline, checkmark, moveOutline } from 'ionicons/icons';
+import { pencilOutline, trashOutline, eyeOutline, reorderThreeOutline, addOutline, checkmark, moveOutline, checkmarkCircle, checkmarkOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Tag } from "primeng/tag";
 import { ButtonModule } from "primeng/button";
@@ -27,7 +27,7 @@ import { InputText } from 'primeng/inputtext';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
     IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
-    ButtonModule, IonButtons, IonButton, InputText,]
+    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList]
 })
 export class ProductionCampaignPage {
   campaignsArray: any = []
@@ -54,13 +54,14 @@ export class ProductionCampaignPage {
   isModalNewCampaign = false
   isModalNewWO = false
   campaignObj: any = {
+    isNew: true,
     code: '',
     name: '',
     description: '',
     status_telegram: 'Unschedule',
     enabled_flag: 'Y',
-    plannedStartDate: '2025-09-11T13:34:49',
-    plannedEndDate: '2025-09-11T13:34:49'
+    end_date: '2025-09-11T13:34:49',
+    start_date: '2025-09-11T13:34:49'
   }
   todayDate: any = {}
   woObj: any = {}
@@ -85,7 +86,7 @@ export class ProductionCampaignPage {
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.organizationSelected = this.userData.Company.Organizations[2];
-    addIcons({ addOutline, pencilOutline, trashOutline, eyeOutline, moveOutline, reorderThreeOutline, checkmark });
+    addIcons({ trashOutline, checkmarkOutline, checkmark, checkmarkCircle, addOutline, pencilOutline, eyeOutline, moveOutline, reorderThreeOutline });
   }
 
   formatLocalISO(date: Date): string {
@@ -95,10 +96,10 @@ export class ProductionCampaignPage {
   }
   ionViewDidEnter() {
     this.todayDate = this.formatLocalISO(new Date())
-    this.campaignObj.plannedStartDate = this.formatLocalISO(
+    this.campaignObj.end_date = this.formatLocalISO(
       new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
     );
-    this.campaignObj.plannedEndDate = this.formatLocalISO(
+    this.campaignObj.start_date = this.formatLocalISO(
       new Date(new Date(new Date().setDate(new Date().getDate() + 7)).setHours(12, 0, 0, 0))
     );
     this.GetWorkCenters()
@@ -121,13 +122,25 @@ export class ProductionCampaignPage {
         this.alerts.Info(response.message);
       } else {
         this.showCampaign = false
-        this.currentCampaign = {
-          campaign_id: "",
-          name: "",
-          code: ""
-        }
+        this.currentCampaign = {}
         this.selectedOrders = []
         this.campaignsArray = response.items
+        this.campaignObj = {
+          campaign_id: 0,
+          isNew: true,
+          code: '',
+          name: '',
+          description: '',
+          status_telegram: 'Unschedule',
+          enabled_flag: 'Y',
+        }
+        this.todayDate = this.formatLocalISO(new Date())
+        this.campaignObj.end_date = this.formatLocalISO(
+          new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
+        );
+        this.campaignObj.start_date = this.formatLocalISO(
+          new Date(new Date(new Date().setDate(new Date().getDate() + 7)).setHours(12, 0, 0, 0))
+        );
       }
     })
   }
@@ -142,12 +155,11 @@ export class ProductionCampaignPage {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
   }
-
   EditCampaign(wo: any) {
-
-  }
-  AddWoToCampaign(wo: any) {
-
+    this.campaignObj = wo
+    this.campaignObj.isNew = false
+    this.isModalNewCampaign = true
+    this.changeDetector.detectChanges()
   }
   async DeleteCampaign(cmp: any) {
     if (await this.alerts.ShowAlert("¿Deseas eliminar esta campaña?", "Alerta", "Atrás", "Eliminar")) {
@@ -215,15 +227,63 @@ export class ProductionCampaignPage {
         //this.alerts.Info(response.message);
       } else {
         this.alerts.Success("Orden(s) de trabajo agregada(s)");
-        this.isModalFreeOrdersOpen = false
-        this.freeWorkOrdersArray = this.freeWorkOrdersArray.filter(
-          (w: any) => !this.selectedFreeOrders.some(s => s.work_order_id === w.work_order_id)
-        );
-        this.currentCampaign.work_orders = [
-          ...(this.currentCampaign.work_orders || []),
-          ...this.selectedFreeOrders
-        ];
-        this.selectedFreeOrders = [];
+
+        let payload: any = { parts: [] }
+        this.selectedFreeOrders.forEach((item: any, index: any) => {
+          payload.parts.push({
+            id: "part" + (index + 1),
+            path: "/inventoryOnhandBalances?limit=500&totalResults=true&onlyData=true&links=canonical&fields=ItemNumber;lots:LotNumber,&q=OrganizationCode='" + this.organizationSelected.Code + "' and ItemNumber='" + item.item_number + "'",
+            operation: "get"
+          })
+        });
+        this.apiService.PostRequestBatchFusion('', payload).then((response: any) => {
+          const data = JSON.parse(response)
+          const lotsMap = new Map<string, Set<string>>();
+          // Procesar cada parte del response
+          if (data.parts) {
+            data.parts.forEach((part: any) => {
+              // Procesar los items dentro del payload de cada parte
+              if (part.payload && part.payload.items) {
+                part.payload.items.forEach((lotItem: any) => {
+                  const itemNumber = lotItem.ItemNumber;
+                  if (!lotsMap.has(itemNumber)) {
+                    lotsMap.set(itemNumber, new Set<string>());
+                  }
+                  // Agregar cada lote al Set (automáticamente evita duplicados)
+                  if (lotItem.lots && lotItem.lots.items) {
+                    lotItem.lots.items.forEach((lot: any) => {
+                      lotsMap.get(itemNumber)!.add(lot.LotNumber);
+                    });
+                  }
+                });
+              }
+            });
+          }
+          // Combinar con work_orders
+          if (this.selectedFreeOrders) {
+            this.selectedFreeOrders.forEach((workOrder: any) => {
+              const itemNumber = workOrder.item_number;
+              if (lotsMap.has(itemNumber) && lotsMap.get(itemNumber)!.size > 0) {
+                const lotsSet = lotsMap.get(itemNumber)!;
+                workOrder.lots = Array.from(lotsSet).map(lotName => ({
+                  name: lotName
+                }));
+              } else {
+                // Si no hay lotes para este item, agregar "Sin lote"
+                workOrder.lots = [{ name: "Sin lote" }];
+              }
+            });
+          }
+          this.isModalFreeOrdersOpen = false
+          this.freeWorkOrdersArray = this.freeWorkOrdersArray.filter(
+            (w: any) => !this.selectedFreeOrders.some(s => s.work_order_id === w.work_order_id)
+          );
+          this.currentCampaign.work_orders = [
+            ...(this.currentCampaign.work_orders || []),
+            ...this.selectedFreeOrders
+          ];
+          this.selectedFreeOrders = [];
+        })
         this.changeDetector.detectChanges()
       }
     });
@@ -253,20 +313,37 @@ export class ProductionCampaignPage {
       work_orders
     };
   }
-
   SaveCampaign() {
     const payload = {
       organization_id: this.organizationSelected.OrganizationId,
       code: this.campaignObj.code,
       name: this.campaignObj.name,
       description: this.campaignObj.description,
-      start_date: this.campaignObj.plannedEndDate,
-      end_date: this.campaignObj.plannedStartDate,
-      status_telegram: this.campaignObj.status_telegram,
+      start_date: this.campaignObj.start_date,
+      end_date: this.campaignObj.end_date,
+      status_telegram: "Unschedule",//this.campaignObj.status_telegram,
       enabled_flag: this.campaignObj.enabled_flag,
-      work_center: this.workCenter.WorkCenterId
+      work_center_id: 1//this.workCenter.WorkCenterId
     }
     this.apiService.PostRequestRender('campaigns', payload).then(async (response: any) => {
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
+        this.alerts.Success(response.message);
+        this.isModalNewCampaign = false
+        this.GetCampaigns()
+      }
+    });
+  }
+  SaveCampaignChanges() {
+    const payload = {
+      code: this.campaignObj.code,
+      name: this.campaignObj.name,
+      description: this.campaignObj.description,
+      start_date: this.campaignObj.start_date,
+      end_date: this.campaignObj.end_date
+    }
+    this.apiService.PutRequestRender('campaigns/' + this.campaignObj.campaign_id, payload).then(async (response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
@@ -280,32 +357,62 @@ export class ProductionCampaignPage {
     table.clear();
     this.searchValueAl = '';
   }
-  GetCompleteCampaign(campaign: any) {
+  GetCurrentCampaign(campaign: any) {
     this.currentCampaign = campaign
     this.apiService.GetRequestRender(`campaign/${campaign.campaign_id}`).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
         this.currentCampaign = response
-        console.log(this.currentCampaign);
-        let query = ""
-        this.currentCampaign.work_orders.forEach((item: any) => {
-          query += " OR ItemNumber='" + item.item_number + "'"
-        });
-        console.log(query);
-
-        /*this.apiService.GetRequestFusion(`/inventoryOnhandBalances?limit=100&totalResults=true&onlyData=true&fields=lots:LotNumber,PrimaryQuantity&expand=all&q=OrganizationCode='${this.organizationSelected.Code}' and ItemNumber='${item.item_number}'&links=canonical`, true).then((response: any) => {
-          const data = JSON.parse(response)
-          if (!data.items) {
-            this.alerts.Info(response.message);
-          } else {
-            
-          }
-        })*/
-        /*this.currentCampaign.work_orders = this.currentCampaign.work_orders.map((wo: any) => {
-          wo.selectedLot = Math.floor(Math.random() * 3) + 1; // Inicialmente no hay lote seleccionado
-          return wo;
-        });*/
+        if (this.currentCampaign.work_orders?.length > 0) {
+          let payload: any = { parts: [] }
+          this.currentCampaign.work_orders.forEach((item: any, index: any) => {
+            payload.parts.push({
+              id: "part" + (index + 1),
+              path: "/inventoryOnhandBalances?limit=500&totalResults=true&onlyData=true&links=canonical&fields=ItemNumber;lots:LotNumber,&q=OrganizationCode='" + this.organizationSelected.Code + "' and ItemNumber='" + item.item_number + "'",
+              operation: "get"
+            })
+          });
+          this.apiService.PostRequestBatchFusion('', payload).then((response: any) => {
+            const data = JSON.parse(response)
+            const lotsMap = new Map<string, Set<string>>();
+            // Procesar cada parte del response
+            if (data.parts) {
+              data.parts.forEach((part: any) => {
+                // Procesar los items dentro del payload de cada parte
+                if (part.payload && part.payload.items) {
+                  part.payload.items.forEach((lotItem: any) => {
+                    const itemNumber = lotItem.ItemNumber;
+                    if (!lotsMap.has(itemNumber)) {
+                      lotsMap.set(itemNumber, new Set<string>());
+                    }
+                    // Agregar cada lote al Set (automáticamente evita duplicados)
+                    if (lotItem.lots && lotItem.lots.items) {
+                      lotItem.lots.items.forEach((lot: any) => {
+                        lotsMap.get(itemNumber)!.add(lot.LotNumber);
+                      });
+                    }
+                  });
+                }
+              });
+            }
+            // Combinar con work_orders
+            if (this.currentCampaign.work_orders) {
+              this.currentCampaign.work_orders.forEach((workOrder: any) => {
+                const itemNumber = workOrder.item_number;
+                if (lotsMap.has(itemNumber) && lotsMap.get(itemNumber)!.size > 0) {
+                  const lotsSet = lotsMap.get(itemNumber)!;
+                  workOrder.lots = Array.from(lotsSet).map(lotName => ({
+                    name: lotName
+                  }));
+                } else {
+                  // Si no hay lotes para este item, agregar "Sin lote"
+                  workOrder.lots = [{ name: "Sin lote" }];
+                }
+              });
+            }
+          })
+        }
       }
     })
     this.apiService.GetRequestRender(`work-orders/without-campaign/1`/*${this.organizationSelected.OrganizationId}`*/, false).then((response: any) => {
@@ -318,41 +425,18 @@ export class ProductionCampaignPage {
     })
     this.showCampaign = true
   }
-  GetItemLots(item: any) {
-    if (!item.lots || item.lots.length === 0) {
-      this.apiService.GetRequestFusion(`/inventoryOnhandBalances?limit=100&totalResults=true&onlyData=true&fields=lots:LotNumber,PrimaryQuantity&expand=all&q=OrganizationCode='${this.organizationSelected.Code}' and ItemNumber='${item.item_number}'&links=canonical`, true).then((response: any) => {
-        const data = JSON.parse(response)
-        if (!data.items) {
-          this.alerts.Info(response.message);
+  SaveLotOnWO(selectedLot: any, item: any) {
+    if (selectedLot != item.selectedlot) {
+      this.apiService.PutRequestRender(`work-orders/update-lot/${Number(item.work_order_id)}`, { lot_number: selectedLot }).then(async (response: any) => {
+        if (response.errorsExistFlag) {
+          //this.alerts.Info(response.message);
         } else {
-          if (data.items.length > 0) {
-            item.lots = data.items
-              .map((obj: any) => ({
-                name: obj.lots.items[0].LotNumber,
-                PrimaryQuantity: obj.lots.items[0].PrimaryQuantity
-              }))
-              .filter((value: any, index: any, self: any) =>
-                index === self.findIndex((t: any) => t.name === value.name)
-              );
-          } else {
-            item.lots = [{
-              name: "Sin lote", PrimaryQuantity: 0
-            }]
-          }
+          this.alerts.Success("Lote actualizado");
+          item.selectedlot = selectedLot
+          this.changeDetector.detectChanges()
         }
-      })
+      });
     }
-  }
-  SaveLotOnWO(event: any, item: any) {
-    const selectedLot = event.detail.value;
-    this.apiService.PutRequestRender(`work-orders/update-lot/${Number(item.work_order_id)}`, { lot_number: selectedLot }).then(async (response: any) => {
-      if (response.errorsExistFlag) {
-        //this.alerts.Info(response.message);
-      } else {
-        this.alerts.Success("Lote actualizado");
-        this.changeDetector.detectChanges()
-      }
-    });
   }
   ShowNewWO() {
     this.isModalNewWO = true
@@ -366,50 +450,37 @@ export class ProductionCampaignPage {
       event.preventDefault();
       return;
     }
-
     this.isDragging = true;
     this.draggedItems = [...this.selectedOrders];
-
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
       event.dataTransfer.setData('application/json', JSON.stringify(this.draggedItems));
     }
-
     // Agregar clase visual durante el drag
     setTimeout(() => {
       document.body.classList.add('dragging-active');
     }, 0);
   }
-
   // Función para manejar drag over
   onDragOver(event: DragEvent, rowIndex: number) {
     if (!this.isDragging) return;
-
     event.preventDefault();
     event.dataTransfer!.dropEffect = 'move';
-
-    // Mostrar indicador visual de donde se va a soltar
     this.showDropIndicator(event, rowIndex);
   }
-
   // Función para manejar el drop
   onDrop(event: DragEvent, dropIndex: number) {
     if (!this.isDragging) return;
-
     event.preventDefault();
-
     const targetItem = this.currentCampaign.work_orders[dropIndex];
-
     // No permitir drop sobre items seleccionados
     if (this.isSelected(targetItem)) {
       this.onDragEnd(event);
       return;
     }
-
     this.moveSelectedRowsToPosition(dropIndex);
     this.onDragEnd(event);
   }
-
   // Función para finalizar el arrastre
   onDragEnd(event: DragEvent) {
     this.isDragging = false;
@@ -423,7 +494,6 @@ export class ProductionCampaignPage {
     const indicators = document.querySelectorAll('.drop-indicator-temp');
     indicators.forEach(indicator => indicator.remove());
   }
-
   // Mostrar indicador de drop
   showDropIndicator(event: DragEvent, rowIndex: number) {
     const targetItem = this.currentCampaign.work_orders[rowIndex];
@@ -459,14 +529,11 @@ export class ProductionCampaignPage {
 
     document.body.appendChild(indicator);
   }
-
   // 👇 función auxiliar para limpiar
   removeDropIndicator() {
     const old = document.querySelector('.drop-indicator-temp');
     if (old) old.remove();
   }
-
-
   // Mover filas seleccionadas a nueva posición
   moveSelectedRowsToPosition(targetIndex: number) {
     const workOrders = [...this.currentCampaign.work_orders];
@@ -500,7 +567,6 @@ export class ProductionCampaignPage {
     // Actualizar secuencia con incrementos de 10
     this.updateRowSequence();
   }
-
   // Actualizar secuencia con incrementos de 10 (10, 20, 30, etc.)
   updateRowSequence() {
     this.currentCampaign.work_orders.forEach((order: any, index: any) => {
@@ -515,29 +581,24 @@ export class ProductionCampaignPage {
       sequence: o.sequence
     })));*/
   }
-
   // Función para rastrear filas (mejora el performance)
   rowTrackBy(index: number, item: any) {
     return item.work_order_number;
   }
-
   // Verificar si una fila está seleccionada
   isSelected(item: any): boolean {
     return this.selectedOrders.some(selected =>
       selected.work_order_number === item.work_order_number
     );
   }
-
   // Seleccionar todas las filas
   selectAll() {
     this.selectedOrders = [...this.currentCampaign.work_orders];
   }
-
   // Limpiar selección
   clearSelection() {
     this.selectedOrders = [];
   }
-
   // Guardar el nuevo orden en el backend
   saveOrderSequence() {
     // Construir payload con secuencia basada en el orden actual

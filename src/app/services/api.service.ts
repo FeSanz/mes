@@ -129,6 +129,31 @@ export class ApiService {
       await this.alerts.HideLoading()
     }
   }
+  async PostRequestBatchFusion(endPoint: string, payload: any) {
+    try {
+      await this.alerts.ShowLoading()
+      const options = {
+        url: `${this.urlFusion}/${endPoint}`,
+        headers: {
+          'Authorization': `Basic ${this.credentials}`,
+          'Content-Type': 'application/vnd.oracle.adf.batch+json',
+          'REST-framework-version': '4',
+          'Accept-Language': 'en-US'
+        },
+        data: payload
+      };
+      const response: HttpResponse = await CapacitorHttp.post(options);
+      this.RequestStatusCode(response.status);
+      return response.data;
+
+    } catch (error: any) {
+      console.log('Error:', error);
+      await this.alerts.Error(`Error de conexión: ${error.message || error}`);
+      return null;
+    } finally {
+      await this.alerts.HideLoading()
+    }
+  }
 
   async AuthRequestFusion(endPoint: string, credentialsTemp: string) {
     await this.alerts.ShowLoading();
