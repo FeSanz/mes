@@ -19,7 +19,7 @@ export class EndpointsService {
                 '&fields=ShiftId,Name,StartTime,EndTime,Duration',
 
     'work_centers': '/workCenters?' + this._params +
-                    '&fields=WorkCenterId,WorkCenterName' +
+                    '&fields=WorkCenterId,WorkCenterCode,WorkCenterName,WorkAreaCode,WorkAreaName' +
                     '&q=OrganizationCode=\'{0}\'',
 
     'machines': '/productionResources?' + this._params +

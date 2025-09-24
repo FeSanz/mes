@@ -1,39 +1,39 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonMenuButton,
+  IonTitle,
+  IonToolbar
 } from '@ionic/angular/standalone';
-
+import {Button} from "primeng/button";
+import {FloatLabel} from "primeng/floatlabel";
+import {IconField} from "primeng/iconfield";
+import {InputIcon} from "primeng/inputicon";
+import {InputText} from "primeng/inputtext";
+import {PrimeTemplate} from "primeng/api";
+import {Select} from "primeng/select";
+import {TableModule} from "primeng/table";
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
-import {HeightTable} from "../../../../models/tables.prime";
 import {addIcons} from "ionicons";
-
-import {TableModule} from 'primeng/table';
-import {TagModule} from 'primeng/tag';
-import {ButtonModule} from 'primeng/button';
-import {InputTextModule} from 'primeng/inputtext';
-import {IconFieldModule} from 'primeng/iconfield';
-import {InputIconModule} from 'primeng/inputicon';
-import {DropdownModule} from 'primeng/dropdown';
-import {MultiSelectModule} from 'primeng/multiselect';
-
-import {arrowForward, chevronDownOutline, closeOutline, cloudOutline, serverOutline, trash} from 'ionicons/icons';
-
+import {arrowForward, chevronDownOutline, closeOutline, cloudOutline, serverOutline, trash} from "ionicons/icons";
+import {HeightTable} from "../../../../models/tables.prime";
 
 @Component({
-  selector: 'app-organizations',
-  templateUrl: './organizations.page.html',
-  styleUrls: ['./organizations.page.scss'],
+  selector: 'app-wc',
+  templateUrl: './wc.page.html',
+  styleUrls: ['./wc.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
-    IonButton, IonIcon,
-    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,DropdownModule,
-    MultiSelectModule ]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, Button, FloatLabel, IconField, InputIcon, InputText, IonButton, IonButtons, IonIcon, IonMenuButton, PrimeTemplate, Select, TableModule]
 })
-export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
+export class WcPage implements OnInit, AfterViewInit, OnDestroy{
 
   @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
   private resizeObserver!: ResizeObserver;
@@ -41,13 +41,12 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   rowsPerPage: number = 50;
   rowsPerPageOptions: number[] = [10, 25, 50];
 
-  userData: any = {};
-
   fusionOriginalData: any = {};
-  fusionData: any = {
-    items : []
-  };
+  fusionData: any = {};
   dbData: any = {};
+
+  dbOrganizations: any = {};
+  organizationSelected: string | any = '';
 
   selectedItemsFusion: any[] = [];
   selectedItemsDB: any[] = [];
@@ -63,9 +62,9 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+
   ngOnInit() {
-    this.userData = JSON.parse(String(localStorage.getItem("userData")));
-    this.GetOrganizations();
+    this.dbOrganizations = JSON.parse(String(localStorage.getItem("userData")));
   }
 
   ngAfterViewInit() {
@@ -94,20 +93,24 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     return this.scrollHeight;
   }
 
-  GetOrganizations(){
-    this.apiService.GetRequestRender(`organizations/${this.userData.Company.CompanyId}`).then((response: any) => {
-      this.dbData = response;
+  async OnOrganizationSelected() {
+    if(this.organizationSelected) {
+      let clause = `workCenters/${this.organizationSelected.OrganizationId}`;
+      this.apiService.GetRequestRender(clause).then((response: any) => {
+        response.totalResults == 0 && this.alerts.Warning(response.message);
+        this.dbData = response;
 
-      this.apiService.GetRequestFusion(this.endPoints.Path('organizations')).then((response: any) => {
-        this.fusionData = JSON.parse(response);
-        this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
+        this.apiService.GetRequestFusion(this.endPoints.Path('work_centers', this.organizationSelected.Code)).then(async (response: any) => {
+          this.fusionData = JSON.parse(response);
 
-        this.FilterRegisteredItems();
+          this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
+
+          this.FilterRegisteredItems();
+        });
       });
-    });
+    }
   }
 
-  //Metodo para manejar el filtro global
   OnFilterGlobal(event: Event, table: any) {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
@@ -116,10 +119,10 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   FilterRegisteredItems() {
     if (this.fusionOriginalData.items && this.dbData.items) {
       // Set de ID's para filtrar posteriormente
-      const dbOrganizationCodes = new Set(this.dbData.items.map((item: any) => String(item.Code)));
+      const dbOrdersNumbers = new Set(this.dbData.items.map((item: any) => String(item.WorkCenterCode)));
       // Filtrar items de fusion que no estén en DB
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
-        return !dbOrganizationCodes.has(String(fusionItem.OrganizationCode));
+        return !dbOrdersNumbers.has(String(fusionItem.WorkCenterCode));
       });
     }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
       if(this.fusionOriginalData.items) {
@@ -128,29 +131,29 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  //Metodo para cargar organizaciones seleccionadas de FUSION
-  UploadOrganization() {
+  UploadWorkCenters() {
     if (this.fusionData.items) {
+
       if (this.selectedItemsFusion.length === 0) {
         this.alerts.Warning("Seleccione algún elemento para cargar");
         return;
       }
 
+      console.log(this.selectedItemsFusion);
+
       const itemsData = this.selectedItemsFusion.map((item: any) => ({
-        CompanyId: this.userData.Company.CompanyId,
-        Code: item.OrganizationCode,
-        Name: item.OrganizationName,
-        Location: item.LocationCode,
-        WorkMethod: this.WorkMethodFormat(item.plantParameters.items[0].DefaultWorkMethod),
-        BUId: item.ManagementBusinessUnitId,
-        Coordinates: null
+        WorkCenterCode: item.WorkCenterCode,
+        WorkCenterName: item.WorkCenterName,
+        WorkAreaCode: item.WorkAreaCode,
+        WorkAreaName: item.WorkAreaName
       }));
 
       const payload = {
+        OrganizationId: this.organizationSelected.OrganizationId,
         items: itemsData
       };
 
-      this.apiService.PostRequestRender('organizations', payload).then(async (response: any) => {
+      this.apiService.PostRequestRender('workCenters', payload).then(async (response: any) => {
         if(response.errorsExistFlag) {
           this.alerts.Info(response.message);
         }else {
@@ -159,18 +162,15 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
           setTimeout(() => {
             this.RefreshTables();
           }, 1500);
+
         }
       });
     }
   }
 
-  WorkMethodFormat(mfgType: string){
-    return mfgType === 'PROCESS_MANUFACTURING' ? 'PROCESOS' : mfgType === 'DISCRETE_MANUFACTURING' ? 'DISCRETA' : 'NA';
-  }
-
-  //Metodo para eliminar organizaciones seleccionadas de DB
-  async DeleteOrganizations() {
+  async DeleteWorkCenters() {
     if (this.dbData.items) {
+
       if (this.selectedItemsDB.length === 0) {
         this.alerts.Warning("Seleccione algún elemento para eliminar");
         return;
@@ -181,15 +181,14 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
 
         // Eliminar uno por uno (secuencial)
         for (const item of this.selectedItemsDB) {
-          const response = await this.apiService.DeleteRequestRender('organizations/' + item.OrganizationId);
+          const response = await this.apiService.DeleteRequestRender('workCenters/' + item.WorkCenterId);
 
           if (!response.errorsExistFlag) {
             successCount++;
           }
         }
 
-        this.alerts.Success(`Organizaciones eliminadas [${successCount}/ ${this.selectedItemsDB.length}]`);
-
+        this.alerts.Success(`Eliminados exitosamente [${successCount}/ ${this.selectedItemsDB.length}]`);
 
         // Recargar la página solo si hubo eliminaciones exitosas
         if (successCount > 0) {
@@ -199,8 +198,8 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
         }
 
       } catch (error) {
-        console.error('Error al eliminar organizaciones:', error);
-        this.alerts.Error('Error al eliminar las organizaciones');
+        console.error('Error al eliminar:', error);
+        this.alerts.Error('Error al eliminar');
       }
     }
   }
@@ -216,10 +215,12 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   RefreshTables() {
-    this.apiService.GetRequestRender('organizations').then((response: any) => {
+    let clause = `workCenters/${this.organizationSelected.OrganizationId}`;
+    this.apiService.GetRequestRender(clause).then((response: any) => {
+      response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
 
-     this.FilterRegisteredItems();
+      this.FilterRegisteredItems();
     });
 
     // Limpiar valores de búsqueda
@@ -229,6 +230,6 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     // Limpiar selecciones
     this.selectedItemsFusion = [];
     this.selectedItemsDB = [];
-
   }
+
 }

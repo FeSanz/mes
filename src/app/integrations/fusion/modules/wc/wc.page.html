@@ -1,0 +1,241 @@
+<ion-header [translucent]="true" xmlns="http://www.w3.org/1999/html">
+  <ion-toolbar>
+    <ion-title>Centros de Trabajo {{dbOrganizations.Company.Name}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="card-select flex flex-wrap justify-center items-end gap-4">
+    <p-floatlabel class="w-full md:w-56" variant="on">
+      <p-select [(ngModel)]="organizationSelected"
+                inputId="organization_select"
+                [options]="dbOrganizations.Company.Organizations"
+                optionLabel="Name"
+                [filter]="true"
+                filterBy="Name"
+                placeholder="Seleccione una organización"
+                styleClass="w-full"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="38"
+                (onChange)="OnOrganizationSelected()" />
+      <label for="organization_select">Organización</label>
+    </p-floatlabel>
+  </div>
+  <div class="regions-wrapper">
+    <!-------------------------- Region FUSION ------------------------------------>
+    <div class="region-container" #regionContainer>
+      <div class="region-header" style="background-color: #fd5d93">
+        <ion-icon name="cloud-outline"></ion-icon>
+        <span>ERP</span>
+        <ion-button size="small" color="primary" (click)="UploadWorkCenters()">CARGAR
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+      </div>
+      <p-table #dtFusion
+               [value]="fusionData.items"
+               [(selection)]="selectedItemsFusion"
+               dataKey="WorkCenterName"
+               styleClass="card-table-primeng"
+               [tableStyle]="{ 'min-width': '50rem','height': '100%'}"
+               [size]="'small'"
+               [rowHover]="true"
+               [rows]="rowsPerPage"
+               [showCurrentPageReport]="true"
+               [rowsPerPageOptions]="rowsPerPageOptions"
+               [paginator]="true"
+               currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+               [filterDelay]="0"
+               [globalFilterFields]="['WorkCenterCode', 'WorkCenterName', 'WorkAreaCode', 'WorkAreaName']"
+               stripedRows
+               [scrollable]="true"
+               [scrollHeight]="GetScrollHeight()"
+               [alwaysShowPaginator]="true"
+      >
+        <ng-template #caption>
+          <div class="table-caption">
+            <p-button
+              [outlined]="true"
+              icon="pi pi-filter-slash"
+              label="Limpiar"
+              (click)="ClearFusion(dtFusion)" />
+
+            <div></div> <!-- Spacer -->
+
+            <p-iconField iconPosition="left">
+              <p-inputIcon>
+                <i class="fas fa-search"></i>
+              </p-inputIcon>
+              <input pInputText type="text"
+                     [(ngModel)]="searchValueFusion"
+                     (input)="OnFilterGlobal($event, dtFusion)"
+                     placeholder="Buscar" />
+            </p-iconField>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox />
+            </th>
+            <th pSortableColumn="WorkCenterCode" style="min-width: 7rem">
+              <div class="flex justify-between items-center">
+                CT Código
+                <p-sortIcon field="WorkCenterCode" />
+                <p-columnFilter type="text" field="WorkCenterCode" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="WorkCenterName" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                CT Nombre
+                <p-sortIcon field="WorkCenterName" />
+                <p-columnFilter type="text" field="WorkCenterName" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="WorkAreaCode" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                AT Código
+                <p-sortIcon field="WorkAreaCode" />
+                <p-columnFilter field="WorkAreaCode" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="WorkAreaName" style="min-width: 8rem">
+              <div class="flex justify-between items-center">
+                AT Nombre
+                <p-sortIcon field="WorkAreaName" />
+                <p-columnFilter field="WorkAreaName" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="item"/>
+            </td>
+            <td>{{ item.WorkCenterCode }}</td>
+            <td>{{ item.WorkCenterName }}</td>
+            <td>{{ item.WorkAreaCode }}</td>
+            <td>{{ item.WorkAreaName }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">No se encontraron recursos.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-------------------------- Region DB ------------------------------------>
+    <div class="region-container">
+      <div class="region-header" style="background-color: #00bf9a">
+        <ion-icon name="server-outline"></ion-icon>
+        <span>MES</span>
+        <ion-button size="small" color="danger" (click)="DeleteWorkCenters()">ELIMINAR
+          <ion-icon slot="end" name="trash"></ion-icon>
+        </ion-button>
+      </div>
+      <p-table #dtDB
+               [value]="dbData.items"
+               [(selection)]="selectedItemsDB"
+               dataKey="WorkCenterName"
+               styleClass="card-table-primeng"
+               [tableStyle]="{ 'min-width': '50rem'}"
+               [size]="'small'"
+               [rowHover]="true"
+               [rows]="rowsPerPage"
+               [showCurrentPageReport]="true"
+               [rowsPerPageOptions]="rowsPerPageOptions"
+               [paginator]="true"
+               currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+               [filterDelay]="0"
+               [globalFilterFields]="['WorkCenterCode', 'WorkCenterName', 'WorkAreaCode', 'WorkAreaName']"
+               stripedRows
+               [scrollable]="true"
+               [scrollHeight]="GetScrollHeight()"
+               [alwaysShowPaginator]="true"
+      >
+        <ng-template pTemplate="caption">
+          <div class="table-caption">
+            <p-button
+              [outlined]="true"
+              icon="pi pi-filter-slash"
+              label="Limpiar"
+              (click)="ClearDB(dtDB)"/>
+
+            <div></div> <!-- Spacer -->
+
+            <p-iconField iconPosition="left">
+              <p-inputIcon>
+                <i class="fas fa-search"></i>
+              </p-inputIcon>
+              <input
+                pInputText
+                type="text"
+                [(ngModel)]="searchValueDB"
+                (input)="OnFilterGlobal($event, dtDB)"
+                placeholder="Buscar"
+                style="width: 250px;" />
+            </p-iconField>
+          </div>
+        </ng-template >
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem">
+              <p-tableHeaderCheckbox />
+            </th>
+            <th pSortableColumn="WorkCenterCode" style="min-width: 7rem">
+              <div class="flex justify-between items-center">
+                CT Código
+                <p-sortIcon field="WorkCenterCode" />
+                <p-columnFilter type="text" field="WorkCenterCode" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="WorkCenterName" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                CT Nombre
+                <p-sortIcon field="WorkCenterName" />
+                <p-columnFilter type="text" field="WorkCenterName" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="WorkAreaCode" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                AT Código
+                <p-sortIcon field="WorkAreaCode" />
+                <p-columnFilter field="WorkAreaCode" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+            <th pSortableColumn="WorkAreaName" style="min-width: 8rem">
+              <div class="flex justify-between items-center">
+                AT Nombre
+                <p-sortIcon field="WorkAreaName" />
+                <p-columnFilter field="WorkAreaName" matchMode="equals" display="menu" class="ml-auto"/>
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <p-tableCheckbox [value]="item"/>
+            </td>
+            <td>{{ item.WorkCenterCode }}</td>
+            <td>{{ item.WorkCenterName }}</td>
+            <td>{{ item.WorkAreaCode }}</td>
+            <td>{{ item.WorkAreaName }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">No se encontraron organizaciones.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</ion-content>

@@ -56,6 +56,13 @@ export class ConnectionPage implements OnInit {
       updateDate: '10/04/2024 10:25:12'
     },
     {
+      icon: 'git-network-outline',
+      iconClass: 'bg-blue',
+      idModule: 'wc',
+      moduleName: 'CENTROS DE TRABAJO',
+      updateDate: '10/04/2024 10:25:12'
+    },
+    {
       icon: 'settings-outline',
       iconClass: 'bg-blue',
       idModule: 'resources',
@@ -247,7 +254,7 @@ export class ConnectionPage implements OnInit {
         document.activeElement.blur(); //Desenfocar el elemento activo antes de navegar
       }
 
-      const m_modules = ['organizations', 'shifts', 'resources', 'items', 'wo'];
+      const m_modules = ['organizations', 'shifts', 'wc', 'resources', 'items', 'wo'];
 
       if (m_modules.includes(module)) {
         this.router.navigate([`/${module}`]);
