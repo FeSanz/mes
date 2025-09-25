@@ -25,11 +25,11 @@
 </ion-header>
 <ion-content [fullscreen]="true">
   <ion-breadcrumbs>
-    <ion-breadcrumb (click)="GetCampaigns()" style="cursor: pointer;">Campañas</ion-breadcrumb>
+    <ion-breadcrumb (click)="GetCampaigns()" style="cursor: pointer;"><strong>Campañas</strong></ion-breadcrumb>
     <ion-breadcrumb (click)="GetCurrentCampaign(currentCampaign)" *ngIf="currentCampaign.campaign_id"
-      style="cursor: pointer;">{{currentCampaign.code}}</ion-breadcrumb>
-    <ion-breadcrumb (click)="GetCurrentWO()" *ngIf="currentWO.work_order_number"
-      style="cursor: pointer;">{{currentWO.work_order_number}}</ion-breadcrumb>
+      style="cursor: pointer;"><strong>{{currentCampaign.code}}</strong></ion-breadcrumb>
+    <ion-breadcrumb (click)="GetCurrentWO()" *ngIf="currentWO.work_order_number" style="cursor: pointer;"
+      color="primary"><strong>{{currentWO.work_order_number}}</strong></ion-breadcrumb>
   </ion-breadcrumbs>
   <ion-grid>
     <ion-row>
@@ -56,8 +56,9 @@
                   </div>
                 </div>
                 <div class="table-caption-right">
-                  <p-button class="btn-add" [outlined]="true" icon="pi pi-arrow-right" label="Pusblish to L2"
-                    *ngIf="selectedCampaigns.length > 0" variant="outlined" severity="success" />
+                  <p-button class="btn-add" [outlined]="true" icon="pi pi-arrow-right" label="Publish to L2"
+                    *ngIf="selectedCampaigns.length > 0" (click)="PublishToL2()" variant="outlined"
+                    severity="success" />
                   <p-iconField iconPosition="left">
                     <p-inputIcon>
                       <i class="fas fa-search"></i>
@@ -181,9 +182,13 @@
                     (click)="ClearOrders(dtOrders)" />
                   <p-button class="btn-add" [outlined]="true" icon="pi pi-plus-circle" label="Agregar"
                     variant="outlined" severity="info" (click)="isModalFreeOrdersOpen = true;" />
-                  <div style="font-size: 25px;">
+                  <!--div style="font-size: 25px;">
                     Campaña de producción:
                     <strong style="color: var(--ion-color-primary);">{{currentCampaign.code}}</strong>
+                  </div-->
+                  <div style="font-size: 18px;">
+                    Estado:
+                    <strong style="color: var(--ion-color-success);">{{ currentCampaign.status_telegram }}</strong>
                   </div>
                 </div>
                 <div class="table-caption-right">
@@ -269,7 +274,8 @@
                   </p-tag>
                 </td>
                 <td class="td-center" (click)="$event.stopPropagation()">
-                  <ion-button size="small" shape="round" color="danger" (click)="DeleteOrder(item)" title="Eliminar de la campaña">
+                  <ion-button size="small" shape="round" color="danger" (click)="DeleteOrder(item)"
+                    title="Eliminar de la campaña">
                     <ion-icon slot="icon-only" name="backspace-outline"></ion-icon>
                   </ion-button>
                 </td>

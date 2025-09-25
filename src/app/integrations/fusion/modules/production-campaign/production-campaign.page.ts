@@ -176,8 +176,10 @@ export class ProductionCampaignPage {
   ViewCampaign(wo: any) {
 
   }
-  EditOrder(wo: any) {
+  async PublishToL2() {
+    if (await this.alerts.ShowAlert("¿Deseas publicar esta" + (this.selectedCampaigns.length > 1 ? "s" : "") + " campaña" + (this.selectedCampaigns.length > 1 ? "s" : "") + " a Nivel 2?", "Alerta", "Atrás", "Publicar")) {
 
+    }
   }
   async DeleteOrder(wo: any) {
     if (await this.alerts.ShowAlert("¿Deseas desasociar esta orden?", "Alerta", "Atrás", "Eliminar")) {
