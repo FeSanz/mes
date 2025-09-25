@@ -4,47 +4,49 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected"
+                  inputId="organization_select"
+                  [options]="dbOrganizations.Company.Organizations"
+                  optionLabel="Name"
+                  [filter]="true"
+                  filterBy="Name"
+                  placeholder="Seleccione una organización"
+                  styleClass="w-full"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="38"
+                  (onChange)="OnOrganizationSelected()"
+                  appendTo="body"/>
+        <label for="organization_select">Organización</label>
+      </p-floatlabel>
+
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="itemTypeSelected"
+                  inputId="itemtype_select"
+                  [options]="itemType.items"
+                  optionLabel="Meaning"
+                  [filter]="true"
+                  filterBy="Meaning"
+                  placeholder="Seleccione un tipo de artículo"
+                  styleClass="w-full"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="38"
+                  (onChange)="OnItemTypeSelected()"
+                  appendTo="body"/>
+        <label for="itemtype_select">Tipo de artículo</label>
+      </p-floatlabel>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="card-select flex flex-wrap justify-center items-end gap-4">
-    <p-floatlabel class="w-full md:w-56" variant="on">
-      <p-select [(ngModel)]="organizationSelected"
-                inputId="organization_select"
-                [options]="dbOrganizations.Company.Organizations"
-                optionLabel="Name"
-                [filter]="true"
-                filterBy="Name"
-                placeholder="Seleccione una organización"
-                styleClass="w-full"
-                [virtualScroll]="true"
-                [virtualScrollItemSize]="38"
-                (onChange)="OnOrganizationSelected()" />
-      <label for="organization_select">Organización</label>
-    </p-floatlabel>
-
-    <p-floatlabel class="w-full md:w-56" variant="on">
-      <p-select [(ngModel)]="itemTypeSelected"
-                inputId="itemtype_select"
-                [options]="itemType.items"
-                optionLabel="Meaning"
-                [filter]="true"
-                filterBy="Meaning"
-                placeholder="Seleccione un tipo de artículo"
-                styleClass="w-full"
-                [virtualScroll]="true"
-                [virtualScrollItemSize]="38"
-                (onChange)="OnItemTypeSelected()"/>
-      <label for="itemtype_select">Tipo de artículo</label>
-    </p-floatlabel>
-  </div>
   <div class="regions-wrapper">
     <!-------------------------- Region FUSION ------------------------------------>
     <div class="region-container" #regionContainer>
       <div class="region-header" style="background-color: #fd5d93">
         <ion-icon name="cloud-outline"></ion-icon>
-        <span>Artículos Fusion</span>
+        <span>ERP</span>
         <ion-button size="small" color="primary" (click)="UploadItems()">CARGAR
           <ion-icon slot="end" name="arrow-forward"></ion-icon>
         </ion-button>
@@ -150,7 +152,7 @@
     <div class="region-container">
       <div class="region-header" style="background-color: #00bf9a">
         <ion-icon name="server-outline"></ion-icon>
-        <span>Artículos DB</span>
+        <span>MES</span>
         <ion-button size="small" color="danger" (click)="DeleteItems()">ELIMINAR
           <ion-icon slot="end" name="trash"></ion-icon>
         </ion-button>

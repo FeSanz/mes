@@ -145,7 +145,8 @@ export class WcPage implements OnInit, AfterViewInit, OnDestroy{
         WorkCenterCode: item.WorkCenterCode,
         WorkCenterName: item.WorkCenterName,
         WorkAreaCode: item.WorkAreaCode,
-        WorkAreaName: item.WorkAreaName
+        WorkAreaName: item.WorkAreaName,
+        FusionId: item.WorkCenterId,
       }));
 
       const payload = {

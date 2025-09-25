@@ -105,8 +105,12 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
 
   OnOrganizationSelected() {
     if(this.organizationSelected) {
-      this.apiService.GetRequestFusion(this.endPoints.Path('work_centers', this.organizationSelected.Code)).then((response: any) => {
-        this.workCenters = JSON.parse(response);
+      let clause = `workCenters/${this.organizationSelected.OrganizationId}`;
+      console.log(clause);
+      this.apiService.GetRequestRender(clause).then((response: any) => {
+        console.log(response);
+        response.totalResults == 0 && this.alerts.Warning(response.message);
+        this.workCenters = response;
       });
     }
   }
@@ -118,7 +122,7 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
         response.totalResults == 0 && this.alerts.Warning(response.message);
         this.dbData = response;
 
-        this.apiService.GetRequestFusion(this.endPoints.Path('machines', this.workCenterSelected.WorkCenterId, this.organizationSelected.Code)).then((response: any) => {
+        this.apiService.GetRequestFusion(this.endPoints.Path('machines', this.workCenterSelected.FusionId, this.organizationSelected.Code)).then((response: any) => {
           this.fusionData = JSON.parse(response);
           this.fusionOriginalData = JSON.parse(JSON.stringify(this.fusionData)); // Guardar estructura original
 
@@ -161,7 +165,6 @@ export class ResourcesPage implements OnInit, AfterViewInit, OnDestroy {
         Code: item.ResourceCode,
         Name: item.ResourceName,
         WorkCenterId: this.workCenterSelected.WorkCenterId,
-        WorkCenter: this.workCenterSelected.WorkCenterName,
         Class: item.ResourceClassCode,
         Token: null
       }));

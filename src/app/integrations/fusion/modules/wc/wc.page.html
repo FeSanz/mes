@@ -4,26 +4,27 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected"
+                  inputId="organization_select"
+                  [options]="dbOrganizations.Company.Organizations"
+                  optionLabel="Name"
+                  [filter]="true"
+                  filterBy="Name"
+                  placeholder="Seleccione una organización"
+                  styleClass="w-full"
+                  [virtualScroll]="true"
+                  [virtualScrollItemSize]="38"
+                  (onChange)="OnOrganizationSelected()"
+                  appendTo="body"/>
+        <label for="organization_select">Organización</label>
+      </p-floatlabel>
+    </div>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="card-select flex flex-wrap justify-center items-end gap-4">
-    <p-floatlabel class="w-full md:w-56" variant="on">
-      <p-select [(ngModel)]="organizationSelected"
-                inputId="organization_select"
-                [options]="dbOrganizations.Company.Organizations"
-                optionLabel="Name"
-                [filter]="true"
-                filterBy="Name"
-                placeholder="Seleccione una organización"
-                styleClass="w-full"
-                [virtualScroll]="true"
-                [virtualScrollItemSize]="38"
-                (onChange)="OnOrganizationSelected()" />
-      <label for="organization_select">Organización</label>
-    </p-floatlabel>
-  </div>
   <div class="regions-wrapper">
     <!-------------------------- Region FUSION ------------------------------------>
     <div class="region-container" #regionContainer>
