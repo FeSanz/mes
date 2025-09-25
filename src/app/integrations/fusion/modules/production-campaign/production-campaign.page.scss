@@ -161,3 +161,9 @@ body.dragging-active {
 ion-datetime-button::part(native) {
   background-color: var(--ion-color-secondary);
 }
+
+.ion-activatable {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonModal, IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea,
-  IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton, IonPopover, IonList
+  IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton, IonPopover, IonList, IonRippleEffect
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
@@ -13,7 +13,7 @@ import { PrimeTemplate } from "primeng/api";
 import { Table, TableModule } from "primeng/table";
 import { Select } from "primeng/select";
 import { FloatLabel } from "primeng/floatlabel";
-import { pencilOutline, trashOutline, eyeOutline, reorderThreeOutline, addOutline, checkmark, moveOutline, checkmarkCircle, checkmarkOutline } from 'ionicons/icons';
+import { pencilOutline, trashOutline, eyeOutline, reorderThreeOutline, addOutline, checkmark, moveOutline, checkmarkCircle, checkmarkOutline, unlinkOutline, backspaceOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Tag } from "primeng/tag";
 import { ButtonModule } from "primeng/button";
@@ -27,7 +27,7 @@ import { InputText } from 'primeng/inputtext';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
     IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
-    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList]
+    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect]
 })
 export class ProductionCampaignPage {
   campaignsArray: any = []
@@ -66,11 +66,11 @@ export class ProductionCampaignPage {
   todayDate: any = {}
   woObj: any = {}
   organizationSelected: string | any = '';
-  selectedProducts: any[] = [];
   workCenter: any = {}
   workCenters: any = []
   selectedOrders: any[] = [];
   selectedFreeOrders: any[] = [];
+  selectedCampaigns: any[] = []
   isDragging: boolean = false;
   draggedItems: any[] = [];
   dropIndicatorVisible: boolean = false;
@@ -86,7 +86,7 @@ export class ProductionCampaignPage {
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.organizationSelected = this.userData.Company.Organizations[2];
-    addIcons({ trashOutline, checkmarkOutline, checkmark, checkmarkCircle, addOutline, pencilOutline, eyeOutline, moveOutline, reorderThreeOutline });
+    addIcons({ trashOutline, pencilOutline, checkmark, backspaceOutline, checkmarkOutline, checkmarkCircle, addOutline, eyeOutline, moveOutline, reorderThreeOutline });
   }
 
   formatLocalISO(date: Date): string {
@@ -105,25 +105,25 @@ export class ProductionCampaignPage {
     this.GetWorkCenters()
   }
   GetWorkCenters() {
-    this.apiService.GetRequestFusion(`/workCenters?limit=50&fields=WorkCenterId,WorkCenterCode,WorkCenterName,WorkCenterDescription,WorkAreaCode,WorkAreaName&onlyData=true&links=canonical&q=OrganizationCode='${this.organizationSelected.Code}'`).then((response: any) => {
-      const data = JSON.parse(response)
-      if (!data.items) {
+    this.apiService.GetRequestRender('workCenters/' + this.organizationSelected.OrganizationId).then((response: any) => {
+      if (!response.items) {
         this.alerts.Info(response.message);
       } else {
-        this.workCenters = data.items
-        this.workCenter = data.items[0]
+        this.workCenters = response.items
+        this.workCenter = response.items[0]
         this.GetCampaigns()
       }
     })
   }
   GetCampaigns() {
-    this.apiService.GetRequestRender(`campaigns/1`/*${this.workCenter.WorkCenterId}`*/).then((response: any) => {
+    this.apiService.GetRequestRender(`campaigns/${this.workCenter.WorkCenterId}`).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
         this.showCampaign = false
         this.currentCampaign = {}
         this.selectedOrders = []
+        this.selectedCampaigns = []
         this.campaignsArray = response.items
         this.campaignObj = {
           campaign_id: 0,
@@ -323,7 +323,7 @@ export class ProductionCampaignPage {
       end_date: this.campaignObj.end_date,
       status_telegram: "Unschedule",//this.campaignObj.status_telegram,
       enabled_flag: this.campaignObj.enabled_flag,
-      work_center_id: 1//this.workCenter.WorkCenterId
+      work_center_id: this.workCenter.WorkCenterId
     }
     this.apiService.PostRequestRender('campaigns', payload).then(async (response: any) => {
       if (response.errorsExistFlag) {
@@ -415,7 +415,7 @@ export class ProductionCampaignPage {
         }
       }
     })
-    this.apiService.GetRequestRender(`work-orders/without-campaign/1`/*${this.organizationSelected.OrganizationId}`*/, false).then((response: any) => {
+    this.apiService.GetRequestRender(`work-orders/without-campaign/${this.organizationSelected.OrganizationId}/${this.workCenter.WorkCenterId}`, false).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
