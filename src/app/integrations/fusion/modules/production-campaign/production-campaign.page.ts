@@ -29,7 +29,7 @@ import { InputIconModule } from 'primeng/inputicon';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
     IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
-    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule,InputIconModule]
+    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule, InputIconModule]
 })
 export class ProductionCampaignPage {
   campaignsArray: any = []
@@ -76,6 +76,8 @@ export class ProductionCampaignPage {
   isDragging: boolean = false;
   draggedItems: any[] = [];
   dropIndicatorVisible: boolean = false;
+  statusGeneral = 0;
+
   /*lots = [
     { id: 1, name: 'Lote A', available: 120 },
     { id: 2, name: 'Lote B', available: 50 },
@@ -146,9 +148,6 @@ export class ProductionCampaignPage {
       }
     })
   }
-  GetCurrentWO() {
-
-  }
   ClearCampaigns(table: any) {
     table.clear();
     this.searchValueAl = '';
@@ -160,6 +159,28 @@ export class ProductionCampaignPage {
   EditCampaign(wo: any) {
     this.campaignObj = wo
     this.campaignObj.isNew = false
+    this.campaignObj.visualization = false
+    this.isModalNewCampaign = true
+    this.changeDetector.detectChanges()
+  }
+  OnlyCloseCampaignModal() {
+    this.campaignObj = {
+      campaign_id: 0,
+      isNew: true,
+      visualization: false,
+      code: '',
+      name: '',
+      description: '',
+      status_telegram: 'Unschedule',
+      enabled_flag: 'Y',
+    }
+    this.isModalNewCampaign = false
+    this.changeDetector.detectChanges()
+  }
+  ShowCampaign(wo: any) {
+    this.campaignObj = wo
+    this.campaignObj.visu = true
+    this.campaignObj.visualization = true
     this.isModalNewCampaign = true
     this.changeDetector.detectChanges()
   }
@@ -175,11 +196,26 @@ export class ProductionCampaignPage {
       })
     }
   }
-  ViewCampaign(wo: any) {
+  getCampaignsStatus() {
+    const statuses = new Set(this.selectedCampaigns.map(c => c.status_telegram));
+    if (statuses.size === 1) {
+      // Solo un estado
+      return statuses.has("Published to MES")
+        ? "1"
+        : statuses.has("Published to L2")
+          ? "2"
+          : Array.from(statuses)[0]; // otro valor
+    }
 
+    return "3"; // más de un estado
   }
   async PublishToL2() {
     if (await this.alerts.ShowAlert("¿Deseas publicar esta" + (this.selectedCampaigns.length > 1 ? "s" : "") + " campaña" + (this.selectedCampaigns.length > 1 ? "s" : "") + " a Nivel 2?", "Alerta", "Atrás", "Publicar")) {
+
+    }
+  }
+  async RecoveryToMES() {
+    if (await this.alerts.ShowAlert("¿Deseas recuperar esta" + (this.selectedCampaigns.length > 1 ? "s" : "") + " campaña" + (this.selectedCampaigns.length > 1 ? "s" : "") + " hacia MES?", "Alerta", "Atrás", "Recuperar")) {
 
     }
   }
@@ -447,6 +483,23 @@ export class ProductionCampaignPage {
   }
   ShowNewCampaign() {
     this.isModalNewCampaign = true
+    this.campaignObj = {
+      campaign_id: 0,
+      code: this.campaignsArray.length != 0 ? (Number(this.campaignsArray[this.campaignsArray.length - 1].code) + 1) : 2150,
+      isNew: true,
+      visualization: false,
+      name: '',
+      description: '',
+      status_telegram: 'Unschedule',
+      enabled_flag: 'Y',
+    }
+    this.todayDate = this.formatLocalISO(new Date())
+    this.campaignObj.end_date = this.formatLocalISO(
+      new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
+    );
+    this.campaignObj.start_date = this.formatLocalISO(
+      new Date(new Date(new Date().setDate(new Date().getDate() + 7)).setHours(12, 0, 0, 0))
+    );
   }
   ////////****************///////////*************////////************/////********** */ */ */ */
   onDragStart(event: DragEvent, item: any) {

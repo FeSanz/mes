@@ -28,7 +28,7 @@
     <ion-breadcrumb (click)="GetCampaigns()" style="cursor: pointer;"><strong>Campañas</strong></ion-breadcrumb>
     <ion-breadcrumb (click)="GetCurrentCampaign(currentCampaign)" *ngIf="currentCampaign.campaign_id"
       style="cursor: pointer;"><strong>{{currentCampaign.code}}</strong></ion-breadcrumb>
-    <ion-breadcrumb (click)="GetCurrentWO()" *ngIf="currentWO.work_order_number" style="cursor: pointer;"
+    <ion-breadcrumb *ngIf="currentWO.work_order_number" style="cursor: pointer;"
       color="primary"><strong>{{currentWO.work_order_number}}</strong></ion-breadcrumb>
   </ion-breadcrumbs>
   <ion-grid>
@@ -49,26 +49,29 @@
                 <div class="table-caption-left">
                   <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
                     (click)="ClearCampaigns(dtCampaigns)" />
-                  <p-button [outlined]="true" icon="pi pi-plus-circle" label="Nueva" variant="outlined"
-                    severity="info" (click)="ShowNewCampaign()" />
+                  <p-button [outlined]="true" icon="pi pi-plus-circle" label="Nueva" variant="outlined" severity="info"
+                    (click)="ShowNewCampaign()" />
                   <div style="font-size: 17px;">
                     Campañas
                   </div>
                 </div>
 
-                <p-button class="btn-add" [outlined]="true" icon="pi pi-arrow-right" label="Publish to L2"
-                          *ngIf="selectedCampaigns.length > 0" (click)="PublishToL2()" variant="outlined"
-                          severity="success" />
+                <div class="table-caption-right">
+                  <div [ngSwitch]="getCampaignsStatus()">
+                    <p-button *ngSwitchCase="'1'" class="btn-add" [outlined]="true" icon="pi pi-arrow-right"
+                      label="Publish to L2" (click)="PublishToL2()" variant="outlined" severity="info" />
+                    <p-button *ngSwitchCase="'2'" class="btn-add" [outlined]="true" icon="pi pi-arrow-left"
+                      label="Recovery to MES" (click)="RecoveryToMES()" variant="outlined" severity="success" />
+                  </div>
 
-                <p-iconField iconPosition="left">
-                  <p-inputIcon>
-                    <i class="fas fa-search"></i>
-                  </p-inputIcon>
-                  <input pInputText type="text"
-                         [(ngModel)]="searchValueAl"
-                         (input)="OnFilterGlobal($event, dtCampaigns)"
-                         placeholder="Buscar" />
-                </p-iconField>
+                  <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                      <i class="fas fa-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" [(ngModel)]="searchValueAl"
+                      (input)="OnFilterGlobal($event, dtCampaigns)" placeholder="Buscar" />
+                  </p-iconField>
+                </div>
               </div>
             </ng-template>
 
@@ -149,8 +152,14 @@
                     <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                   </ion-button>
                   <ion-button size="small" shape="round" color="success"
+                    *ngIf="item.status_telegram === 'Published to MES'"
                     (click)="$event.stopPropagation(); EditCampaign(item)" title="Editar">
                     <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+                  </ion-button>
+                  <ion-button size="small" shape="round" color="tertiary"
+                    *ngIf="item.status_telegram === 'Published to L2'"
+                    (click)="$event.stopPropagation(); ShowCampaign(item)" title="Visualizar">
+                    <ion-icon slot="icon-only" name="eye-outline"></ion-icon>
                   </ion-button>
                 </td>
                 <ion-ripple-effect></ion-ripple-effect>
@@ -212,7 +221,8 @@
             <ng-template pTemplate="header">
               <tr>
                 <th style="width: 4rem">
-                  <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                  <p-tableHeaderCheckbox
+                    [disabled]="currentCampaign.status_telegram != 'Published to MES'"></p-tableHeaderCheckbox>
                 </th>
                 <th pSortableColumn="work_order_number" class="td-center">Orden #<p-sortIcon
                     field="work_order_number" /></th>
@@ -226,7 +236,7 @@
                 <th pSortableColumn="machine_name" class="td-center">Máquina <p-sortIcon field="machine_name" /></th>
                 <th pSortableColumn="start_date" class="td-center">Fecha inicio <p-sortIcon field="start_date" /></th>
                 <th pSortableColumn="end_date" class="td-center">Fecha fin <p-sortIcon field="end_date" /></th>
-                <th pSortableColumn="status">Estado <p-sortIcon field="status" /></th>
+                <!--th pSortableColumn="status">Estado <p-sortIcon field="status" /></th-->
                 <th class="td-center">Acciones</th>
               </tr>
             </ng-template>
@@ -238,9 +248,10 @@
                 (dragstart)="onDragStart($event, item)" (dragover)="onDragOver($event, rowIndex)"
                 (drop)="onDrop($event, rowIndex)" (dragend)="onDragEnd($event)"
                 [style.cursor]="selectedOrders.length > 0 && isSelected(item) ? 'move' : 'default'"
-                [pSelectableRowDisabled]="false">
+                [pSelectableRowDisabled]="currentCampaign.status_telegram == 'Published to L2'">
                 <td>
-                  <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                  <p-tableCheckbox [value]="item"
+                    [disabled]="currentCampaign.status_telegram != 'Published to MES'"></p-tableCheckbox>
                 </td>
                 <td class="td-center">
                   <p-tag [value]="item.work_order_number" [severity]="'contrast'" />
@@ -248,6 +259,7 @@
                 <td class="td-center">{{ item.sequence }}</td>
                 <td class="td-center" (click)="$event.stopPropagation()">
                   <ion-button id="lot-popover-{{item.work_order_id}}" expand="block" fill="outline"
+                    [disabled]="currentCampaign.status_telegram != 'Published to MES'"
                     [color]="item.selectedlot ? 'secondary' : 'medium'" shape="round" size="small">
                     {{ item.selectedlot || 'Seleccione lote' }}
                   </ion-button>
@@ -269,15 +281,15 @@
                 <td class="td-center">{{ item.machine_name }}</td>
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
                 <td class="td-center">{{ item.end_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
-                <td class="td-center">
+                <!--td class="td-center">
                   <p-tag
                     [value]="item.status === 'UNRELEASED' ? 'Sin liberar' : item.status === 'IN_PROCESS' ? 'En proceso' : item.status === 'COMPLETED' ? 'Completada' : ''"
                     [severity]="item.status === 'UNRELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
                   </p-tag>
-                </td>
+                </td-->
                 <td class="td-center" (click)="$event.stopPropagation()">
                   <ion-button size="small" shape="round" color="danger" (click)="DeleteOrder(item)"
-                    title="Eliminar de la campaña">
+                    [disabled]="currentCampaign.status_telegram != 'Published to MES'" title="Eliminar de la campaña">
                     <ion-icon slot="icon-only" name="backspace-outline"></ion-icon>
                   </ion-button>
                 </td>
@@ -300,14 +312,16 @@
     <ng-template>
       <ion-header>
         <ion-toolbar color="primary">
-          <ion-title>{{campaignObj.isNew ? 'Nueva campaña' : 'Editar campaña'}} </ion-title>
+          <ion-title>{{campaignObj.visualization == true ? 'Información de la campaña' : campaignObj.isNew ? 'Nueva
+            campaña' : 'Editar campaña'}}
+          </ion-title>
         </ion-toolbar>
       </ion-header>
 
       <ion-content class="ion-padding">
         <!-- Código -->
         <ion-item>
-          <ion-input type="text" placeholder="Ej: CMP-001" [(ngModel)]="campaignObj.code">
+          <ion-input type="text" placeholder="Ej: CMP-001" [(ngModel)]="campaignObj.code" disabled>
             <div slot="label"><ion-text color="primary">Código:</ion-text></div>
           </ion-input>
         </ion-item>
@@ -384,22 +398,22 @@
       <ion-footer class="footer-style">
         <ion-row>
           <ion-col size="6">
-            <ion-button expand="block" color="danger" (click)="isModalNewCampaign = false">
+            <ion-button expand="block" color="danger" (click)="OnlyCloseCampaignModal()">
               CERRAR
             </ion-button>
           </ion-col>
           <ion-col size="6">
             <ion-button expand="block" color="success"
-              (click)="campaignObj.isNew ? SaveCampaign() : SaveCampaignChanges()"
+              (click)="campaignObj.visualization == true ? OnlyCloseCampaignModal() : campaignObj.isNew ? SaveCampaign() : SaveCampaignChanges()"
               [disabled]="campaignObj.code == '' || campaignObj.name == ''">
-              {{campaignObj.isNew ? 'GUARDAR' : 'GUARDAR CAMBIOS'}}
+              {{campaignObj.visualization == true ? 'Ok' : campaignObj.isNew ? 'GUARDAR' : 'GUARDAR CAMBIOS'}}
             </ion-button>
           </ion-col>
         </ion-row>
       </ion-footer>
     </ng-template>
   </ion-modal>
-  <ion-modal [isOpen]="isModalFreeOrdersOpen" (ionModalWillDismiss)="isModalFreeOrdersOpen = false" [focusTrap]="false">
+  <ion-modal [isOpen]="isModalFreeOrdersOpen" (ionModalWillDismiss)="OnlyCloseCampaignModal()" [focusTrap]="false">
     <ng-template>
       <ion-header>
         <ion-toolbar color="primary">
@@ -410,7 +424,7 @@
       <ion-content class="ion-padding"><p-table #dtOrders [value]="freeWorkOrdersArray"
           [(selection)]="selectedFreeOrders" dataKey="work_order_number" selectionMode="multiple"
           styleClass="card-table-primeng orders-table-custom" [tableStyle]="{ 'height': '100%'}" [size]="'small'"
-          [rowHover]="true" [paginator]="true" [rows]="rowsPerPage"
+          [rowHover]="false" [paginator]="true" [rows]="rowsPerPage"
           [globalFilterFields]="['work_order_number','item_number','machine_name','itemDescription','status']"
           currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
           [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true" [scrollHeight]="scrollHeight"
@@ -431,7 +445,9 @@
           <!-- Encabezado -->
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 3rem"></th> <!-- columna de selección -->
+              <th style="width: 3rem">
+                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+              </th> <!-- columna de selección -->
               <th pSortableColumn="work_order_number" class="td-center">
                 Orden #<p-sortIcon field="work_order_number" />
               </th>
@@ -441,9 +457,9 @@
               <th pSortableColumn="machine_name" class="td-center">
                 Máquina <p-sortIcon field="machine_name" />
               </th>
-              <th pSortableColumn="status" class="td-center">
+              <!--th pSortableColumn="status" class="td-center">
                 Estado <p-sortIcon field="status" />
-              </th>
+              </th-->
             </tr>
           </ng-template>
           <!-- Cuerpo -->
@@ -455,12 +471,12 @@
               <td class="td-center">{{ item.work_order_number }}</td>
               <td class="td-center">{{ item.item_number }}</td>
               <td class="td-center">{{ item.machine_name }}</td>
-              <td class="td-center">
+              <!--td class="td-center">
                 <p-tag
                   [value]="item.status === 'UNRELEASED' ? 'Sin liberar' : item.status === 'IN_PROCESS' ? 'En proceso' : item.status === 'COMPLETED' ? 'Completada' : ''"
                   [severity]="item.status === 'UNRELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
                 </p-tag>
-              </td>
+              </td-->
             </tr>
           </ng-template>
           <!-- Mensaje vacío -->
@@ -474,7 +490,7 @@
       <ion-footer class="footer-style">
         <ion-row>
           <ion-col size="6">
-            <ion-button expand="block" color="danger" (click)="isModalFreeOrdersOpen = false">
+            <ion-button expand="block" color="danger" (click)="OnlyCloseCampaignModal()">
               CERRAR
             </ion-button>
           </ion-col>
