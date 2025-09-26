@@ -15,10 +15,10 @@
     </div-->
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
-        <p-select [(ngModel)]="workCenter" inputId="workCenter" [options]="workCenters" optionLabel="WorkAreaName"
+        <p-select [(ngModel)]="workCenter" inputId="workCenter" [options]="workCenters" optionLabel="WorkCenterName"
           [filter]="true" filterBy="WorkCenterId" placeholder="Seleccione centro de trabajo" styleClass="w-full"
           [virtualScroll]="true" [virtualScrollItemSize]="38" (onChange)="GetCampaigns()" appendTo="body" />
-        <label for="workCenter">Centro de trabajo</label>
+        <label for="workCenter">Área de trabajo</label>
       </p-floatlabel>
     </div>
   </ion-toolbar>
@@ -49,24 +49,26 @@
                 <div class="table-caption-left">
                   <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
                     (click)="ClearCampaigns(dtCampaigns)" />
-                  <p-button [outlined]="true" icon="pi pi-plus-circle" label="Nueva campaña" variant="outlined"
+                  <p-button [outlined]="true" icon="pi pi-plus-circle" label="Nueva" variant="outlined"
                     severity="info" (click)="ShowNewCampaign()" />
-                  <div style="font-size: 25px;">
-                    Campañas de producción
+                  <div style="font-size: 17px;">
+                    Campañas
                   </div>
                 </div>
-                <div class="table-caption-right">
-                  <p-button class="btn-add" [outlined]="true" icon="pi pi-arrow-right" label="Publish to L2"
-                    *ngIf="selectedCampaigns.length > 0" (click)="PublishToL2()" variant="outlined"
-                    severity="success" />
-                  <p-iconField iconPosition="left">
-                    <p-inputIcon>
-                      <i class="fas fa-search"></i>
-                    </p-inputIcon>
-                    <input pInputText type="text" [(ngModel)]="searchValueAl"
-                      (input)="OnFilterGlobal($event, dtCampaigns)" placeholder="Buscar" />
-                  </p-iconField>
-                </div>
+
+                <p-button class="btn-add" [outlined]="true" icon="pi pi-arrow-right" label="Publish to L2"
+                          *ngIf="selectedCampaigns.length > 0" (click)="PublishToL2()" variant="outlined"
+                          severity="success" />
+
+                <p-iconField iconPosition="left">
+                  <p-inputIcon>
+                    <i class="fas fa-search"></i>
+                  </p-inputIcon>
+                  <input pInputText type="text"
+                         [(ngModel)]="searchValueAl"
+                         (input)="OnFilterGlobal($event, dtCampaigns)"
+                         placeholder="Buscar" />
+                </p-iconField>
               </div>
             </ng-template>
 
@@ -101,13 +103,13 @@
                 </th>
                 <th pSortableColumn="start_date" class="td-center">
                   <div class="flex justify-between items-center">
-                    Inicio Estimado
+                    F. Inicio
                     <p-sortIcon field="start_date" />
                   </div>
                 </th>
                 <th pSortableColumn="end_date" class="td-center">
                   <div class="flex justify-between items-center">
-                    Fin Estimado
+                    F. Fin
                     <p-sortIcon field="end_date" />
                   </div>
                 </th>
@@ -136,8 +138,8 @@
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a' }}</td>
                 <td class="td-center">{{ item.end_date | date: 'dd/MM/yyyy hh:mm a' }}</td>
                 <td class="td-center">
-                  <p-tag [value]="item.status_telegram" [severity]="item.status_telegram === 'Unschedule' ? 'warn' : 
-                    item.status_telegram === 'Published to MES' ? 'success' : 
+                  <p-tag [value]="item.status_telegram" [severity]="item.status_telegram === 'Unschedule' ? 'warn' :
+                    item.status_telegram === 'Published to MES' ? 'success' :
                     item.status_telegram === 'Published to L2' ? 'info' : 'danger'">
                   </p-tag>
                 </td>
@@ -186,7 +188,7 @@
                     Campaña de producción:
                     <strong style="color: var(--ion-color-primary);">{{currentCampaign.code}}</strong>
                   </div-->
-                  <div style="font-size: 18px;">
+                  <div style="font-size: 17px;">
                     Estado:
                     <strong style="color: var(--ion-color-success);">{{ currentCampaign.status_telegram }}</strong>
                   </div>

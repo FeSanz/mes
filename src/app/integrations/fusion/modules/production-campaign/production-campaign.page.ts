@@ -18,6 +18,8 @@ import { addIcons } from 'ionicons';
 import { Tag } from "primeng/tag";
 import { ButtonModule } from "primeng/button";
 import { InputText } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 
 @Component({
   selector: 'app-production-campaign',
@@ -27,7 +29,7 @@ import { InputText } from 'primeng/inputtext';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
     IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
-    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect]
+    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule,InputIconModule]
 })
 export class ProductionCampaignPage {
   campaignsArray: any = []
@@ -557,7 +559,7 @@ export class ProductionCampaignPage {
       if (selectedIndex < targetIndex) {
         adjustedTargetIndex--;
         console.log(selectedIndex);
-        
+
       }
     }*/
 
@@ -623,7 +625,7 @@ export class ProductionCampaignPage {
     //   work_order_number: order.work_order_number,
     //   sequence: order.sequence
     // }));
-    // 
+    //
     // this.orderService.updateOrderSequence(sequenceData)
     //   .subscribe(response => {
     //     console.log('Secuencia guardada exitosamente');
