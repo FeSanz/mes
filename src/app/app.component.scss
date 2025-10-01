@@ -1,3 +1,382 @@
+// ========================================
+// ESTILOS GENERALES DEL MENÚ
+// ========================================
+ion-menu {
+  --width: 300px;
+  --background: var(--ion-color-back);
+}
+
+// ========================================
+// CONTENEDOR Y PANEL PRINCIPAL
+// ========================================
+.menu-wrapper {
+  //margin-top: -5px;
+  padding-top: 5px;
+  padding-left: 7px;
+  padding-right: 7px;
+  padding-bottom: 5px;
+}
+
+.menu-panel {
+  background: #2c2f3e;
+  border-radius: 16px;
+  overflow: hidden;
+  //box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+
+// ========================================
+// HEADER CON USUARIO
+// ========================================
+.menu-header {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  padding: 24px 16px;
+}
+
+.menu-brand {
+  flex: 1;
+  padding: 5px;
+
+  h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.5px;
+  }
+}
+
+.menu-separator {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 0 20px 0;
+}
+
+.user-profile-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+
+  ion-avatar {
+    width: 50px;
+    height: 50px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .user-details {
+    flex: 1;
+
+    h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
+    }
+
+    p {
+      margin: 4px 0 0 0;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  .button-panel {
+    margin: 0;
+    --padding-start: 8px;
+    --padding-end: 8px;
+
+    ion-icon {
+      color: white;
+      font-size: 18px;
+    }
+  }
+}
+
+// ========================================
+// CONTENIDO DEL MENÚ
+// ========================================
+.menu-content {
+  --background: var(--ion-color-menu-content);
+  // NOTA: height debe ir como style inline en el HTML
+}
+
+.navigation-wrapper {
+  padding: 10px 0 12px 0;
+}
+
+.navigation-title {
+  padding: 4px 20px 12px 20px;
+
+  ion-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ion-color-grey-nav);
+    letter-spacing: 1px;
+  }
+}
+
+// ========================================
+// ITEMS DEL ACORDEÓN (Headers)
+// ========================================
+.menu-header-item {
+  --background: transparent;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 48px;
+  margin: 4px 8px;
+  border-radius: 8px;
+
+  .menu-icon {
+    //color: white;
+    font-size: 22px;
+    margin-right: 16px;
+  }
+
+  .menu-label {
+    //color: white;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  &:hover {
+    --background: rgba(255, 255, 255, 0.05);
+  }
+
+  ion-button ion-icon {
+    //color: white;
+    font-size: 18px;
+  }
+}
+
+// ========================================
+// SUBITEMS DEL MENÚ
+// ========================================
+.submenu-item {
+  --background: transparent;
+  --padding-start: 52px;
+  --padding-end: 16px;
+  --min-height: 44px;
+  margin: 2px 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    --background: rgba(255, 255, 255, 0.05);
+    //--background: green;
+  }
+
+  ion-icon {
+    //color: rgba(255, 255, 255, 0.8);
+    font-size: 20px;
+    margin-right: 16px;
+  }
+
+  ion-label {
+    font-size: 14px;
+    font-weight: 500;
+    //color: rgba(255,255,255,0.8);
+  }
+
+  ion-button ion-icon {
+    //color: rgba(255, 255, 255, 0.5);
+    font-size: 18px;
+    margin-right: 0;
+  }
+}
+
+.submenu-add-item {
+  ion-label {
+    font-size: 14px;
+    font-weight: 500;
+    //color: rgba(255, 255, 255, 0.9);
+    //color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+// ========================================
+// ITEM SELECCIONADO
+// ========================================
 ion-item.selected {
-  --ion-color-base: rgba(var(--ion-color-primary-rgb), 0.14) !important;
+  --background: rgba(33, 150, 243, 0.2) !important;
+  position: relative;
+  border-radius: 8px;
+  margin: 2px 8px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 50%;
+    width: 3px;
+    background: #2196F3;
+    border-radius: 2px;
+  }
+
+  ion-label {
+    //color: white !important;
+    font-weight: 600 !important;
+
+    h3 {
+      //color: white !important;
+    }
+
+    p {
+      //color: rgba(255, 255, 255, 0.7) !important;
+    }
+  }
+
+  ion-icon {
+    color: #2196F3 !important;
+  }
+}
+
+// ========================================
+// ACORDEÓN
+// ========================================
+ion-accordion {
+  background: transparent !important;
+
+  &::part(header) {
+    background: transparent;
+  }
+
+  &::part(content) {
+    background: transparent;
+  }
+}
+
+ion-accordion-group {
+  background: transparent !important;
+  border: none !important;
+}
+
+.accordion-content {
+  padding: 0;
+}
+
+// ========================================
+// LISTAS
+// ========================================
+ion-list {
+  background: transparent !important;
+  padding: 0;
+}
+
+.menu-list {
+  background: transparent;
+  padding: 0;
+}
+
+// ========================================
+// REORDER
+// ========================================
+ion-reorder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+// ========================================
+// POPOVER
+// ========================================
+ion-popover {
+  --background: var(--ion-background-color);
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --border-radius: 8px;
+
+  ion-item {
+    --background: transparent;
+    font-size: 14px;
+    --min-height: 40px;
+
+    &:hover {
+      --background: rgba(var(--ion-color-primary-rgb), 0.1);
+    }
+  }
+}
+
+// ========================================
+// FOOTER
+// ========================================
+.menu-footer {
+  background: var(--ion-color-tab-col);
+}
+
+ion-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+  ion-toolbar {
+    --background: transparent;
+    --padding-top: 8px;
+    --padding-bottom: 8px;
+  }
+
+  ion-item {
+    --background: transparent;
+    --padding-start: 16px;
+    --min-height: 20px; //Alto items footer 32 es el minimo para switches
+    font-size: 13px;
+
+    &:hover {
+      --background: rgba(255, 255, 255, 0.03);
+    }
+
+    ion-label {
+      color: var(--ion-color-footer-label);
+    }
+
+    ion-note {
+      font-size: 11px;
+      //color: rgba(255, 255, 255, 0.4);
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  ion-toggle {
+    --handle-width: 22px;
+    --handle-height: 22px;
+  }
+}
+
+// ========================================
+// ANIMACIONES
+// ========================================
+ion-item {
+  transition: background-color 0.2s ease;
+}
+
+// ========================================
+// SCROLLBAR PERSONALIZADO
+// ========================================
+ion-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+ion-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+ion-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+// ========================================
+// FIXES Y AJUSTES
+// ========================================
+ion-accordion ion-item[slot="header"]::part(native) {
+  padding-right: 8px;
+}
+
+ion-icon {
+  --ionicon-stroke-width: 32px;
 }

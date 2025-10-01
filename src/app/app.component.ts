@@ -1,10 +1,44 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { addIcons } from 'ionicons';
 import {
-  IonAccordion, IonAccordionGroup, IonApp, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonIcon, IonItem, IonLabel,
-  IonList, IonMenu, IonMenuToggle, IonNote, IonPopover, IonRouterOutlet, IonTitle, IonToolbar, IonToggle, IonAvatar, IonCol,
-  IonGrid, IonRow, IonModal, IonInput, IonTextarea, IonSelect, IonSelectOption, IonFab, IonFabButton, IonSplitPane, IonRouterLink,
-  IonReorder, IonReorderGroup, ItemReorderEventDetail, IonText
+  IonAccordion,
+  IonAccordionGroup,
+  IonApp,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonFooter,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonMenu,
+  IonMenuToggle,
+  IonNote,
+  IonPopover,
+  IonRouterOutlet,
+  IonTitle,
+  IonToolbar,
+  IonToggle,
+  IonAvatar,
+  IonCol,
+  IonGrid,
+  IonRow,
+  IonModal,
+  IonInput,
+  IonTextarea,
+  IonSelect,
+  IonSelectOption,
+  IonFab,
+  IonFabButton,
+  IonSplitPane,
+  IonRouterLink,
+  IonReorder,
+  IonReorderGroup,
+  ItemReorderEventDetail,
+  IonText,
+  IonMenuButton
 } from '@ionic/angular/standalone';
 
 import { NavController } from '@ionic/angular';
@@ -15,9 +49,8 @@ import {
   statsChartOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline,
   gitNetworkOutline, closeOutline, barChartOutline, pieChartOutline, addOutline, checkmark, pencilOutline, trashOutline,
   reorderThreeOutline, reorderTwoOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline,
-  cashOutline,
-  notificationsOutline,
-  calendarOutline
+  cashOutline, notificationsOutline, calendarOutline, buildOutline, addCircleOutline, createOutline, albumsOutline,
+  layersOutline
 } from 'ionicons/icons';
 
 import { FormsModule } from '@angular/forms';
@@ -31,6 +64,7 @@ import { AlertsService } from "./services/alerts.service";
 import { ActionPerformed, PushNotificationSchema, PushNotifications, Token, } from '@capacitor/push-notifications';
 import { Platform } from '@ionic/angular';
 import { WebSocketService } from './services/web-socket.service';
+import {ToggleMenu} from "./models/design";
 @Component({
   selector: 'app-root',
   styleUrls: ['app.component.scss'],
@@ -39,7 +73,7 @@ import { WebSocketService } from './services/web-socket.service';
   imports: [IonApp, RouterLink, IonMenu, IonToolbar, IonHeader, IonTitle, IonItem, IonIcon, IonLabel,
     IonButtons, IonButton, IonPopover, IonContent, IonList, IonMenuToggle, IonAccordionGroup, IonSplitPane, IonReorder, IonReorderGroup,
     IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid,
-    IonRow, IonModal, IonInput, IonTextarea, IonText, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast]
+    IonRow, IonModal, IonInput, IonTextarea, IonText, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast, IonMenuButton]
 })
 export class AppComponent implements OnInit {
   darkMode = false
@@ -71,7 +105,8 @@ export class AppComponent implements OnInit {
       ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline,
       reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline,
       timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline,
-      person, homeOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline, cashOutline, notificationsOutline, calendarOutline
+      person, homeOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline, cashOutline, notificationsOutline, calendarOutline,
+      buildOutline, addCircleOutline, createOutline, albumsOutline, layersOutline
     });
 
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false
@@ -363,4 +398,6 @@ export class AppComponent implements OnInit {
 
     }
   }
+
+  protected readonly ToggleMenu = ToggleMenu;
 }

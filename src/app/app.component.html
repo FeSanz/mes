@@ -2,48 +2,48 @@
   <p-toast></p-toast>
   <ion-split-pane contentId="main-content" when="(min-width: 1800px)">
     <ion-menu contentId="main-content" type="overlay" *ngIf="showMenu">
-      <ion-header>
-        <ion-header>
-          <ion-toolbar color="primary">
-            <ion-grid class="ion-no-padding ion-align-items-center">
-              <ion-row class="ion-align-items-center">
-                <ion-col>
-                  <ion-title class="ion-no-margin">Menú</ion-title>
-                </ion-col>
-              </ion-row>
-            </ion-grid>
-          </ion-toolbar>
-          <ion-toolbar color="primary">
+
+      <div class="menu-wrapper">
+        <!-- Panel completo -->
+        <div class="menu-panel">
+          <!-- Header -->
+          <div class="menu-header">
+            <div class="menu-brand">
+              <h2>MES</h2>
+            </div>
+
+            <!-- Separador -->
+            <div class="menu-separator"></div>
+
+            <!-- Usuario actual -->
             <ion-menu-toggle auto-hide="false">
-              <ion-item lines="none" button [routerLink]="['/settings/user']" class="user-card" color="primary">
-                <ion-avatar slot="start" style="width: 60px; height: 60px;">
+              <div class="user-profile-section" [routerLink]="['/settings/user']">
+                <ion-avatar>
                   <img src="../assets/images/avatar.png" alt="usuario" />
                 </ion-avatar>
-                <ion-label>
-                  <h2 style="margin-bottom: 2px; font-size: 12px;">{{ username }}</h2>
-                  <p style="font-size: 13px; color: var(--ion-color-medium); margin: 0;">Ver perfil</p>
-                </ion-label>
-              </ion-item>
+                <div class="user-details">
+                  <h3>{{ username }}</h3>
+                  <p>Ver perfil</p>
+                </div>
+                <ion-button fill="clear" id="popover-button-user" class="button-panel">
+                  <ion-icon name="ellipsis-vertical"></ion-icon>
+                </ion-button>
+              </div>
             </ion-menu-toggle>
-            <ion-buttons slot="end">
-              <ion-button shape="round" id="popover-button-user">
-                <ion-icon name="ellipsis-vertical-outline"></ion-icon>
-              </ion-button>
-            </ion-buttons>
+
             <ion-popover trigger="popover-button-user" [dismissOnSelect]="true">
               <ng-template>
                 <ion-content>
                   <ion-list>
                     <ion-menu-toggle auto-hide="false">
-                      <ion-item [routerLink]="['/settings']" lines="none" detail="false" routerLinkActive="selected"
-                        button>
-                        <ion-icon aria-hidden="true" slot="start" name="settings-outline" color="primary"></ion-icon>
+                      <ion-item [routerLink]="['/settings']" lines="none" detail="false" button>
+                        <ion-icon slot="start" name="settings-outline" color="primary"></ion-icon>
                         <ion-label>Ajustes</ion-label>
                       </ion-item>
                     </ion-menu-toggle>
                     <ion-menu-toggle auto-hide="false">
-                      <ion-item (click)="LogOut()" lines="none" detail="false" routerLinkActive="selected" button>
-                        <ion-icon aria-hidden="true" slot="start" name="power-outline" color="primary"></ion-icon>
+                      <ion-item (click)="LogOut()" lines="none" detail="false" button>
+                        <ion-icon slot="start" name="power-outline" color="danger"></ion-icon>
                         <ion-label>Salir</ion-label>
                       </ion-item>
                     </ion-menu-toggle>
@@ -51,214 +51,238 @@
                 </ion-content>
               </ng-template>
             </ion-popover>
-          </ion-toolbar>
-        </ion-header>
-      </ion-header>
-      <ion-content style="--background: var(--ion-item-background);">
-        <ion-accordion-group [multiple]="true" [value]="['dash']" style="padding-top: 5px;">
-          <ion-accordion value="dash"><!-- style="background-color: var(--ion-item-background);"-->
-            <ion-item slot="header" lines="full" color="secondary" button>
-              <ion-icon slot="start" name="pie-chart-outline"></ion-icon>
-              <ion-label><strong>Tableros</strong></ion-label>
-              <ion-buttons slot="end" *ngIf="permissions.canEdit()">
-                <ion-button title="Editar orden" *ngIf="!editDashOrder" (click)="Reorder($event, true)">
-                  <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
-                </ion-button>
-                <ion-button title="Editar orden" *ngIf="editDashOrder" (click)="Reorder($event, false)">
-                  <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-                </ion-button>
-              </ion-buttons>
-            </ion-item>
-            <div slot="content" style="padding-left: 16px; padding-right: 4px;">
-              <ion-list>
-                <ion-menu-toggle auto-hide="false">
-                  <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($event)">
-                    <ion-item routerLinkActive="selected" detail="false" button color="light"
-                      *ngFor="let dashGroup of dashboardGroups; trackBy: trackByGroup"
-                      (click)="GoToDashboards(dashGroup)" [routerLink]="['/monitoring', dashGroup.dashboard_group_id]">
-                      <ion-icon slot="start" name="stats-chart-outline" color="secondary"></ion-icon>
-                      <ion-label>
-                        <ion-text>{{ dashGroup.group_name }}</ion-text>
-                        <br />
-                        <ion-note color="medium" class="ion-text-wrap">{{ dashGroup.organization_name }}</ion-note>
-                      </ion-label>
-                      <ion-buttons slot="end" *ngIf="permissions.canEdit()">
-                        <ion-button title="Opciones" [style.display]="editDashOrder ? 'none' : 'inline-flex'"
-                          (click)="HandleClick($event)" id="popover-${{dashGroup['dashboard_group_id']}}">
-                          <ion-icon slot="icon-only" name="ellipsis-vertical-outline" color="secondary"></ion-icon>
-                        </ion-button>
-                      </ion-buttons>
-                      <ion-reorder slot="end" *ngIf="editDashOrder" class="custom-reorder-icon">
-                      </ion-reorder>
-                      <ion-popover trigger="popover-${{dashGroup['dashboard_group_id']}}" [dismissOnSelect]="true"
-                        showBackdrop="false">
-                        <ng-template>
-                          <ion-content>
-                            <ion-list>
-                              <ion-item [button]="true" [detail]="false" (click)="editDashGroup(dashGroup)">Editar
-                                <ion-icon slot="start" name="pencil-outline" color="success"></ion-icon>
-                              </ion-item>
-                              <ion-item [button]="true" [detail]="false"
-                                (click)="deleteDashGroup(dashGroup.dashboard_group_id)"
-                                *ngIf="permissions.isSuperAdmin()">Eliminar
-                                <ion-icon slot="start" name="trash-outline" color="danger"></ion-icon>
-                              </ion-item>
-                            </ion-list>
-                          </ion-content>
-                        </ng-template>
-                      </ion-popover>
-                    </ion-item>
-                  </ion-reorder-group>
-                </ion-menu-toggle>
-                <ion-menu-toggle auto-hide="false" (click)="setOpen(true)" *ngIf="!permissions.isViewer()">
-                  <ion-item routerLinkActive="selected" detail="false" button color="light">
-                    <ion-icon slot="start" name="add-outline" color="secondary"></ion-icon>
-                    <ion-label>Nuevo grupo de tableros</ion-label>
+          </div>
+
+          <!-- Contenido del menú -->
+          <ion-content style="height: calc(100vh - 275px);" class="menu-content">
+
+            <!-- Sección de Navegación -->
+            <div class="navigation-wrapper">
+              <div class="navigation-title">
+                <ion-text> NAVEGACIÓN</ion-text>
+              </div>
+              <!-- Acordeón de Tableros -->
+              <ion-accordion-group [multiple]="true" [value]="['dash']">
+                <ion-accordion value="dash">
+                  <ion-item slot="header" lines="none" button class="menu-header-item">
+                    <ion-icon slot="start" name="pie-chart-outline" class="menu-icon"></ion-icon>
+                    <ion-label class="menu-label">Tableros</ion-label>
+                    <ion-buttons slot="end" *ngIf="permissions.canEdit()">
+                      <ion-button fill="clear" size="small" *ngIf="!editDashOrder" (click)="Reorder($event, true)">
+                        <ion-icon slot="icon-only" name="layers-outline"></ion-icon>
+                      </ion-button>
+                      <ion-button fill="clear" size="small" *ngIf="editDashOrder" (click)="Reorder($event, false)">
+                        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+                      </ion-button>
+                    </ion-buttons>
                   </ion-item>
-                </ion-menu-toggle>
-              </ion-list>
+
+                  <div slot="content" class="accordion-content">
+                    <ion-list class="menu-list">
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($event)">
+                          <ion-item
+                            routerLinkActive="selected"
+                            detail="false"
+                            button
+                            lines="none"
+                            class="submenu-item"
+                            *ngFor="let dashGroup of dashboardGroups; trackBy: trackByGroup"
+                            (click)="GoToDashboards(dashGroup)"
+                            [routerLink]="['/monitoring', dashGroup.dashboard_group_id]">
+                            <ion-icon slot="start" name="stats-chart-outline"></ion-icon>
+                            <ion-label>
+                              <h3>{{ dashGroup.group_name }}</h3>
+                              <p>{{ dashGroup.organization_name }}</p>
+                            </ion-label>
+                            <ion-buttons slot="end" *ngIf="permissions.canEdit()">
+                              <ion-button
+                                fill="clear"
+                                size="small"
+                                [style.display]="editDashOrder ? 'none' : 'inline-flex'"
+                                (click)="HandleClick($event)"
+                                id="popover-${{dashGroup['dashboard_group_id']}}">
+                                <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
+                              </ion-button>
+                            </ion-buttons>
+                            <ion-reorder slot="end" *ngIf="editDashOrder"></ion-reorder>
+
+                            <ion-popover trigger="popover-${{dashGroup['dashboard_group_id']}}" [dismissOnSelect]="true">
+                              <ng-template>
+                                <ion-content>
+                                  <ion-list>
+                                    <ion-item [button]="true" [detail]="false" (click)="editDashGroup(dashGroup)" lines="none">
+                                      <ion-icon slot="start" name="pencil-outline" color="primary"></ion-icon>
+                                      <ion-label>Editar</ion-label>
+                                    </ion-item>
+                                    <ion-item
+                                      [button]="true"
+                                      [detail]="false"
+                                      (click)="deleteDashGroup(dashGroup.dashboard_group_id)"
+                                      *ngIf="permissions.isSuperAdmin()"
+                                      lines="none">
+                                      <ion-icon slot="start" name="trash-outline" color="danger"></ion-icon>
+                                      <ion-label>Eliminar</ion-label>
+                                    </ion-item>
+                                  </ion-list>
+                                </ion-content>
+                              </ng-template>
+                            </ion-popover>
+                          </ion-item>
+                        </ion-reorder-group>
+                      </ion-menu-toggle>
+
+                      <ion-menu-toggle auto-hide="false" (click)="setOpen(true)" *ngIf="!permissions.isViewer()">
+                        <ion-item detail="false" button lines="none" class="submenu-item submenu-add-item">
+                          <ion-icon slot="start" name="add-outline"></ion-icon>
+                          <ion-label>Nuevo grupo de tableros</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                    </ion-list>
+                  </div>
+                </ion-accordion>
+
+                <!-- Sensores -->
+                <ion-accordion value="iot" *ngIf="!permissions.isViewer()">
+                  <ion-item slot="header" lines="none" button class="menu-header-item">
+                    <ion-icon slot="start" name="radio-outline" class="menu-icon"></ion-icon>
+                    <ion-label class="menu-label">Sensores</ion-label>
+                  </ion-item>
+                  <div slot="content" class="accordion-content">
+                    <ion-list class="menu-list">
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="hardware-chip-outline"></ion-icon>
+                          <ion-label>Dispositivos</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                    </ion-list>
+                  </div>
+                </ion-accordion>
+
+                <!-- Manufactura -->
+                <ion-accordion value="mfg" *ngIf="!permissions.isViewer()">
+                  <ion-item slot="header" lines="none" button class="menu-header-item">
+                    <ion-icon slot="start" name="cube-outline" class="menu-icon"></ion-icon>
+                    <ion-label class="menu-label">Manufactura</ion-label>
+                  </ion-item>
+                  <div slot="content" class="accordion-content">
+                    <ion-list class="menu-list">
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/production-campaign']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="calendar-outline"></ion-icon>
+                          <ion-label>Campañas</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/fusion_production']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="trending-up-outline"></ion-icon>
+                          <ion-label>Producción</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/dispatch_transaction']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="document-text-outline"></ion-icon>
+                          <ion-label>Despachos</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/costs']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="cash-outline"></ion-icon>
+                          <ion-label>Costos</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                    </ion-list>
+                  </div>
+                </ion-accordion>
+
+                <!-- Mantenimiento -->
+                <ion-accordion value="mtto" *ngIf="!permissions.isViewer()">
+                  <ion-item slot="header" lines="none" button class="menu-header-item">
+                    <ion-icon slot="start" name="hammer-outline" class="menu-icon"></ion-icon>
+                    <ion-label class="menu-label">Mantenimiento</ion-label>
+                  </ion-item>
+                  <div slot="content" class="accordion-content">
+                    <ion-list class="menu-list">
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/alerts']" lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="notifications-outline"></ion-icon>
+                          <ion-label>Alertas</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/failures']" lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="warning-outline"></ion-icon>
+                          <ion-label>Fallas</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="time-outline"></ion-icon>
+                          <ion-label>Scada</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                    </ion-list>
+                  </div>
+                </ion-accordion>
+
+                <!-- Configuraciones -->
+                <ion-accordion value="settings" *ngIf="!permissions.isViewer()">
+                  <ion-item slot="header" lines="none" button class="menu-header-item">
+                    <ion-icon slot="start" name="settings-outline" class="menu-icon"></ion-icon>
+                    <ion-label class="menu-label">Configuraciones</ion-label>
+                  </ion-item>
+                  <div slot="content" class="accordion-content">
+                    <ion-list class="menu-list">
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/settings/users']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="people-outline"></ion-icon>
+                          <ion-label>Usuarios</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/settings/machines']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="build-outline"></ion-icon>
+                          <ion-label>Máquinas</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/fusion_connection']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="git-network-outline"></ion-icon>
+                          <ion-label>Integraciones</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                    </ion-list>
+                  </div>
+                </ion-accordion>
+              </ion-accordion-group>
             </div>
-          </ion-accordion>
-          <ion-accordion value="iot" *ngIf="!permissions.isViewer()">
-            <ion-item slot="header" lines="full" color="secondary" button>
-              <ion-icon slot="start" name="radio-outline"></ion-icon>
-              <ion-label><strong>Sensores</strong></ion-label>
-            </ion-item>
-            <div slot="content" style="padding-left: 16px; padding-right: 4px;">
-              <ion-list lines="none">
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button color="light">
-                    <ion-icon slot="start" name="hardware-chip-outline" color="secondary"></ion-icon>
-                    <ion-label>Dispositivoss</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-              </ion-list>
-            </div>
-          </ion-accordion>
-          <ion-accordion value="mfg" *ngIf="!permissions.isViewer()">
-            <ion-item slot="header" lines="full" color="secondary" button>
-              <ion-icon slot="start" name="cube-outline"></ion-icon>
-              <ion-label><strong>Manufactura</strong></ion-label>
-            </ion-item>
-            <div slot="content" style="padding-left: 16px;  padding-right: 4px;">
-              <ion-list lines="none">
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/production-campaign']" routerLinkActive="selected" detail="false" button
-                    color="light">
-                    <ion-icon slot="start" name="calendar-outline" color="secondary"></ion-icon>
-                    <ion-label>
-                      Campañas
-                    </ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/fusion_production']" routerLinkActive="selected" detail="false" button
-                    color="light">
-                    <ion-icon slot="start" name="trending-up-outline" color="secondary"></ion-icon>
-                    <ion-label>Producción</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
+          </ion-content>
 
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/dispatch_transaction']" routerLinkActive="selected" detail="false" button
-                    color="light">
-                    <ion-icon slot="start" name="document-text-outline" color="secondary"></ion-icon>
-                    <ion-label>Despachos</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
+          <!-- Footer -->
+          <ion-footer class="menu-footer ion-no-border">
+            <ion-toolbar>
+              <ion-item lines="none">
+                <ion-label>Servidor remoto</ion-label>
+                <ion-toggle slot="end" [(ngModel)]="remoteServer" (ionChange)="ChangeServerMode()" color="primary"></ion-toggle>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-label>Modo oscuro</ion-label>
+                <ion-toggle slot="end" [(ngModel)]="darkMode" (ionChange)="ChangeColorMode()" color="primary"></ion-toggle>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-note>Versión: 1.0.0</ion-note>
+              </ion-item>
+            </ion-toolbar>
+          </ion-footer>
+        </div>
+      </div>
 
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/costs']" routerLinkActive="selected" detail="false" button color="light">
-                    <ion-icon slot="start" name="cash-outline" color="secondary"></ion-icon>
-                    <ion-label>Costos</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-              </ion-list>
-            </div>
-          </ion-accordion>
-          <ion-accordion value="mtto" *ngIf="!permissions.isViewer()">
-            <ion-item slot="header" lines="full" color="secondary" button>
-              <ion-icon slot="start" name="hammer-outline"></ion-icon>
-              <ion-label><strong>Mantenimiento</strong></ion-label>
-            </ion-item>
-            <div slot="content" style="padding-left: 16px;  padding-right: 4px;">
-              <ion-list lines="none">
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item routerLinkActive="selected" detail="false" button color="light" [routerLink]="['/alerts']">
-                    <ion-icon slot="start" name="notifications-outline" color="secondary"></ion-icon>
-                    <ion-label>Alertas</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item routerLinkActive="selected" detail="false" button color="light"
-                    [routerLink]="['/failures']">
-                    <ion-icon slot="start" name="warning-outline" color="secondary"></ion-icon>
-                    <ion-label>Fallas</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item routerLinkActive="selected" detail="false" button color="light">
-                    <ion-icon slot="start" name="time-outline" color="secondary"></ion-icon>
-                    <ion-label>Scada</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-              </ion-list>
-            </div>
-          </ion-accordion>
-          <ion-accordion value="settings" *ngIf="!permissions.isViewer()">
-            <ion-item slot="header" lines="full" color="secondary" button>
-              <ion-icon slot="start" name="settings-outline"></ion-icon>
-              <ion-label><strong>Configuraciones</strong></ion-label>
-            </ion-item>
-
-            <div slot="content" style="padding-left: 16px; padding-right: 4px;">
-              <ion-list lines="none">
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/settings/users']" routerLinkActive="selected" detail="false" button
-                    color="light">
-                    <ion-icon slot="start" name="people-outline" color="secondary"></ion-icon>
-                    <ion-label>Usuarios</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/settings/machines']" routerLinkActive="selected" detail="false" button
-                    color="light">
-                    <ion-icon src="assets/images/robot-arm.svg" slot="start" color="secondary"></ion-icon>
-                    <ion-label>Máquinas</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-
-                <ion-menu-toggle auto-hide="false">
-                  <ion-item [routerLink]="['/fusion_connection']" routerLinkActive="selected" detail="false" button
-                    color="light">
-                    <ion-icon slot="start" name="git-network-outline" color="secondary"></ion-icon>
-                    <ion-label>Integraciones</ion-label>
-                  </ion-item>
-                </ion-menu-toggle>
-
-
-              </ion-list>
-            </div>
-          </ion-accordion>
-        </ion-accordion-group>
-      </ion-content>
-      <ion-footer class="no-shadow">
-        <ion-toolbar>
-          <ion-item lines="none">
-            <ion-toggle [(ngModel)]="remoteServer" (ionChange)="ChangeServerMode()" color="primary">Servidor
-              remoto</ion-toggle>
-          </ion-item>
-          <ion-item lines="none">
-            <ion-toggle [(ngModel)]="darkMode" (ionChange)="ChangeColorMode()" color="primary">Modo oscuro</ion-toggle>
-          </ion-item>
-          <ion-item lines="none">
-            <ion-note color="medium" slot="end" class="ion-text-center" slot="end">Versión: 1.0.0</ion-note>
-          </ion-item>
-        </ion-toolbar>
-      </ion-footer>
     </ion-menu>
+
     <ion-router-outlet id="main-content"></ion-router-outlet>
+
+    <!-- Modal -->
     <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false" [focusTrap]="false">
       <ng-template>
         <ion-header>
@@ -271,27 +295,22 @@
         </ion-header>
         <ion-content class="ion-padding">
           <ion-item>
-            <ion-input type="text" placeholder="Nombre del tablero" [(ngModel)]="dashboardGroupData.group_name"
-              style="text-align: right;">
+            <ion-input type="text" placeholder="Nombre del tablero" [(ngModel)]="dashboardGroupData.group_name" style="text-align: right;">
               <div slot="label">
                 <ion-text color="primary">Nombre:</ion-text>
               </div>
             </ion-input>
           </ion-item>
           <ion-item>
-            <ion-textarea type="text" placeholder="Descripción" [(ngModel)]="dashboardGroupData.description"
-              style="text-align: right;">
+            <ion-textarea type="text" placeholder="Descripción" [(ngModel)]="dashboardGroupData.description" style="text-align: right;">
               <div slot="label">
                 <ion-text color="primary">Descripción:</ion-text>
               </div>
             </ion-textarea>
           </ion-item>
           <ion-item [disabled]="!dashboardGroupData.isNew">
-            <ion-select label="Organización:" class="select" color="primary"
-              [(ngModel)]="dashboardGroupData.organization_id" interface="popover">
-              <ion-select-option [value]="org.OrganizationId" *ngFor="let org of user.Company.Organizations">{{ org.Name
-                }}
-              </ion-select-option>
+            <ion-select label="Organización:" class="select" color="primary" [(ngModel)]="dashboardGroupData.organization_id" interface="popover">
+              <ion-select-option [value]="org.OrganizationId" *ngFor="let org of user.Company.Organizations">{{ org.Name }}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-fab slot="fixed" vertical="bottom" horizontal="start" *ngIf="!dashboardGroupData.isNew">
@@ -300,8 +319,7 @@
             </ion-fab-button>
           </ion-fab>
           <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-            <ion-fab-button (click)="dashboardGroupData.isNew == true ? addNewWidgetGroup() : updateWidgetGroup()"
-              color="success">
+            <ion-fab-button (click)="dashboardGroupData.isNew ? addNewWidgetGroup() : updateWidgetGroup()" color="success">
               <ion-icon name="checkmark"></ion-icon>
             </ion-fab-button>
           </ion-fab>

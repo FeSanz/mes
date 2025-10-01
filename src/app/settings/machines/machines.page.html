@@ -1,5 +1,5 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -128,7 +128,7 @@
               <div slot="label"><ion-text color="primary">Clase:</ion-text></div>
             </ion-input>
           </ion-item>
-          <ion-item>            
+          <ion-item>
             <ion-select [(ngModel)]="workCenterSelected" interface="popover" placeholder="Centro de trabajo"
             (ionChange)="OnWorkCenterSelected()">
               <ion-select-option *ngFor="let center of workCenters" [value]="center">

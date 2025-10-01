@@ -2,12 +2,13 @@ import {AfterViewInit, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnDestro
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {
+  IonButton,
   IonButtons,
   IonCard,
   IonCol,
   IonContent,
   IonGrid,
-  IonHeader,
+  IonHeader, IonIcon,
   IonMenuButton,
   IonRow,
   IonTitle,
@@ -20,6 +21,7 @@ import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
 import {HeightTable} from "../../../../models/tables.prime";
 import {FormatForDisplayFromISO} from "../../../../models/date.format";
+import {ToggleMenu} from "../../../../models/design";
 
 import {Button} from "primeng/button";
 import {IconField} from "primeng/iconfield";
@@ -33,7 +35,11 @@ import {Slider} from "primeng/slider";
 import {WebSocketService} from "../../../../services/web-socket.service";
 import {FloatLabel} from "primeng/floatlabel";
 import {Select} from "primeng/select";
-import {contract} from "ionicons/icons";
+import {
+  contract,
+  menuOutline
+} from "ionicons/icons";
+import {addIcons} from "ionicons";
 
 
 @Component({
@@ -43,7 +49,7 @@ import {contract} from "ionicons/icons";
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton, IonCard, IonCol, IonGrid, IonRow, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule,
-    Tag, ProgressBar, Slider, FloatLabel, Select]
+    Tag, ProgressBar, Slider, FloatLabel, Select, IonButton, IonIcon]
 })
 export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
   scrollHeight: string = '550px';
@@ -63,7 +69,9 @@ export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
               private endPoints: EndpointsService,
               private alerts: AlertsService,
               private platform: Platform,
-              private websocket: WebSocketService) { }
+              private websocket: WebSocketService) {
+    addIcons({ contract, menuOutline });
+  }
 
   ngOnInit() {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
@@ -268,4 +276,5 @@ export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
 
   protected readonly FormatForDisplayFromISO = FormatForDisplayFromISO;
   protected readonly contract = contract;
+  protected readonly ToggleMenu = ToggleMenu;
 }
