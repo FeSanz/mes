@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -6,32 +6,33 @@ import {
   IonIcon, IonInput, IonItem, IonLabel, IonMenuButton, IonModal, IonRow, IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
 
-import {FloatLabel} from "primeng/floatlabel";
-import {Select} from "primeng/select";
+import { FloatLabel } from "primeng/floatlabel";
+import { Select } from "primeng/select";
 import { Toast } from 'primeng/toast';
-import {InputText, InputTextModule} from 'primeng/inputtext';
-import {Button} from "primeng/button";
-import {Divider} from "primeng/divider";
-import {Card} from "primeng/card";
-import {Dialog} from "primeng/dialog";
-import {AlertsService} from "../../../../services/alerts.service";
-import {IconField} from "primeng/iconfield";
-import {InputIcon} from "primeng/inputicon";
-import {PrimeTemplate} from "primeng/api";
-import {ProgressBar} from "primeng/progressbar";
-import {Slider} from "primeng/slider";
-import {TableModule} from "primeng/table";
-import {Tag} from "primeng/tag";
+import { InputText, InputTextModule } from 'primeng/inputtext';
+import { Button } from "primeng/button";
+import { Divider } from "primeng/divider";
+import { Card } from "primeng/card";
+import { Dialog } from "primeng/dialog";
+import { AlertsService } from "../../../../services/alerts.service";
+import { IconField } from "primeng/iconfield";
+import { InputIcon } from "primeng/inputicon";
+import { PrimeTemplate } from "primeng/api";
+import { ProgressBar } from "primeng/progressbar";
+import { Slider } from "primeng/slider";
+import { TableModule } from "primeng/table";
+import { Tag } from "primeng/tag";
 import { DialogModule } from 'primeng/dialog';
 
-import {ApiService} from "../../../../services/api.service";
-import {EndpointsService} from "../../../../services/endpoints.service";
-import {Platform} from "@ionic/angular";
-import {HeightTable} from "../../../../models/tables.prime";
-import {Round, Truncate} from "../../../../models/math.operations";
-import { cloudUploadOutline
-} from 'ionicons/icons';
-import {addIcons} from "ionicons";
+import { ApiService } from "../../../../services/api.service";
+import { EndpointsService } from "../../../../services/endpoints.service";
+import { Platform } from "@ionic/angular";
+import { HeightTable } from "../../../../models/tables.prime";
+import { Round, Truncate } from "../../../../models/math.operations";
+import {
+  cloudUploadOutline, menuOutline } from 'ionicons/icons';
+import { addIcons } from "ionicons";
+import { ToggleMenu } from 'src/app/models/design';
 
 @Component({
   selector: 'app-transaction',
@@ -44,7 +45,7 @@ import {addIcons} from "ionicons";
 })
 export class TransactionPage implements OnInit {
   private resizeTimeout: any;
-  modalSize: string= '';
+  modalSize: string = '';
 
   scrollHeight: string = '550px';
   rowsPerPage: number = 10;
@@ -53,7 +54,7 @@ export class TransactionPage implements OnInit {
   organizationSelected: string | any = '';
   searchValueWO: string = '';
 
-  isModaldispatchOpen : boolean = false;
+  isModaldispatchOpen: boolean = false;
 
   workOrdersToDispatch: any = { items: [] };
   selectedWorkOrder: any = {
@@ -77,7 +78,7 @@ export class TransactionPage implements OnInit {
       WorkOrderNumber: data.WorkOrderNumber,
       WorkDefinitionId: data.WorkDefinitionId,
       ItemId: data.PrimaryProductId,
-      ItemNumber:data.ItemNumber,
+      ItemNumber: data.ItemNumber,
       Description: data.Description,
       UoM: data.PrimaryProductUOMCode,
       PlannedQuantity: data.PrimaryProductQuantity,
@@ -98,7 +99,7 @@ export class TransactionPage implements OnInit {
       WorkOrderNumber: data.WorkOrderNumber,
       WorkDefinitionId: data.WorkDefinitionId,
       ItemId: data.InventoryItemId,
-      ItemNumber:data.ItemNumber,
+      ItemNumber: data.ItemNumber,
       Description: data.Description,
       UoM: data.UOMCode,
       PlannedQuantity: data.PlannedStartQuantity,
@@ -115,10 +116,10 @@ export class TransactionPage implements OnInit {
   };
 
   constructor(private apiService: ApiService,
-              private endPoints: EndpointsService,
-              private alerts: AlertsService,
-              private platform: Platform,) {
-    addIcons({cloudUploadOutline});
+    private endPoints: EndpointsService,
+    private alerts: AlertsService,
+    private platform: Platform,) {
+    addIcons({menuOutline,cloudUploadOutline});
   }
 
   ngOnInit() {
@@ -132,7 +133,7 @@ export class TransactionPage implements OnInit {
         const sortedOrganizations = organizations.sort((a, b) => a.OrganizationId - b.OrganizationId);
         this.organizationSelected = sortedOrganizations[0];
         this.GetWorkOrders();
-      }else{
+      } else {
         this.alerts.Warning("No se encontraron organizaciones");
       }
     }
@@ -156,7 +157,7 @@ export class TransactionPage implements OnInit {
   }
 
 
-  GetWorkOrders(){
+  GetWorkOrders() {
     this.workOrdersToDispatch = { items: [] };
     this.apiService.GetRequestRender(`dispatchPending/${this.organizationSelected.OrganizationId}`).then((response: any) => {
 
@@ -220,7 +221,7 @@ export class TransactionPage implements OnInit {
     return this.selectedWorkOrder?.Operations?.items || [];
   }
 
-//Metodo helper para obtener PlannedQuantity de forma segura
+  //Metodo helper para obtener PlannedQuantity de forma segura
   private getPlannedQuantity(): number {
     return this.selectedWorkOrder?.PlannedQuantity || 1;
   }
@@ -233,7 +234,7 @@ export class TransactionPage implements OnInit {
     // Agregar campo Standard a cada output
     filtered.forEach((output: any) => {
       output.Standard = (output.OutputQuantity || 0) / plannedQuantity;
-      output.StandardReal = (output.Standard || 0) * (this.totalGlobal|| 0);
+      output.StandardReal = (output.Standard || 0) * (this.totalGlobal || 0);
     });
 
     return filtered;
@@ -247,7 +248,7 @@ export class TransactionPage implements OnInit {
     // Agregar campo Standard a cada material
     filtered.forEach((material: any) => {
       material.Standard = (material.Quantity || 0) / plannedQuantity;
-      material.StandardReal = (material.Standard || 0) * (this.totalGlobal|| 0);
+      material.StandardReal = (material.Standard || 0) * (this.totalGlobal || 0);
 
       //material.QuantityOnhand = material.QuantityOnhand || 0;
       //material.AvailableToTransact = material.AvailableToTransact || 0;
@@ -295,7 +296,7 @@ export class TransactionPage implements OnInit {
     // Agregar campo Standard a cada equipment
     filtered.forEach((equipment: any) => {
       equipment.Standard = (equipment.RequiredUsage || 0) / plannedQuantity;
-      equipment.StandardReal = (equipment.Standard || 0) * (this.totalGlobal|| 0);
+      equipment.StandardReal = (equipment.Standard || 0) * (this.totalGlobal || 0);
     });
 
     return filtered;
@@ -311,7 +312,7 @@ export class TransactionPage implements OnInit {
     // Agregar campo Standard a cada labor
     filtered.forEach((labor: any) => {
       labor.Standard = (labor.RequiredUsage || 0) / plannedQuantity;
-      labor.StandardReal = (labor.Standard || 0) * (this.totalGlobal|| 0);
+      labor.StandardReal = (labor.Standard || 0) * (this.totalGlobal || 0);
     });
 
     return filtered;
@@ -328,4 +329,5 @@ export class TransactionPage implements OnInit {
   }
 
   protected readonly Truncate = Truncate;
+  protected readonly ToggleMenu = ToggleMenu;
 }

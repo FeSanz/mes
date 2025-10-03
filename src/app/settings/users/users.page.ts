@@ -7,7 +7,7 @@ import { EndpointsService } from 'src/app/services/endpoints.service';
 import { ApiService } from 'src/app/services/api.service';
 import { TableModule } from 'primeng/table';
 import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pauseSharp, pencilOutline } from 'ionicons/icons';
+import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pauseSharp, pencilOutline, menuOutline, peopleOutline } from 'ionicons/icons';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -18,6 +18,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { PermissionsService } from 'src/app/services/permissions.service';
+import { ToggleMenu } from 'src/app/models/design';
 
 @Component({
   selector: 'app-users',
@@ -59,7 +60,7 @@ export class UsersPage implements OnInit {
     private api: ApiService,
     private changeDetector: ChangeDetectorRef,
     private alerts: AlertsService) {
-    addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline })
+    addIcons({menuOutline,peopleOutline,pencilOutline,checkmarkOutline,trashOutline,addOutline,ellipsisVerticalOutline,chevronForwardOutline});
     const user = JSON.parse(String(localStorage.getItem("userData")))
     this.company = user.Company
 
@@ -198,4 +199,5 @@ export class UsersPage implements OnInit {
       enabled_flag: 'Y'
     };
   }
+  protected readonly ToggleMenu = ToggleMenu;
 }

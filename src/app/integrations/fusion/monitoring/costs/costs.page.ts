@@ -1,6 +1,6 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import {
   IonButton,
@@ -18,27 +18,28 @@ import {
   IonTitle,
   IonToolbar
 } from '@ionic/angular/standalone';
+import { ToggleMenu } from 'src/app/models/design';
 
-import {FloatLabel} from "primeng/floatlabel";
-import {Select} from "primeng/select";
-import {InputText} from 'primeng/inputtext';
-import {Button} from "primeng/button";
-import {AlertsService} from "../../../../services/alerts.service";
-import {IconField} from "primeng/iconfield";
-import {InputIcon} from "primeng/inputicon";
-import {PrimeTemplate} from "primeng/api";
-import {TableModule} from "primeng/table";
-import {Tag} from "primeng/tag";
+import { FloatLabel } from "primeng/floatlabel";
+import { Select } from "primeng/select";
+import { InputText } from 'primeng/inputtext';
+import { Button } from "primeng/button";
+import { AlertsService } from "../../../../services/alerts.service";
+import { IconField } from "primeng/iconfield";
+import { InputIcon } from "primeng/inputicon";
+import { PrimeTemplate } from "primeng/api";
+import { TableModule } from "primeng/table";
+import { Tag } from "primeng/tag";
 
-import {ApiService} from "../../../../services/api.service";
-import {EndpointsService} from "../../../../services/endpoints.service";
-import {Platform} from "@ionic/angular";
-import {HeightTable} from "../../../../models/tables.prime";
-import {TruncatePoint} from "../../../../models/math.operations";
-import {cloudUploadOutline, readerOutline} from 'ionicons/icons';
-import {addIcons} from "ionicons";
-import {TodayDateForFusion} from "../../../../models/date.format";
-import {Badge} from "primeng/badge";
+import { ApiService } from "../../../../services/api.service";
+import { EndpointsService } from "../../../../services/endpoints.service";
+import { Platform } from "@ionic/angular";
+import { HeightTable } from "../../../../models/tables.prime";
+import { TruncatePoint } from "../../../../models/math.operations";
+import { cloudUploadOutline, readerOutline, menuOutline } from 'ionicons/icons';
+import { addIcons } from "ionicons";
+import { TodayDateForFusion } from "../../../../models/date.format";
+import { Badge } from "primeng/badge";
 
 
 @Component({
@@ -59,7 +60,7 @@ export class CostsPage implements OnInit {
   organizationSelected: string | any = '';
   searchValueWO: string = '';
 
-  isModaldispatchOpen : boolean = false;
+  isModaldispatchOpen: boolean = false;
 
   workOrdersCost: any = { items: [] };
   selectedWorkOrder: any = {
@@ -76,7 +77,7 @@ export class CostsPage implements OnInit {
       WorkOrderNumber: data.WorkOrderNumber,
       WorkDefinitionId: data.WorkDefinitionId,
       ItemId: data.PrimaryProductId,
-      ItemNumber:data.ItemNumber,
+      ItemNumber: data.ItemNumber,
       Description: data.Description,
       UoM: data.PrimaryProductUOMCode,
       PlannedQuantity: data.PrimaryProductQuantity,
@@ -97,7 +98,7 @@ export class CostsPage implements OnInit {
       WorkOrderNumber: data.WorkOrderNumber,
       WorkDefinitionId: data.WorkDefinitionId,
       ItemId: data.InventoryItemId,
-      ItemNumber:data.ItemNumber,
+      ItemNumber: data.ItemNumber,
       Description: data.Description,
       UoM: data.UOMCode,
       PlannedQuantity: data.PlannedStartQuantity,
@@ -115,10 +116,10 @@ export class CostsPage implements OnInit {
   };
 
   constructor(private apiService: ApiService,
-              private endPoints: EndpointsService,
-              private alerts: AlertsService,
-              private platform: Platform,) {
-    addIcons({cloudUploadOutline, readerOutline});
+    private endPoints: EndpointsService,
+    private alerts: AlertsService,
+    private platform: Platform,) {
+    addIcons({ menuOutline, readerOutline, cloudUploadOutline });
   }
 
   ngOnInit() {
@@ -132,7 +133,7 @@ export class CostsPage implements OnInit {
         const sortedOrganizations = organizations.sort((a, b) => a.OrganizationId - b.OrganizationId);
         this.organizationSelected = sortedOrganizations[0];
         this.GetWorkOrders();
-      }else{
+      } else {
         this.alerts.Warning("No se encontraron organizaciones");
       }
     }
@@ -195,11 +196,11 @@ export class CostsPage implements OnInit {
 
       const [itemsCostResponse, resorcesCostResponse] = await Promise.all([
         this.apiService.GetRequestFusion(this.endPoints.Path('standard_costs',
-                                  'COST_PLANTA1', filters.itemNumberFilter,
-                                        today), false),
+          'COST_PLANTA1', filters.itemNumberFilter,
+          today), false),
         this.apiService.GetRequestFusion(this.endPoints.Path('resource_rates',
-                                  'COST_PLANTA1', filters.resourceCodeFilter,
-                                        today), false),
+          'COST_PLANTA1', filters.resourceCodeFilter,
+          today), false),
       ]);
 
 
@@ -277,7 +278,7 @@ export class CostsPage implements OnInit {
     };
   }
 
-// Función para agregar datos de costos dentro de cada elemento
+  // Función para agregar datos de costos dentro de cada elemento
   private CombineCostData(dataCostItems: any, dataCostResources: any) {
 
     // Combinar datos con workOrdersCost
@@ -381,7 +382,7 @@ export class CostsPage implements OnInit {
     console.log('Datos combinados con costos:', this.workOrdersCost);
   }
 
-// Función para calcular totales de costos por WorkOrder
+  // Función para calcular totales de costos por WorkOrder
   private CalculateWorkOrderCostTotals() {
     this.workOrdersCost.items.forEach((workOrder: any) => {
       // Calcular costo de BOM Global
@@ -404,7 +405,7 @@ export class CostsPage implements OnInit {
           }
         });
         workOrder.Outputs.OutputCost = outputCost;
-      }else {
+      } else {
         // Inicializar Outputs si no existe (para órdenes discretas)
         workOrder.Outputs = { items: [], OutputCost: 0 };
       }
@@ -480,7 +481,7 @@ export class CostsPage implements OnInit {
     return totalCost;
   }
 
-// Función para calcular costo total de equipos por operación
+  // Función para calcular costo total de equipos por operación
   GetEquipmentCostByOperation(operationSequence: number): number {
     const equipment = this.EquipmentResourcesForOperation(operationSequence);
     let totalCost = 0;
@@ -494,7 +495,7 @@ export class CostsPage implements OnInit {
     return totalCost;
   }
 
-// Función para calcular costo total de personal por operación
+  // Función para calcular costo total de personal por operación
   GetLaborCostByOperation(operationSequence: number): number {
     const labor = this.LaborResourcesForOperation(operationSequence);
     let totalCost = 0;
@@ -508,7 +509,7 @@ export class CostsPage implements OnInit {
     return totalCost;
   }
 
-// Función para calcular costo total de outputs por operación
+  // Función para calcular costo total de outputs por operación
   GetOutputsCostByOperation(operationSequence: number): number {
     if (!this.selectedWorkOrder?.Outputs?.items) {
       return 0;
@@ -525,13 +526,13 @@ export class CostsPage implements OnInit {
     return totalCost;
   }
 
-// Función para calcular costo total de recursos (equipos + personal) por operación
+  // Función para calcular costo total de recursos (equipos + personal) por operación
   GetResourcesCostByOperation(operationSequence: number): number {
     return this.GetEquipmentCostByOperation(operationSequence) +
       this.GetLaborCostByOperation(operationSequence);
   }
 
-// Función para calcular costo total de operación (materiales + recursos)
+  // Función para calcular costo total de operación (materiales + recursos)
   GetTotalOperationCost(operationSequence: number): number {
     return this.GetMaterialsCostByOperation(operationSequence) +
       this.GetResourcesCostByOperation(operationSequence);
@@ -554,12 +555,13 @@ export class CostsPage implements OnInit {
   }
 
   MfgType(mfg: any) {
-      if (mfg === 'P') return 'info';
-      else if (mfg === 'D') return 'warn';
-      else return 'contrast';
-    }
+    if (mfg === 'P') return 'info';
+    else if (mfg === 'D') return 'warn';
+    else return 'contrast';
+  }
 
 
   //protected readonly Truncate = Truncate;
   protected readonly TruncatePoint = TruncatePoint;
+  protected readonly ToggleMenu = ToggleMenu;
 }

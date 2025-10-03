@@ -21,8 +21,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
 import { FloatLabel } from "primeng/floatlabel"
+import { ToggleMenu } from 'src/app/models/design';
 
-import { closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline } from 'ionicons/icons';
+import { closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline, menuOutline } from 'ionicons/icons';
 
 
 @Component({
@@ -92,9 +93,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
   constructor(private apiService: ApiService,
               private endPoints: EndpointsService,
               private alerts: AlertsService) {
-    addIcons({
-      closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
-    });
+    addIcons({menuOutline,cloudOutline,arrowForward,serverOutline,trash,closeOutline,chevronDownOutline});
   }
 
 
@@ -424,4 +423,5 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
   }
 
   protected readonly FormatForDisplayFromISO = FormatForDisplayFromISO;
+    protected readonly ToggleMenu = ToggleMenu;
 }

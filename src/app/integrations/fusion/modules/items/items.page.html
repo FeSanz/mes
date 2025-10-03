@@ -1,9 +1,14 @@
-<ion-header [translucent]="true" xmlns="http://www.w3.org/1999/html">
+<ion-header [translucent]="true" style="box-shadow: none !important;"xmlns="http://www.w3.org/1999/html">
   <ion-toolbar>
-    <ion-title>Artículos Producción {{dbOrganizations.Company.Name}}</ion-title>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      <ion-menu-button autoHide="false">
+        <ion-button size="large" (click)="ToggleMenu()">
+          <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-menu-button>
     </ion-buttons>
+    <ion-title>Artículos Producción {{dbOrganizations.Company.Name}}</ion-title>
+    
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="organizationSelected"

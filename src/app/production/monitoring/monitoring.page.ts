@@ -20,7 +20,7 @@ import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { ResizeEvent, ResizableModule } from 'angular-resizable-element';
 import { NumericComponent } from 'src/app/components/numeric/numeric.component';
-
+import { ToggleMenu } from 'src/app/models/design';
 
 export interface SensorData {
   [key: string]: any;
@@ -582,4 +582,5 @@ export class MonitoringPage {
       }
     })
   }
+    protected readonly ToggleMenu = ToggleMenu;
 }

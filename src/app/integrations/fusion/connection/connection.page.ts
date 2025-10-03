@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonButton, IonButtons, IonCard, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel,
-         IonMenuButton, IonRow, IonText, IonTitle, IonToolbar
+import {
+  IonButton, IonButtons, IonCard, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel,
+  IonMenuButton, IonRow, IonText, IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
 
 import { ApiService } from "../../../services/api.service";
@@ -11,10 +12,11 @@ import { EndpointsService } from "../../../services/endpoints.service";
 import { AlertsService } from "../../../services/alerts.service";
 import { addIcons } from "ionicons";
 
-import { cloudOutline, serverOutline, personOutline, keyOutline, linkOutline, checkmarkCircle, timeOutline, syncOutline,
-         globeOutline, alarmOutline, clipboardOutline
-} from 'ionicons/icons';
+import {
+  cloudOutline, serverOutline, personOutline, keyOutline, linkOutline, checkmarkCircle, timeOutline, syncOutline,
+  globeOutline, alarmOutline, clipboardOutline, menuOutline } from 'ionicons/icons';
 import { CredentialsService } from "../../../services/credentials.service";
+import { ToggleMenu } from 'src/app/models/design';
 
 @Component({
   selector: 'app-connection',
@@ -92,9 +94,7 @@ export class ConnectionPage implements OnInit {
     private alerts: AlertsService,
     private router: Router) {
 
-    addIcons({ cloudOutline, serverOutline, personOutline, keyOutline, linkOutline, checkmarkCircle, timeOutline,
-      syncOutline, globeOutline, alarmOutline, clipboardOutline
-    });
+    addIcons({menuOutline,cloudOutline,serverOutline,personOutline,keyOutline,linkOutline,timeOutline,syncOutline,checkmarkCircle,globeOutline,alarmOutline,clipboardOutline});
     this.userData = JSON.parse(String(localStorage.getItem("userData")))
   }
 
@@ -266,5 +266,6 @@ export class ConnectionPage implements OnInit {
       this.alerts.Warning("Acceso no autorizado. Primero verifique y guarde los datos de conexión ");
     }
   }
+  protected readonly ToggleMenu = ToggleMenu;
 
 }

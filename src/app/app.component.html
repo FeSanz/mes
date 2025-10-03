@@ -2,7 +2,11 @@
   <p-toast></p-toast>
   <ion-split-pane contentId="main-content" when="(min-width: 1800px)">
     <ion-menu contentId="main-content" type="overlay" *ngIf="showMenu">
-
+    <ion-header class="background-header">
+      <ion-toolbar>
+        <ion-title></ion-title>
+      </ion-toolbar>
+    </ion-header>
       <div class="menu-wrapper">
         <!-- Panel completo -->
         <div class="menu-panel">
@@ -25,8 +29,8 @@
                   <h3>{{ username }}</h3>
                   <p>Ver perfil</p>
                 </div>
-                <ion-button fill="clear" id="popover-button-user" class="button-panel">
-                  <ion-icon name="ellipsis-vertical"></ion-icon>
+                <ion-button fill="clear" id="popover-button-user" class="button-panel" (click)="$event.stopPropagation()">
+                  <ion-icon name="ellipsis-vertical-outline"></ion-icon>
                 </ion-button>
               </div>
             </ion-menu-toggle>
@@ -81,12 +85,7 @@
                     <ion-list class="menu-list">
                       <ion-menu-toggle auto-hide="false">
                         <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($event)">
-                          <ion-item
-                            routerLinkActive="selected"
-                            detail="false"
-                            button
-                            lines="none"
-                            class="submenu-item"
+                          <ion-item routerLinkActive="selected" detail="false" button lines="none" class="submenu-item"
                             *ngFor="let dashGroup of dashboardGroups; trackBy: trackByGroup"
                             (click)="GoToDashboards(dashGroup)"
                             [routerLink]="['/monitoring', dashGroup.dashboard_group_id]">
@@ -96,31 +95,27 @@
                               <p>{{ dashGroup.organization_name }}</p>
                             </ion-label>
                             <ion-buttons slot="end" *ngIf="permissions.canEdit()">
-                              <ion-button
-                                fill="clear"
-                                size="small"
-                                [style.display]="editDashOrder ? 'none' : 'inline-flex'"
-                                (click)="HandleClick($event)"
+                              <ion-button fill="clear" size="small"
+                                [style.display]="editDashOrder ? 'none' : 'inline-flex'" (click)="HandleClick($event)"
                                 id="popover-${{dashGroup['dashboard_group_id']}}">
                                 <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
                               </ion-button>
                             </ion-buttons>
                             <ion-reorder slot="end" *ngIf="editDashOrder"></ion-reorder>
 
-                            <ion-popover trigger="popover-${{dashGroup['dashboard_group_id']}}" [dismissOnSelect]="true">
+                            <ion-popover trigger="popover-${{dashGroup['dashboard_group_id']}}"
+                              [dismissOnSelect]="true">
                               <ng-template>
                                 <ion-content>
                                   <ion-list>
-                                    <ion-item [button]="true" [detail]="false" (click)="editDashGroup(dashGroup)" lines="none">
+                                    <ion-item [button]="true" [detail]="false" (click)="editDashGroup(dashGroup)"
+                                      lines="none">
                                       <ion-icon slot="start" name="pencil-outline" color="primary"></ion-icon>
                                       <ion-label>Editar</ion-label>
                                     </ion-item>
-                                    <ion-item
-                                      [button]="true"
-                                      [detail]="false"
+                                    <ion-item [button]="true" [detail]="false"
                                       (click)="deleteDashGroup(dashGroup.dashboard_group_id)"
-                                      *ngIf="permissions.isSuperAdmin()"
-                                      lines="none">
+                                      *ngIf="permissions.isSuperAdmin()" lines="none">
                                       <ion-icon slot="start" name="trash-outline" color="danger"></ion-icon>
                                       <ion-label>Eliminar</ion-label>
                                     </ion-item>
@@ -151,7 +146,8 @@
                   <div slot="content" class="accordion-content">
                     <ion-list class="menu-list">
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/devices']" routerLinkActive="selected" detail="false" button
+                          lines="none" class="submenu-item">
                           <ion-icon slot="start" name="hardware-chip-outline"></ion-icon>
                           <ion-label>Dispositivos</ion-label>
                         </ion-item>
@@ -169,25 +165,29 @@
                   <div slot="content" class="accordion-content">
                     <ion-list class="menu-list">
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/production-campaign']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/production-campaign']" routerLinkActive="selected" detail="false"
+                          button lines="none" class="submenu-item">
                           <ion-icon slot="start" name="calendar-outline"></ion-icon>
                           <ion-label>Campañas</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/fusion_production']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/fusion_production']" routerLinkActive="selected" detail="false"
+                          button lines="none" class="submenu-item">
                           <ion-icon slot="start" name="trending-up-outline"></ion-icon>
                           <ion-label>Producción</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/dispatch_transaction']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/dispatch_transaction']" routerLinkActive="selected" detail="false"
+                          button lines="none" class="submenu-item">
                           <ion-icon slot="start" name="document-text-outline"></ion-icon>
                           <ion-label>Despachos</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/costs']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/costs']" routerLinkActive="selected" detail="false" button
+                          lines="none" class="submenu-item">
                           <ion-icon slot="start" name="cash-outline"></ion-icon>
                           <ion-label>Costos</ion-label>
                         </ion-item>
@@ -205,13 +205,15 @@
                   <div slot="content" class="accordion-content">
                     <ion-list class="menu-list">
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/alerts']" lines="none" class="submenu-item">
+                        <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/alerts']"
+                          lines="none" class="submenu-item">
                           <ion-icon slot="start" name="notifications-outline"></ion-icon>
                           <ion-label>Alertas</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/failures']" lines="none" class="submenu-item">
+                        <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/failures']"
+                          lines="none" class="submenu-item">
                           <ion-icon slot="start" name="warning-outline"></ion-icon>
                           <ion-label>Fallas</ion-label>
                         </ion-item>
@@ -235,19 +237,22 @@
                   <div slot="content" class="accordion-content">
                     <ion-list class="menu-list">
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/settings/users']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/settings/users']" routerLinkActive="selected" detail="false" button
+                          lines="none" class="submenu-item">
                           <ion-icon slot="start" name="people-outline"></ion-icon>
                           <ion-label>Usuarios</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/settings/machines']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/settings/machines']" routerLinkActive="selected" detail="false"
+                          button lines="none" class="submenu-item">
                           <ion-icon slot="start" name="build-outline"></ion-icon>
                           <ion-label>Máquinas</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/fusion_connection']" routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/fusion_connection']" routerLinkActive="selected" detail="false"
+                          button lines="none" class="submenu-item">
                           <ion-icon slot="start" name="git-network-outline"></ion-icon>
                           <ion-label>Integraciones</ion-label>
                         </ion-item>
@@ -264,11 +269,13 @@
             <ion-toolbar>
               <ion-item lines="none">
                 <ion-label>Servidor remoto</ion-label>
-                <ion-toggle slot="end" [(ngModel)]="remoteServer" (ionChange)="ChangeServerMode()" color="primary"></ion-toggle>
+                <ion-toggle slot="end" [(ngModel)]="remoteServer" (ionChange)="ChangeServerMode()"
+                  color="primary"></ion-toggle>
               </ion-item>
               <ion-item lines="none">
                 <ion-label>Modo oscuro</ion-label>
-                <ion-toggle slot="end" [(ngModel)]="darkMode" (ionChange)="ChangeColorMode()" color="primary"></ion-toggle>
+                <ion-toggle slot="end" [(ngModel)]="darkMode" (ionChange)="ChangeColorMode()"
+                  color="primary"></ion-toggle>
               </ion-item>
               <ion-item lines="none">
                 <ion-note>Versión: 1.0.0</ion-note>
@@ -295,22 +302,26 @@
         </ion-header>
         <ion-content class="ion-padding">
           <ion-item>
-            <ion-input type="text" placeholder="Nombre del tablero" [(ngModel)]="dashboardGroupData.group_name" style="text-align: right;">
+            <ion-input type="text" placeholder="Nombre del tablero" [(ngModel)]="dashboardGroupData.group_name"
+              style="text-align: right;">
               <div slot="label">
                 <ion-text color="primary">Nombre:</ion-text>
               </div>
             </ion-input>
           </ion-item>
           <ion-item>
-            <ion-textarea type="text" placeholder="Descripción" [(ngModel)]="dashboardGroupData.description" style="text-align: right;">
+            <ion-textarea type="text" placeholder="Descripción" [(ngModel)]="dashboardGroupData.description"
+              style="text-align: right;">
               <div slot="label">
                 <ion-text color="primary">Descripción:</ion-text>
               </div>
             </ion-textarea>
           </ion-item>
           <ion-item [disabled]="!dashboardGroupData.isNew">
-            <ion-select label="Organización:" class="select" color="primary" [(ngModel)]="dashboardGroupData.organization_id" interface="popover">
-              <ion-select-option [value]="org.OrganizationId" *ngFor="let org of user.Company.Organizations">{{ org.Name }}</ion-select-option>
+            <ion-select label="Organización:" class="select" color="primary"
+              [(ngModel)]="dashboardGroupData.organization_id" interface="popover">
+              <ion-select-option [value]="org.OrganizationId" *ngFor="let org of user.Company.Organizations">{{ org.Name
+                }}</ion-select-option>
             </ion-select>
           </ion-item>
           <ion-fab slot="fixed" vertical="bottom" horizontal="start" *ngIf="!dashboardGroupData.isNew">
@@ -319,7 +330,8 @@
             </ion-fab-button>
           </ion-fab>
           <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-            <ion-fab-button (click)="dashboardGroupData.isNew ? addNewWidgetGroup() : updateWidgetGroup()" color="success">
+            <ion-fab-button (click)="dashboardGroupData.isNew ? addNewWidgetGroup() : updateWidgetGroup()"
+              color="success">
               <ion-icon name="checkmark"></ion-icon>
             </ion-fab-button>
           </ion-fab>

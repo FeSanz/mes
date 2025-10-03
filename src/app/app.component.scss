@@ -380,3 +380,34 @@ ion-accordion ion-item[slot="header"]::part(native) {
 ion-icon {
   --ionicon-stroke-width: 32px;
 }
+
+
+.background-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  box-shadow: none !important;
+  /* detrás de split-pane */
+}
+
+.background-header ion-toolbar {
+  min-height: 68px;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, var(--ion-color-primary), var(--ion-color-secondary));
+  }
+  /* asegura que no se expanda */
+}
+
+ion-header ion-toolbar {
+  min-height: 68px;
+}

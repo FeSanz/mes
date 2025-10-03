@@ -133,7 +133,8 @@ body.dragging-active {
 .table-caption-right {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem; /* ajusta el espacio */
+  gap: 0.5rem;
+  /* ajusta el espacio */
   /* Alinea al final, es decir, a la derecha */
   align-items: center;
   /* Opcional: centra verticalmente */

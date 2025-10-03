@@ -1,23 +1,19 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" style="box-shadow: none !important;">
   <ion-toolbar>
-    <ion-title>Despachos</ion-title>
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
+      <ion-menu-button autoHide="false">
+        <ion-button size="large" (click)="ToggleMenu()">
+          <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-menu-button>
+    </ion-buttons><ion-title>Despachos</ion-title>
+    
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
-        <p-select [(ngModel)]="organizationSelected"
-                  inputId="organization_select"
-                  [options]="userData.Company.Organizations"
-                  optionLabel="Name"
-                  [filter]="true"
-                  filterBy="Name"
-                  placeholder="Seleccione una organización"
-                  styleClass="w-full"
-                  [virtualScroll]="true"
-                  [virtualScrollItemSize]="38"
-                  (onChange)="GetWorkOrders()"
-                  appendTo="body"/>
+        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
+          [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
+          placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
+          [virtualScrollItemSize]="38" (onChange)="GetWorkOrders()" appendTo="body" />
         <label for="organization_select">Organización</label>
       </p-floatlabel>
     </div>
@@ -31,33 +27,16 @@
     <ion-row>
       <ion-col size="12">
         <ion-card class="stats-card">
-          <p-table #dtWorkOrders
-                   [value]="workOrdersToDispatch.items"
-                   dataKey="WorkOrderNumber"
-                   styleClass="card-table-primeng wo-table-custom "
-                   [tableStyle]="{ 'min-width': '96rem','height': '100%'}"
-                   [size]="'small'"
-                   [rowHover]="true"
-                   [rows]="rowsPerPage"
-                   [showCurrentPageReport]="true"
-                   [paginator]="true"
-                   currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
-                   [filterDelay]="0"
-                   [globalFilterFields]="['WorkOrderNumber', 'ResourceCode', 'ItemNumber']"
-                   stripedRows
-                   [scrollable]="true"
-                   [scrollHeight]="scrollHeight"
-                   [alwaysShowPaginator]="true"
-                   sortField="WorkOrderNumber"
-                   [sortOrder]="1"
-          >
+          <p-table #dtWorkOrders [value]="workOrdersToDispatch.items" dataKey="WorkOrderNumber"
+            styleClass="card-table-primeng wo-table-custom " [tableStyle]="{ 'min-width': '96rem','height': '100%'}"
+            [size]="'small'" [rowHover]="true" [rows]="rowsPerPage" [showCurrentPageReport]="true" [paginator]="true"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos" [filterDelay]="0"
+            [globalFilterFields]="['WorkOrderNumber', 'ResourceCode', 'ItemNumber']" stripedRows [scrollable]="true"
+            [scrollHeight]="scrollHeight" [alwaysShowPaginator]="true" sortField="WorkOrderNumber" [sortOrder]="1">
             <ng-template #caption>
               <div class="table-caption">
-                <p-button
-                  [outlined]="true"
-                  icon="pi pi-filter-slash"
-                  label="Limpiar"
-                  (click)="ClearWorkOrders(dtWorkOrders)"/>
+                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
+                  (click)="ClearWorkOrders(dtWorkOrders)" />
 
                 <div></div> <!-- Spacer -->
 
@@ -65,10 +44,8 @@
                   <p-inputIcon>
                     <i class="fas fa-search"></i>
                   </p-inputIcon>
-                  <input pInputText type="text"
-                         [(ngModel)]="searchValueWO"
-                         (input)="OnFilterGlobal($event, dtWorkOrders)"
-                         placeholder="Buscar"/>
+                  <input pInputText type="text" [(ngModel)]="searchValueWO"
+                    (input)="OnFilterGlobal($event, dtWorkOrders)" placeholder="Buscar" />
                 </p-iconField>
               </div>
             </ng-template>
@@ -78,57 +55,57 @@
                 <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     O.T.
-                    <p-sortIcon field="WorkOrderNumber"/>
-                    <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto"/>
+                    <p-sortIcon field="WorkOrderNumber" />
+                    <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="ResourceCode" style="min-width: 9rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Máquina
-                    <p-sortIcon field="ResourceCode"/>
-                    <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto"/>
+                    <p-sortIcon field="ResourceCode" />
+                    <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="ItemNumber" style="min-width: 9rem">
                   <div class="flex justify-between items-center">
                     Producto
-                    <p-sortIcon field="ItemNumber"/>
-                    <p-columnFilter field="ItemNumber" matchMode="equals" display="menu" class="ml-auto"/>
+                    <p-sortIcon field="ItemNumber" />
+                    <p-columnFilter field="ItemNumber" matchMode="equals" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="Description" style="min-width: 9rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Descripción
-                    <p-sortIcon field="Description"/>
-                    <p-columnFilter field="Description" matchMode="equals" display="menu" class="ml-auto"/>
+                    <p-sortIcon field="Description" />
+                    <p-columnFilter field="Description" matchMode="equals" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="WorkCenter" style="min-width: 7rem">
                   <div class="flex justify-between items-center">
                     C. T.
-                    <p-sortIcon field="WorkCenter"/>
-                    <p-columnFilter field="WorkCenter" matchMode="equals" display="menu" class="ml-auto"/>
+                    <p-sortIcon field="WorkCenter" />
+                    <p-columnFilter field="WorkCenter" matchMode="equals" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="PlannedQuantity" style="min-width:7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Meta
-                    <p-sortIcon field="PlannedQuantity"/>
-                    <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+                    <p-sortIcon field="PlannedQuantity" />
+                    <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="CompletedQuantity" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Completo
-                    <p-sortIcon field="CompletedQuantity"/>
-                    <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+                    <p-sortIcon field="CompletedQuantity" />
+                    <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="DispatchedQuantity" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Pendiente
-                    <p-sortIcon field="DispatchedQuantity"/>
-                    <p-columnFilter field="DispatchedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+                    <p-sortIcon field="DispatchedQuantity" />
+                    <p-columnFilter field="DispatchedQuantity" matchMode="equals" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th class="td-center">
@@ -141,9 +118,7 @@
             <ng-template pTemplate="body" let-item let-rowgroup="rowgroup" let-rowspan="rowspan">
               <tr>
                 <td class="td-center">
-                  <p-tag
-                    [value]="item.WorkOrderNumber"
-                    [severity]="'contrast'"/>
+                  <p-tag [value]="item.WorkOrderNumber" [severity]="'contrast'" />
                 </td>
                 <td>{{ item.ResourceCode }}</td>
                 <td>{{ item.ItemNumber }}</td>
@@ -173,21 +148,16 @@
 
   <!-- Modal para despacho OT -->
   <!-- Modal para despacho OT -->
-  <p-dialog
-    [modal]="true"
-    [(visible)]="isModaldispatchOpen"
-    [style]="{ height: '95vh', 'max-height': '90vh' }"
-    [draggable]="true"
-    [resizable]="true"
-    [maximizable]="true"
-    appendTo="body">
+  <p-dialog [modal]="true" [(visible)]="isModaldispatchOpen" [style]="{ height: '95vh', 'max-height': '90vh' }"
+    [draggable]="true" [resizable]="true" [maximizable]="true" appendTo="body">
 
     <!-- Header personalizado-->
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <span>OT <strong>{{ selectedWorkOrder?.WorkOrderNumber || 'N/A' }}</strong></span>
         <span style="color: #0078a8">
-          Avance: <strong>{{ (selectedWorkOrder?.CompletedQuantity || 0) + ' / ' + (selectedWorkOrder?.PlannedQuantity || 0) }} </strong>
+          Avance: <strong>{{ (selectedWorkOrder?.CompletedQuantity || 0) + ' / ' + (selectedWorkOrder?.PlannedQuantity
+            || 0) }} </strong>
         </span>
       </div>
     </ng-template>
@@ -228,31 +198,19 @@
               <strong class="text-opname">{{ operation.OperationName }}</strong>
             </ion-col>
             <ion-col size="12" size-sm="2">
-              <input pInputText
-                     type="text"
-                     [value]="scrapGlobal"
-                     pSize="small"
-                     [disabled]="true"
-                     class="input-operation"/>
+              <input pInputText type="text" [value]="scrapGlobal" pSize="small" [disabled]="true"
+                class="input-operation" />
             </ion-col>
             <ion-col size="12" size-sm="2">
-              <input pInputText
-                     type="text"
-                     [value]="rejectGlobal"
-                     pSize="small"
-                     [disabled]="true"
-                     class="input-operation"/>
+              <input pInputText type="text" [value]="rejectGlobal" pSize="small" [disabled]="true"
+                class="input-operation" />
             </ion-col>
             <ion-col size="12" size-sm="2">
-              <input pInputText
-                     type="text"
-                     [value]="completeGlobal"
-                     pSize="small"
-                     [disabled]="true"
-                     class="input-operation"/>
+              <input pInputText type="text" [value]="completeGlobal" pSize="small" [disabled]="true"
+                class="input-operation" />
             </ion-col>
             <ion-col size="12" size-sm="1">
-              <strong>{{ operation.UnitOfMeasure  }}</strong>
+              <strong>{{ operation.UnitOfMeasure }}</strong>
             </ion-col>
           </ion-row>
 
@@ -262,27 +220,23 @@
               <ion-col><br><strong class="section-title">SALIDAS</strong></ion-col>
             </ion-row>
 
-            <ion-row class="data-row"
-                     *ngFor="let output of OutputsForOperation(operation.OperationSequenceNumber)">
+            <ion-row class="data-row" *ngFor="let output of OutputsForOperation(operation.OperationSequenceNumber)">
               <ion-col size="12" size-sm="4" class="text-list">{{ output.ItemNumber }}</ion-col>
               <ion-col size="12" size-sm="2" class="data-center">
                 <span class="std-consume">[ {{ Truncate(output.Standard) }} ]</span>
               </ion-col>
               <ion-col size="12" size-sm="2">
                 <p-floatlabel variant="on">
-                  <input pInputText type="text"
-                         [value]="output.StandardReal || 0"
-                         pSize="small"
-                         [disabled]="false"
-                         class="input-standard"/>
+                  <input pInputText type="text" [value]="output.StandardReal || 0" pSize="small" [disabled]="false"
+                    class="input-standard" />
                   <label for="std_output">{{ Truncate(output.StandardReal) || 0}}</label>
                 </p-floatlabel>
               </ion-col>
               <ion-col size="12" size-sm="1">{{ output.UOMCode }}</ion-col>
               <ion-col size="12" size-sm="3" class="data-center">
-              <span class="text-blue">
-                [ {{Truncate(output.CompletedQuantity)}} / {{ Truncate(output.OutputQuantity) }} ]
-              </span>
+                <span class="text-blue">
+                  [ {{Truncate(output.CompletedQuantity)}} / {{ Truncate(output.OutputQuantity) }} ]
+                </span>
               </ion-col>
             </ion-row>
           </ng-container>
@@ -300,27 +254,22 @@
               </ion-col>
             </ion-row>
 
-            <ion-row class="data-row"
-                     *ngFor="let material of MaterialsForOperation(operation.OperationSequenceNumber)">
+            <ion-row class="data-row" *ngFor="let material of MaterialsForOperation(operation.OperationSequenceNumber)">
               <ion-col size="12" size-sm="4" class="text-list">{{ material.ItemNumber }}</ion-col>
               <ion-col size="12" size-sm="2" class="data-center">
                 <span class="std-consume text-green">[ {{900}} / {{ Truncate(material.Standard) }} ] </span>
               </ion-col>
               <ion-col size="12" size-sm="2">
                 <p-floatlabel variant="on">
-                  <input pInputText
-                         type="text"
-                         [value]="material.StandardReal"
-                         pSize="small"
-                         class="input-standard"/>
+                  <input pInputText type="text" [value]="material.StandardReal" pSize="small" class="input-standard" />
                   <label for="std_material">{{ Truncate(material.StandardReal) || 0}}</label>
                 </p-floatlabel>
               </ion-col>
               <ion-col size="12" size-sm="1">{{ material.UOMCode }}</ion-col>
               <ion-col size="12" size-sm="3" class="data-center">
-              <span class="text-blue">
-               [ {{Truncate(material.IssuedQuantity)}} / {{ Truncate(material.Quantity) }} ]
-              </span>
+                <span class="text-blue">
+                  [ {{Truncate(material.IssuedQuantity)}} / {{ Truncate(material.Quantity) }} ]
+                </span>
               </ion-col>
             </ion-row>
           </ng-container>
@@ -336,26 +285,22 @@
             </ion-row>
 
             <ion-row class="data-row"
-                     *ngFor="let equipment of EquipmentResourcesForOperation(operation.OperationSequenceNumber)">
+              *ngFor="let equipment of EquipmentResourcesForOperation(operation.OperationSequenceNumber)">
               <ion-col size="12" size-sm="4" class="text-list">{{ equipment.ResourceName }}</ion-col>
               <ion-col size="12" size-sm="2" class="data-center">
                 <span class="std-consume">[ {{ Truncate(equipment.Standard) }} ] </span>
               </ion-col>
               <ion-col size="12" size-sm="2">
                 <p-floatlabel variant="on">
-                  <input pInputText
-                         type="text"
-                         [value]="equipment.StandardReal"
-                         pSize="small"
-                         class="input-standard"/>
+                  <input pInputText type="text" [value]="equipment.StandardReal" pSize="small" class="input-standard" />
                   <label for="std_equipment">{{ Truncate(equipment.StandardReal) || 0}}</label>
                 </p-floatlabel>
               </ion-col>
               <ion-col size="12" size-sm="1">{{ equipment.UOMCode }}</ion-col>
               <ion-col size="12" size-sm="3" class="data-center">
-              <span class="text-blue">
-               [ {{Truncate(equipment.ActualResourceUsage)}} / {{ Truncate(equipment.RequiredUsage) }} ]
-              </span>
+                <span class="text-blue">
+                  [ {{Truncate(equipment.ActualResourceUsage)}} / {{ Truncate(equipment.RequiredUsage) }} ]
+                </span>
               </ion-col>
             </ion-row>
           </ng-container>
@@ -371,26 +316,22 @@
             </ion-row>
 
             <ion-row class="data-row"
-                     *ngFor="let labor of LaborResourcesForOperation(operation.OperationSequenceNumber)">
+              *ngFor="let labor of LaborResourcesForOperation(operation.OperationSequenceNumber)">
               <ion-col size="12" size-sm="4" class="text-list">{{ labor.ResourceName }}</ion-col>
               <ion-col size="12" size-sm="2" class="data-center">
                 <span class="std-consume">[ {{ Truncate(labor.Standard) }} ] </span>
               </ion-col>
               <ion-col size="12" size-sm="2">
                 <p-floatlabel variant="on">
-                  <input pInputText
-                         type="text"
-                         [value]="labor.StandardReal"
-                         pSize="small"
-                         class="input-standard"/>
+                  <input pInputText type="text" [value]="labor.StandardReal" pSize="small" class="input-standard" />
                   <label for="std_labor">{{ Truncate(labor.StandardReal) || 0}}</label>
                 </p-floatlabel>
               </ion-col>
               <ion-col size="12" size-sm="1">{{ labor.UOMCode }}</ion-col>
               <ion-col size="12" size-sm="3" class="data-center">
-              <span class="text-blue">
-               [ {{Truncate(labor.ActualResourceUsage)}} / {{ Truncate(labor.RequiredUsage) }} ]
-              </span>
+                <span class="text-blue">
+                  [ {{Truncate(labor.ActualResourceUsage)}} / {{ Truncate(labor.RequiredUsage) }} ]
+                </span>
               </ion-col>
             </ion-row>
           </ng-container>

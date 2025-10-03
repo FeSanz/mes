@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -11,20 +11,21 @@ import {
   IonTitle,
   IonToolbar
 } from '@ionic/angular/standalone';
-import {Button} from "primeng/button";
-import {FloatLabel} from "primeng/floatlabel";
-import {IconField} from "primeng/iconfield";
-import {InputIcon} from "primeng/inputicon";
-import {InputText} from "primeng/inputtext";
-import {PrimeTemplate} from "primeng/api";
-import {Select} from "primeng/select";
-import {TableModule} from "primeng/table";
-import {ApiService} from "../../../../services/api.service";
-import {EndpointsService} from "../../../../services/endpoints.service";
-import {AlertsService} from "../../../../services/alerts.service";
-import {addIcons} from "ionicons";
-import {arrowForward, chevronDownOutline, closeOutline, cloudOutline, serverOutline, trash} from "ionicons/icons";
-import {HeightTable} from "../../../../models/tables.prime";
+import { Button } from "primeng/button";
+import { FloatLabel } from "primeng/floatlabel";
+import { IconField } from "primeng/iconfield";
+import { InputIcon } from "primeng/inputicon";
+import { InputText } from "primeng/inputtext";
+import { PrimeTemplate } from "primeng/api";
+import { Select } from "primeng/select";
+import { TableModule } from "primeng/table";
+import { ApiService } from "../../../../services/api.service";
+import { EndpointsService } from "../../../../services/endpoints.service";
+import { AlertsService } from "../../../../services/alerts.service";
+import { addIcons } from "ionicons";
+import { arrowForward, chevronDownOutline, closeOutline, cloudOutline, serverOutline, trash, menuOutline } from "ionicons/icons";
+import { HeightTable } from "../../../../models/tables.prime";
+import { ToggleMenu } from 'src/app/models/design';
 
 @Component({
   selector: 'app-wc',
@@ -33,7 +34,7 @@ import {HeightTable} from "../../../../models/tables.prime";
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, Button, FloatLabel, IconField, InputIcon, InputText, IonButton, IonButtons, IonIcon, IonMenuButton, PrimeTemplate, Select, TableModule]
 })
-export class WcPage implements OnInit, AfterViewInit, OnDestroy{
+export class WcPage implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
   private resizeObserver!: ResizeObserver;
@@ -55,11 +56,9 @@ export class WcPage implements OnInit, AfterViewInit, OnDestroy{
   searchValueDB: string = '';
 
   constructor(private apiService: ApiService,
-              private endPoints: EndpointsService,
-              private alerts: AlertsService) {
-    addIcons({
-      closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
-    });
+    private endPoints: EndpointsService,
+    private alerts: AlertsService) {
+    addIcons({ menuOutline, cloudOutline, arrowForward, serverOutline, trash, closeOutline, chevronDownOutline });
   }
 
 
@@ -94,7 +93,7 @@ export class WcPage implements OnInit, AfterViewInit, OnDestroy{
   }
 
   async OnOrganizationSelected() {
-    if(this.organizationSelected) {
+    if (this.organizationSelected) {
       let clause = `workCenters/${this.organizationSelected.OrganizationId}`;
       this.apiService.GetRequestRender(clause).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
@@ -124,8 +123,8 @@ export class WcPage implements OnInit, AfterViewInit, OnDestroy{
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
         return !dbOrdersNumbers.has(String(fusionItem.WorkCenterCode));
       });
-    }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
-      if(this.fusionOriginalData.items) {
+    } else { //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
+      if (this.fusionOriginalData.items) {
         this.fusionData = JSON.parse(JSON.stringify(this.fusionOriginalData));
       }
     }
@@ -155,9 +154,9 @@ export class WcPage implements OnInit, AfterViewInit, OnDestroy{
       };
 
       this.apiService.PostRequestRender('workCenters', payload).then(async (response: any) => {
-        if(response.errorsExistFlag) {
+        if (response.errorsExistFlag) {
           this.alerts.Info(response.message);
-        }else {
+        } else {
           this.alerts.Success(response.message);
 
           setTimeout(() => {
@@ -233,4 +232,6 @@ export class WcPage implements OnInit, AfterViewInit, OnDestroy{
     this.selectedItemsDB = [];
   }
 
+
+  protected readonly ToggleMenu = ToggleMenu;
 }

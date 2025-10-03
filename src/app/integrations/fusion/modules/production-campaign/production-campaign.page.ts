@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@a
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonModal, IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea,
+  IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonModal, IonItem, IonInput, IonDatetime, IonMenuButton, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea,
   IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton, IonPopover, IonList, IonRippleEffect
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
@@ -13,13 +13,14 @@ import { PrimeTemplate } from "primeng/api";
 import { Table, TableModule } from "primeng/table";
 import { Select } from "primeng/select";
 import { FloatLabel } from "primeng/floatlabel";
-import { pencilOutline, trashOutline, eyeOutline, reorderThreeOutline, addOutline, checkmark, moveOutline, checkmarkCircle, checkmarkOutline, unlinkOutline, backspaceOutline } from 'ionicons/icons';
+import { pencilOutline, trashOutline, eyeOutline, reorderThreeOutline, addOutline, checkmark, moveOutline, checkmarkCircle, checkmarkOutline, unlinkOutline, backspaceOutline, menuOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Tag } from "primeng/tag";
 import { ButtonModule } from "primeng/button";
 import { InputText } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { ToggleMenu } from 'src/app/models/design';
 
 @Component({
   selector: 'app-production-campaign',
@@ -28,7 +29,7 @@ import { InputIconModule } from 'primeng/inputicon';
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
-    IonItem, IonInput, IonDatetime, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
+    IonItem, IonInput, IonDatetime, IonMenuButton, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
     ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule, InputIconModule]
 })
 export class ProductionCampaignPage {
@@ -90,7 +91,7 @@ export class ProductionCampaignPage {
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.organizationSelected = this.userData.Company.Organizations[2];
-    addIcons({ trashOutline, pencilOutline, checkmark, backspaceOutline, checkmarkOutline, checkmarkCircle, addOutline, eyeOutline, moveOutline, reorderThreeOutline });
+    addIcons({menuOutline,trashOutline,pencilOutline,eyeOutline,checkmark,backspaceOutline,checkmarkOutline,checkmarkCircle,addOutline,moveOutline,reorderThreeOutline});
   }
 
   formatLocalISO(date: Date): string {
@@ -684,4 +685,5 @@ export class ProductionCampaignPage {
     //     console.log('Secuencia guardada exitosamente');
     //   });
   }
+  protected readonly ToggleMenu = ToggleMenu;
 }

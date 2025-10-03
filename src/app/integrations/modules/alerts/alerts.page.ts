@@ -20,7 +20,8 @@ import { FloatLabel } from "primeng/floatlabel";
 import { Select } from "primeng/select";
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline } from 'ionicons/icons';
+import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline, menuOutline } from 'ionicons/icons';
+import { ToggleMenu } from 'src/app/models/design';
 @Component({
   selector: 'app-alerts',
   templateUrl: './alerts.page.html',
@@ -65,7 +66,7 @@ export class AlertsPage {
     this.company = this.userData.Company
     this.userData.Company.Organizations = this.userData.Company.Organizations.filter((org: any) => org.WorkMethod != null);
     this.organizationSelected = this.userData.Company.Organizations[0];
-    addIcons({ trashOutline, addOutline, closeOutline, checkmarkOutline, hammerOutline });
+    addIcons({menuOutline,hammerOutline,checkmarkOutline,trashOutline,addOutline,closeOutline});
   }
   ionViewDidEnter() {
     this.GetAlerts()
@@ -282,4 +283,5 @@ export class AlertsPage {
       clearInterval(this.timer);
     }
   }
+  protected readonly ToggleMenu = ToggleMenu;
 }

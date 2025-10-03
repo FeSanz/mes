@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" style="box-shadow: none !important;">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false">
@@ -8,9 +8,7 @@
       </ion-menu-button>
     </ion-buttons>
     <ion-title>Producción {{userData.Company.Name}}</ion-title>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
+    
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="organizationSelected"

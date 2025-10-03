@@ -1,14 +1,16 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy  } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle,
-         IonToolbar } from '@ionic/angular/standalone';
+import {
+  IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle,
+  IonToolbar
+} from '@ionic/angular/standalone';
 
-import {ApiService} from "../../../../services/api.service";
-import {AlertsService} from "../../../../services/alerts.service";
-import {EndpointsService} from "../../../../services/endpoints.service";
-import {HeightTable} from "../../../../models/tables.prime";
-import {addIcons} from "ionicons";
+import { ApiService } from "../../../../services/api.service";
+import { AlertsService } from "../../../../services/alerts.service";
+import { EndpointsService } from "../../../../services/endpoints.service";
+import { HeightTable } from "../../../../models/tables.prime";
+import { addIcons } from "ionicons";
 
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -20,8 +22,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
 import { FloatLabel } from "primeng/floatlabel"
+import { ToggleMenu } from 'src/app/models/design';
 
-import { closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline } from 'ionicons/icons';
+import { closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline, menuOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-items',
@@ -59,11 +62,9 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
 
 
   constructor(private apiService: ApiService,
-              private endPoints: EndpointsService,
-              private alerts: AlertsService) {
-    addIcons({
-      closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
-    });
+    private endPoints: EndpointsService,
+    private alerts: AlertsService) {
+    addIcons({ menuOutline, cloudOutline, arrowForward, serverOutline, trash, closeOutline, chevronDownOutline });
   }
 
 
@@ -97,14 +98,14 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
     return this.scrollHeight;
   }
 
-  GetOrganizationsRender(){
+  GetOrganizationsRender() {
     this.apiService.GetRequestRender('organizations').then((response: any) => {
       this.dbOrganizations = response;
     });
   }
 
   OnOrganizationSelected() {
-    if(this.organizationSelected) {
+    if (this.organizationSelected) {
       this.apiService.GetRequestFusion(this.endPoints.Path('lookups', 'EGP_ITEM_TYPE')).then((response: any) => {
         const data = JSON.parse(response);
 
@@ -127,7 +128,7 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   OnItemTypeSelected() {
-    if(this.itemTypeSelected) {
+    if (this.itemTypeSelected) {
       let clause = `items/${this.dbOrganizations.Company.CompanyId}/${this.itemTypeSelected.Meaning}`;
       this.apiService.GetRequestRender(clause).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
@@ -160,8 +161,8 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
         return !dbItemsNumbers.has(String(fusionItem.ItemNumber));
       });
-    }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
-      if(this.fusionOriginalData.items) {
+    } else { //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
+      if (this.fusionOriginalData.items) {
         this.fusionData = JSON.parse(JSON.stringify(this.fusionOriginalData));
       }
     }
@@ -189,9 +190,9 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
       };
 
       this.apiService.PostRequestRender('items', payload).then(async (response: any) => {
-        if(response.errorsExistFlag) {
+        if (response.errorsExistFlag) {
           this.alerts.Info(response.message);
-        }else {
+        } else {
           this.alerts.Success(response.message);
           setTimeout(() => {
             this.RefreshTables();
@@ -278,4 +279,5 @@ export class ItemsPage implements OnInit, AfterViewInit, OnDestroy {
     this.selectedItemsDB = [];
 
   }
+  protected readonly ToggleMenu = ToggleMenu;
 }

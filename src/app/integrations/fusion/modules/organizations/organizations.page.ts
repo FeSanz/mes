@@ -1,26 +1,28 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar
+import {
+  IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
 
-import {ApiService} from "../../../../services/api.service";
-import {EndpointsService} from "../../../../services/endpoints.service";
-import {AlertsService} from "../../../../services/alerts.service";
-import {HeightTable} from "../../../../models/tables.prime";
-import {addIcons} from "ionicons";
+import { ApiService } from "../../../../services/api.service";
+import { EndpointsService } from "../../../../services/endpoints.service";
+import { AlertsService } from "../../../../services/alerts.service";
+import { HeightTable } from "../../../../models/tables.prime";
+import { addIcons } from "ionicons";
 
-import {TableModule} from 'primeng/table';
-import {TagModule} from 'primeng/tag';
-import {ButtonModule} from 'primeng/button';
-import {InputTextModule} from 'primeng/inputtext';
-import {IconFieldModule} from 'primeng/iconfield';
-import {InputIconModule} from 'primeng/inputicon';
-import {DropdownModule} from 'primeng/dropdown';
-import {MultiSelectModule} from 'primeng/multiselect';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ToggleMenu } from 'src/app/models/design';
 
-import {arrowForward, chevronDownOutline, closeOutline, cloudOutline, serverOutline, trash} from 'ionicons/icons';
+import { arrowForward, chevronDownOutline, closeOutline, cloudOutline, serverOutline, trash, menuOutline } from 'ionicons/icons';
 
 
 @Component({
@@ -30,8 +32,8 @@ import {arrowForward, chevronDownOutline, closeOutline, cloudOutline, serverOutl
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
     IonButton, IonIcon,
-    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,DropdownModule,
-    MultiSelectModule ]
+    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, DropdownModule,
+    MultiSelectModule]
 })
 export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
 
@@ -45,7 +47,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
 
   fusionOriginalData: any = {};
   fusionData: any = {
-    items : []
+    items: []
   };
   dbData: any = {};
 
@@ -56,11 +58,9 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
   searchValueDB: string = '';
 
   constructor(private apiService: ApiService,
-              private endPoints: EndpointsService,
-              private alerts: AlertsService) {
-    addIcons({
-      closeOutline, cloudOutline, chevronDownOutline, arrowForward, trash, serverOutline
-    });
+    private endPoints: EndpointsService,
+    private alerts: AlertsService) {
+    addIcons({ menuOutline, cloudOutline, arrowForward, serverOutline, trash, closeOutline, chevronDownOutline });
   }
 
   ngOnInit() {
@@ -94,7 +94,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     return this.scrollHeight;
   }
 
-  GetOrganizations(){
+  GetOrganizations() {
     this.apiService.GetRequestRender(`organizations/${this.userData.Company.CompanyId}`).then((response: any) => {
       this.dbData = response;
 
@@ -121,8 +121,8 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
       this.fusionData.items = this.fusionOriginalData.items.filter((fusionItem: any) => {
         return !dbOrganizationCodes.has(String(fusionItem.OrganizationCode));
       });
-    }else{ //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
-      if(this.fusionOriginalData.items) {
+    } else { //Si DB no tiene datos a comparar, solo imprimir datos originales de Fusion
+      if (this.fusionOriginalData.items) {
         this.fusionData = JSON.parse(JSON.stringify(this.fusionOriginalData));
       }
     }
@@ -151,9 +151,9 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
       };
 
       this.apiService.PostRequestRender('organizations', payload).then(async (response: any) => {
-        if(response.errorsExistFlag) {
+        if (response.errorsExistFlag) {
           this.alerts.Info(response.message);
-        }else {
+        } else {
           this.alerts.Success(response.message);
 
           setTimeout(() => {
@@ -164,7 +164,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  WorkMethodFormat(mfgType: string){
+  WorkMethodFormat(mfgType: string) {
     return mfgType === 'PROCESS_MANUFACTURING' ? 'PROCESOS' : mfgType === 'DISCRETE_MANUFACTURING' ? 'DISCRETA' : 'NA';
   }
 
@@ -219,7 +219,7 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     this.apiService.GetRequestRender('organizations').then((response: any) => {
       this.dbData = response;
 
-     this.FilterRegisteredItems();
+      this.FilterRegisteredItems();
     });
 
     // Limpiar valores de búsqueda
@@ -231,4 +231,5 @@ export class OrganizationsPage implements OnInit, AfterViewInit, OnDestroy {
     this.selectedItemsDB = [];
 
   }
+  protected readonly ToggleMenu = ToggleMenu;
 }

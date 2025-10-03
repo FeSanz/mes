@@ -2,7 +2,7 @@ import { ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, ViewChild
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pauseSharp, pencilOutline } from 'ionicons/icons';
+import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pauseSharp, pencilOutline, menuOutline } from 'ionicons/icons';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonFab, IonFabButton, IonModal, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonText } from '@ionic/angular/standalone';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
@@ -21,6 +21,7 @@ import { EndpointsService } from "../../services/endpoints.service";
 import { AlertsService } from "../../services/alerts.service";
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToggleMenu } from 'src/app/models/design';
 
 @Component({
   selector: 'app-machines',
@@ -77,7 +78,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     private changeDetector: ChangeDetectorRef
   ) {
 
-    addIcons({ ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline })
+    addIcons({menuOutline,checkmarkOutline,addOutline,ellipsisVerticalOutline,chevronForwardOutline,trashOutline,pencilOutline});
   }
 
   ngOnInit() {
@@ -128,10 +129,10 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   OnOrganizationSelected() {
     if (this.organizationSelected) {
       let clause = `orgResourceMachines/${this.organizationSelected.OrganizationId}`;
-      this.orgSelect = this.organizationSelected.OrganizationId;      
+      this.orgSelect = this.organizationSelected.OrganizationId;
       this.apiService.GetRequestRender(clause).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
-        this.dbData = response;        
+        this.dbData = response;
       });
     }
   }
@@ -146,7 +147,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     this.isNewFlag = true
     this.resource.OrganizationId = this.orgSelect
     this.isModalOpen = true;
-    this.getWorkCenters();   
+    this.getWorkCenters();
     this.resource.Token = this.generateToken();
   }
 
@@ -229,5 +230,6 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     });
 
   }
+  protected readonly ToggleMenu = ToggleMenu;
 }
 
