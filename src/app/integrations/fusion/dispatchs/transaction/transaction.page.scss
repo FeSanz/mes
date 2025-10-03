@@ -1,12 +1,106 @@
 ion-modal.dispach-modal::part(content) {
-  width: 40%;
-  //max-width: 10%;
-  height: 90%;
-  max-height: auto;
+  width: 60%; // Default para >= 1921px
+  height: 95%;
+  max-height: 90vh;
+
+  // 1721px - 1920px = 65%
+  @media (max-width: 1920px) {
+    width: 65%;
+  }
+
+  // 1621px - 1720px = 70%
+  @media (max-width: 1720px) {
+    width: 70%;
+  }
+
+  // 1501px - 1620px = 75%
+  @media (max-width: 1620px) {
+    width: 75%;
+  }
+
+  // 1401px - 1500px = 80%
+  @media (max-width: 1500px) {
+    width: 80%;
+  }
+
+  // 1321px - 1400px = 85%
+  @media (max-width: 1400px) {
+    width: 85%;
+  }
+
+  // 1081px - 1320px = 90%
+  @media (max-width: 1320px) {
+    width: 90%;
+  }
+
+  // 980px - 1080px = 95%
+  @media (max-width: 1080px) {
+    width: 95%;
+  }
+
+  // < 980px = 98%
+  @media (max-width: 979px) {
+    width: 98%;
+  }
 }
+
+
+::ng-deep {
+  .p-dialog {
+    // Default para >= 1921px
+    width: 60vw !important;
+
+    // 1721px - 1920px = 65%
+    @media (max-width: 1920px) {
+      width: 65vw !important;
+    }
+
+    // 1621px - 1720px = 70%
+    @media (max-width: 1720px) {
+      width: 70vw !important;
+    }
+
+    // 1501px - 1620px = 75%
+    @media (max-width: 1620px) {
+      width: 75vw !important;
+    }
+
+    // 1401px - 1500px = 80%
+    @media (max-width: 1500px) {
+      width: 80vw !important;
+    }
+
+    // 1321px - 1400px = 85%
+    @media (max-width: 1400px) {
+      width: 85vw !important;
+    }
+
+    // 1081px - 1320px = 90%
+    @media (max-width: 1320px) {
+      width: 90vw !important;
+    }
+
+    // 980px - 1080px = 95%
+    @media (max-width: 1080px) {
+      width: 95vw !important;
+    }
+
+    // < 980px = 98%
+    @media (max-width: 979px) {
+      width: 98vw !important;
+    }
+  }
+}
+
 /* ==========================================================================
    DESPACHOS PAGE STYLES - Estilos exactos del HTML original
    ========================================================================== */
+.dialog-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
 
 /* Headers de sección */
 .section-header {

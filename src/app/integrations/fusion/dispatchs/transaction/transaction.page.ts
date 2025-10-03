@@ -22,6 +22,7 @@ import {ProgressBar} from "primeng/progressbar";
 import {Slider} from "primeng/slider";
 import {TableModule} from "primeng/table";
 import {Tag} from "primeng/tag";
+import { DialogModule } from 'primeng/dialog';
 
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
@@ -39,9 +40,12 @@ import {addIcons} from "ionicons";
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, FloatLabel, IonButtons, IonMenuButton,
     Select, IonGrid, IonRow, IonCol, IonIcon, IonModal, IonButton, InputText, Button, IonFooter, IconField, InputIcon,
-    IonCard, PrimeTemplate, TableModule, Tag]
+    IonCard, PrimeTemplate, TableModule, Tag, Dialog, DialogModule]
 })
 export class TransactionPage implements OnInit {
+  private resizeTimeout: any;
+  modalSize: string= '';
+
   scrollHeight: string = '550px';
   rowsPerPage: number = 10;
   rowsPerPageOptions: number[] = [5, 10, 20];
@@ -137,6 +141,14 @@ export class TransactionPage implements OnInit {
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
     this.UpdateScrollHeight();
+
+    if (this.isModaldispatchOpen) {
+      // Esperar 200ms después del último resize para imprimir
+      clearTimeout(this.resizeTimeout);
+      this.resizeTimeout = setTimeout(() => {
+        this.logModalSize();
+      }, 200);
+    }
   }
 
   private UpdateScrollHeight() {
@@ -160,6 +172,16 @@ export class TransactionPage implements OnInit {
   OpenDispatch(WOSelected: any) {
     this.GetWorkOrderFusion(WOSelected);
     this.isModaldispatchOpen = true;
+
+    this.logModalSize();
+  }
+
+  private logModalSize() {
+    const contentPart = document.querySelector('ion-modal.dispach-modal')?.shadowRoot?.querySelector('[part="content"]');
+    if (contentPart) {
+      const rect = contentPart.getBoundingClientRect();
+      this.modalSize = `Modal: ${Truncate(rect.width)} x ${Truncate(rect.height)} | Viewport: ${window.innerWidth} (${((rect.width / window.innerWidth) * 100).toFixed(2)}%)`;
+    }
   }
 
   GetWorkOrderFusion(WOSelectedData: any) {
@@ -168,7 +190,6 @@ export class TransactionPage implements OnInit {
     this.rejectGlobal = parseFloat(WOSelectedData.RejectPending) || 0;
 
     this.totalGlobal = this.completeGlobal + this.scrapGlobal + this.rejectGlobal;
-    console.log(this.totalGlobal);
 
     const path = WOSelectedData.Type === 'P' ? 'wo_process_dispatch' : 'wo_discrete_dispatch';
     this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code, WOSelectedData.WorkOrderNumber)).then(async (response: any) => {
@@ -186,7 +207,6 @@ export class TransactionPage implements OnInit {
       const restructuredData = data.items.map((item: any) => transformer(item));
 
       this.selectedWorkOrder = restructuredData[0] || {};
-      console.log(this.selectedWorkOrder);
     });
   }
 
