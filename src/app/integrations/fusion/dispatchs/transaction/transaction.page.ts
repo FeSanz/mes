@@ -172,7 +172,6 @@ export class TransactionPage implements OnInit {
 
   OpenDispatch(WOSelected: any) {
     this.GetWorkOrderFusion(WOSelected);
-    this.isModaldispatchOpen = true;
 
     this.logModalSize();
   }
@@ -208,13 +207,13 @@ export class TransactionPage implements OnInit {
       const restructuredData = data.items.map((item: any) => transformer(item));
 
       this.selectedWorkOrder = restructuredData[0] || {};
+
+      this.isModaldispatchOpen = true;
     });
   }
 
   OnSaveDispatch() {
-    // Implementar lógica de guardado
-    console.log('Guardando despacho...');
-    this.isModaldispatchOpen = false;
+    this.alerts.ShowLoading("Prueba...");
   }
 
   Operations() {

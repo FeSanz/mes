@@ -77,7 +77,8 @@
 }
 
 .custom-loading {
-  --width: 290px;
-  --min-width: 250px;
+  --min-width: 300px;
   --max-width: 90vw; // Para que sea responsive en pantallas pequeñas
+  z-index: 99999 !important;
 }
+
