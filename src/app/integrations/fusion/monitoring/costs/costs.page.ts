@@ -40,6 +40,7 @@ import { cloudUploadOutline, readerOutline, menuOutline } from 'ionicons/icons';
 import { addIcons } from "ionicons";
 import { TodayDateForFusion } from "../../../../models/date.format";
 import { Badge } from "primeng/badge";
+import {Dialog} from "primeng/dialog";
 
 
 @Component({
@@ -49,7 +50,7 @@ import { Badge } from "primeng/badge";
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, FloatLabel, IonButtons, IonMenuButton,
     Select, IonGrid, IonRow, IonCol, IonIcon, IonModal, IonButton, InputText, Button, IonFooter, IconField, InputIcon,
-    IonCard, PrimeTemplate, TableModule, Tag, Badge]
+    IonCard, PrimeTemplate, TableModule, Tag, Badge, Dialog]
 })
 export class CostsPage implements OnInit {
 
