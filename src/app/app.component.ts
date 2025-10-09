@@ -64,7 +64,7 @@ import { AlertsService } from "./services/alerts.service";
 import { ActionPerformed, PushNotificationSchema, PushNotifications, Token, } from '@capacitor/push-notifications';
 import { Platform } from '@ionic/angular';
 import { WebSocketService } from './services/web-socket.service';
-import {ToggleMenu} from "./models/design";
+import { ToggleMenu } from "./models/design";
 @Component({
   selector: 'app-root',
   styleUrls: ['app.component.scss'],
@@ -228,7 +228,8 @@ export class AppComponent implements OnInit {
   }
 
   HandleClick(event: Event) {
-    event.stopPropagation();//detener la propagación de clicks
+    event.stopPropagation(); // Detiene la propagación del click
+    event.preventDefault();   // Previene el comportamiento por defecto
   }
 
   handleReorder(event: CustomEvent<ItemReorderEventDetail>) {

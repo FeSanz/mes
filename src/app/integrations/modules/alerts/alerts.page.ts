@@ -20,16 +20,19 @@ import { FloatLabel } from "primeng/floatlabel";
 import { Select } from "primeng/select";
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline, menuOutline } from 'ionicons/icons';
+import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline, menuOutline, pencilOutline, timeOutline } from 'ionicons/icons';
 import { ToggleMenu } from 'src/app/models/design';
+import { DialogModule } from 'primeng/dialog';
+import { Dialog } from "primeng/dialog";
+
 @Component({
   selector: 'app-alerts',
   templateUrl: './alerts.page.html',
   styleUrls: ['./alerts.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonIcon, IonFab, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonModal, IonSelect, IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule,
-    Tag, FloatLabel, Select]
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonIcon, IonFab, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption,
+    IonModal, IonSelect, IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule, DialogModule, Dialog, Tag, FloatLabel, Select]
 })
 export class AlertsPage {
   searchValueAl: string = '';
@@ -42,13 +45,14 @@ export class AlertsPage {
   finalicedAlertsData: any = []
   organizationSelected: string | any = '';
   company: any = {}
-  isModalOpen = false
+  isEditAlertModalOpen = false
   failures: any = []
   newAlert: any = {}
   selectedFailure: any = null;
   machines: any = []
   filteredFailures: any = [];
   searchTerm = '';
+  selectedAlert: any = {}
   selectedArea = '';
   selectedType = '';
   selectedMachine = 0;
@@ -66,7 +70,7 @@ export class AlertsPage {
     this.company = this.userData.Company
     this.userData.Company.Organizations = this.userData.Company.Organizations.filter((org: any) => org.WorkMethod != null);
     this.organizationSelected = this.userData.Company.Organizations[0];
-    addIcons({menuOutline,hammerOutline,checkmarkOutline,trashOutline,addOutline,closeOutline});
+    addIcons({ menuOutline, timeOutline, hammerOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline });
   }
   ionViewDidEnter() {
     this.GetAlerts()
@@ -103,6 +107,13 @@ export class AlertsPage {
       this.apiService.GetRequestRender(`alertsByOrganizations/finaliced?organizations=${orgsIds}`).then((response: any) => {
         if (!response.errorsExistFlag) {
           this.finalicedAlertsData = response.items
+          this.finalicedAlertsData.forEach((alert: any) => {
+            alert.responseTimeString = this.getElapsedStartEndTime(alert.response_time, alert.repair_time)
+            alert.repairTimeString = this.getElapsedStartEndTime(alert.response_time, alert.repair_time)
+            alert.responseLegibleTimeString = this.getElapsedLegibleTime(alert.response_time, alert.repair_time)
+            alert.repairLegibleTimeString = this.getElapsedLegibleTime(alert.response_time, alert.repair_time)
+          });
+
         } else {
           this.alerts.Error(response.error)
         }
@@ -159,18 +170,33 @@ export class AlertsPage {
     this.progressValue = [0, 100];
   }
   ShowNewAlert() {
-    this.isModalOpen = true
+    this.isEditAlertModalOpen = true
     this.selectedFailure = this.failures[0]
   }
-  AddNewAlert() {
-    const body = {
-      machine_id: this.selectedMachine,
-      failure_id: this.selectedFailure.failure_id
+  async EditAlert(alert: any) {
+    console.log(alert);
+
+    this.selectedFailure = {
+      name: alert.name,
+      area: alert.area,
+      type: alert.type,
+      failure_id: alert.failure_id
     }
-    this.apiService.PostRequestRender('alerts', body).then((response: any) => {
-      this.isModalOpen = false
-      //this.GetAlerts()
-    })
+    this.selectedAlert = alert
+    this.isEditAlertModalOpen = true
+  }
+  async UpdateFailureOfAlert() {
+    if (await this.alerts.ShowAlert("¿Deseas asignar la falla seleccionada a esta alerta?", "Alerta", "Atrás", "Asignar")) {
+      this.apiService.PutRequestRender('alerts/' + this.selectedAlert.alert_id + '/failure', { failure_id: this.selectedFailure.failure_id }).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          this.alerts.Success("Alerta actualizada")
+          this.isEditAlertModalOpen = false
+          this.GetAlerts()
+        } else {
+          this.alerts.Info(response.error)
+        }
+      })
+    }
   }
   async AttendAlert(alert: any) {
     if (await this.alerts.ShowAlert("¿Deseas atender esta alerta?", "Alerta", "Atrás", "Atender")) {
@@ -209,10 +235,10 @@ export class AlertsPage {
       })
     }
   }
-  getElapsedTime(startDate: string | Date): string {
+  getElapsedLegibleTime(startDate: string | Date, endDate?: string | Date): string {
     const start = new Date(startDate);
-    const now = new Date();
-    const diffMs = now.getTime() - start.getTime();
+    const end = endDate ? new Date(endDate) : new Date();
+    const diffMs = end.getTime() - start.getTime();
 
     const seconds = Math.floor(diffMs / 1000) % 60;
     const minutes = Math.floor(diffMs / (1000 * 60)) % 60;
@@ -233,22 +259,19 @@ export class AlertsPage {
     const end = endDate ? new Date(endDate) : new Date();
     const diffMs = end.getTime() - start.getTime();
 
-    if (diffMs < 0) return '0s';
+    if (diffMs < 0) return '00:00:00';
 
-    const seconds = Math.floor(diffMs / 1000) % 60;
-    const minutes = Math.floor(diffMs / (1000 * 60)) % 60;
-    const hours = Math.floor(diffMs / (1000 * 60 * 60)) % 24;
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const seconds = totalSeconds % 60;
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const minutes = totalMinutes % 60;
+    const hours = Math.floor(totalMinutes / 60);
 
-    const parts: string[] = [];
-    if (days > 0) parts.push(`${days} día${days > 1 ? 's' : ''}`);
-    if (hours > 0) parts.push(`${hours}h`);
-    if (minutes > 0) parts.push(`${minutes}min`);
-    parts.push(`${seconds}s`);
+    // función helper para formatear con 2 dígitos
+    const pad = (n: number) => n.toString().padStart(2, '0');
 
-    return parts.join(' ');
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   }
-
 
   loadFailures() {
     // después de cargar las fallas

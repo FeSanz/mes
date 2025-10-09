@@ -7,7 +7,7 @@
         </ion-button>
       </ion-menu-button>
     </ion-buttons><ion-title>Alertas {{userData.Company.Name}}</ion-title>
-    
+
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
@@ -50,7 +50,7 @@
             </ng-template>
             <ng-template pTemplate="header">
               <tr>
-                <th pSortableColumn="name" class="td-center">
+                <th pSortableColumn="name" class="td-center" style="min-width: 7rem">
                   <div class="flex justify-between items-center">
                     Falla
                     <p-sortIcon field="name" />
@@ -114,34 +114,41 @@
             </ng-template>
             <ng-template #body let-item>
               <tr>
-                <td class="td-center"><strong>{{ item.name }}</strong></td>
+                <td style="padding-left: 20px; max-width: 200px;"><strong>{{ item.name }}</strong></td>
                 <td class="td-center">{{item.type}}</td>
-                <td class="td-center">{{ item.area}}</td>
+                <td class="td-center">
+                  <p-tag [value]="item.area"
+                    [severity]="item.area === 'Mantenimiento' ? 'danger' : item.area === 'Almacén' ? 'info' : item.area === 'Producción' ? 'success' : item.area === 'Calidad' ? 'warn' : '' ">
+                  </p-tag>
+                </td>
                 <td class="td-center">{{ item.machine_name}}</td>
                 <td class="td-center">
                   <p-tag
-                    [value]="item.status === 'attend' ? 'Atender' : item.status === 'in_progress' ? 'En progreso' : item.status === 'finaliced' ? 'Finalizada' : ''"
-                    [severity]=" item.status === 'attend' ? 'danger' : item.status === 'in_progress' ? 'warn' : item.status === 'finaliced' ? 'success' : '' ">
+                    [value]="item.status == 0 ? 'Pendiente' : item.status === 'attend' ? 'Atender' : item.status === 'in_progress' ? 'Reparando' : item.status === 'finaliced' ? 'Finalizada' : ''"
+                    [severity]="item.status == 0 ? 'warn' : item.status === 'attend' ? 'danger' : item.status === 'in_progress' ? 'warn' : item.status === 'finaliced' ? 'success' : '' ">
+                    <ion-icon
+                      [name]="item.status == 0 ? 'time-outline' : item.status === 'attend' ? 'warning-outline' : item.status === 'in_progress' ? 'time-outline' : item.status === 'finaliced' ? 'checkmark-outline' : ''"></ion-icon>
                   </p-tag>
                 </td>
 
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a' }}</td>
-                <td class="td-center">
+                <td class="td-center" [title]="getElapsedLegibleTime(item.start_date, item.response_time || '')">
                   <ng-container *ngIf="item.response_time; else elapsed">
                     <!--{{ item.response_time | date: 'hh:mm a dd/MM/yyyy' }}-->
                     {{ getElapsedStartEndTime(item.start_date, item.response_time) }}
                   </ng-container>
                   <ng-template #elapsed>
-                    {{ getElapsedTime(item.start_date) }}
+                    {{ getElapsedStartEndTime(item.start_date)}}
                   </ng-template>
                 </td>
-                <td class="td-center">
+                <td class="td-center"
+                  [title]="item.response_time ? getElapsedLegibleTime(item.response_time, item.repair_time) : 'En espera'">
                   <ng-container *ngIf="item.repair_time; else elapsedRepair">
                     {{ getElapsedStartEndTime(item.response_time, item.repair_time) }}
                     <!--{{ item.repair_time | date: 'hh:mm a dd/MM/yyyy' }}-->
                   </ng-container>
                   <ng-template #elapsedRepair>
-                    {{ item.response_time != null ? getElapsedTime(item.response_time) : 'En espera' }}
+                    {{ item.response_time != null ? getElapsedStartEndTime(item.response_time) : 'En espera' }}
                   </ng-template>
                 </td>
                 <td class="td-center">
@@ -151,8 +158,12 @@
                 <ion-button *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time" size="small"
                   color="success" (click)="FinaliceAlert(item)"> Finalizar </ion-button-->
                   <ion-button size="small" shape="round" color="warning" (click)="AttendAlert(item)" title="Atender"
-                    *ngIf="permissions.isSuperAdmin() && !item.response_time">
+                    *ngIf="permissions.isSuperAdmin() && !item.response_time && item.area">
                     <ion-icon slot="icon-only" name="hammer-outline"></ion-icon>
+                  </ion-button>
+                  <ion-button size="small" shape="round" color="secondary" (click)="EditAlert(item)" title="Atender"
+                    *ngIf="permissions.isSuperAdmin() && !item.response_time">
+                    <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
                   </ion-button>
                   <ion-button size="small" shape="round" color="success" (click)="FinaliceAlert(item)" title="Finalizar"
                     *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time">
@@ -269,22 +280,31 @@
             </ng-template>
             <ng-template #body let-item>
               <tr>
-                <td class="td-center"><strong>{{ item.name }}</strong></td>
+                <td style="padding-left: 20px; max-width: 200px;"><strong>{{ item.name }}</strong></td>
                 <td class="td-center">{{item.type}}</td>
-                <td class="td-center">{{ item.area}}</td>
+                <td class="td-center">
+                  <p-tag [value]="item.area"
+                    [severity]="item.area === 'Mantenimiento' ? 'danger' : item.area === 'Almacén' ? 'info' : item.area === 'Producción' ? 'success' : item.area === 'Calidad' ? 'warn' : '' ">
+                  </p-tag>
+                </td>
                 <td class="td-center">{{ item.machine_name}}</td>
                 <td class="td-center">
-                  <p-tag [value]="'Finalizada'" [severity]="'success'" />
+                  <p-tag
+                    [value]="item.status == 0 ? 'Pendiente' : item.status === 'attend' ? 'Atender' : item.status === 'in_progress' ? 'Reparando' : item.status === 'finaliced' ? 'Finalizada' : ''"
+                    [severity]="item.status == 0 ? 'warn' : item.status === 'attend' ? 'danger' : item.status === 'in_progress' ? 'warn' : item.status === 'finaliced' ? 'success' : '' ">
+                    <ion-icon
+                      [name]="item.status == 0 ? 'time-outline' : item.status === 'attend' ? 'warning-outline' : item.status === 'in_progress' ? 'time-outline' : item.status === 'finaliced' ? 'checkmark-outline' : ''"></ion-icon>
+                  </p-tag>
                 </td>
-                <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a' }}</td>
-                <td class="td-center">
-                  {{ getElapsedStartEndTime(item.start_date, item.response_time) }}
+                <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm' }}</td>
+                <td class="td-center" [title]="item.responseLegibleTimeString">
+                  {{ item.responseTimeString }}
+                </td>
+                <td class="td-center" [title]="item.repairLegibleTimeString">
+                  {{ item.repairTimeString }}
                 </td>
                 <td class="td-center">
-                  {{ getElapsedStartEndTime(item.response_time, item.repair_time) }}
-                </td>
-                <td class="td-center">
-                  {{ item.repair_time | date: 'dd/MM/yyyy hh:mm a' }}
+                  {{ item.repair_time | date: 'dd/MM/yyyy hh:mm' }}
                 </td>
                 <td class="td-center">
                   <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item)" title="Eliminar">
@@ -303,97 +323,58 @@
       </ion-col>
     </ion-row>
   </ion-grid>
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="permissions.isSuperAdmin()">
-    <ion-fab-button (click)="ShowNewAlert()">
-      <ion-icon name="add-outline"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 </ion-content>
 
-<ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false" [focusTrap]="false">
-  <ng-template>
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>Crear nueva alerta</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="isModalOpen = false;">Cerrar</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <ion-item>
-        <ion-select label="Máquina:" [(ngModel)]="selectedMachine" interface="popover">
-          <ion-select-option *ngFor="let machine of machines" [value]="machine.machine_id">{{ machine.machine_name
-            }}</ion-select-option>
-        </ion-select>
-      </ion-item>
-      <!--ion-searchbar [(ngModel)]="searchTerm" placeholder="Buscar falla"></ion-searchbar-->
-      <p-table [value]="failures" selectionMode="single" [(selection)]="selectedFailure"
-        styleClass="card-table-primeng">
-        <ng-template pTemplate="header">
-          <tr>
-            <th pSortableColumn="name" style="width: 60%">
-              <div>
-                Inicio
-                <p-sortIcon field="name" />
-                <p-columnFilter type="text" field="name" display="menu" class="ml-auto" />
-              </div>
-            </th>
-            <th pSortableColumn="area" style="width: 20%" class="td-center">
-              <div>
-                Área
-                <p-sortIcon field="area" />
-                <p-columnFilter type="text" field="area" display="menu" class="ml-auto" />
-              </div>
-            </th>
-            <th pSortableColumn="type" style="min-width: 9rem" class="td-center">
-              <div>
-                Tipo
-                <p-sortIcon field="type" />
-                <p-columnFilter type="text" field="type" display="menu" class="ml-auto" />
-              </div>
-            </th>
-          </tr>
-        </ng-template>
-        <ng-template #body let-item let-rowIndex="rowIndex">
-          <tr [pSelectableRow]="item" [pSelectableRowIndex]="rowIndex">
-            <td>{{ item.name }}</td>
-            <td class="td-center">{{ item.area }}</td>
-            <td class="td-center">{{ item.type }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-      <!--ion-item>
-        <ion-col>
-          <ion-select label="Área:" [(ngModel)]="selectedArea" interface="popover" placeholder="seleccione área">
-            <ion-select-option *ngFor="let area of uniqueAreas" [value]="area">{{ area }}</ion-select-option>
-          </ion-select>
-        </ion-col>
-        <ion-col>
-          <ion-select label="Tipo:" [(ngModel)]="selectedType" interface="popover" placeholder="seleccione tipo">
-            <ion-select-option *ngFor="let type of uniqueTypes" [value]="type">{{ type }}</ion-select-option>
-          </ion-select>
-        </ion-col>
-        <ion-buttons slot="end">
-          <ion-button size="small" shape="round" (click)="selectedArea = ''; selectedType = '';">
-            <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-item>
-      <ion-list>
-        <ion-item button *ngFor="let failure of filteredFailures" (click)="SelectFail(failure)"
-          [ngClass]="{ 'selected-failure': failure.failure_id === selectedFailureId }">
-          <ion-label>
-            <h2>{{ failure.name }}</h2>
-            <p>{{ failure.type }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-list-->
-      <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button (click)="AddNewAlert()" color="success">
-          <ion-icon name="checkmark-outline"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
-    </ion-content>
+<p-dialog header="Editar alerta" [(visible)]="isEditAlertModalOpen" [modal]="true" [draggable]="true" [resizable]="true"
+  [maximizable]="true" appendTo="body" [style]="{ width: '800px', height: '85vh', 'max-height': '90vh' }"
+  (onHide)="isEditAlertModalOpen = false">
+  <div class="dialog-content-wrapper">
+    <p-table [value]="failures" selectionMode="single" [(selection)]="selectedFailure" styleClass="card-table-primeng"
+      [responsiveLayout]="'scroll'">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="name" style="max-width: 4rem">
+            <div class="flex align-items-center justify-content-between">
+              <span>Inicio</span>
+              <p-sortIcon field="name"></p-sortIcon>
+              <p-columnFilter type="text" field="name" display="menu"></p-columnFilter>
+            </div>
+          </th>
+          <th pSortableColumn="area" style="max-width: 4rem" class="td-center">
+            <div class="flex align-items-center justify-content-between">
+              <span>Área</span>
+              <p-sortIcon field="area"></p-sortIcon>
+              <p-columnFilter type="text" field="area" display="menu"></p-columnFilter>
+            </div>
+          </th>
+          <th pSortableColumn="type" style="max-width: 4rem" class="td-center">
+            <div class="flex align-items-center justify-content-between">
+              <span>Tipo</span>
+              <p-sortIcon field="type"></p-sortIcon>
+              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+        <tr [pSelectableRow]="item" [pSelectableRowIndex]="rowIndex">
+          <td>{{ item.name }}</td>
+          <td class="td-center">{{ item.area }}</td>
+          <td class="td-center">{{ item.type }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="3">No hay fallas disponibles.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cerrar" icon="pi pi-times" severity="danger" (click)="isEditAlertModalOpen = false" />
+
+    <p-button label="Guardar" icon="pi pi-check" severity="success" (click)="UpdateFailureOfAlert()"
+      [disabled]="!selectedFailure" />
   </ng-template>
-</ion-modal>
+
+</p-dialog>

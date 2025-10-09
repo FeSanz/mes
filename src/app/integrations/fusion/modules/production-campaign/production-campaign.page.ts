@@ -21,6 +21,8 @@ import { InputText } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { ToggleMenu } from 'src/app/models/design';
+import { DialogModule } from 'primeng/dialog';
+import { Dialog } from "primeng/dialog";
 
 @Component({
   selector: 'app-production-campaign',
@@ -30,7 +32,7 @@ import { ToggleMenu } from 'src/app/models/design';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
     IonItem, IonInput, IonDatetime, IonMenuButton, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
-    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule, InputIconModule]
+    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule, InputIconModule, DialogModule, Dialog]
 })
 export class ProductionCampaignPage {
   campaignsArray: any = []
@@ -176,6 +178,7 @@ export class ProductionCampaignPage {
       enabled_flag: 'Y',
     }
     this.isModalNewCampaign = false
+    this.isModalFreeOrdersOpen = false
     this.changeDetector.detectChanges()
   }
   ShowCampaign(wo: any) {
