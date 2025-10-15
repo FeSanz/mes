@@ -100,9 +100,14 @@ export const routes: Routes = [
   {
     path: 'production-campaign',
     loadComponent: () => import('./integrations/fusion/modules/production-campaign/production-campaign.page').then(m => m.ProductionCampaignPage)
-  },  {
+  },
+  {
     path: 'wc',
     loadComponent: () => import('./integrations/fusion/modules/wc/wc.page').then( m => m.WcPage)
+  },
+  {
+    path: 'kpis',
+    loadComponent: () => import('./integrations/modules/kpis/kpis.page').then( m => m.KpisPage)
   }
 
 

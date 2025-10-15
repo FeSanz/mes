@@ -1,0 +1,198 @@
+.drag-handle {
+    cursor: grab;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.clickable-text {
+    cursor: pointer;
+}
+
+ion-input {
+    text-align: right;
+}
+
+ion-select::part(label) {
+    color: var(--ion-color-primary);
+}
+
+.drop-indicator-temp {
+    z-index: 9999;
+    pointer-events: none;
+}
+
+/* Estilos para la tabla con drag & drop */
+.orders-table-custom {
+    .selected-row {
+        background-color: rgba(var(--ion-color-primary-rgb), 0.1) !important;
+        border-left: 3px solid var(--ion-color-primary);
+        transition: all 0.2s ease;
+
+        &.draggable-row {
+            &:hover .draggable-cell {
+                background-color: rgba(var(--ion-color-primary-rgb), 0.05);
+            }
+        }
+    }
+
+    /* Celdas arrastrables - excluir checkbox y botones */
+    .draggable-cell {
+        transition: background-color 0.2s ease;
+    }
+
+    /* Filas arrastrables */
+    .draggable-row {
+        .draggable-cell {
+            cursor: move;
+
+            &:hover {
+                background-color: rgba(var(--ion-color-success-rgb), 0.05);
+            }
+        }
+    }
+
+    /* Estado durante arrastre */
+    &.dragging-state {
+        .selected-row {
+            opacity: 0.8;
+            border-left-color: var(--ion-color-success);
+        }
+
+        tr:not(.selected-row) {
+            opacity: 0.6;
+        }
+    }
+
+    /* Indicador de drop */
+    .drop-indicator {
+        height: 3px;
+        background: linear-gradient(90deg, var(--ion-color-success), var(--ion-color-success-shade));
+        position: absolute;
+        z-index: 1000;
+        border-radius: 2px;
+        box-shadow: 0 0 6px var(--ion-color-success);
+    }
+}
+
+/* Estado global durante arrastre */
+body.dragging-active {
+    .orders-table-custom {
+        .selected-row {
+            background-color: rgba(var(--ion-color-success-rgb), 0.15) !important;
+            border-left-color: var(--ion-color-success);
+        }
+
+        .p-datatable-tbody>tr:not(.selected-row) {
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+    }
+
+    /* Prevenir selección de texto durante drag */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+
+/* Animaciones suaves */
+.p-datatable-tbody>tr {
+    transition: all 0.2s ease;
+}
+
+/* Mejorar la apariencia del checkbox header */
+.p-datatable-thead th:first-child {
+    text-align: center;
+}
+
+/* Hover en filas cuando hay selección activa */
+.orders-table-custom .draggable-row:hover .draggable-cell {
+    background-color: rgba(var(--ion-color-primary-rgb), 0.05);
+}
+
+.table-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* separación entre izquierda y derecha */
+    gap: 1rem;
+    flex-wrap: wrap;
+    /* evita desbordes */
+}
+
+.table-caption-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* separación entre botones */
+}
+
+.table-caption-right {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    /* ajusta el espacio */
+    /* Alinea al final, es decir, a la derecha */
+    align-items: center;
+    /* Opcional: centra verticalmente */
+}
+
+/* Footer */
+.footer-style {
+    background-color: var(--ion-color-back);
+}
+
+.center-select {
+    display: flex;
+    justify-content: center;
+}
+
+.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.clickable-row:hover {
+    background-color: #f0f4ff;
+    /* azul clarito al pasar el mouse */
+}
+
+ion-datetime-button::part(native) {
+    background-color: var(--ion-color-secondary);
+}
+
+.ion-activatable {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+ion-card-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xs);
+
+    ion-icon {
+        font-size: 1.3rem;
+    }
+}
+
+ion-card.graphic {
+    height: 450px;
+    --background: var(--ion-color-back-shade, #fff);
+    border-radius: 12px;
+
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+    &:hover {
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+        transform: translateY(-2px);
+    }
+}

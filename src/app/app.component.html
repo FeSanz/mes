@@ -212,6 +212,13 @@
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
+                        <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/kpis']"
+                          lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="pie-chart-outline"></ion-icon>
+                          <ion-label>KPIs</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                      <ion-menu-toggle auto-hide="false">
                         <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/failures']"
                           lines="none" class="submenu-item">
                           <ion-icon slot="start" name="warning-outline"></ion-icon>

@@ -17,3 +17,13 @@ ion-input::part(label) {
 .selected-failure {
     border: 1px solid var(--ion-color-primary);
 }
+::ng-deep ion-select::part(popover) {
+  z-index: 2000 !important; /* mayor que el overlay del p-dialog (~1100) */
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}

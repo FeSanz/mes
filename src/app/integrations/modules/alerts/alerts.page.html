@@ -13,7 +13,7 @@
         <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
           [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
           placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
-          [virtualScrollItemSize]="38" (onChange)="GetAlerts()" appendTo="body" />
+          [virtualScrollItemSize]="38" (onChange)="GetAlerts()" appendTo="ion-app" />
         <label for="organization_select">Organización</label>
       </p-floatlabel>
     </div>
@@ -115,7 +115,7 @@
             <ng-template #body let-item>
               <tr>
                 <td style="padding-left: 20px; max-width: 200px;"><strong>{{ item.name }}</strong></td>
-                <td class="td-center">{{item.type}}</td>
+                <td class="td-center">{{item.type || '-'}}</td>
                 <td class="td-center">
                   <p-tag [value]="item.area"
                     [severity]="item.area === 'Mantenimiento' ? 'danger' : item.area === 'Almacén' ? 'info' : item.area === 'Producción' ? 'success' : item.area === 'Calidad' ? 'warn' : '' ">
@@ -123,12 +123,12 @@
                 </td>
                 <td class="td-center">{{ item.machine_name}}</td>
                 <td class="td-center">
-                  <p-tag
-                    [value]="item.status == 0 ? 'Pendiente' : item.status === 'attend' ? 'Atender' : item.status === 'in_progress' ? 'Reparando' : item.status === 'finaliced' ? 'Finalizada' : ''"
-                    [severity]="item.status == 0 ? 'warn' : item.status === 'attend' ? 'danger' : item.status === 'in_progress' ? 'warn' : item.status === 'finaliced' ? 'success' : '' ">
-                    <ion-icon
-                      [name]="item.status == 0 ? 'time-outline' : item.status === 'attend' ? 'warning-outline' : item.status === 'in_progress' ? 'time-outline' : item.status === 'finaliced' ? 'checkmark-outline' : ''"></ion-icon>
-                  </p-tag>
+                  <ion-icon
+                    [color]="item.status == 0 ? 'warning' : item.status === 'attend' ? 'danger' : item.status === 'in_progress' ? 'tertiary' : item.status === 'finaliced' ? 'sucess' : ''"
+                    [name]="item.status == 0 ? 'time-outline' : item.status === 'attend' ? 'warning-outline' : item.status === 'in_progress' ? 'time-outline' : item.status === 'finaliced' ? 'checkmark-outline' : ''">
+                  </ion-icon>
+                  {{item.status == 0 ? 'Pendiente' : item.status === 'attend' ? 'Atender' : item.status ===
+                  'in_progress' ? 'Reparando' : item.status === 'finaliced' ? 'Finalizada' : ''}}
                 </td>
 
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a' }}</td>
@@ -237,13 +237,13 @@
                     <p-columnFilter type="text" field="machine_name" display="menu" class="ml-auto" />
                   </div>
                 </th>
-                <th pSortableColumn="status" class="td-center">
+                <!--th pSortableColumn="status" class="td-center">
                   <div class="flex justify-between items-center">
                     Estado
                     <p-sortIcon field="status" />
                     <p-columnFilter type="text" field="status" display="menu" class="ml-auto" />
                   </div>
-                </th>
+                </th-->
                 <th pSortableColumn="start_date" class="td-center">
                   <div class="flex justify-between items-center">
                     Inicio
@@ -272,11 +272,11 @@
                     <p-columnFilter type="text" field="repair_time" display="menu" class="ml-auto" />
                   </div>
                 </th>
-                <th class="td-center">
+                <!--th class="td-center">
                   <div class="flex justify-between items-center">
                     Acciones
                   </div>
-                </th>
+                </th-->
             </ng-template>
             <ng-template #body let-item>
               <tr>
@@ -288,14 +288,14 @@
                   </p-tag>
                 </td>
                 <td class="td-center">{{ item.machine_name}}</td>
-                <td class="td-center">
+                <!--td class="td-center">
                   <p-tag
                     [value]="item.status == 0 ? 'Pendiente' : item.status === 'attend' ? 'Atender' : item.status === 'in_progress' ? 'Reparando' : item.status === 'finaliced' ? 'Finalizada' : ''"
                     [severity]="item.status == 0 ? 'warn' : item.status === 'attend' ? 'danger' : item.status === 'in_progress' ? 'warn' : item.status === 'finaliced' ? 'success' : '' ">
                     <ion-icon
                       [name]="item.status == 0 ? 'time-outline' : item.status === 'attend' ? 'warning-outline' : item.status === 'in_progress' ? 'time-outline' : item.status === 'finaliced' ? 'checkmark-outline' : ''"></ion-icon>
                   </p-tag>
-                </td>
+                </td-->
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm' }}</td>
                 <td class="td-center" [title]="item.responseLegibleTimeString">
                   {{ item.responseTimeString }}
@@ -306,11 +306,11 @@
                 <td class="td-center">
                   {{ item.repair_time | date: 'dd/MM/yyyy hh:mm' }}
                 </td>
-                <td class="td-center">
+                <!--td class="td-center">
                   <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item)" title="Eliminar">
                     <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                   </ion-button>
-                </td>
+                </td-->
               </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
@@ -324,57 +324,43 @@
     </ion-row>
   </ion-grid>
 </ion-content>
+<p-dialog [(visible)]="isEditAlertModalOpen" [modal]="true" [maximizable]="true" appendTo="ion-app"
+  [style]="{ width: 'auto', height: '85vh', 'max-height': '90vh' }" (onHide)="isEditAlertModalOpen = false">
+  <!-- HEADER PERSONALIZADO -->
+  <ng-template pTemplate="header">
+    <div class="dialog-header flex align-items-center justify-content-between flex-wrap gap-3">
+      <h3 class="m-0">Editar alerta</h3>
+      <div class="card-select flex items-end">
+        <p-floatlabel class="w-full md:w-56" variant="on">
+          <p-select [(ngModel)]="selectedArea" inputId="area_select" [options]="uniqueAreas" optionLabel="label"
+            optionValue="value" [filter]="true" filterBy="label" placeholder="Filtrar área" styleClass="w-full"
+            (onChange)="onAreaFilterChange($event)"></p-select>
+          <label for="area_select">Área</label>
+        </p-floatlabel>
+      </div>
+    </div>
+  </ng-template>
 
-<p-dialog header="Editar alerta" [(visible)]="isEditAlertModalOpen" [modal]="true" [draggable]="true" [resizable]="true"
-  [maximizable]="true" appendTo="body" [style]="{ width: '800px', height: '85vh', 'max-height': '90vh' }"
-  (onHide)="isEditAlertModalOpen = false">
+  <!-- CONTENIDO -->
   <div class="dialog-content-wrapper">
-    <p-table [value]="failures" selectionMode="single" [(selection)]="selectedFailure" styleClass="card-table-primeng"
-      [responsiveLayout]="'scroll'">
+    <p-table [value]="filteredFailures" selectionMode="single" [(selection)]="selectedFailure"
+      [responsiveLayout]="'scroll'" styleClass="card-table-primeng">
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="name" style="max-width: 4rem">
-            <div class="flex align-items-center justify-content-between">
-              <span>Inicio</span>
-              <p-sortIcon field="name"></p-sortIcon>
-              <p-columnFilter type="text" field="name" display="menu"></p-columnFilter>
-            </div>
-          </th>
-          <th pSortableColumn="area" style="max-width: 4rem" class="td-center">
-            <div class="flex align-items-center justify-content-between">
-              <span>Área</span>
-              <p-sortIcon field="area"></p-sortIcon>
-              <p-columnFilter type="text" field="area" display="menu"></p-columnFilter>
-            </div>
-          </th>
-          <th pSortableColumn="type" style="max-width: 4rem" class="td-center">
-            <div class="flex align-items-center justify-content-between">
-              <span>Tipo</span>
-              <p-sortIcon field="type"></p-sortIcon>
-              <p-columnFilter type="text" field="type" display="menu"></p-columnFilter>
-            </div>
-          </th>
+          <th style="min-width: 28rem">Inicio</th>
+          <th style="min-width: 6rem">Tipo</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
         <tr [pSelectableRow]="item" [pSelectableRowIndex]="rowIndex">
           <td>{{ item.name }}</td>
-          <td class="td-center">{{ item.area }}</td>
-          <td class="td-center">{{ item.type }}</td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="3">No hay fallas disponibles.</td>
+          <td>{{ item.type }}</td>
         </tr>
       </ng-template>
     </p-table>
   </div>
   <ng-template pTemplate="footer">
-    <p-button label="Cerrar" icon="pi pi-times" severity="danger" (click)="isEditAlertModalOpen = false" />
-
-    <p-button label="Guardar" icon="pi pi-check" severity="success" (click)="UpdateFailureOfAlert()"
-      [disabled]="!selectedFailure" />
+    <ion-button color="danger" (click)="isEditAlertModalOpen = false">Cerrar</ion-button>
+    <ion-button color="secondary" (click)="UpdateFailureOfAlert()" [disabled]="!selectedFailure">Guardar</ion-button>
   </ng-template>
-
 </p-dialog>

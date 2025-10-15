@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonSearchbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonLabel, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonSearchbar } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
@@ -31,7 +31,7 @@ import { Dialog } from "primeng/dialog";
   styleUrls: ['./alerts.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonIcon, IonFab, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption,
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonLabel, IonIcon, IonFab, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption,
     IonModal, IonSelect, IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule, DialogModule, Dialog, Tag, FloatLabel, Select]
 })
 export class AlertsPage {
@@ -137,6 +137,7 @@ export class AlertsPage {
   }
   startSubscription() {
     this.websocket.SuscribeById({ organization_id: this.organizationSelected.OrganizationId }, "alerts", (response) => {
+      response.name = response.failure_name
       if (response.action == 'new') {
         this.alertsData = [response, ...this.alertsData];
         this.changeDetector.detectChanges()
@@ -174,8 +175,6 @@ export class AlertsPage {
     this.selectedFailure = this.failures[0]
   }
   async EditAlert(alert: any) {
-    console.log(alert);
-
     this.selectedFailure = {
       name: alert.name,
       area: alert.area,
@@ -276,7 +275,14 @@ export class AlertsPage {
   loadFailures() {
     // después de cargar las fallas
     this.filteredFailures = this.failures;
-    this.uniqueAreas = [...new Set(this.failures.map((f: any) => f.area))];
+    // Genera lista única de áreas con estructura { label, value }
+    this.uniqueAreas = [
+      { label: 'Todas', value: '' },
+      ...[...new Set(this.failures.map((f: any) => f.area))]
+        .filter((a: any) => a && a.trim() !== '') // opcional: elimina vacíos o nulos
+        .map(a => ({ label: a, value: a }))
+    ];
+
     this.uniqueTypes = [...new Set(this.failures.map((f: any) => f.type))];
     this.applyFilters();
   }
@@ -305,6 +311,17 @@ export class AlertsPage {
     if (this.timer) {
       clearInterval(this.timer);
     }
+  }
+  onAreaFilterChange(selectedValue: any) {
+    // Lógica de filtrado de tabla u otros elementos
+    if (!selectedValue.value || selectedValue.value == 'Todas') {
+      // Mostrar todo
+      this.filteredFailures = [...this.failures];
+    } else {
+      // Filtrar por área seleccionada
+      this.filteredFailures = this.failures.filter((f: any) => f.area === selectedValue.value);
+    }
+    this.changeDetector.detectChanges()
   }
   protected readonly ToggleMenu = ToggleMenu;
 }
