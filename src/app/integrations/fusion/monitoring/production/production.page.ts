@@ -250,6 +250,7 @@ export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
   }
 
   GetColorByAdvanced(advance: number) {
+    console.log('GetColorByAdvanced');
    if(advance == 0 || advance == null){
      return "danger"; //rojo
    }else if(advance >= 1){

@@ -8,7 +8,7 @@
       </ion-menu-button>
     </ion-buttons>
     <ion-title>Ordenes de Trabajo {{dbOrganizations.Company.Name}} [ <strong>{{organizationSelected.WorkMethod}}</strong> ]</ion-title>
-    
+
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="organizationSelected"
@@ -149,8 +149,8 @@
             <td>{{ item.ResourceCode }}</td>
             <td>{{ item.PlannedQuantity }}</td>
             <td>{{ item.CompletedQuantity }}</td>
-            <td>{{ FormatForDisplayFromISO(item.StartDate) }}</td>
-            <td>{{ FormatForDisplayFromISO(item.CompletionDate) }}</td>
+            <td>{{ item.StartDate | date:'dd/MM/yy HH:mm' }}</td>
+            <td>{{ item.CompletionDate | date:'dd/MM/yy HH:mm' }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -281,8 +281,8 @@
             <td>{{ item.ResourceCode }}</td>
             <td>{{ item.PlannedQuantity }}</td>
             <td>{{ item.CompletedQuantity }}</td>
-            <td>{{ FormatForDisplayFromISO(item.StartDate) }}</td>
-            <td>{{ FormatForDisplayFromISO(item.CompletionDate) }}</td>
+            <td>{{ item.StartDate | date:'dd/MM/yy HH:mm' }}</td>
+            <td>{{ item.CompletionDate | date:'dd/MM/yy HH:mm' }}</td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

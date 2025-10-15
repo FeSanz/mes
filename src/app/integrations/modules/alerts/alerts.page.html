@@ -50,6 +50,13 @@
             </ng-template>
             <ng-template pTemplate="header">
               <tr>
+                <th pSortableColumn="AlertId" class="td-center" style="min-width: 5rem">
+                  <div class="flex justify-between items-center">
+                    Id
+                    <p-sortIcon field="AlertId" />
+                    <p-columnFilter type="text" field="AlertId" display="menu" class="ml-auto" />
+                  </div>
+                </th>
                 <th pSortableColumn="name" class="td-center" style="min-width: 7rem">
                   <div class="flex justify-between items-center">
                     Falla
@@ -114,7 +121,8 @@
             </ng-template>
             <ng-template #body let-item>
               <tr>
-                <td style="padding-left: 20px; max-width: 200px;"><strong>{{ item.name }}</strong></td>
+                <td class="td-center">{{item.alert_id}}</td>
+                <td><strong>{{ item.name }}</strong></td>
                 <td class="td-center">{{item.type || '-'}}</td>
                 <td class="td-center">
                   <p-tag [value]="item.area"
@@ -131,7 +139,7 @@
                   'in_progress' ? 'Reparando' : item.status === 'finaliced' ? 'Finalizada' : ''}}
                 </td>
 
-                <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a' }}</td>
+                <td class="td-center">{{ item.start_date | date: 'dd/MM/yy HH:mm' }}</td>
                 <td class="td-center" [title]="getElapsedLegibleTime(item.start_date, item.response_time || '')">
                   <ng-container *ngIf="item.response_time; else elapsed">
                     <!--{{ item.response_time | date: 'hh:mm a dd/MM/yyyy' }}-->
@@ -209,6 +217,13 @@
             </ng-template>
             <ng-template pTemplate="header">
               <tr>
+                <th pSortableColumn="AlertId" class="td-center" style="min-width: 5rem">
+                  <div class="flex justify-between items-center">
+                    Id
+                    <p-sortIcon field="AlertId" />
+                    <p-columnFilter type="text" field="AlertId" display="menu" class="ml-auto" />
+                  </div>
+                </th>
                 <th pSortableColumn="name" class="td-center">
                   <div class="flex justify-between items-center">
                     Falla
@@ -280,7 +295,8 @@
             </ng-template>
             <ng-template #body let-item>
               <tr>
-                <td style="padding-left: 20px; max-width: 200px;"><strong>{{ item.name }}</strong></td>
+                <td class="td-center">{{item.alert_id}}</td>
+                <td><strong>{{ item.name }}</strong></td>
                 <td class="td-center">{{item.type}}</td>
                 <td class="td-center">
                   <p-tag [value]="item.area"
@@ -296,7 +312,7 @@
                       [name]="item.status == 0 ? 'time-outline' : item.status === 'attend' ? 'warning-outline' : item.status === 'in_progress' ? 'time-outline' : item.status === 'finaliced' ? 'checkmark-outline' : ''"></ion-icon>
                   </p-tag>
                 </td-->
-                <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm' }}</td>
+                <td class="td-center">{{ item.start_date | date: 'dd/MM/yy HH:mm' }}</td>
                 <td class="td-center" [title]="item.responseLegibleTimeString">
                   {{ item.responseTimeString }}
                 </td>
@@ -304,7 +320,7 @@
                   {{ item.repairTimeString }}
                 </td>
                 <td class="td-center">
-                  {{ item.repair_time | date: 'dd/MM/yyyy hh:mm' }}
+                  {{ item.repair_time | date: 'dd/MM/yy HH:mm' }}
                 </td>
                 <!--td class="td-center">
                   <ion-button size="small" shape="round" color="danger" (click)="DeleteAlert(item)" title="Eliminar">

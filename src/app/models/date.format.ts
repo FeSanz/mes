@@ -1,4 +1,4 @@
-//Cambiar zona horaria de ISO58601 a CDMX
+//Cambiar zona horaria de ISO8601 a CDMX
 export function ISOToCDMX(iso8601: string): string{
   if (!iso8601) return '';
 
@@ -50,6 +50,7 @@ export function FormatForDisplayFromCDMX(iso8601CDMX: string, sec: boolean = fal
 
 //Mostrar fecha acotada DD/MM/YY hh:mm de ISO8601
 export function FormatForDisplayFromISO(iso8601: string, sec: boolean = false): string {
+  console.log('FormatDisplay')
   if (!iso8601) return '';
   const dateCDMX= ISOToCDMX(iso8601);
   return FormatForDisplayFromCDMX(dateCDMX, sec);

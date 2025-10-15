@@ -8,7 +8,7 @@
       </ion-menu-button>
     </ion-buttons>
     <ion-title>Producción {{userData.Company.Name}}</ion-title>
-    
+
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="organizationSelected"
@@ -184,8 +184,8 @@
                 <td>
                   <p-progressbar [value]="item.Advance" [showValue]="false" />
                 </td>
-                <td>{{ FormatForDisplayFromISO(item.StartDate) }}</td>
-                <td>{{ FormatForDisplayFromISO(item.CompletionDate) }}</td>
+                <td>{{ item.StartDate | date:'dd/MM/yy HH:mm' }}</td>
+                <td>{{ item.CompletionDate | date:'dd/MM/yy HH:mm' }}</td>
               </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
@@ -279,7 +279,7 @@
                 <td>{{ item.Description }}</td>
                 <td class="td-center">{{ item.Number }}</td>
                 <td class="td-center">{{ item.Quantity }}</td>
-                <td class="td-center">{{ FormatForDisplayFromISO(item.ExecutionDate) }}</td>
+                <td class="td-center">{{ item.ExecutionDate | date:'dd/MM/yy HH:mm' }}</td>
               </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
