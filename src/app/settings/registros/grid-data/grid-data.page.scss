@@ -1,0 +1,257 @@
+/********** Conexión Fusion *********+*/
+.form-container {
+  background-color: var(--ion-color-card);
+  color: var(--ion-color-card-contrast);;
+  border-radius: 8px;
+  margin: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  border: 1px solid var(--ion-color-card-tint);
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  //background-color: #6b7280;
+  background-color: var(--ion-color-grey-nav);
+
+  ion-icon {
+    margin: 0 10px;
+    font-size: 18px;
+    color: var(--ion-color-card-contrast);
+  }
+
+  span {
+    flex: 1;
+    color: var(--ion-color-card-contrast);
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+ion-content {
+  --background: var(--ion-color-back);
+}
+
+.form-group {
+  flex: 1;
+
+  &.full-width {
+    flex: 1 0 100%;
+  }
+}
+
+.form-content {
+  padding: 16px;
+}
+
+.custom-input {
+  --background: transparent;
+  //--background-focused: var(--ion-color-card-tint);
+  //--color: var(--ion-color-card-contrast);
+  --border-color: var(--ion-color-grey-nav);
+  --border-radius: 4px;
+  --border-width: 1px;
+  --highlight-color-focused: var(--ion-color-primary);
+  --highlight-height: 0;
+
+  ion-icon {
+    color: var(--ion-color-card-contrast);
+    opacity: 0.7;
+    font-size: 18px;
+    margin-right: 10px;
+  }
+
+  ion-label {
+    color: var(--ion-color-card-contrast);
+    font-size: 14px;
+  }
+
+  ion-input {
+    --color: var(--ion-color-card-contrast);
+    font-size: 14px;
+  }
+
+  &.item-has-focus {
+    --border-color: var(--ion-color-primary);
+
+    ion-icon, ion-label {
+      color: var(--ion-color-primary);
+      opacity: 1;
+    }
+  }
+}
+
+.connection-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.left-actions {
+  display: flex;
+  align-items: center;
+}
+
+.right-actions {
+  margin-left: auto;
+}
+
+.auth-status {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+
+  ion-icon {
+    font-size: 20px;
+    margin-right: 8px;
+    color: var(--ion-color-success);
+  }
+
+  ion-text {
+    color: var(--ion-color-card-contrast);
+  }
+}
+
+.connection-actions ion-button[fill="outline"] {
+  --border-radius: 16px;
+}
+
+.connection-actions ion-button[color="success"] {
+  --border-radius: 4px;
+}
+
+@media (max-width: 576px) {
+  .connection-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .left-actions {
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .auth-status {
+    margin-top: 8px;
+    margin-left: 0;
+  }
+
+  .right-actions {
+    width: 100%;
+  }
+}
+
+/********** Cards Fusion *********+*/
+.stats-card {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  border-radius: 10px;
+  background-color: var(--ion-color-card);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid var(--ion-color-card-tint);
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin: 16px;
+}
+
+.bg-pink {
+  background-color: rgba(255, 100, 124, 0.2);
+}
+
+.bg-pink ion-icon {
+  color: #ff647c;
+}
+
+.bg-purple {
+  background-color: rgba(174, 100, 255, 0.2);
+}
+
+.bg-purple ion-icon {
+  color: #ae64ff;
+}
+
+.bg-blue {
+  background-color: rgba(100, 144, 255, 0.2);
+}
+
+.bg-blue ion-icon {
+  color: #6490ff;
+}
+
+.bg-red {
+  background-color: rgba(255, 89, 89, 0.2);
+}
+
+.bg-red ion-icon {
+  color: #ff5959;
+}
+
+.icon-container ion-icon {
+  font-size: 24px;
+}
+
+.stats-content {
+  flex-grow: 1;
+  padding: 16px 16px 16px 0;
+}
+
+.stats-label {
+  font-size: 14px;
+  color: #8a94a6;
+  margin: 0;
+}
+
+.stats-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--ion-color-card-contrast);
+  margin: 4px 0 8px 0;
+}
+
+.stats-footer {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: var(--ion-color-card-contrast);
+  opacity: 0.7;
+}
+
+.stats-footer ion-icon {
+  margin-right: 4px;
+  font-size: 14px;
+  color: var(--ion-color-card-contrast);
+  opacity: 0.7;
+}
+
+.card-action {
+  position: relative;
+  top: 8px;
+  right: 8px;
+}
+
+.card-action ion-button {
+  --color: var(--ion-color-primary);
+  margin: 0;
+  height: 42px;
+}

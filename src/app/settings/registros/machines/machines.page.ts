@@ -15,13 +15,18 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
 import { Select } from 'primeng/select';
 import { FloatLabel } from "primeng/floatlabel"
-import { HeightTable } from "../../models/tables.prime";
-import { ApiService } from "../../services/api.service";
-import { EndpointsService } from "../../services/endpoints.service";
-import { AlertsService } from "../../services/alerts.service";
+import { HeightTable } from "../../../models/tables.prime";
+import { ApiService } from "../../../services/api.service";
+import { EndpointsService } from "../../../services/endpoints.service";
+import { AlertsService } from "../../../services/alerts.service";
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToggleMenu } from 'src/app/models/design';
+import { Truncate } from "../../../models/math.operations";
+import { Dialog } from "primeng/dialog";
+import { PrimeTemplate } from "primeng/api";
+import { DialogModule } from 'primeng/dialog';
+import { IonBreadcrumb, IonBreadcrumbs } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-machines',
@@ -29,14 +34,18 @@ import { ToggleMenu } from 'src/app/models/design';
   styleUrls: ['./machines.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, CommonModule, FormsModule, TableModule, CardModule, IonContent, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, 
+    CommonModule, FormsModule, TableModule, CardModule, IonContent, IonTitle, IonToolbar, 
+    CommonModule, FormsModule, IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
     IonButton, IonIcon, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle,
-    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, DropdownModule,
-    MultiSelectModule, Select, FloatLabel, IonText]
+    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, 
+    DropdownModule,MultiSelectModule, Select, FloatLabel, IonText, Dialog, PrimeTemplate, 
+    DialogModule, IonBreadcrumb, IonBreadcrumbs]
 })
 
 export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
+  modalSize: string = '';
   private resizeObserver!: ResizeObserver;
   scrollHeight: string = '550px';
   rowsPerPage: number = 50;
@@ -51,6 +60,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   orgSelect: any = {};
 
   selectedItemsDB: any[] = [];
+  isFusion: boolean = false;
 
   searchValueDB: string = '';
   resources: any = [];
@@ -64,8 +74,8 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     Token: null
   };
 
-  isNewFlag = true;
-  isModalOpen = false;
+  isNewFlag: boolean = true;
+  isModalOpen: boolean = false;
   userData: any = {};
 
   workCenters: any[] = [];
@@ -78,7 +88,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     private changeDetector: ChangeDetectorRef
   ) {
 
-    addIcons({menuOutline,checkmarkOutline,addOutline,ellipsisVerticalOutline,chevronForwardOutline,trashOutline,pencilOutline});
+    addIcons({ menuOutline, checkmarkOutline, addOutline, ellipsisVerticalOutline, chevronForwardOutline, trashOutline, pencilOutline });
   }
 
   ngOnInit() {
@@ -93,7 +103,20 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
         const sortedOrganizations = organizations.sort((a, b) => a.OrganizationId - b.OrganizationId);
         this.organizationSelected = sortedOrganizations[0];
         this.orgSelect = this.organizationSelected.OrganizationId;
-        this.RefreshTables();
+
+        let clause = `settingsFusionExist/${this.userData.Company.CompanyId}`;
+
+        this.apiService.GetRequestRender(clause).then((response: any) => {
+          if (response.items[0].count > 0) {
+            this.isFusion = true;
+          } else {
+            this.isFusion = false;
+          }
+
+          this.RefreshTables();
+        });
+
+
       } else {
         this.alerts.Warning("No se encontraron organizaciones");
       }
@@ -147,8 +170,18 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     this.isNewFlag = true
     this.resource.OrganizationId = this.orgSelect
     this.isModalOpen = true;
-    this.getWorkCenters();
+
+    if (this.isFusion) {
+      this.getWorkCenters();
+    }
+
     this.resource.Token = this.generateToken();
+
+    const contentPart = document.querySelector('ion-modal.dispach-modal')?.shadowRoot?.querySelector('[part="content"]');
+    if (contentPart) {
+      const rect = contentPart.getBoundingClientRect();
+      this.modalSize = `Modal: ${Truncate(rect.width)} x ${Truncate(rect.height)} | Viewport: ${window.innerWidth} (${((rect.width / window.innerWidth) * 100).toFixed(2)}%)`;
+    }
   }
 
   resetResource() {//se reinician los datos del usuario nuevo o a editar
@@ -163,30 +196,62 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  AddNewResource() {
-    if (this.organizationSelected) {
-      const itemsArray = [this.resource];
-      const payload = {
-        items: itemsArray
-      };
-      // console.log(JSON.stringify(payload, null, 2));
+  AddOrEditResource() {
+    const itemsArray = [this.resource];
+    const payload = {
+      items: itemsArray
+    };
 
-      this.apiService.PostRequestRender('resourceMachines', payload).then(async (response: any) => {
+    if (this.isNewFlag) {
+      if (this.organizationSelected) {        
+        this.apiService.PostRequestRender('resourceMachines', payload).then(async (response: any) => {
+          if (response.errorsExistFlag) {
+            this.alerts.Info(response.message);
+          } else {
+            this.alerts.Success(response.message);
+
+            setTimeout(() => {
+              this.RefreshTables();
+            }, 1500);
+
+          }
+        });
+        this.isModalOpen = false
+      } else {
+        this.alerts.Info('Seleccione una organización');
+      }
+    } else {
+      this.apiService.PutRequestRender('resourceMachines/' + this.resource.MachineId, payload).then(async (response: any) => {
         if (response.errorsExistFlag) {
           this.alerts.Info(response.message);
         } else {
           this.alerts.Success(response.message);
-
-          setTimeout(() => {
-            this.RefreshTables();
-          }, 1500);
-
+          this.isNewFlag = true
+          this.isModalOpen = false
+          this.RefreshTables()
         }
       });
-      this.isModalOpen = false
-    } else {
-      this.alerts.Info('Seleccione una organización');
     }
+  }
+
+  async DeleteResource(mach: any) {
+    if (await this.alerts.ShowAlert("¿Deseas eliminar esta máquina?", "Alerta", "Cancelar", "Eliminar")) {
+      this.apiService.DeleteRequestRender('resourceMachines/' + mach.MachineId).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          this.alerts.Success("Máquina eliminada");
+          this.RefreshTables();
+        } else {
+          this.alerts.Info(response.error);
+        }
+      })
+    }
+  }
+
+  EditResource(mach: any) {
+    this.resource = mach;
+    this.isNewFlag = false
+    this.isModalOpen = true
+    this.changeDetector.detectChanges()
   }
 
   RefreshTables() {

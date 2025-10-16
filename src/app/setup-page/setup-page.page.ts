@@ -52,7 +52,7 @@ import { SelectLocationModalPage } from '../select-location-modal/select-locatio
 })
 
 export class SetupPagePage implements OnInit, AfterViewInit {
-  @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
+  @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;  
 
   private resizeObserver!: ResizeObserver;
   scrollHeight: string = '550px';
@@ -147,11 +147,13 @@ export class SetupPagePage implements OnInit, AfterViewInit {
 
   ionViewWillEnter() {
     this.menuCtrl.swipeGesture(false);
+    this.app.showMenu = false;
   }
   ngOnInit() {
   }
 
-  ngAfterViewInit() {
+
+  ngAfterViewInit() {    
     this.ObserveResize();
     const swiperEl = this.swiperEl.nativeElement;
     const prevBtn = document.getElementById('prevBtn');
@@ -177,7 +179,6 @@ export class SetupPagePage implements OnInit, AfterViewInit {
               nextBtn!.classList.add('disabled');
               break;
             case 3:
-              // prevBtn!.classList.add('disabled');
               nextBtn!.classList.add('disabled');
               break;
             default:
@@ -256,7 +257,7 @@ export class SetupPagePage implements OnInit, AfterViewInit {
               this.organization.CompanyId = this.company_id;
               this.organization.WorkMethod = this.WorkMethodFormat(this.organization.WorkMethod);
               payloadOrg = { items: [this.organization] };
-              
+
 
               await this.apiService.PostRequestRender('organizations', payloadOrg).then(async (response: any) => {
                 this.orgs = response.insertedIds;
@@ -273,10 +274,10 @@ export class SetupPagePage implements OnInit, AfterViewInit {
           }
 
         } else {
-            this.alerts.Error(response.message);
-          }
+          this.alerts.Error(response.message);
+        }
 
-        });
+      });
     } else {
       if (this.company.Name === '' || this.company.Description === '') {
         this.alerts.Error('Datos de compañía requeridos');
@@ -550,13 +551,6 @@ export class SetupPagePage implements OnInit, AfterViewInit {
       this.organization.Location = "";
     }
   }
-
-  // formatCoordinates(): string {
-  //   if (this.organization.Coordinates) {
-  //     const { lat, lng } = this.organization.Coordinates;
-  //     return `${lat}, ${lng}`;
-  //   }
-  //   return '';
-  // }
+  
 }
 

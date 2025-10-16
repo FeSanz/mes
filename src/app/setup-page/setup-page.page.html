@@ -1,4 +1,4 @@
-<ion-content class="ion-padding swiper-container-wrapper" fullscreen>
+<ion-content class="ion-padding swiper-container-wrapper" fullscreen scroll-y="false">
   <swiper-container #swiperEl pagination="true" class="login-container my-swiper" [config]="{observer: true}">
     <swiper-slide>
       <div class="login-card">
@@ -7,7 +7,7 @@
           <h1>Configuración</h1>
         </ion-toolbar>
 
-        <ion-item lines="none" class="invisible">
+        <ion-item lines="none" class="invisible" style="margin-top: 10px;">
           <ion-input placeholder="Compañía" type="text" fill="outline" [(ngModel)]="company.Name" name="company">
             <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
@@ -68,7 +68,7 @@
           <h1>Configuración</h1>
         </ion-toolbar>
 
-        <ion-item lines="none" class="invisible">
+        <ion-item lines="none" class="invisible" style="margin-top: 10px;">
           <ion-input placeholder="Usuario" type="text" fill="outline" [(ngModel)]="userSuperAdmin.name" name="username">
             <ion-icon name="person-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
           </ion-input>
@@ -105,7 +105,7 @@
           <ion-title>Conexión Oracle Manufacturing Cloud</ion-title>
         </ion-toolbar>
 
-        <ion-item lines="none" class="invisible">
+        <ion-item lines="none" class="invisible" style="margin-top: 10px;">
           <ion-input type="text" placeholder="example.fa.ocs.oraclecloud.com" [(ngModel)]="host" fill="outline">
             <ion-icon name="server-outline" slot="start"></ion-icon>
             <ion-label>Servidor</ion-label>
@@ -126,7 +126,7 @@
           </ion-input>
         </ion-item>
 
-        <ion-item lines="none" class="invisible" >
+        <ion-item lines="none" class="invisible" style="margin-left: 20%">
           <div>
             <ion-button (click)="VerifyConnection()" [disabled]="!host.trim() || !user.trim() || !pwd.trim()">
               <ion-icon name="link-outline" slot="start"></ion-icon>
@@ -160,25 +160,41 @@
     </swiper-slide>
 
     <swiper-slide>
-      <div class="sync">
-        <div
-          style="background-color: #fd5d93; padding: 2px; display: flex; align-items: center; justify-content: space-between;">
+      <div class="login-card sync">
+        <div 
+          style="background-color: #fd5d93; 
+          padding: 2px; display: flex; align-items: center; justify-content: space-between; 
+          border-top-left-radius: 20px; border-top-right-radius: 20px;">
           <span></span>
           <span><ion-icon name="cloud-outline" slot="start"></ion-icon> Organizaciones Fusion</span>
           <ion-button size="small" color="primary" (click)="UploadOrganization()">CARGAR
             <ion-icon slot="end" name="arrow-forward"></ion-icon>
           </ion-button>
         </div>
-        <div>
-          <p-table #dtFusion [value]="fusionData.items" [(selection)]="selectedItemsFusion" dataKey="OrganizationCode"
-            class="table-cards" [tableStyle]="{ 'min-width': '50rem' }" [size]="'small'" [rowHover]="true"
-            [rows]="rowsPerPage" [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions"
-            [paginator]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
-            [filterDelay]="0" [globalFilterFields]="['OrganizationCode', 'OrganizationName', 'LocationCode']"
-            stripedRows [scrollable]="true" [scrollHeight]="GetScrollHeight()" [alwaysShowPaginator]="true">
+
+        <div class="div-org-fusion" style="margin-left: 10px; margin-right: 10px;">
+          <p-table #dtFusion [value]="fusionData.items" 
+            [(selection)]="selectedItemsFusion" 
+            dataKey="OrganizationCode"
+            styleClass="card-table-primeng table-swiper"
+            [tableStyle]="{ 'min-width': '50rem'}" 
+            [size]="'small'" 
+            [rowHover]="true"
+            [rows]="rowsPerPage" 
+            [showCurrentPageReport]="true" 
+            [rowsPerPageOptions]="rowsPerPageOptions"
+            [paginator]="true" 
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+            [filterDelay]="0" 
+            [globalFilterFields]="['OrganizationCode', 'OrganizationName', 'LocationCode']"
+            stripedRows [scrollable]="true" 
+            [scrollHeight]="GetScrollHeight()" 
+            [alwaysShowPaginator]="true" >
+
             <ng-template #caption>
-              <div class="table-caption">
-                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearFusion(dtFusion)" />
+              <div class="table-caption" >
+                <p-button icon="pi pi-filter-slash" label="Limpiar" (click)="ClearFusion(dtFusion)" 
+                [style]="{'color': 'rgba(255, 255, 255, 0.5)', 'background-color': '#000', 'border-color': '#000'}" />
 
                 <div></div>
 
@@ -187,13 +203,14 @@
                     <i class="fas fa-search"></i>
                   </p-inputIcon>
                   <input pInputText type="text" [(ngModel)]="searchValueFusion"
-                    (input)="OnFilterGlobal($event, dtFusion)" placeholder="Buscar" />
+                    (input)="OnFilterGlobal($event, dtFusion)" placeholder="Buscar" 
+                    [style]="{'color': 'rgba(255, 255, 255, 0.5)', 'background-color': '#000', 'border-color': '#000'}"  />
                 </p-iconField>
               </div>
             </ng-template>
 
             <ng-template pTemplate="header">
-              <tr>
+              <tr class="custom-header" style="--background-color: #1e1e2f !important">
                 <th style="width: 4rem">
                   <p-tableHeaderCheckbox />
                 </th>
@@ -227,6 +244,7 @@
                 </th>
               </tr>
             </ng-template>
+
             <ng-template pTemplate="body" let-item>
               <tr>
                 <td>
@@ -246,7 +264,8 @@
           </p-table>
         </div>
 
-        <div style="height: 10px;"></div>
+        <div id="separador" style="height: 30px;"></div>
+
         <div
           style="background-color: #B8860B; padding: 2px; display: flex; align-items: center; justify-content: space-between;">
           <span></span>
@@ -256,16 +275,30 @@
           </ion-button>
 
         </div>
-        <div>
-          <p-table #dtDB [value]="dbData.items" [(selection)]="selectedItemsDB" dataKey="Code"
-            styleClass="card-table-primeng" [tableStyle]="{ 'min-width': '50rem'}" [size]="'small'" [rowHover]="true"
-            [rows]="rowsPerPage" [showCurrentPageReport]="true" [rowsPerPageOptions]="rowsPerPageOptions"
-            [paginator]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
-            [filterDelay]="0" [globalFilterFields]="['Code', 'Name', 'Location']" stripedRows [scrollable]="true"
-            [scrollHeight]="GetScrollHeight()" [alwaysShowPaginator]="true">
+        <div style="margin-left: 10px; margin-right: 10px;">
+          <p-table 
+            #dtDB [value]="dbData.items" 
+            [(selection)]="selectedItemsDB" 
+            dataKey="Code"
+            styleClass="card-table-primeng table-swiper" 
+            [tableStyle]="{ 'min-width': '50rem'}" 
+            [size]="'small'" 
+            [rowHover]="true"
+            [rows]="rowsPerPage" 
+            [showCurrentPageReport]="true" 
+            [rowsPerPageOptions]="rowsPerPageOptions"
+            [paginator]="true" 
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+            [filterDelay]="0" 
+            [globalFilterFields]="['Code', 'Name', 'Location']" 
+            stripedRows [scrollable]="true"
+            [scrollHeight]="GetScrollHeight()" 
+            [alwaysShowPaginator]="true" >
+
             <ng-template pTemplate="caption">
               <div class="table-caption">
-                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearDB(dtDB)" />
+                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearDB(dtDB)"
+                [style]="{'color': 'rgba(255, 255, 255, 0.5)', 'background-color': '#000', 'border-color': '#000'}" />
 
                 <div></div>
 
@@ -274,14 +307,15 @@
                     <i class="fas fa-search"></i>
                   </p-inputIcon>
                   <input pInputText type="text" [(ngModel)]="searchValueDB" (input)="OnFilterGlobal($event, dtDB)"
-                    placeholder="Buscar" style="width: 250px;" />
+                    placeholder="Buscar" style="width: 250px;" 
+                    [style]="{'color': 'rgba(255, 255, 255, 0.5)', 'background-color': '#000', 'border-color': '#000'}" />
                 </p-iconField>
               </div>
             </ng-template>
 
             <ng-template pTemplate="header">
               <tr>
-                <th pSortableColumn="Code" style="min-width: 10rem">
+                <th pSortableColumn="Code" style="min-width: 10rem;">
                   <div class="flex justify-between items-center">
                     Código
                     <p-sortIcon field="Code" />

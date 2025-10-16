@@ -6,10 +6,11 @@
 }
 
 .login-card {
-    width: 90%;
+    width: 30%;
     max-width: 450px;
     min-width: 350px;
     min-height: 650px;
+    // height: 90%;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.2);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -112,48 +113,10 @@ ion-content::before {
     --ripple-color: transparent;
 }
 
-// swiper-container {
-//     --swiper-pagination-bullet-inactive-color: var(--ion-text-color-step-800, #cccccc);
-//     --swiper-pagination-color: var(--ion-color-primary, #0054e9);
-//     --swiper-pagination-progressbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.25);
-//     --swiper-scrollbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.1);
-//     --swiper-scrollbar-drag-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.5);
-// }
-
-// swiper-slide {
-//     display: flex;
-//     position: relative;
-
-//     flex-direction: column;
-//     flex-shrink: 0;
-//     align-items: center;
-//     justify-content: center;
-
-//     width: 100%;
-//     height: 100%;
-
-//     font-size: 18px;
-
-//     text-align: center;
-//     box-sizing: border-box;
-// }
-
 swiper-container::part(pagination) {
-  bottom: 50px !important;
+    bottom: 50px !important;
 }
 
-// swiper-slide img {
-//     width: auto;
-//     max-width: 100%;
-//     height: auto;
-//     max-height: 100%;
-// }
-
-// ion-item {
-//     display: flex;
-//     justify-content: space-between;
-//     align-items: center;
-// }
 
 .scrollable-div {
     max-height: 700px;
@@ -162,35 +125,12 @@ swiper-container::part(pagination) {
     border: 1px solid #ccc;
 }
 
-.custom-card {
-    // background-color: #DCDCDC;
-    color: darkgray;
-
-    box-shadow: -3px 3px 59px -7px rgba(188, 179, 179, 0.75);
-    -webkit-box-shadow: -3px 3px 59px -7px rgba(188, 179, 179, 0.75);
-    -moz-box-shadow: -3px 3px 59px -7px rgba(188, 179, 179, 0.75);
-}
-
-.sync {
-    width: 90%;
-    max-width: 70%;
-    min-width: 50%;
-    min-height: 40%;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    // margin-top: 20px;    
-}
-
 .btn-inferior {
     margin-top: 60%;
     margin-bottom: 20px;
     margin-left: auto;
     margin-right: auto;
 }
-
 
 .prev-button {
     left: 20px;
@@ -237,11 +177,220 @@ ion-select {
     --padding-end: 0;
     --min-height: 44px;
     line-height: 1;
-    align-items: center;    
+    align-items: center;
 
 }
 
+ion-toolbar {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
 
-::ng-deep .p-table {
-  background-color: #f5f5f5;
+::ng-deep .table-swiper.p-datatable {
+    background-color: transparent !important;
+
+    .p-datatable-wrapper {
+        background-color: transparent !important;
+    }
+
+    .p-datatable-table {
+        background-color: transparent !important;
+    }
+
+    // Especificidad aumentada para la cabecera
+    .p-datatable-header {
+        background-color: transparent !important;
+        color: white !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    // Para el footer si existe
+    .p-datatable-tfoot {
+        background-color: transparent !important;
+        color: white !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .p-datatable-tbody {
+        tr {
+            background-color: transparent !important;
+            color: white !important;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+        }
+    }
+
+    .p-paginator {
+        background-color: transparent !important;
+    }
+
+    thead {
+        background-color: transparent !important;
+    }
+}
+
+.table-swiper {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.sync {
+    width: 820px;
+    max-width: 820px;
+    min-width: 400px;
+}
+
+@media (max-width : 500px) {
+    .login-card {
+        width: 100%;
+        border-radius: 20px;
+        min-width: 100%;
+        border-radius: 20px;
+    }
+
+    .sync {
+        max-width: 300px;
+    }
+
+    .login-container {
+        height: 70%;
+    }
+
+}
+
+// En tu component.scss - SOLO para móvil
+@media (max-width: 710px) {
+    :host {
+        --safe-area-top: env(safe-area-inset-top);
+        --safe-area-bottom: env(safe-area-inset-bottom);
+    }
+
+    ion-content.ion-padding.swiper-container-wrapper {
+        --padding-top: calc(var(--safe-area-top) + 16px) !important;
+        --offset-top: 0 !important;
+
+        &::part(scroll) {
+            padding-top: 0 !important;            
+        }
+    }
+
+    // SWIPER CONTAINER - Añadir padding superior
+    swiper-container.login-container.my-swiper {
+        height: 100vh !important;
+        height: calc(100vh - var(--safe-area-top)) !important;
+        min-height: calc(100vh - var(--safe-area-top)) !important;
+        padding-top: calc(var(--safe-area-top) + 16px) !important;
+        margin: 0 !important;
+        border-radius: 20px !important;
+        overflow: hidden !important;
+    }
+
+    // CONTENIDO INTERNO - Compensar safe area
+    .login-card {
+        min-height: 100% !important;
+        padding-top: 0px !important;
+        margin-top: 15% !important;
+        border-radius: 20px !important;
+        overflow: hidden !important;
+    }
+
+    swiper-slide:has(.login-card.sync) {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        height: 100vh !important;
+        border-radius: 20px !important;
+        // overflow: hidden !important;
+
+        &::part(slide) {
+            overflow-y: auto !important;
+            align-items: flex-start !important;
+            border-radius: 20px !important;
+        }
+
+        .login-card.sync {
+            height: auto !important;
+            min-height: 100vh !important;
+            padding-bottom: 40px !important; // ✅ Espacio para scroll
+            border-radius: 20px !important;
+            // overflow: hidden !important;
+        }
+    }
+
+    // Los otros slides sin scroll
+    swiper-slide:not(:has(.login-card.sync)) {
+        overflow-y: hidden !important;
+        border-radius: 20px !important;
+        // overflow: hidden !important;
+    }
+}
+
+::ng-deep swiper-slide ion-toolbar {
+    --background: #1e1e2f !important;
+    --color: white !important;
+    background: #1e1e2f !important;
+    color: white !important;
+}
+
+::ng-deep swiper-slide .toggle-label{
+    color: white !important;
+}
+
+::ng-deep .p-datatable .p-datatable-thead > tr > th {
+    background: #1e1e2f !important;
+    color: white !important
+}
+
+.custom-card {
+    color: darkgray;
+
+    box-shadow: -3px 3px 59px -7px rgba(188, 179, 179, 0.75);
+    -webkit-box-shadow: -3px 3px 59px -7px rgba(188, 179, 179, 0.75);
+    -moz-box-shadow: -3px 3px 59px -7px rgba(188, 179, 179, 0.75);
+}
+
+::ng-deep body .p-paginator {
+    color: #ffffff !important;
+    
+    .p-paginator-current,
+    .p-paginator-first,
+    .p-paginator-prev,
+    .p-paginator-page,
+    .p-paginator-next,
+    .p-paginator-last {
+        color: #ffffff !important;
+    }
+    
+    .p-dropdown-label {
+        color: #ffffff !important;
+    }
+}
+
+@media (max-width: 700px) {
+  ::ng-deep .swiper-pagination {
+    // Sacarlo del flujo normal
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 1000 !important;
+    
+    // Fondo para mejor contraste
+    background: rgba(0, 0, 0, 0.3) !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+  }
+  
+  ::ng-deep .swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.7) !important;
+    
+    &.swiper-pagination-bullet-active {
+      background: #fd5d93 !important;
+    }
+  }
 }

@@ -82,8 +82,8 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'settings/machines',
-    loadComponent: () => import('./settings/machines/machines.page').then(m => m.MachinesPage),
+    path: 'machines',
+    loadComponent: () => import('./settings/registros/machines/machines.page').then(m => m.MachinesPage),
     canActivate: [AuthGuard]
   },
   {
@@ -113,5 +113,9 @@ export const routes: Routes = [
   {
     path: 'kpis',
     loadComponent: () => import('./integrations/modules/kpis/kpis.page').then( m => m.KpisPage)
+  },  
+  {
+    path: 'grid-data',
+    loadComponent: () => import('./settings/registros/grid-data/grid-data.page').then( m => m.GridDataPage)
   }
 ];

@@ -7,7 +7,12 @@
         </ion-button>
       </ion-menu-button>
     </ion-buttons>
-    <ion-title>Máquinas {{userData.Company.Name}}</ion-title>
+    <ion-title>
+      <ion-breadcrumbs>
+        <ion-breadcrumb href="/grid-data">Registros</ion-breadcrumb>
+        <ion-breadcrumb href="/machines">Máquinas {{userData.Company.Name}}</ion-breadcrumb>
+      </ion-breadcrumbs>      
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -84,6 +89,13 @@
                 <p-columnFilter field="Token" matchMode="equals" display="menu" class="ml-auto" />
               </div>
             </th>
+            <th pSortableColumn="Acciones" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Acciones
+                <p-sortIcon field="Acciones" />
+                <p-columnFilter field="Acciones" matchMode="equals" display="menu" class="ml-auto" />
+              </div>
+            </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-item>
@@ -93,6 +105,16 @@
             <td>{{ item.Class }}</td>
             <td>{{ item.WorkCenter }}</td>
             <td>{{ item.Token }}</td>
+            <td>
+              <ion-button size="small" shape="round" color="success" title="Editar"
+                (click)="$event.stopPropagation(); EditResource(item)">
+                <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+              </ion-button>
+              <ion-button size="small" shape="round" color="danger" title="Eliminar"
+                (click)="$event.stopPropagation(); DeleteResource(item)">
+                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+              </ion-button>
+            </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -104,61 +126,60 @@
     </div>
   </div>
 
-  <ion-modal [isOpen]="isModalOpen" (ionModalWillDismiss)="isModalOpen = false" cssClass="custom-modal">
-    <div class="form-container">
-      <ng-template>
-        <ion-header>
-          <ion-toolbar color="primary">
-            <ion-title>Agregar nueva máquina</ion-title>
-            <ion-buttons slot="end">
-              <ion-button (click)="isModalOpen = false;">Cerrar</ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-header>
+  <p-dialog [modal]="true" [(visible)]="isModalOpen" [style]="{ height: '60vh', 'max-height': '90vh' }"
+    [draggable]="true" [resizable]="true" [maximizable]="true" appendTo="body">
 
-        <ion-content>
-          <ion-item>
-            <ion-input placeholder="Código" [(ngModel)]="resource.Code" name="code" required>
-              <div slot="label"><ion-text color="primary">Código:</ion-text></div>
-            </ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-input placeholder="Nombre" [(ngModel)]="resource.Name" name="name" required>
-              <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
-            </ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-input placeholder="Clase" [(ngModel)]="resource.Class" name="class" required>
-              <div slot="label"><ion-text color="primary">Clase:</ion-text></div>
-            </ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-select [(ngModel)]="workCenterSelected" interface="popover" placeholder="Centro de trabajo"
-            (ionChange)="OnWorkCenterSelected()">
-              <ion-select-option *ngFor="let center of workCenters" [value]="center">
-                {{ center.WorkCenterName }}
-              </ion-select-option>
-              <div slot="label"><ion-text color="primary">CT:</ion-text></div>
-            </ion-select>
-          </ion-item>
+    <!-- Header personalizado-->
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <span>
+          {{ isNewFlag ? 'Nueva máquina' : 'Editar máquina' }}
+        </span>
+      </div>
+    </ng-template>
 
-          <ion-item>
-            <ion-input placeholder="Token" [(ngModel)]="resource.Token" name="token" readonly>
-              <div slot="label"><ion-text color="primary">Token:</ion-text></div>
-            </ion-input>
-          </ion-item>
+    <!-- Contenido principal del diálogo -->
+    <div class="dialog-content-wrapper">
+      <ion-item>
+        <ion-input placeholder="Código" [(ngModel)]="resource.Code" name="code" required>
+          <div slot="label"><ion-text color="primary">Código:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input placeholder="Nombre" [(ngModel)]="resource.Name" name="name" required>
+          <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input placeholder="Clase" [(ngModel)]="resource.Class" name="class" required>
+          <div slot="label"><ion-text color="primary">Clase:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item [disabled]="!isFusion">
+        <ion-select [(ngModel)]="workCenterSelected" interface="popover" placeholder="Centro de trabajo"
+          (ionChange)="OnWorkCenterSelected()">
+          <ion-select-option *ngFor="let center of workCenters" [value]="center">
+            {{ center.WorkCenterName }}
+          </ion-select-option>
+          <div slot="label"><ion-text color="primary">CT:</ion-text></div>
+        </ion-select>
+      </ion-item>
 
+      <ion-item>
+        <ion-input placeholder="Token" [(ngModel)]="resource.Token" name="token" readonly>
+          <div slot="label"><ion-text color="primary">Token:</ion-text></div>
+        </ion-input>
+      </ion-item>
 
-          <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-            <ion-fab-button (click)="AddNewResource()" color="success"
-              [disabled]="!resource.Code?.trim() || !resource.Name?.trim() || !resource.Class?.trim()">
-              <ion-icon name="checkmark-outline"></ion-icon>
-            </ion-fab-button>
-          </ion-fab>
-        </ion-content>
-      </ng-template>
     </div>
-  </ion-modal>
+
+    <!-- Footer con botones -->
+    <ng-template pTemplate="footer">
+      <p-button label="Cancelar" severity="danger" (click)="isModalOpen = false;" />
+      <p-button label="Guardar" severity="success" (click)="AddOrEditResource()"
+        [disabled]="!resource.Code?.trim() || !resource.Name?.trim() || !resource.Class?.trim()" />
+    </ng-template>
+  </p-dialog>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end" *ngIf="permissions.isSuperAdmin()">
     <ion-fab-button (click)="OpenAsNewResource()">
