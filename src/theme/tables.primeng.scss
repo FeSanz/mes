@@ -7,6 +7,67 @@
   min-height: 40px;
 }
 
+.table-caption-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap; // Permite que los elementos se envuelvan
+
+  .left-section {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap; // Permite que los botones se envuelvan
+  }
+
+  .right-section {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap; // Permite que el botón y el buscador se envuelvan
+  }
+
+  .title-text {
+    font-size: 17px;
+    align-content: center;
+  }
+
+  // Para tablets y móviles
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+
+    .left-section,
+    .right-section {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .right-section {
+      margin-top: 0.5rem;
+    }
+  }
+
+  // Para móviles pequeños
+  @media (max-width: 576px) {
+    .left-section,
+    .right-section {
+      flex-direction: column;
+
+      p-button,
+      p-iconField {
+        width: 100%;
+      }
+    }
+
+    .title-text {
+      text-align: center;
+      width: 100%;
+    }
+  }
+}
+
 /******************************* Color Table PrimeNG  *******************************/
 .card-table-primeng {
   // Contenedor principal

@@ -1,5 +1,6 @@
 <ion-app>
   <p-toast></p-toast>
+  <p-confirmDialog [style]="{ width: '450px' }" />
   <ion-split-pane contentId="main-content" when="(min-width: 2000px)">
     <ion-menu contentId="main-content" type="overlay" *ngIf="showMenu">
     <ion-header class="background-header">
@@ -205,6 +206,13 @@
                   <div slot="content" class="accordion-content">
                     <ion-list class="menu-list">
                       <ion-menu-toggle auto-hide="false">
+                        <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/failures']"
+                                  lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="warning-outline"></ion-icon>
+                          <ion-label>Fallas</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                      <ion-menu-toggle auto-hide="false">
                         <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/alerts']"
                           lines="none" class="submenu-item">
                           <ion-icon slot="start" name="notifications-outline"></ion-icon>
@@ -216,19 +224,6 @@
                           lines="none" class="submenu-item">
                           <ion-icon slot="start" name="pie-chart-outline"></ion-icon>
                           <ion-label>KPIs</ion-label>
-                        </ion-item>
-                      </ion-menu-toggle>
-                      <ion-menu-toggle auto-hide="false">
-                        <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/failures']"
-                          lines="none" class="submenu-item">
-                          <ion-icon slot="start" name="warning-outline"></ion-icon>
-                          <ion-label>Fallas</ion-label>
-                        </ion-item>
-                      </ion-menu-toggle>
-                      <ion-menu-toggle auto-hide="false">
-                        <ion-item routerLinkActive="selected" detail="false" button lines="none" class="submenu-item">
-                          <ion-icon slot="start" name="time-outline"></ion-icon>
-                          <ion-label>Scada</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                     </ion-list>

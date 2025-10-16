@@ -65,6 +65,7 @@ import { ActionPerformed, PushNotificationSchema, PushNotifications, Token, } fr
 import { Platform } from '@ionic/angular';
 import { WebSocketService } from './services/web-socket.service';
 import { ToggleMenu } from "./models/design";
+import {ConfirmDialog} from "primeng/confirmdialog";
 @Component({
   selector: 'app-root',
   styleUrls: ['app.component.scss'],
@@ -73,7 +74,7 @@ import { ToggleMenu } from "./models/design";
   imports: [IonApp, RouterLink, IonMenu, IonToolbar, IonHeader, IonTitle, IonItem, IonIcon, IonLabel,
     IonButtons, IonButton, IonPopover, IonContent, IonList, IonMenuToggle, IonAccordionGroup, IonSplitPane, IonReorder, IonReorderGroup,
     IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid,
-    IonRow, IonModal, IonInput, IonTextarea, IonText, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast, IonMenuButton]
+    IonRow, IonModal, IonInput, IonTextarea, IonText, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast, IonMenuButton, ConfirmDialog]
 })
 export class AppComponent implements OnInit {
   darkMode = false

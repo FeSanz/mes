@@ -5,7 +5,7 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 //Para PrimeNG
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 //import 'primeicons/primeicons.css';
 
@@ -20,7 +20,7 @@ import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { register } from 'swiper/element/bundle';
 
-register(); 
+register();
 
 registerLocaleData(localeEs, 'es');
 
@@ -31,6 +31,7 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(),
     provideAnimationsAsync(), //Para PrimeNG
+    ConfirmationService,
     MessageService,
     providePrimeNG({//Para PrimeNG
       theme: {

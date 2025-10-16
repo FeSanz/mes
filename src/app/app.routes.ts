@@ -77,6 +77,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'failures',
+    loadComponent: () => import('./integrations/modules/failures/failures.page').then(m => m.FailuresPage),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'settings/machines',
     loadComponent: () => import('./settings/machines/machines.page').then(m => m.MachinesPage),
     canActivate: [AuthGuard]
@@ -109,6 +114,4 @@ export const routes: Routes = [
     path: 'kpis',
     loadComponent: () => import('./integrations/modules/kpis/kpis.page').then( m => m.KpisPage)
   }
-
-
 ];
