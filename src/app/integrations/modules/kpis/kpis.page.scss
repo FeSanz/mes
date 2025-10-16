@@ -196,3 +196,43 @@ ion-card.graphic {
         transform: translateY(-2px);
     }
 }
+
+// Ocultar el ícono por defecto
+.action-icon {
+  cursor: pointer;
+  color: var(--ion-color-primary);
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  
+  &:hover {
+    color: var(--ion-color-primary-shade);
+  }
+}
+
+// Mostrar el ícono cuando se pasa el mouse sobre la fila
+.row-with-actions:hover {
+  .action-icon {
+    opacity: 1;
+  }
+}
+
+// Centrar el contenido de la celda de acción
+.action-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+// Asegurar que la columna de acciones tenga el ancho correcto
+::ng-deep {
+  .p-datatable .p-datatable-tbody > tr > td.action-cell {
+    padding: 0.5rem;
+  }
+}
+
+.row-selected {
+  background-color: var(--ion-color-success-tint);
+  transition: background-color 0.2s ease;
+}
+.checkmark-icon {
+  font-size: 1.4rem;
+}

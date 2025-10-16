@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import {
   NgApexchartsModule,
   ApexChart,
@@ -6,10 +6,12 @@ import {
   ChartComponent,
   ApexDataLabels,
   ApexPlotOptions,
-  ApexYAxis,
   ApexLegend,
   ApexGrid
 } from "ng-apexcharts";
+import { AlertsService } from 'src/app/services/alerts.service';
+import { ApiService } from 'src/app/services/api.service';
+import { PermissionsService } from 'src/app/services/permissions.service';
 
 type ApexXAxis = {
   type?: "category" | "datetime" | "numeric";
@@ -49,8 +51,17 @@ export class SimpleColumnBarComponent implements OnInit {
   @Input() data: data = {};
   @ViewChild("columnChart", { static: false }) chart: ChartComponent | undefined;
   public chartOptions: ChartOptions;
-
-  constructor() {
+  organizationSelected: string | any = '';
+  userData: any = {};
+  company: any = {}
+  constructor(
+    private alerts: AlertsService,
+    private apiService: ApiService,
+    public permissions: PermissionsService,
+    private changeDetector: ChangeDetectorRef) {
+    this.userData = JSON.parse(String(localStorage.getItem("userData")));
+    this.company = this.userData.Company
+    this.organizationSelected = this.userData.Company.Organizations[1];
     this.chartOptions = {
       series: [
         {
@@ -112,6 +123,37 @@ export class SimpleColumnBarComponent implements OnInit {
       }
     };
   }
-  ngOnInit() { }
+  ngOnInit() {
+  }
 
+  updateChart() {
+    const nombres = Object.keys(this.data);
+    const valores = Object.values(this.data);
+    this.chartOptions = {
+      ...this.chartOptions, // mantiene configuración base
+      series: [
+        {
+          name: "Fallas",
+          data: valores
+        }
+      ],
+      xaxis: {
+        categories: nombres.map(n => [n]), // cada nombre será una barra
+        labels: {
+          style: {
+            colors: nombres.map((_, i) => this.chartOptions.colors[i % this.chartOptions.colors.length]),
+            fontSize: "12px"
+          }
+        }
+      }
+    };
+
+    if (this.chart && this.chart.updateOptions) {
+      this.chart.updateOptions(this.chartOptions);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.updateChart()
+  }
 }

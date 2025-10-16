@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { NgApexchartsModule, ChartComponent } from 'ng-apexcharts';
 import {
   ApexNonAxisChartSeries,
@@ -58,13 +58,16 @@ export class SimpleDonutComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.updateChart()
   }
   updateChart() {
-    this.chartOptions.series = [this.data[0],this.data[1]]
+    this.chartOptions.series = [this.data[0], this.data[1]]
     if (this.chart && this.chart.updateSeries) {
       this.chart.updateSeries(this.chartOptions.series);
     }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.updateChart()
   }
 
 }

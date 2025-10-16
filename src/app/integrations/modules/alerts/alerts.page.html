@@ -132,11 +132,11 @@
                 <td class="td-center">{{ item.machine_name}}</td>
                 <td class="td-center">
                   <ion-icon
-                    [color]="item.status == 0 ? 'warning' : item.status === 'attend' ? 'danger' : item.status === 'in_progress' ? 'tertiary' : item.status === 'finaliced' ? 'sucess' : ''"
-                    [name]="item.status == 0 ? 'time-outline' : item.status === 'attend' ? 'warning-outline' : item.status === 'in_progress' ? 'time-outline' : item.status === 'finaliced' ? 'checkmark-outline' : ''">
+                    [color]="item.status == 'open' ? 'warning' : item.status == 'attending' ? 'danger' : item.status == 'assigned' ? 'tertiary' : item.status == 'completed' ? 'sucess' : ''"
+                    [name]="item.status == 'open' ? 'time-outline' : item.status == 'attending' ? 'warning-outline' : item.status == 'assigned' ? 'time-outline' : item.status == 'completed' ? 'checkmark-outline' : ''">
                   </ion-icon>
-                  {{item.status == 0 ? 'Pendiente' : item.status === 'attend' ? 'Atender' : item.status ===
-                  'in_progress' ? 'Reparando' : item.status === 'finaliced' ? 'Finalizada' : ''}}
+                  {{item.status == 'open' ? 'Pendiente' : item.status == 'attending' ? 'Atender' : item.status ===
+                  'in_progress' ? 'Reparando' : item.status == 'completed' ? 'Finalizada' : ''}}
                 </td>
 
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yy HH:mm' }}</td>
@@ -306,10 +306,10 @@
                 <td class="td-center">{{ item.machine_name}}</td>
                 <!--td class="td-center">
                   <p-tag
-                    [value]="item.status == 0 ? 'Pendiente' : item.status === 'attend' ? 'Atender' : item.status === 'in_progress' ? 'Reparando' : item.status === 'finaliced' ? 'Finalizada' : ''"
-                    [severity]="item.status == 0 ? 'warn' : item.status === 'attend' ? 'danger' : item.status === 'in_progress' ? 'warn' : item.status === 'finaliced' ? 'success' : '' ">
+                    [value]="item.status == 'open' ? 'Pendiente' : item.status == 'attending' ? 'Atender' : item.status == 'assigned' ? 'Reparando' : item.status == 'completed' ? 'Finalizada' : ''"
+                    [severity]="item.status == 'open' ? 'warn' : item.status == 'attending' ? 'danger' : item.status == 'assigned' ? 'warn' : item.status == 'completed' ? 'success' : '' ">
                     <ion-icon
-                      [name]="item.status == 0 ? 'time-outline' : item.status === 'attend' ? 'warning-outline' : item.status === 'in_progress' ? 'time-outline' : item.status === 'finaliced' ? 'checkmark-outline' : ''"></ion-icon>
+                      [name]="item.status == 'open' ? 'time-outline' : item.status == 'attending' ? 'warning-outline' : item.status == 'assigned' ? 'time-outline' : item.status == 'completed' ? 'checkmark-outline' : ''"></ion-icon>
                   </p-tag>
                 </td-->
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yy HH:mm' }}</td>

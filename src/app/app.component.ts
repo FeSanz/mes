@@ -131,7 +131,7 @@ export class AppComponent implements OnInit {
       this.ApplyTheme(this.darkMode);
     }
 
-    isLogged && this.GetDashGroup()
+    //isLogged && this.GetDashGroup()
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.showMenu = !event.url.includes('login');
@@ -386,7 +386,6 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
-
     try {
       const response = await this.api.GetRequestRender('userNumber');
       const count = parseInt(response.items);
