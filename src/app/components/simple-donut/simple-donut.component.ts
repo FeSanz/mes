@@ -60,7 +60,7 @@ export class SimpleDonutComponent implements OnInit {
   ngOnInit() {
   }
   updateChart() {
-    this.chartOptions.series = [this.data[0], this.data[1]]
+    this.chartOptions.series = [this.data['runtimePercentage'], this.data['downtimePercentage']]
     if (this.chart && this.chart.updateSeries) {
       this.chart.updateSeries(this.chartOptions.series);
     }

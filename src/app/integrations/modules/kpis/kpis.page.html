@@ -95,7 +95,7 @@
               <tr class="clickable-row ion-activatable row-with-actions" (click)="toggleRowSelection(item)"
                 [class.row-selected]="selectedRowMachine?.Code === item.Code">
                 <td (click)="$event.stopPropagation();">
-                  <p-tableCheckbox [value]="item" (click)="$event.stopPropagation();"></p-tableCheckbox>
+                  <p-tableCheckbox [value]="item" (click)="$event.stopPropagation(); GetDataDB(item)"></p-tableCheckbox>
                 </td>
                 <td class="td-center">
                   <p-tag [value]="item.Code" severity="contrast"></p-tag>
@@ -131,14 +131,14 @@
           <ion-card-header>
             <ion-card-title>Timeline</ion-card-title>
           </ion-card-header>
-          <app-simple-timeline></app-simple-timeline>
+          <app-simple-timeline [data]="timeLineData"></app-simple-timeline>
           <ion-card-content>
           </ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-col size="4">
+      <ion-col size="6">
         <ion-card class="graphic">
           <ion-card-header>
             <ion-card-title>Estadísticas</ion-card-title>
@@ -148,7 +148,7 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col size=" 4">
+      <!--ion-col size=" 4">
         <ion-card class="graphic">
           <ion-card-header>
             <ion-card-title>Mapa de calor</ion-card-title>
@@ -157,11 +157,11 @@
           <ion-card-content>
           </ion-card-content>
         </ion-card>
-      </ion-col>
-      <ion-col size="4">
+      </ion-col-->
+      <ion-col size="6">
         <ion-card class="graphic">
           <ion-card-header>
-            <ion-card-title>Fallas más recurrentes</ion-card-title>
+            <ion-card-title>Areas más recurrentes</ion-card-title>
           </ion-card-header>
           <app-simple-column-bar [data]="barsData"></app-simple-column-bar>
           <ion-card-content>

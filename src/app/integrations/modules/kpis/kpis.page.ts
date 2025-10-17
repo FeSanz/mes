@@ -44,6 +44,7 @@ export class KpisPage implements OnInit {
   userData: any = {};
   donutData: any = []
   barsData: any = []
+  timeLineData: any = []
   dateRangeOptions = [
     { label: 'Hoy', value: 'today' },
     { label: 'Últimas 24 horas', value: '24hours' },
@@ -53,7 +54,7 @@ export class KpisPage implements OnInit {
     { label: 'Este mes', value: 'month' },
     { label: 'Rango personalizado', value: 'custom' }
   ];
-  dateRange: any = "30days"
+  dateRange: any = "today"
   selectedRowMachine: any = null;
   constructor(
     private alerts: AlertsService,
@@ -63,7 +64,7 @@ export class KpisPage implements OnInit {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.organizationSelected = this.userData.Company.Organizations[0];
     addIcons({ menuOutline, checkmarkCircle, trashOutline, pencilOutline, eyeOutline, hammerOutline, checkmarkOutline, timeOutline });
-    this.donutData = this.generarValores();
+    //this.donutData = this.generarValores();
   }
   generarValores() {
     const a = Math.floor(Math.random() * 101);
@@ -99,15 +100,29 @@ export class KpisPage implements OnInit {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
   }
+  GetDataDB(item: any) {
+    this.apiService.GetRequestRender('alertsInterval/' + item.MachineId + '/' + this.dateRange).then((response: any) => {
+      if (response.errorsExistFlag == true) {
+        //this.alerts.Info(response.message);
+      } else {
+        const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name)
+        this.timeLineData = [...this.timeLineData, timeLineRes[0]]
+      }
+    })
+  }
   ViewDetails(item: any) {
     this.apiService.GetRequestRender('alertsInterval/' + item.MachineId + '/' + this.dateRange).then((response: any) => {
-      if (!response.totalResults) {
-        this.alerts.Info(response.message);
-        this.donutData = [100, 0]
+      if (response.errorsExistFlag == true) {
+        //this.alerts.Info(response.message);
       } else {
-        const res = this.CalcularPorcentajes(response.items)
+        const donutRes = this.calculateMachineMetrics(response.items)
         this.barsData = this.ContarFallasPorArea(response.items)
-        this.donutData = [res[0], Number(res[1]) + Number(res[2])]
+        this.donutData = donutRes
+        if (this.timeLineData.length == 0) {
+          const timeLineRes = this.generateSeparateTimelineData(response.items, item.Name)
+          this.timeLineData = [timeLineRes[0]]
+        }
+        this.changeDetector.detectChanges()
       }
     })
   }
@@ -128,53 +143,221 @@ export class KpisPage implements OnInit {
 
     return conteo;
   }
-  CalcularPorcentajes(failures: any[], dias: number = 30) {
-    const ahora = new Date();
-    const inicioPeriodo = new Date(ahora);
-    inicioPeriodo.setDate(ahora.getDate() - dias);
+  calculateMachineMetrics(
+    alerts: any[],
+    startDate?: Date,
+    endDate?: Date
+  ) {
+    const now = endDate || new Date();
+    const periodStart = startDate || new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
 
-    // Convertimos las fechas de los eventos a rangos de tiempo
-    const eventos = failures
-      .map(f => ({
-        type: f.Type,
-        start: new Date(f.StartDate),
-        end: f.EndDate ? new Date(f.EndDate) : ahora
-      }))
-      .filter(e => e.start >= inicioPeriodo); // Solo los últimos N días
+    // Calcular el total de minutos en el período
+    const totalMinutes = Math.floor((now.getTime() - periodStart.getTime()) / (1000 * 60));
 
-    const duracionTotal = ahora.getTime() - inicioPeriodo.getTime();
+    // Filtrar alertas activas (en downtime)
+    const activeAlerts = alerts
+    // Crear intervalos de downtime
+    const downtimeIntervals: any[] = activeAlerts.map(alert => {
+      const start = new Date(alert.StartDate);
+      const end = alert.EndDate ? new Date(alert.EndDate) : now;
 
-    let duracionFalla = 0;
-    let duracionMantenimiento = 0;
+      // Ajustar si el inicio es antes del período
+      const effectiveStart = start < periodStart ? periodStart : start;
+      // Ajustar si el fin es después del período
+      const effectiveEnd = end > now ? now : end;
 
-    // Sumamos tiempos según tipo
-    for (const e of eventos) {
-      const fin = e.end.getTime() > ahora.getTime() ? ahora : e.end;
-      const inicio = e.start.getTime() < inicioPeriodo.getTime() ? inicioPeriodo : e.start;
-      const duracion = fin.getTime() - inicio.getTime();
+      return {
+        start: effectiveStart,
+        end: effectiveEnd
+      };
+    });
 
-      if (e.type === 'TNP') duracionFalla += duracion;
-      else if (e.type === 'TMP') duracionMantenimiento += duracion;
+    // Combinar intervalos superpuestos para no contar tiempo duplicado
+    const mergedIntervals = this.mergeIntervals(downtimeIntervals);
+
+    // Calcular total de minutos en downtime
+    const downtimeMinutes = mergedIntervals.reduce((total, interval) => {
+      const minutes = Math.floor((interval.end.getTime() - interval.start.getTime()) / (1000 * 60));
+      return total + minutes;
+    }, 0);
+
+    // Calcular runtime
+    const runtimeMinutes = totalMinutes - downtimeMinutes;
+
+    // Calcular porcentajes
+    const downtimePercentage = totalMinutes > 0 ? (downtimeMinutes / totalMinutes) * 100 : 0;
+    const runtimePercentage = totalMinutes > 0 ? (runtimeMinutes / totalMinutes) * 100 : 0;
+
+    // Convertir a horas
+    const runtimeHours = runtimeMinutes / 60;
+    const downtimeHours = downtimeMinutes / 60;
+
+    return {
+      runtimeMinutes,
+      downtimeMinutes,
+      totalMinutes,
+      runtimePercentage: parseFloat(runtimePercentage.toFixed(2)),
+      downtimePercentage: parseFloat(downtimePercentage.toFixed(2)),
+      runtimeHours: parseFloat(runtimeHours.toFixed(2)),
+      downtimeHours: parseFloat(downtimeHours.toFixed(2))
+    };
+  }
+  mergeIntervals(intervals: any[]): any[] {
+    if (intervals.length === 0) return [];
+
+    // Ordenar intervalos por fecha de inicio
+    const sorted = intervals.sort((a, b) => a.start.getTime() - b.start.getTime());
+    const merged: any[] = [sorted[0]];
+
+    for (let i = 1; i < sorted.length; i++) {
+      const current = sorted[i];
+      const last = merged[merged.length - 1];
+
+      // Si los intervalos se superponen, combinarlos
+      if (current.start <= last.end) {
+        last.end = new Date(Math.max(last.end.getTime(), current.end.getTime()));
+      } else {
+        merged.push(current);
+      }
     }
 
-    // Limitamos al total del rango y normalizamos
-    const totalUsado = duracionFalla + duracionMantenimiento;
-    const duracionSinFalla = Math.max(0, duracionTotal - totalUsado);
-
-    const porcentajeFalla = (duracionFalla / duracionTotal) * 100;
-    const porcentajeMantenimiento = (duracionMantenimiento / duracionTotal) * 100;
-    const porcentajeSinFalla = (duracionSinFalla / duracionTotal) * 100;
-
-    /*console.log('Falla:', porcentajeFalla.toFixed(2));
-    console.log('Mantenimiento:', porcentajeMantenimiento.toFixed(2));
-    console.log('Sin falla:', porcentajeSinFalla.toFixed(2));*/
-
-    return [
-      Number(porcentajeSinFalla.toFixed(2)),
-      Number(porcentajeFalla.toFixed(2)),
-      Number(porcentajeMantenimiento.toFixed(2))
-    ];
+    return merged;
   }
+  generateSeparateTimelineData(
+    alerts: any[],
+    machineName: string,
+    startDate?: Date,
+    endDate?: Date
+  ) {
+    const now = endDate || new Date();
+    const periodStart = startDate || new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
 
+    // Filtrar y mapear alertas válidas
+    const validAlerts = alerts.map(alert => {
+      const start = new Date(alert.StartDate).getTime();
+      let end: number;
+
+      // Si tiene RepairDate, el downtime es hasta esa fecha
+      if (alert.RepairDate) {
+        end = new Date(alert.RepairDate).getTime();
+      }
+      // Si no tiene RepairDate, sigue activo hasta ahora
+      else {
+        end = now.getTime();
+      }
+
+      return {
+        start: start,
+        end: end
+      };
+    })
+      .sort((a, b) => a.start - b.start);
+
+    const timelineData: any[] = [];
+    const endTimeMs = now.getTime();
+
+    // Si no hay alertas válidas, toda la línea es runtime
+    if (validAlerts.length === 0) {
+      return [{
+        name: machineName,
+        data: [{
+          x: machineName,
+          y: [periodStart.getTime(), endTimeMs],
+          fillColor: "#007bff"
+        }]
+      }];
+    }
+
+    // Fusionar alertas solapadas para obtener períodos de downtime continuos
+    const mergedDowntimes: { start: number; end: number }[] = [];
+
+    for (const alert of validAlerts) {
+      if (mergedDowntimes.length === 0) {
+        mergedDowntimes.push({ start: alert.start, end: alert.end });
+      } else {
+        const last = mergedDowntimes[mergedDowntimes.length - 1];
+
+        // Si la alerta actual se solapa o está contigua con la anterior
+        if (alert.start <= last.end) {
+          // Extender el downtime hasta el máximo de ambas
+          last.end = Math.max(last.end, alert.end);
+        } else {
+          // Nueva alerta separada
+          mergedDowntimes.push({ start: alert.start, end: alert.end });
+        }
+      }
+    }
+
+    // Generar los segmentos de runtime y downtime
+    let currentTime = periodStart.getTime();
+
+    for (const downtime of mergedDowntimes) {
+      // Runtime antes del downtime (solo si el downtime está después del inicio)
+      if (currentTime < downtime.start) {
+        timelineData.push({
+          x: machineName,
+          y: [currentTime, downtime.start],
+          fillColor: "#007bff"
+        });
+      }
+
+      // Downtime (desde StartDate hasta RepairDate o ahora)
+      timelineData.push({
+        x: machineName,
+        y: [downtime.start, downtime.end],
+        fillColor: "#dc3545"
+      });
+
+      currentTime = downtime.end;
+    }
+
+    // Runtime final si queda tiempo
+    if (currentTime < endTimeMs) {
+      timelineData.push({
+        x: machineName,
+        y: [currentTime, endTimeMs],
+        fillColor: "#007bff"
+      });
+    }
+
+    return [{
+      name: machineName,
+      data: timelineData
+    }];
+  }
+  mergeDowntimeIntervals(intervals: Array<{ start: Date; end: Date; alerts: any[] }>): Array<{ start: Date; end: Date; alerts: any[] }> {
+    if (intervals.length === 0) return [];
+
+    const sorted = [...intervals].sort((a, b) => a.start.getTime() - b.start.getTime());
+    const merged: Array<{ start: Date; end: Date; alerts: any[] }> = [{
+      start: sorted[0].start,
+      end: sorted[0].end,
+      alerts: [...sorted[0].alerts]
+    }];
+
+    for (let i = 1; i < sorted.length; i++) {
+      const current = sorted[i];
+      const last = merged[merged.length - 1];
+
+      // Si los intervalos se superponen o están contiguos, combinarlos
+      if (current.start.getTime() <= last.end.getTime()) {
+        // Extender el fin si el actual termina después
+        if (current.end.getTime() > last.end.getTime()) {
+          last.end = current.end;
+        }
+        // Agregar las alertas del intervalo actual
+        last.alerts.push(...current.alerts);
+      } else {
+        // No hay superposición, agregar como nuevo intervalo
+        merged.push({
+          start: current.start,
+          end: current.end,
+          alerts: [...current.alerts]
+        });
+      }
+    }
+
+    return merged;
+  }
   protected readonly ToggleMenu = ToggleMenu;
 }

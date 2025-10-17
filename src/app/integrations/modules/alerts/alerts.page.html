@@ -13,7 +13,7 @@
         <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
           [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
           placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
-          [virtualScrollItemSize]="38" (onChange)="GetAlerts()" appendTo="ion-app" />
+          [virtualScrollItemSize]="38" (onChange)="GetAlerts()" appendTo="body" />
         <label for="organization_select">Organización</label>
       </p-floatlabel>
     </div>
