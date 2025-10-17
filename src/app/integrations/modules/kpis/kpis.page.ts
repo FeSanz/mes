@@ -37,7 +37,7 @@ export class KpisPage implements OnInit {
   machinesArray: any = []
   rowsPerPage: number = 8;
   rowsPerPageOptions: number[] = [5, 10, 20];
-  selectedMachine: any[] = []
+  selectedMachine: any = {}
   scrollHeight: string = '90%';
   searchValueAl: string = '';
   organizationSelected: string | any = '';
@@ -54,8 +54,10 @@ export class KpisPage implements OnInit {
     { label: 'Este mes', value: 'month' },
     { label: 'Rango personalizado', value: 'custom' }
   ];
-  dateRange: any = "today"
+
+  dateRange: any = "24hours"
   selectedRowMachine: any = null;
+  selectedMachines: any[] = [];
   constructor(
     private alerts: AlertsService,
     private apiService: ApiService,
@@ -83,6 +85,12 @@ export class KpisPage implements OnInit {
     );*/
     this.GetMachines()
   }
+  ResetData() {
+    this.donutData = []
+    this.timeLineData = []
+    this.selectedMachine = {}
+    this.selectedMachines = []
+  }
   GetMachines() {
     this.apiService.GetRequestRender('orgResourceMachines/' + this.organizationSelected.OrganizationId).then((response: any) => {
       if (!response.items) {
@@ -105,43 +113,76 @@ export class KpisPage implements OnInit {
       if (response.errorsExistFlag == true) {
         //this.alerts.Info(response.message);
       } else {
-        const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name)
+        const hours = this.getDateRangeFromOption(this.dateRange)
+        const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
         this.timeLineData = [...this.timeLineData, timeLineRes[0]]
       }
     })
   }
   ViewDetails(item: any) {
     this.apiService.GetRequestRender('alertsInterval/' + item.MachineId + '/' + this.dateRange).then((response: any) => {
+      console.log(response);
+
       if (response.errorsExistFlag == true) {
         //this.alerts.Info(response.message);
       } else {
-        const donutRes = this.calculateMachineMetrics(response.items)
-        this.barsData = this.ContarFallasPorArea(response.items)
+        const hours = this.getDateRangeFromOption(this.dateRange)
+        const donutRes = response.items ? this.calculateMachineMetrics(response.items, hours.start, hours.end) : {
+          runtimeMinutes: 1,
+          downtimeMinutes: 0,
+          totalMinutes: 0,
+          runtimePercentage: 100,
+          downtimePercentage: 0,
+          runtimeHours: 0,
+          downtimeHours: 0
+        }
+        this.barsData = response.items ? this.ContarFallasPorArea(response.items) : ''
         this.donutData = donutRes
         if (this.timeLineData.length == 0) {
-          const timeLineRes = this.generateSeparateTimelineData(response.items, item.Name)
+          const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
           this.timeLineData = [timeLineRes[0]]
+        } else {
+          const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
+          this.timeLineData = [...this.timeLineData, timeLineRes[0]]
         }
         this.changeDetector.detectChanges()
       }
     })
   }
-  toggleRowSelection(item: any) {
-    if (this.selectedRowMachine && this.selectedRowMachine.Code === item.Code) {
-      this.selectedRowMachine = null;
-    } else {
-      this.selectedRowMachine = item;
-      this.ViewDetails(item);
-    }
-  }
-  ContarFallasPorArea(failures: any[]) {
-    const conteo = failures.reduce((acc, f) => {
-      const area = f.Area || "Sin asignar";
-      acc[area] = (acc[area] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+  getDateRangeFromOption(option: string): { start: Date; end: Date } {
+    const now = new Date();
+    const end = new Date(); // Fecha actual
+    let start: Date;
+    switch (option) {
+      case 'today':
+        start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        break;
+      case '24hours':
+        start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        break;
+      case '7days':
+        start = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000);
+        start.setHours(0, 0, 0, 0);
+        break;
+      case 'week': {
+        const dayOfWeek = now.getDay(); // 0 = domingo
+        const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // lunes
+        start = new Date(now.setDate(diff));
+        start.setHours(0, 0, 0, 0);
+        break;
+      }
+      case '30days':
+        start = new Date(now.getTime() - 29 * 24 * 60 * 60 * 1000);
+        start.setHours(0, 0, 0, 0);
+        break;
+      case 'month':
+        start = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
 
-    return conteo;
+      default:
+        throw new Error('Opción de rango de fechas no válida');
+    }
+    return { start, end };
   }
   calculateMachineMetrics(
     alerts: any[],
@@ -201,6 +242,23 @@ export class KpisPage implements OnInit {
       runtimeHours: parseFloat(runtimeHours.toFixed(2)),
       downtimeHours: parseFloat(downtimeHours.toFixed(2))
     };
+  }
+  toggleRowSelection(item: any) {
+    if (this.selectedRowMachine && this.selectedRowMachine.Code === item.Code) {
+      this.selectedRowMachine = null;
+    } else {
+      this.selectedRowMachine = item;
+      this.ViewDetails(item);
+    }
+  }
+  ContarFallasPorArea(failures: any[]) {
+    const conteo = failures.reduce((acc, f) => {
+      const area = f.Area || "Sin asignar";
+      acc[area] = (acc[area] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return conteo;
   }
   mergeIntervals(intervals: any[]): any[] {
     if (intervals.length === 0) return [];
@@ -358,6 +416,8 @@ export class KpisPage implements OnInit {
     }
 
     return merged;
+  }
+  onRowUnselect(event: any) {
   }
   protected readonly ToggleMenu = ToggleMenu;
 }

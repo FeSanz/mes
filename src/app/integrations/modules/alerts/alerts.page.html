@@ -50,7 +50,7 @@
             </ng-template>
             <ng-template pTemplate="header">
               <tr>
-                <th pSortableColumn="AlertId" class="td-center" style="min-width: 5rem">
+                <th pSortableColumn="alert_id" class="td-center" style="min-width: 5rem">
                   <div class="flex justify-between items-center">
                     Id
                     <p-sortIcon field="AlertId" />
@@ -136,7 +136,7 @@
                     [name]="item.status == 'open' ? 'time-outline' : item.status == 'attending' ? 'warning-outline' : item.status == 'assigned' ? 'time-outline' : item.status == 'completed' ? 'checkmark-outline' : ''">
                   </ion-icon>
                   {{item.status == 'open' ? 'Pendiente' : item.status == 'attending' ? 'Atender' : item.status ===
-                  'in_progress' ? 'Reparando' : item.status == 'completed' ? 'Finalizada' : ''}}
+                  'in_progress' ? 'Reparando' : item.status == 'completed' ? 'Finalizada' : item.status == 'assigned' ? 'En espera' : ''}}
                 </td>
 
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yy HH:mm' }}</td>
@@ -169,7 +169,7 @@
                     *ngIf="permissions.isSuperAdmin() && !item.response_time && item.area">
                     <ion-icon slot="icon-only" name="hammer-outline"></ion-icon>
                   </ion-button>
-                  <ion-button size="small" shape="round" color="secondary" (click)="EditAlert(item)" title="Atender"
+                  <ion-button size="small" shape="round" color="secondary" (click)="EditAlert(item)" title="Editar"
                     *ngIf="permissions.isSuperAdmin() && !item.response_time">
                     <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
                   </ion-button>
@@ -340,7 +340,7 @@
     </ion-row>
   </ion-grid>
 </ion-content>
-<p-dialog [(visible)]="isEditAlertModalOpen" [modal]="true" [maximizable]="true" appendTo="ion-app"
+<p-dialog [(visible)]="isEditAlertModalOpen" [modal]="true" [maximizable]="true"
   [style]="{ width: 'auto', height: '85vh', 'max-height': '90vh' }" (onHide)="isEditAlertModalOpen = false">
   <!-- HEADER PERSONALIZADO -->
   <ng-template pTemplate="header">
@@ -360,7 +360,7 @@
   <!-- CONTENIDO -->
   <div class="dialog-content-wrapper">
     <p-table [value]="filteredFailures" selectionMode="single" [(selection)]="selectedFailure"
-      [responsiveLayout]="'scroll'" styleClass="card-table-primeng">
+      [responsiveLayout]="'scroll'" stripedRows>
       <ng-template pTemplate="header">
         <tr>
           <th style="min-width: 28rem">Inicio</th>

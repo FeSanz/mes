@@ -364,7 +364,7 @@
     </div>
 
     <!-- Modal inicio -->
-    <ion-modal [keepContentsMounted]="true">
+    <ion-modal [keepContentsMounted]="true" appendTo="body">
       <ng-template>
         <ion-datetime id="end_date" [(ngModel)]="campaignObj.end_date" locale="es-MX" hourCycle="h12"
           presentation="date-time" show-default-buttons="true" [max]="campaignObj.start_date" cancel-text="Cancelar"

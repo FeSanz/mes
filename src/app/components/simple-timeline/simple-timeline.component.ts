@@ -195,7 +195,6 @@ export class SimpleTimelineComponent implements OnInit {
       }
     }
   }
-
   ngOnChanges(changes: SimpleChanges) {
     this.updateChart()
   }

@@ -92,7 +92,7 @@ export class ProductionCampaignPage {
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
-    this.organizationSelected = this.userData.Company.Organizations[2];
+    this.organizationSelected = this.userData.Company.Organizations[1];
     addIcons({menuOutline,trashOutline,pencilOutline,eyeOutline,checkmark,backspaceOutline,checkmarkOutline,checkmarkCircle,addOutline,moveOutline,reorderThreeOutline});
   }
 

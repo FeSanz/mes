@@ -132,7 +132,7 @@ export class AppComponent implements OnInit {
       this.ApplyTheme(this.darkMode);
     }
 
-    //isLogged && this.GetDashGroup()
+    isLogged && this.GetDashGroup()
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.showMenu = !event.url.includes('login');
