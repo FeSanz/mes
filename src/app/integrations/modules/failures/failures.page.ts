@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {
   IonContent,
   IonHeader,
@@ -9,7 +9,18 @@ import {
   IonToggle,
   IonGrid,
   IonRow,
-  IonCol, IonCard, IonCardTitle, IonButton, IonIcon, IonButtons, IonMenuButton
+  IonCol,
+  IonCard,
+  IonCardTitle,
+  IonButton,
+  IonIcon,
+  IonButtons,
+  IonMenuButton,
+  IonInput,
+  IonItem,
+  IonText,
+  IonSelect,
+  IonSelectOption, IonLabel
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
@@ -26,10 +37,13 @@ import {Button} from "primeng/button";
 import {IconField} from "primeng/iconfield";
 import {InputText} from "primeng/inputtext";
 import {InputIcon} from "primeng/inputicon";
-import {HeightTable} from "../../../models/tables.prime";
+import {HeightSingleTable, HeightTable} from "../../../models/tables.prime";
 import {Platform} from "@ionic/angular";
 import {Tag} from "primeng/tag";
 import {ConfirmDialog} from "primeng/confirmdialog";
+import {Dialog} from "primeng/dialog";
+import {Toast} from "primeng/toast";
+import {ProgressSpinner} from "primeng/progressspinner";
 
 @Component({
   selector: 'app-failures',
@@ -37,19 +51,30 @@ import {ConfirmDialog} from "primeng/confirmdialog";
   styleUrls: ['./failures.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonGrid, IonRow, IonCol, IonCard, IonCardTitle, IonButton, IonIcon, FloatLabel, IonButtons, IonMenuButton, Select, Button, IconField, InputText, InputIcon, Tag, ConfirmDialog]
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonGrid, IonRow, IonCol, IonCard, IonCardTitle, IonButton, IonIcon, FloatLabel, IonButtons, IonMenuButton, Select, Button, IconField, InputText, InputIcon, Tag, ConfirmDialog, Dialog, IonInput, IonItem, IonText, IonSelect, IonSelectOption, IonLabel, ReactiveFormsModule, Toast, ProgressSpinner]
 })
+
 export class FailuresPage implements OnInit {
   failuresData: any = { items: []}
   selectedFailures: any[] = [];
   userData: any = {};
-  isModalOpen = false
-  rowsPerPage: number = 12;
+  isModalNewOpen: boolean = false
+  rowsPerPage: number = 23;
   rowsPerPageOptions: number[] = [5, 10, 20];
   scrollHeight: string = '550px';
   searchValueAl: string = '';
+
+  ftypes: string[] = ['Paro NO programado', 'Paro programado', 'Apagado'];
+  areas: string[] = ['Producción', 'Mantenimiento', 'Almacén', 'Calidad'];
+
+  formFailure: any = {
+    name: '',
+    type: '',
+    area: ''
+  };
+
   constructor(
-    private alerts: AlertsService,
+    public alerts: AlertsService,
     private apiService: ApiService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef,
@@ -60,6 +85,7 @@ export class FailuresPage implements OnInit {
   }
 
   ngOnInit() {
+
   }
 
   ionViewDidEnter() {
@@ -73,7 +99,7 @@ export class FailuresPage implements OnInit {
   }
 
   private UpdateScrollHeight() {
-    this.scrollHeight = HeightTable(this.platform.height());
+    this.scrollHeight = HeightSingleTable(this.platform.height());
   }
 
 
@@ -101,11 +127,35 @@ export class FailuresPage implements OnInit {
     table.filterGlobal(target.value, 'contains');
   }
 
+  UploadSingleFailure() {
+    this.alerts.PDAlertHide();
+    if (!this.formFailure.name?.trim() || !this.formFailure.type || !this.formFailure.area) {
+      this.alerts.PDAlertShow('Llene todos los campos requeridos', 'danger');
+      return;
+    }
+
+    this.alerts.PDAlertShow('Por favor espere...', 'contrast');
+    this.alerts.PDLoading(true); // Activar loading
+
+    // Simulación de proceso (reemplaza con tu llamada real al API)
+    setTimeout(() => {
+      this.alerts.PDLoading(false); // Desactivar loading
+      this.alerts.PDAlertShow('Guardado exitosamente', 'success');
+
+      setTimeout(() => {
+        this.isModalNewOpen = false;
+        this.formFailure = { name: '', type: '', area: '' };
+        this.RefreshTables();
+      }, 2500);
+    }, 5000);
+
+    //this.isModalNewOpen = false;
+    //this.formFailure = { name: '', type: '', area: '' };
+  }
+
   EdithFailure(failure: any) {
 
   }
-
-
 
   async DeleteFailure() {
     if (this.selectedFailures.length === 0) {

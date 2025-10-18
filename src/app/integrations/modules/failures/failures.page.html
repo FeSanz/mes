@@ -48,7 +48,7 @@
                     label="Nueva"
                     variant="outlined"
                     severity="info"
-                    (click)="failuresData" />
+                    (click)="isModalNewOpen = true" />
 
                   <div class="title-text">
                     Tabla de fallas
@@ -91,7 +91,7 @@
                     <p-columnFilter type="text" field="FailureId" display="menu" class="ml-auto" />
                   </div>
                 </th>
-                <th pSortableColumn="Name" style="min-width: 50rem" class="td-center">
+                <th pSortableColumn="Name" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Nombre de la falla
                     <p-sortIcon field="Name" />
@@ -150,4 +150,63 @@
     </ion-row>
   </ion-grid>
 
+  <!-- Modal para New -->
+  <p-dialog [modal]="true"
+            [(visible)]="isModalNewOpen"
+            (onHide)="alerts.PDAlertHide()"
+            [closable]="!alerts.pd.loading"
+            styleClass="responsive-pdialog"
+            [draggable]="true"
+            [resizable]="true"
+            [maximizable]="true"
+            appendTo="body">
+
+    <!-- Header personalizado-->
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <span>Nueva falla</span>
+      </div>
+    </ng-template>
+    <div class="dialog-content-wrapper"
+         [style.pointer-events]="alerts.pd.loading ? 'none' : 'auto'"
+         [style.opacity]="alerts.pd.loading ? '0.6' : '1'">
+      <ion-grid [fixed]="true">
+        <ion-item>
+          <ion-input
+            placeholder="Nombre"
+            [(ngModel)]="formFailure.name"
+            name="name">
+            <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+          </ion-input>
+        </ion-item>
+        <ion-item >
+          <ion-label color="primary">Tipo:</ion-label>
+          <p-select
+            slot="end"
+            [options]="ftypes"
+            [(ngModel)]="formFailure.type"
+            placeholder="Seleccione tipo de falla"
+            [showClear]="true"
+            appendTo="body"/>
+        </ion-item>
+      <ion-item >
+        <ion-label color="primary">Áreas:</ion-label>
+        <p-select
+          slot="end"
+          [options]="areas"
+          [(ngModel)]="formFailure.area"
+          placeholder="Seleccione área"
+          [showClear]="true"
+          appendTo="body"/>
+      </ion-item>
+      </ion-grid>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-progress-spinner *ngIf="alerts.pd.loading" ariaLabel="loading" [style]="{ width: '25px', height: '25px' }"/>
+      <ion-label *ngIf="alerts.pd.message" [color]="alerts.pd.color"  style="margin-right: auto">{{alerts.pd.message}}</ion-label>
+      <p-button label="Cancelar" severity="danger" [disabled]="alerts.pd.loading" (click)="isModalNewOpen = false;" />
+      <p-button label="Guardar" severity="success" [disabled]="alerts.pd.loading" (click)="UploadSingleFailure()" />
+    </ng-template>
+  </p-dialog>
 </ion-content>
