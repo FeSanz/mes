@@ -244,7 +244,7 @@
               <tr>
                 <th style="width: 4rem">
                   <p-tableHeaderCheckbox
-                    [disabled]="currentCampaign.status_telegram != 'Published to MES'"></p-tableHeaderCheckbox>
+                    [disabled]="currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule'"></p-tableHeaderCheckbox>
                 </th>
                 <th pSortableColumn="work_order_number" class="td-center">Orden #<p-sortIcon
                     field="work_order_number" /></th>
@@ -270,10 +270,10 @@
                 (dragstart)="onDragStart($event, item)" (dragover)="onDragOver($event, rowIndex)"
                 (drop)="onDrop($event, rowIndex)" (dragend)="onDragEnd($event)"
                 [style.cursor]="selectedOrders.length > 0 && isSelected(item) ? 'move' : 'default'"
-                [pSelectableRowDisabled]="currentCampaign.status_telegram == 'Published to L2'">
+                [pSelectableRowDisabled]="currentCampaign.status_telegram == 'Published to L2' || currentCampaign.status_telegram != 'Unschedule'">
                 <td>
                   <p-tableCheckbox [value]="item"
-                    [disabled]="currentCampaign.status_telegram != 'Published to MES'"></p-tableCheckbox>
+                    [disabled]="currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule'"></p-tableCheckbox>
                 </td>
                 <td class="td-center">
                   <p-tag [value]="item.work_order_number" [severity]="'contrast'" />
@@ -488,7 +488,7 @@
     </ng-template>
   </ion-modal-->
   <p-dialog [(visible)]="isModalFreeOrdersOpen" [modal]="true"
-    [style]="{ width: '90vw', height: '90vh', 'max-height': '95vh' }" [draggable]="true" [resizable]="true"
+    [style]="{ width: 'auto', height: '90vh', 'max-height': '95vh' }" [draggable]="true" [resizable]="true"
     [maximizable]="true" appendTo="body" (onHide)="OnlyCloseCampaignModal()">
     <!-- HEADER -->
     <ng-template pTemplate="header">
@@ -500,12 +500,10 @@
     <!-- CONTENIDO -->
     <div class="dialog-content-wrapper">
       <p-table #dtOrders [value]="freeWorkOrdersArray" [(selection)]="selectedFreeOrders" dataKey="work_order_number"
-        selectionMode="multiple" styleClass="card-table-primeng orders-table-custom" [tableStyle]="{ 'height': '100%' }"
-        [size]="'small'" [rowHover]="false" [paginator]="true" [rows]="rowsPerPage"
+        selectionMode="multiple" [size]="'small'" [rowHover]="false" [paginator]="true" [rows]="rowsPerPage"
         [globalFilterFields]="['work_order_number','item_number','machine_name','itemDescription','status']"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-        [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true" [scrollHeight]="scrollHeight"
-        [sortOrder]="1">
+        [showCurrentPageReport]="true" [filterDelay]="0" stripedRows >
 
         <!-- Filtros -->
         <ng-template #caption>
@@ -522,16 +520,16 @@
         <!-- Encabezado -->
         <ng-template pTemplate="header">
           <tr>
-            <th style="width: 3rem">
+            <th style="min-width: 2rem">
               <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
             </th>
-            <th pSortableColumn="work_order_number" class="td-center">
+            <th pSortableColumn="work_order_number" class="td-center" style="min-width: 5rem">
               Orden # <p-sortIcon field="work_order_number" />
             </th>
-            <th pSortableColumn="item_number" class="td-center">
+            <th pSortableColumn="item_number" class="td-center" style="min-width: 15rem">
               Item <p-sortIcon field="item_number" />
             </th>
-            <th pSortableColumn="machine_name" class="td-center">
+            <th pSortableColumn="machine_name" class="td-center" style="min-width: 20rem">
               Máquina <p-sortIcon field="machine_name" />
             </th>
           </tr>
