@@ -19,6 +19,13 @@
     </div-->
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
+          [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
+          placeholder="Seleccione una organización" [virtualScroll]="true" [virtualScrollItemSize]="38"
+          (onChange)="GetWorkCenters()" appendTo="body" />
+        <label for="organization_select">Organización</label> <!-- [closable]="!alerts.pd.loading"-->
+      </p-floatlabel>
+      <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="workCenter" inputId="workCenter" [options]="workCenters" optionLabel="WorkCenterName"
           [filter]="true" filterBy="WorkCenterId" placeholder="Seleccione centro de trabajo" styleClass="w-full"
           [virtualScroll]="true" [virtualScrollItemSize]="38" (onChange)="GetCampaigns()" appendTo="body" />
@@ -62,6 +69,8 @@
 
                 <div class="table-caption-right">
                   <div [ngSwitch]="getCampaignsStatus()">
+                    <p-button *ngSwitchCase="'0'" class="btn-add" [outlined]="true" icon="pi pi-arrow-right"
+                      label="Publish to MES" (click)="PublishToMES()" variant="outlined" severity="warn" />
                     <p-button *ngSwitchCase="'1'" class="btn-add" [outlined]="true" icon="pi pi-arrow-right"
                       label="Publish to L2" (click)="PublishToL2()" variant="outlined" severity="info" />
                     <p-button *ngSwitchCase="'2'" class="btn-add" [outlined]="true" icon="pi pi-arrow-left"
@@ -156,7 +165,7 @@
                     <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
                   </ion-button>
                   <ion-button size="small" shape="round" color="success"
-                    *ngIf="item.status_telegram === 'Published to MES'"
+                    *ngIf="item.status_telegram === 'Published to MES' || item.status_telegram === 'Unschedule'"
                     (click)="$event.stopPropagation(); EditCampaign(item)" title="Editar">
                     <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
                   </ion-button>
@@ -207,6 +216,15 @@
                   </div>
                 </div>
                 <div class="table-caption-right">
+                  <p-button *ngIf="currentCampaign.status_telegram == 'Unschedule'" class="btn-add" [outlined]="true"
+                    icon="pi pi-arrow-right" label="Publish to MES" (click)="PublishToMES()" variant="outlined"
+                    severity="warn" />
+                  <p-button *ngIf="currentCampaign.status_telegram == 'Published to MES'" class="btn-add"
+                    [outlined]="true" icon="pi pi-arrow-right" label="Publish to L2" (click)="PublishToL2()"
+                    variant="outlined" severity="info" />
+                  <p-button *ngIf="currentCampaign.status_telegram == 'Published to L2'" class="btn-add"
+                    [outlined]="true" icon="pi pi-arrow-left" label="Recovery to MES" (click)="RecoveryToMES()"
+                    variant="outlined" severity="success" />
                   <p-button class="btn-add" [outlined]="true" icon="pi pi-delete-left" label="Eliminar"
                     *ngIf="selectedOrders.length > 0" variant="outlined" severity="danger" (click)="DeleteOrders()" />
                   <p-iconField iconPosition="left">
@@ -233,11 +251,11 @@
                 <th pSortableColumn="sequence" class="td-center">Seq.</th>
                 <th class="td-center">Lote</th>
                 <th pSortableColumn="item_number" class="td-center">Item <p-sortIcon field="item_number" /></th>
-                <!--th pSortableColumn="item_description" class="td-center">Descripción <p-sortIcon
-                    field="item_description" /></th-->
                 <th pSortableColumn="planned_quantity" class="td-center">Cantidad planeada <p-sortIcon
                     field="planned_quantity" /></th>
-                <th pSortableColumn="machine_name" class="td-center">Máquina <p-sortIcon field="machine_name" /></th>
+                <th pSortableColumn="item_description" class="td-center">Descripción <p-sortIcon
+                    field="item_description" /></th>
+                <!--th pSortableColumn="machine_name" class="td-center">Máquina <p-sortIcon field="machine_name" /></th-->
                 <th pSortableColumn="start_date" class="td-center">Fecha inicio <p-sortIcon field="start_date" /></th>
                 <th pSortableColumn="end_date" class="td-center">Fecha fin <p-sortIcon field="end_date" /></th>
                 <!--th pSortableColumn="status">Estado <p-sortIcon field="status" /></th-->
@@ -263,7 +281,7 @@
                 <td class="td-center">{{ item.sequence }}</td>
                 <td class="td-center" (click)="$event.stopPropagation()">
                   <ion-button id="lot-popover-{{item.work_order_id}}" expand="block" fill="outline"
-                    [disabled]="currentCampaign.status_telegram != 'Published to MES'"
+                    [disabled]="currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule'"
                     [color]="item.selectedlot ? 'secondary' : 'medium'" shape="round" size="small">
                     {{ item.selectedlot || 'Seleccione lote' }}
                   </ion-button>
@@ -280,9 +298,9 @@
                   </ion-popover>
                 </td>
                 <td class="td-center" (click)="$event.stopPropagation()">{{ item.item_number }}</td>
-                <!--td class="td-center">{{ item.item_description }}</td-->
                 <td class="td-center"><strong>{{ item.planned_quantity + ' ' + item.uom }}</strong></td>
-                <td class="td-center">{{ item.machine_name }}</td>
+                <td class="td-center">{{ item.item_description }}</td>
+                <!--td class="td-center">{{ item.machine_name }}</td-->
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
                 <td class="td-center">{{ item.end_date | date: 'dd/MM/yyyy hh:mm a'}}</td>
                 <!--td class="td-center">
@@ -293,7 +311,8 @@
                 </td-->
                 <td class="td-center" (click)="$event.stopPropagation()">
                   <ion-button size="small" shape="round" color="danger" (click)="DeleteOrder(item)"
-                    [disabled]="currentCampaign.status_telegram != 'Published to MES'" title="Eliminar de la campaña">
+                    [disabled]="currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule'"
+                    title="Eliminar de la campaña">
                     <ion-icon slot="icon-only" name="backspace-outline"></ion-icon>
                   </ion-button>
                 </td>
@@ -355,34 +374,18 @@
       <!-- Fechas -->
       <ion-item>
         <ion-label style="color: var(--ion-color-primary);">Fecha de inicio:</ion-label>
-        <ion-datetime-button datetime="end_date" slot="end"></ion-datetime-button>
+        <p-datepicker slot="end" [(ngModel)]="minDate" [showTime]="true" [showIcon]="true" [readonlyInput]="true"
+          [maxDate]="maxDate" dateFormat="dd/mm/yy" hourFormat="12" [showButtonBar]="true" appendTo="body">
+        </p-datepicker>
       </ion-item>
+
       <ion-item>
         <ion-label style="color: var(--ion-color-primary);">Fecha de finalización:</ion-label>
-        <ion-datetime-button datetime="start_date" slot="end"></ion-datetime-button>
+        <p-datepicker slot="end" [(ngModel)]="maxDate" [showTime]="true" [showIcon]="true" [readonlyInput]="true"
+          [minDate]="maxDate" dateFormat="dd/mm/yy" hourFormat="12" [showButtonBar]="true" appendTo="body">
+        </p-datepicker>
       </ion-item>
     </div>
-
-    <!-- Modal inicio -->
-    <ion-modal [keepContentsMounted]="true" appendTo="body">
-      <ng-template>
-        <ion-datetime id="end_date" [(ngModel)]="campaignObj.end_date" locale="es-MX" hourCycle="h12"
-          presentation="date-time" show-default-buttons="true" [max]="campaignObj.start_date" cancel-text="Cancelar"
-          done-text="Confirmar">
-          <span slot="title">Fecha de inicio</span>
-        </ion-datetime>
-      </ng-template>
-    </ion-modal>
-    <!-- Modal fin -->
-    <ion-modal [keepContentsMounted]="true">
-      <ng-template>
-        <ion-datetime id="start_date" [(ngModel)]="campaignObj.start_date" locale="es-MX" hourCycle="h12"
-          presentation="date-time" show-default-buttons="true" [min]="campaignObj.end_date" cancel-text="Cancelar"
-          done-text="Confirmar">
-          <span slot="title">Fecha de fin</span>
-        </ion-datetime>
-      </ng-template>
-    </ion-modal>
     <!-- FOOTER -->
     <ng-template pTemplate="footer">
       <div class="footer-style">

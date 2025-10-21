@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonModal, IonItem, IonInput, IonDatetime, IonMenuButton, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea,
   IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton, IonPopover, IonList, IonRippleEffect
@@ -23,6 +23,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { ToggleMenu } from 'src/app/models/design';
 import { DialogModule } from 'primeng/dialog';
 import { Dialog } from "primeng/dialog";
+import { DatePicker } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-production-campaign',
@@ -32,7 +33,7 @@ import { Dialog } from "primeng/dialog";
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
     IonItem, IonInput, IonDatetime, IonMenuButton, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
-    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule, InputIconModule, DialogModule, Dialog]
+    ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule, InputIconModule, DialogModule, Dialog, DatePicker, ReactiveFormsModule]
 })
 export class ProductionCampaignPage {
   campaignsArray: any = []
@@ -64,9 +65,7 @@ export class ProductionCampaignPage {
     name: '',
     description: '',
     status_telegram: 'Unschedule',
-    enabled_flag: 'Y',
-    end_date: '2025-09-11T13:34:49',
-    start_date: '2025-09-11T13:34:49'
+    enabled_flag: 'Y'
   }
   todayDate: any = {}
   woObj: any = {}
@@ -86,6 +85,11 @@ export class ProductionCampaignPage {
     { id: 2, name: 'Lote B', available: 50 },
     { id: 3, name: 'Lote C', available: 0 }
   ];*/
+  date: Date | undefined;
+
+  minDate: Date | undefined;
+
+  maxDate: Date | undefined
   constructor(
     private alerts: AlertsService,
     private apiService: ApiService,
@@ -93,7 +97,7 @@ export class ProductionCampaignPage {
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.organizationSelected = this.userData.Company.Organizations[1];
-    addIcons({menuOutline,trashOutline,pencilOutline,eyeOutline,checkmark,backspaceOutline,checkmarkOutline,checkmarkCircle,addOutline,moveOutline,reorderThreeOutline});
+    addIcons({ menuOutline, trashOutline, pencilOutline, eyeOutline, checkmark, backspaceOutline, checkmarkOutline, checkmarkCircle, addOutline, moveOutline, reorderThreeOutline });
   }
 
   formatLocalISO(date: Date): string {
@@ -102,13 +106,7 @@ export class ProductionCampaignPage {
       `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   }
   ionViewDidEnter() {
-    this.todayDate = this.formatLocalISO(new Date())
-    this.campaignObj.end_date = this.formatLocalISO(
-      new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
-    );
-    this.campaignObj.start_date = this.formatLocalISO(
-      new Date(new Date(new Date().setDate(new Date().getDate() + 7)).setHours(12, 0, 0, 0))
-    );
+    this.SetDate()
     this.GetWorkCenters()
   }
   GetWorkCenters() {
@@ -141,15 +139,20 @@ export class ProductionCampaignPage {
           status_telegram: 'Unschedule',
           enabled_flag: 'Y',
         }
-        this.todayDate = this.formatLocalISO(new Date())
-        this.campaignObj.end_date = this.formatLocalISO(
-          new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
-        );
-        this.campaignObj.start_date = this.formatLocalISO(
-          new Date(new Date(new Date().setDate(new Date().getDate() + 7)).setHours(12, 0, 0, 0))
-        );
+        this.SetDate()
       }
     })
+  }
+  SetDate() {
+    let today = new Date();
+
+    this.minDate = new Date();
+    this.minDate.setHours(12, 0, 0, 0);
+
+    // maxDate: dentro de 7 días a las 12 PM
+    this.maxDate = new Date();
+    this.maxDate.setDate(today.getDate() + 7);
+    this.maxDate.setHours(12, 0, 0, 0);
   }
   ClearCampaigns(table: any) {
     table.clear();
@@ -208,10 +211,17 @@ export class ProductionCampaignPage {
         ? "1"
         : statuses.has("Published to L2")
           ? "2"
-          : Array.from(statuses)[0]; // otro valor
+          : statuses.has("Unschedule")
+            ? "0"
+            : Array.from(statuses)[0];
     }
 
     return "3"; // más de un estado
+  }
+  async PublishToMES() {
+    if (await this.alerts.ShowAlert("¿Deseas publicar esta" + (this.selectedCampaigns.length > 1 ? "s" : "") + " campaña" + (this.selectedCampaigns.length > 1 ? "s" : "") + " hacia MES?", "Alerta", "Atrás", "Publicar")) {
+
+    }
   }
   async PublishToL2() {
     if (await this.alerts.ShowAlert("¿Deseas publicar esta" + (this.selectedCampaigns.length > 1 ? "s" : "") + " campaña" + (this.selectedCampaigns.length > 1 ? "s" : "") + " a Nivel 2?", "Alerta", "Atrás", "Publicar")) {
@@ -358,18 +368,21 @@ export class ProductionCampaignPage {
     };
   }
   SaveCampaign() {
+    //this.alerts.PDAlertShow('Por favor espere...', 'contrast');
+    //this.alerts.PDLoading(true); // Activar loading
     const payload = {
       organization_id: this.organizationSelected.OrganizationId,
       code: this.campaignObj.code,
       name: this.campaignObj.name,
       description: this.campaignObj.description,
-      start_date: this.campaignObj.start_date,
-      end_date: this.campaignObj.end_date,
+      start_date: this.maxDate,
+      end_date: this.minDate,
       status_telegram: "Unschedule",//this.campaignObj.status_telegram,
       enabled_flag: this.campaignObj.enabled_flag,
       work_center_id: this.workCenter.WorkCenterId
     }
-    this.apiService.PostRequestRender('campaigns', payload).then(async (response: any) => {
+    this.apiService.PostRequestRender('campaigns', payload, false).then(async (response: any) => {
+      //this.alerts.PDAlertHide();
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
@@ -380,14 +393,17 @@ export class ProductionCampaignPage {
     });
   }
   SaveCampaignChanges() {
+    //this.alerts.PDAlertShow('Por favor espere...', 'contrast');
+    //this.alerts.PDLoading(true); // Activar loading
     const payload = {
       code: this.campaignObj.code,
       name: this.campaignObj.name,
       description: this.campaignObj.description,
-      start_date: this.campaignObj.start_date,
-      end_date: this.campaignObj.end_date
+      start_date: this.maxDate,
+      end_date: this.minDate
     }
-    this.apiService.PutRequestRender('campaigns/' + this.campaignObj.campaign_id, payload).then(async (response: any) => {
+    this.apiService.PutRequestRender('campaigns/' + this.campaignObj.campaign_id, payload, false).then(async (response: any) => {
+      //this.alerts.PDAlertHide();
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
       } else {
@@ -497,13 +513,7 @@ export class ProductionCampaignPage {
       status_telegram: 'Unschedule',
       enabled_flag: 'Y',
     }
-    this.todayDate = this.formatLocalISO(new Date())
-    this.campaignObj.end_date = this.formatLocalISO(
-      new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
-    );
-    this.campaignObj.start_date = this.formatLocalISO(
-      new Date(new Date(new Date().setDate(new Date().getDate() + 7)).setHours(12, 0, 0, 0))
-    );
+    this.SetDate()
   }
   ////////****************///////////*************////////************/////********** */ */ */ */
   onDragStart(event: DragEvent, item: any) {

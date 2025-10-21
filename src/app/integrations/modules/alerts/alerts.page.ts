@@ -61,7 +61,7 @@ export class AlertsPage {
   timer: any;
   @ViewChild('dtAlerts') table!: Table;
   constructor(
-    private alerts: AlertsService,
+    public alerts: AlertsService,
     private apiService: ApiService,
     private websocket: WebSocketService,
     public permissions: PermissionsService,

@@ -12,9 +12,9 @@
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
           [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
-          placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
+          placeholder="Seleccione una organización" [virtualScroll]="true"
           [virtualScrollItemSize]="38" (onChange)="GetAlerts()" appendTo="body" />
-        <label for="organization_select">Organización</label>
+        <label for="organization_select">Organización</label> <!-- [closable]="!alerts.pd.loading"-->
       </p-floatlabel>
     </div>
   </ion-toolbar>
@@ -136,7 +136,8 @@
                     [name]="item.status == 'open' ? 'time-outline' : item.status == 'attending' ? 'warning-outline' : item.status == 'assigned' ? 'time-outline' : item.status == 'completed' ? 'checkmark-outline' : ''">
                   </ion-icon>
                   {{item.status == 'open' ? 'Pendiente' : item.status == 'attending' ? 'Atender' : item.status ===
-                  'in_progress' ? 'Reparando' : item.status == 'completed' ? 'Finalizada' : item.status == 'assigned' ? 'En espera' : ''}}
+                  'in_progress' ? 'Reparando' : item.status == 'completed' ? 'Finalizada' : item.status == 'assigned' ?
+                  'En espera' : ''}}
                 </td>
 
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yy HH:mm' }}</td>
@@ -376,7 +377,11 @@
     </p-table>
   </div>
   <ng-template pTemplate="footer">
-    <ion-button color="danger" (click)="isEditAlertModalOpen = false">Cerrar</ion-button>
-    <ion-button color="secondary" (click)="UpdateFailureOfAlert()" [disabled]="!selectedFailure">Guardar</ion-button>
+    <p-progress-spinner ariaLabel="loading"
+      [style]="{ width: '25px', height: '25px' }" /><!--*ngIf="alerts.pd.loading"-->
+    <ion-label style="margin-right: auto"></ion-label><!-- [color]="alerts.pd.color" *ngIf="alerts.pd.message"{{alerts.pd.message}}-->
+    <p-button label="Cancelar" severity="danger" (click)="isEditAlertModalOpen = false;" />
+    <p-button label="Guardar" severity="success" (click)="UpdateFailureOfAlert()" />
+    <!--[disabled]="alerts.pd.loading"--><!--[disabled]="alerts.pd.loading"-->
   </ng-template>
 </p-dialog>
