@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit, ViewChild} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {
@@ -58,7 +58,10 @@ export class FailuresPage implements OnInit {
   failuresData: any = { items: []}
   selectedFailures: any[] = [];
   userData: any = {};
+
   isModalNewOpen: boolean = false
+  isEditMode: boolean = false;
+
   rowsPerPage: number = 23;
   rowsPerPageOptions: number[] = [5, 10, 20];
   scrollHeight: string = '550px';
@@ -128,35 +131,69 @@ export class FailuresPage implements OnInit {
   }
 
   UploadSingleFailure() {
-    this.alerts.PDAlertHide();
     if (!this.formFailure.name?.trim() || !this.formFailure.type || !this.formFailure.area) {
-      this.alerts.PDAlertShow('Llene todos los campos requeridos', 'danger');
+      this.alerts.Warning("Llene todos los campos requeridos");
       return;
     }
+    this.isModalNewOpen = false;
 
-    this.alerts.PDAlertShow('Por favor espere...', 'contrast');
-    this.alerts.PDLoading(true); // Activar loading
+    const payload = {
+      CompanyId: this.userData.Company.CompanyId,
+      Name: this.formFailure.name,
+      Type: this.formFailure.type,
+      Area: this.formFailure.area,
+    };
 
-    // Simulación de proceso (reemplaza con tu llamada real al API)
-    setTimeout(() => {
-      this.alerts.PDLoading(false); // Desactivar loading
-      this.alerts.PDAlertShow('Guardado exitosamente', 'success');
+    this.apiService.PostRequestRender('failures', payload).then(async (response: any) => {
+      if (response.errorsExistFlag) {
+        this.isModalNewOpen = true;
+        this.alerts.ToastZIndex();
+        this.alerts.Info(response.message);
+      } else {
+        this.alerts.Success(response.message);
 
-      setTimeout(() => {
-        this.isModalNewOpen = false;
+        // Crear el nuevo objeto con los datos que enviaste + el ID de la respuesta
+        const newFailure = {
+          failure_id: response.items[0].FailureId,
+          name: this.formFailure.name,
+          type: this.formFailure.type,
+          area: this.formFailure.area,
+          company_id: this.userData.Company.CompanyId
+        };
+
+        // Agregar al inicio del arreglo (o al final con push)
+        this.failuresData.items = [newFailure, ...this.failuresData.items];
+
+        // Actualizar totalResults si existe
+        if (this.failuresData.totalResults !== undefined) {
+          this.failuresData.totalResults++;
+        }
+
         this.formFailure = { name: '', type: '', area: '' };
-        this.RefreshTables();
-      }, 2500);
-    }, 5000);
 
-    //this.isModalNewOpen = false;
-    //this.formFailure = { name: '', type: '', area: '' };
+        // Forzar detección de cambios si es necesario
+        this.changeDetector.detectChanges();
+      }
+    }).catch(error => {
+      this.isModalNewOpen = true;
+      this.alerts.ToastZIndex();
+      console.error('Error al crear:', error);
+      this.alerts.Error('Error al crear la falla');
+    });
+  }
+
+  isFormValid(): boolean {
+    return !!(
+      this.formFailure.name &&
+      this.formFailure.name.trim() !== '' &&
+      this.formFailure.type &&
+      this.formFailure.area
+    );
   }
 
   EdithFailure(failure: any) {
 
   }
-
   async DeleteFailure() {
     if (this.selectedFailures.length === 0) {
       this.alerts.Warning("Seleccione algún elemento para eliminar");

@@ -38,7 +38,7 @@ import {
   IonReorderGroup,
   ItemReorderEventDetail,
   IonText,
-  IonMenuButton
+  IonMenuButton, IonSpinner
 } from '@ionic/angular/standalone';
 
 import { NavController } from '@ionic/angular';
@@ -74,7 +74,7 @@ import {ConfirmDialog} from "primeng/confirmdialog";
   imports: [IonApp, RouterLink, IonMenu, IonToolbar, IonHeader, IonTitle, IonItem, IonIcon, IonLabel,
     IonButtons, IonButton, IonPopover, IonContent, IonList, IonMenuToggle, IonAccordionGroup, IonSplitPane, IonReorder, IonReorderGroup,
     IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid,
-    IonRow, IonModal, IonInput, IonTextarea, IonText, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast, IonMenuButton, ConfirmDialog]
+    IonRow, IonModal, IonInput, IonTextarea, IonText, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast, IonMenuButton, ConfirmDialog, IonSpinner]
 })
 export class AppComponent implements OnInit {
   darkMode = false
@@ -97,7 +97,7 @@ export class AppComponent implements OnInit {
     private api: ApiService,
     private platform: Platform,
     private ws: WebSocketService,
-    private alerts: AlertsService,
+    public alerts: AlertsService,
     private navCtrl: NavController,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef,

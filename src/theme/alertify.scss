@@ -1,3 +1,15 @@
+/******************************* Loading Controller *******************************/
+.custom-loading {
+  --min-width: 300px;
+  --max-width: 90vw; // Para que sea responsive en pantallas pequeñas
+  z-index: 99999 !important;
+
+  .loading-wrapper {
+    border-radius: 10px;
+    padding: 20px;
+  }
+}
+
 /******************************* Alertify *******************************/
 .alertify-toast {
   font-weight: 500;
@@ -76,9 +88,4 @@
   --color: #ffffff;
 }
 
-.custom-loading {
-  --min-width: 300px;
-  --max-width: 90vw; // Para que sea responsive en pantallas pequeñas
-  z-index: 99999 !important;
-}
 

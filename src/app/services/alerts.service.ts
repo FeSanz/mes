@@ -10,12 +10,6 @@ import { MessageService } from 'primeng/api';
 })
 export class AlertsService {
 
-  pd = {
-    loading: false,
-    message: '',
-    color: 'contrast' as 'contrast' | 'warning' | 'danger' | 'success' | 'primary'
-  };
-
   constructor(
     private messageService: MessageService,
     public loadController: LoadingController,
@@ -105,19 +99,13 @@ export class AlertsService {
     });
   }
 
-  /*****************Alertas para p-dialog**************/
-  PDLoading(loading: boolean) {
-    this.pd.loading = loading;
-  }
-
-  PDAlertShow(message: string, color:'contrast' | 'danger' | 'warning' | 'success' | 'primary' = 'contrast') {
-    this.pd.message = message;
-    this.pd.color = color;
-  }
-
-  PDAlertHide() {
-    this.pd.message = '';
-    this.pd.loading = false;
+  ToastZIndex() {
+    setTimeout(() => {
+      const toast = document.querySelector('.p-toast') as HTMLElement;
+      if (toast) {
+        toast.style.zIndex = '999999';
+      }
+    }, 50);
   }
 
   async ShowAlert(message: string, title: string = "Alerta", cancel: string = "Cancelar", confirm: string = "Aceptar") {//Alerta genérica para toma de desiciones
