@@ -5,6 +5,9 @@ const config: CapacitorConfig = {
   appName: 'mes',
   webDir: 'www',
   "plugins": {
+    "Keyboard": {
+      "resizeOnFullScreen": false
+    },
     "CapacitorHttp": {
       "enabled": true
     }

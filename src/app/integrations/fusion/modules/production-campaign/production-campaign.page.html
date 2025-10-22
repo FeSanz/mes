@@ -346,10 +346,8 @@
         </span>
       </div>
     </ng-template>
-
     <!-- CONTENIDO -->
     <div class="dialog-content-wrapper p-fluid p-formgrid p-grid" style="padding: 1rem;">
-
       <ion-item>
         <ion-input type="text" placeholder="Ej: CMP-001" [(ngModel)]="campaignObj.code" disabled>
           <div slot="label"><ion-text color="primary">Código:</ion-text></div>
@@ -375,14 +373,13 @@
       <ion-item>
         <ion-label style="color: var(--ion-color-primary);">Fecha de inicio:</ion-label>
         <p-datepicker slot="end" [(ngModel)]="minDate" [showTime]="true" [showIcon]="true" [readonlyInput]="true"
-          [maxDate]="maxDate" dateFormat="dd/mm/yy" hourFormat="12" [showButtonBar]="true" appendTo="body">
+          inputStyleClass="no-border-bg" [maxDate]="maxDate" dateFormat="dd/mm/yy" hourFormat="12" appendTo="body">
         </p-datepicker>
       </ion-item>
-
       <ion-item>
         <ion-label style="color: var(--ion-color-primary);">Fecha de finalización:</ion-label>
         <p-datepicker slot="end" [(ngModel)]="maxDate" [showTime]="true" [showIcon]="true" [readonlyInput]="true"
-          [minDate]="maxDate" dateFormat="dd/mm/yy" hourFormat="12" [showButtonBar]="true" appendTo="body">
+          inputStyleClass="no-border-bg" [minDate]="maxDate" dateFormat="dd/mm/yy" hourFormat="12" appendTo="body">
         </p-datepicker>
       </ion-item>
     </div>
@@ -503,7 +500,7 @@
         selectionMode="multiple" [size]="'small'" [rowHover]="false" [paginator]="true" [rows]="rowsPerPage"
         [globalFilterFields]="['work_order_number','item_number','machine_name','itemDescription','status']"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-        [showCurrentPageReport]="true" [filterDelay]="0" stripedRows >
+        [showCurrentPageReport]="true" [filterDelay]="0" stripedRows>
 
         <!-- Filtros -->
         <ng-template #caption>

@@ -43,7 +43,8 @@ import {
 
 import { NavController } from '@ionic/angular';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from "@angular/router";
-
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import {
   person, ellipsisVerticalOutline, personOutline, settingsOutline, powerOutline, homeOutline, cubeOutline,
   statsChartOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline,
@@ -65,7 +66,7 @@ import { ActionPerformed, PushNotificationSchema, PushNotifications, Token, } fr
 import { Platform } from '@ionic/angular';
 import { WebSocketService } from './services/web-socket.service';
 import { ToggleMenu } from "./models/design";
-import {ConfirmDialog} from "primeng/confirmdialog";
+import { ConfirmDialog } from "primeng/confirmdialog";
 @Component({
   selector: 'app-root',
   styleUrls: ['app.component.scss'],
@@ -138,7 +139,7 @@ export class AppComponent implements OnInit {
         this.showMenu = !event.url.includes('login');
       }
     });
-
+    this.initializeApp()
     if (this.platform.is('capacitor')) {
       PushNotifications.requestPermissions().then(result => {
         if (result.receive === 'granted') {
@@ -151,6 +152,15 @@ export class AppComponent implements OnInit {
     }
   }
 
+  async initializeApp() {
+    this.platform.ready().then(async () => {
+      if (this.platform.is('capacitor')) {
+        await EdgeToEdge.enable();
+        await EdgeToEdge.setBackgroundColor({ color: '#0054e9' }); // barra de estado + navegación
+        await StatusBar.setStyle({ style: Style.Light }); // iconos claros
+      }
+    });
+  }
   initPush(user_id: any) {
     // On success, we should be able to receive notifications
     PushNotifications.addListener('registration',

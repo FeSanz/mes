@@ -169,3 +169,40 @@ ion-datetime-button::part(native) {
   overflow: hidden;
   cursor: pointer;
 }
+
+/* Quitar borde y fondo del input */
+::ng-deep .no-border-bg {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .no-border-bg:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Estilizar el botón del calendario */
+::ng-deep .p-datepicker-dropdown {
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  color: white !important;
+  margin-left: 8px;
+}
+
+::ng-deep .p-datepicker-dropdown:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+::ng-deep .p-datepicker-dropdown:focus {
+  outline: none !important;
+}
+
+/* Ajustar el tamaño del icono SVG */
+::ng-deep .p-datepicker-dropdown svg {
+  width: 18px !important;
+  height: 18px !important;
+}
