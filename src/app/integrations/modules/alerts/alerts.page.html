@@ -26,7 +26,7 @@
         <ion-card>
           <p-table #dtAlerts [value]="alertsData" dataKey="alert_id" styleClass="card-table-primeng wo-table-custom"
             [tableStyle]="{ 'height': '100%'}" [size]="'small'" [rowHover]="true" [paginator]="true"
-            [rows]="rowsPerPage" [globalFilterFields]="['name', 'area', 'machine_name']"
+            [rows]="rowsPerPage" [globalFilterFields]="['alert_id', 'name', 'type', 'area', 'machine_name', 'status']"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
             [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true"
             [scrollHeight]="scrollHeight" [sortOrder]="1">
@@ -52,8 +52,8 @@
                 <th pSortableColumn="alert_id" class="td-center" style="min-width: 5rem">
                   <div class="flex justify-between items-center">
                     Id
-                    <p-sortIcon field="AlertId" />
-                    <p-columnFilter type="text" field="AlertId" display="menu" class="ml-auto" />
+                    <p-sortIcon field="alert_id" />
+                    <p-columnFilter type="text" field="alert_id" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="name" class="td-center" style="min-width: 7rem">
@@ -132,7 +132,7 @@
                 <td class="td-center">
                   <ion-icon
                     [color]="item.status == 'open' ? 'warning' : item.status == 'attending' ? 'danger' : item.status == 'assigned' ? 'tertiary' : item.status == 'completed' ? 'sucess' : ''"
-                    [name]="item.status == 'open' ? 'time-outline' : item.status == 'attending' ? 'warning-outline' : item.status == 'assigned' ? 'time-outline' : item.status == 'completed' ? 'checkmark-outline' : ''">
+                    [name]="item.status == 'open' ? 'hourglass-outline' : item.status == 'attending' ? 'warning-outline' : item.status == 'assigned' ? 'time-outline' : item.status == 'completed' ? 'checkmark-outline' : ''">
                   </ion-icon>
                   {{item.status == 'open' ? 'Pendiente' : item.status == 'attending' ? 'Atender' : item.status ===
                   'in_progress' ? 'Reparando' : item.status == 'completed' ? 'Finalizada' : item.status == 'assigned' ?
@@ -195,7 +195,7 @@
         <ion-card>
           <p-table #dtFinalicedAlerts [value]="finalicedAlertsData" dataKey="alert_id"
             styleClass="card-table-primeng wo-table-custom" [tableStyle]="{ 'height': '100%'}" [size]="'small'"
-            [rowHover]="true" [globalFilterFields]="['name', 'area', 'machine_name']" [filterDelay]="0" stripedRows
+            [rowHover]="true" [globalFilterFields]="['alert_id', 'name', 'type', 'area', 'machine_name', 'status']" [filterDelay]="0" stripedRows
             [scrollable]="true" [scrollHeight]="scrollHeight" [sortOrder]="1">
             <ng-template #caption>
               <div class="table-caption">
@@ -214,11 +214,11 @@
             </ng-template>
             <ng-template pTemplate="header">
               <tr>
-                <th pSortableColumn="AlertId" class="td-center" style="min-width: 5rem">
+                <th pSortableColumn="alert_id" class="td-center" style="min-width: 5rem">
                   <div class="flex justify-between items-center">
                     Id
-                    <p-sortIcon field="AlertId" />
-                    <p-columnFilter type="text" field="AlertId" display="menu" class="ml-auto" />
+                    <p-sortIcon field="alert_id" />
+                    <p-columnFilter type="text" field="alert_id" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="name" class="td-center">

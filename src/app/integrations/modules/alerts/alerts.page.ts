@@ -20,7 +20,7 @@ import { FloatLabel } from "primeng/floatlabel";
 import { Select } from "primeng/select";
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline, menuOutline, pencilOutline, timeOutline } from 'ionicons/icons';
+import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline, menuOutline, pencilOutline, timeOutline, hourglassOutline } from 'ionicons/icons';
 import { ToggleMenu } from 'src/app/models/design';
 import { DialogModule } from 'primeng/dialog';
 import { Dialog } from "primeng/dialog";
@@ -70,7 +70,7 @@ export class AlertsPage {
     this.company = this.userData.Company
     this.userData.Company.Organizations = this.userData.Company.Organizations.filter((org: any) => org.WorkMethod != null);
     this.organizationSelected = this.userData.Company.Organizations[0];
-    addIcons({ menuOutline, timeOutline, hammerOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline });
+    addIcons({ menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline });
   }
   ionViewDidEnter() {
     this.GetAlerts()
@@ -175,6 +175,8 @@ export class AlertsPage {
     this.selectedFailure = this.failures[0]
   }
   async EditAlert(alert: any) {
+    console.log(alert);
+    
     this.selectedFailure = {
       name: alert.name,
       area: alert.area,
