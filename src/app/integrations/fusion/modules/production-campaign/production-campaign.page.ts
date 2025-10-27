@@ -3,17 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonModal, IonItem, IonInput, IonDatetime, IonMenuButton, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea,
-  IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton, IonPopover, IonList, IonRippleEffect
+  IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton, IonPopover, IonList, IonRippleEffect, IonSpinner
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
 import { PermissionsService } from 'src/app/services/permissions.service';
+import { MessageService } from 'primeng/api';
 
 import { PrimeTemplate } from "primeng/api";
 import { Table, TableModule } from "primeng/table";
 import { Select } from "primeng/select";
 import { FloatLabel } from "primeng/floatlabel";
-import { pencilOutline, trashOutline, eyeOutline, reorderThreeOutline, addOutline, checkmark, moveOutline, checkmarkCircle, checkmarkOutline, unlinkOutline, backspaceOutline, menuOutline } from 'ionicons/icons';
+import { pencilOutline, trashOutline, eyeOutline, reorderThreeOutline, addOutline, checkmark, moveOutline, checkmarkCircle, checkmarkOutline, unlinkOutline, backspaceOutline, menuOutline, removeOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Tag } from "primeng/tag";
 import { ButtonModule } from "primeng/button";
@@ -24,6 +25,8 @@ import { ToggleMenu } from 'src/app/models/design';
 import { DialogModule } from 'primeng/dialog';
 import { Dialog } from "primeng/dialog";
 import { DatePicker } from 'primeng/datepicker';
+import { ProgressBar } from 'primeng/progressbar';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-production-campaign',
@@ -31,11 +34,14 @@ import { DatePicker } from 'primeng/datepicker';
   styleUrls: ['./production-campaign.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal,
+  providers: [MessageService],
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal, IonSpinner, ProgressBar, ToastModule,
     IonItem, IonInput, IonDatetime, IonMenuButton, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
     ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule, InputIconModule, DialogModule, Dialog, DatePicker, ReactiveFormsModule]
 })
 export class ProductionCampaignPage {
+  showProgressBar = false
+  segs = 10
   campaignsArray: any = []
   workOrdersArray: any = []
   freeWorkOrdersArray: any = []
@@ -97,7 +103,7 @@ export class ProductionCampaignPage {
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.organizationSelected = this.userData.Company.Organizations[1];
-    addIcons({ menuOutline, trashOutline, pencilOutline, eyeOutline, checkmark, backspaceOutline, checkmarkOutline, checkmarkCircle, addOutline, moveOutline, reorderThreeOutline });
+    addIcons({ menuOutline, trashOutline, pencilOutline, eyeOutline, checkmark, removeOutline, backspaceOutline, checkmarkOutline, checkmarkCircle, addOutline, moveOutline, reorderThreeOutline });
   }
 
   formatLocalISO(date: Date): string {
@@ -121,6 +127,7 @@ export class ProductionCampaignPage {
     })
   }
   GetCampaigns() {
+    this.showProgressBar = false
     this.apiService.GetRequestRender(`campaigns/${this.workCenter.WorkCenterId}`).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
@@ -225,8 +232,34 @@ export class ProductionCampaignPage {
   }
   async PublishToL2() {
     if (await this.alerts.ShowAlert("¿Deseas publicar esta" + (this.selectedCampaigns.length > 1 ? "s" : "") + " campaña" + (this.selectedCampaigns.length > 1 ? "s" : "") + " a Nivel 2?", "Alerta", "Atrás", "Publicar")) {
+      this.showProgressBar = true
+      for (let i = 0; i < this.currentCampaign.work_orders.length; i++) {
+        const workOrder = this.currentCampaign.work_orders[i];
 
+        // Cambiar a 'sending'
+        workOrder.status = 'sending';
+        // Esperar 10 segundos
+        await this.delay(this.segs * 1000);
+
+        // Cambiar a 'sent'
+        workOrder.status = 'sent';
+      }
     }
+  }
+  private delay(ms: number): Promise<void> {
+    this.changeDetector.detectChanges()
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  getPercentageSent(): number {
+    if (!this.currentCampaign?.work_orders?.length) {
+      return 0;
+    }
+    const totalOrders = this.currentCampaign.work_orders.length;
+    const sentOrders = this.currentCampaign.work_orders.filter(
+      (wo: any) => wo.status === 'sent'
+    ).length;
+
+    return Math.round((sentOrders / totalOrders) * 100);
   }
   async RecoveryToMES() {
     if (await this.alerts.ShowAlert("¿Deseas recuperar esta" + (this.selectedCampaigns.length > 1 ? "s" : "") + " campaña" + (this.selectedCampaigns.length > 1 ? "s" : "") + " hacia MES?", "Alerta", "Atrás", "Recuperar")) {
@@ -427,6 +460,7 @@ export class ProductionCampaignPage {
         if (this.currentCampaign.work_orders?.length > 0) {
           let payload: any = { parts: [] }
           this.currentCampaign.work_orders.forEach((item: any, index: any) => {
+            this.currentCampaign.status_telegram == 'Published to L2' ? item.status = 'sent' : item.status = 'pending'
             payload.parts.push({
               id: "part" + (index + 1),
               path: "/inventoryOnhandBalances?limit=500&totalResults=true&onlyData=true&links=canonical&fields=ItemNumber;lots:LotNumber,&q=OrganizationCode='" + this.organizationSelected.Code + "' and ItemNumber='" + item.item_number + "'",

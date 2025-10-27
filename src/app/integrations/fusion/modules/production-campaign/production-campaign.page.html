@@ -216,6 +216,9 @@
                   </div>
                 </div>
                 <div class="table-caption-right">
+                  <p-progressbar [value]="getPercentageSent()" title="Porcentaje de enviados" *ngIf="showProgressBar"
+                    [style]="{'width': '200px', 'margin-right': '10px', 'height': '30px' }"
+                    [styleClass]="'custom-progressbar'" />
                   <p-button *ngIf="currentCampaign.status_telegram == 'Unschedule'" class="btn-add" [outlined]="true"
                     icon="pi pi-arrow-right" label="Publish to MES" (click)="PublishToMES()" variant="outlined"
                     severity="warn" />
@@ -258,6 +261,7 @@
                 <!--th pSortableColumn="machine_name" class="td-center">Máquina <p-sortIcon field="machine_name" /></th-->
                 <th pSortableColumn="start_date" class="td-center">Fecha inicio <p-sortIcon field="start_date" /></th>
                 <th pSortableColumn="end_date" class="td-center">Fecha fin <p-sortIcon field="end_date" /></th>
+                <th class="td-center">Status <p-sortIcon field="end_date" /></th>
                 <!--th pSortableColumn="status">Estado <p-sortIcon field="status" /></th-->
                 <th class="td-center">Acciones</th>
               </tr>
@@ -273,7 +277,7 @@
                 [pSelectableRowDisabled]="currentCampaign.status_telegram == 'Published to L2' || currentCampaign.status_telegram != 'Unschedule'">
                 <td>
                   <p-tableCheckbox [value]="item"
-                    [disabled]="currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule'"></p-tableCheckbox>
+                    [disabled]="(currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule') || item.status == 'sent'"></p-tableCheckbox>
                 </td>
                 <td class="td-center">
                   <p-tag [value]="item.work_order_number" [severity]="'contrast'" />
@@ -281,7 +285,7 @@
                 <td class="td-center">{{ item.sequence }}</td>
                 <td class="td-center" (click)="$event.stopPropagation()">
                   <ion-button id="lot-popover-{{item.work_order_id}}" expand="block" fill="outline"
-                    [disabled]="currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule'"
+                    [disabled]="(currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule') || item.status == 'sent'"
                     [color]="item.selectedlot ? 'secondary' : 'medium'" shape="round" size="small">
                     {{ item.selectedlot || 'Seleccione lote' }}
                   </ion-button>
@@ -309,9 +313,24 @@
                     [severity]="item.status === 'UNRELEASED' ? 'info' : item.status === 'IN_PROCESS' ? 'warn' : item.status === 'COMPLETED' ? 'success' : ''">
                   </p-tag>
                 </td-->
+                <td class="td-center">
+                  <ng-container [ngSwitch]="item.status">
+                    <!-- Spinner cuando está enviando -->
+                    <ion-spinner *ngSwitchCase="'sending'" name="dots" color="secondary" slot="icon-only"
+                      title="Enviando">
+                    </ion-spinner>
+                    <!-- Icono de pendiente -->
+                    <ion-icon *ngSwitchCase="'pending'" slot="icon-only" name="remove-outline" color="warning"
+                      title="En espera">
+                    </ion-icon>
+                    <!-- Icono de enviado -->
+                    <ion-icon *ngSwitchCase="'sent'" slot="icon-only" name="checkmark" color="success" title="Enviado">
+                    </ion-icon>
+                  </ng-container>
+                </td>
                 <td class="td-center" (click)="$event.stopPropagation()">
                   <ion-button size="small" shape="round" color="danger" (click)="DeleteOrder(item)"
-                    [disabled]="currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule'"
+                    [disabled]="(currentCampaign.status_telegram != 'Published to MES' && currentCampaign.status_telegram != 'Unschedule') || item.status == 'sent'"
                     title="Eliminar de la campaña">
                     <ion-icon slot="icon-only" name="backspace-outline"></ion-icon>
                   </ion-button>

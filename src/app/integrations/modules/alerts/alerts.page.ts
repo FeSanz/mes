@@ -87,7 +87,7 @@ export class AlertsPage {
       const headerHeight = 100; // altura del header de la página
       const tableHeaderHeight = 50; // altura del header de la tabla
       const paginatorHeight = 60; // altura del paginador
-      const padding = 550; // padding extra
+      const padding = 450; // padding extra
 
       const availableHeight = viewportHeight - headerHeight - tableHeaderHeight - paginatorHeight - padding;
       const calculatedRows = Math.floor(availableHeight / rowHeight);
