@@ -99,6 +99,24 @@ export class AlertsPage {
   GetAlerts() {
     const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.apiService.GetRequestRender(`alertsByOrganizations/pendings?organizations=${orgsIds}`).then((response: any) => {
+      const item = response.items[0]
+      /*console.log(response.items);
+      if (!item.response_time && item.area) {
+        console.log(1);
+
+      } else if (!item.response_time) {
+        console.log(2);
+
+      } else if (item.response_time && !item.repair_time) {
+        console.log(3);
+
+      } else {
+        console.log(item.response_time);
+        console.log(item.repair_time);
+        console.log(item.area);
+        console.log(4);
+
+      }*/
       if (!response.errorsExistFlag) {
         this.alertsData = response.items
       } else {
@@ -107,10 +125,11 @@ export class AlertsPage {
       this.apiService.GetRequestRender(`alertsByOrganizations/finaliced?organizations=${orgsIds}`).then((response: any) => {
         if (!response.errorsExistFlag) {
           this.finalicedAlertsData = response.items
+
           this.finalicedAlertsData.forEach((alert: any) => {
-            alert.responseTimeString = this.getElapsedStartEndTime(alert.response_time, alert.repair_time)
+            alert.responseTimeString = this.getElapsedStartEndTime(alert.start_date, alert.response_time)
             alert.repairTimeString = this.getElapsedStartEndTime(alert.response_time, alert.repair_time)
-            alert.responseLegibleTimeString = this.getElapsedLegibleTime(alert.response_time, alert.repair_time)
+            alert.responseLegibleTimeString = this.getElapsedLegibleTime(alert.start_date, alert.response_time)
             alert.repairLegibleTimeString = this.getElapsedLegibleTime(alert.response_time, alert.repair_time)
           });
 
@@ -176,7 +195,7 @@ export class AlertsPage {
   }
   async EditAlert(alert: any) {
     console.log(alert);
-    
+
     this.selectedFailure = {
       name: alert.name,
       area: alert.area,
