@@ -8,6 +8,7 @@ import {
   ApexXAxis,
   ApexFill,
   ApexLegend,
+  ApexNoData,
   ApexTooltip,
   NgApexchartsModule
 } from "ng-apexcharts";
@@ -20,6 +21,7 @@ export type ChartOptions = {
   chart: ApexChart;
   fill: ApexFill;
   legend: ApexLegend;
+  noData: ApexNoData;
   xaxis: ApexXAxis;
   plotOptions: ApexPlotOptions;
   colors: string[];
@@ -54,39 +56,19 @@ export class SimpleTimelineComponent implements OnInit {
     this.company = this.userData.Company
     this.organizationSelected = this.userData.Company.Organizations[1];
     this.chartOptions = {
-      series: [
-        {
-          name: "Runtime/Downtime",
-          data: [
-            {
-              x: "Máquina 1",
-              y: [
-                new Date("2025-10-06T08:00:00").getTime(),
-                new Date("2025-10-06T09:30:00").getTime()
-              ],
-              fillColor: "#007bff",
-            },
-            {
-              x: "Máquina 1",
-              y: [
-                new Date("2025-10-06T09:30:00").getTime(),
-                new Date("2025-10-06T09:50:00").getTime()
-              ],
-              fillColor: "#dc3545",
-            },
-            {
-              x: "Máquina 1",
-              y: [
-                new Date("2025-10-06T09:50:00").getTime(),
-                new Date("2025-10-06T12:00:00").getTime()
-              ],
-              fillColor: "#007bff",
-            }]
-        }
-      ],
+      series: [],
       chart: {
         height: 350,
         type: "rangeBar"
+      },
+      noData: {
+        text: "No hay datos para mostrar",
+        align: 'center',
+        verticalAlign: 'middle',
+        style: {
+          color: '#999',
+          fontSize: '16px'
+        }
       },
       plotOptions: {
         bar: {
@@ -96,21 +78,7 @@ export class SimpleTimelineComponent implements OnInit {
         }
       },
       colors: [
-        "#008FFB",
-        "#00E396",
-        "#FEB019",
-        "#FF4560",
-        "#775DD0",
-        "#3F51B5",
-        "#546E7A",
-        "#D4526E",
-        "#8D5B4C",
-        "#F86624",
-        "#D7263D",
-        "#1B998B",
-        "#2E294E",
-        "#F46036",
-        "#E2C044"
+        "#008FFB"
       ],
       fill: {
         type: "solid"
@@ -119,7 +87,7 @@ export class SimpleTimelineComponent implements OnInit {
         type: "datetime"
       },
       legend: {
-        position: "right"
+        position: "top"
       },
       tooltip: {
         custom: function (opts) {

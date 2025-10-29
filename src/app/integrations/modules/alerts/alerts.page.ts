@@ -99,24 +99,6 @@ export class AlertsPage {
   GetAlerts() {
     const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.apiService.GetRequestRender(`alertsByOrganizations/pendings?organizations=${orgsIds}`).then((response: any) => {
-      const item = response.items[0]
-      /*console.log(response.items);
-      if (!item.response_time && item.area) {
-        console.log(1);
-
-      } else if (!item.response_time) {
-        console.log(2);
-
-      } else if (item.response_time && !item.repair_time) {
-        console.log(3);
-
-      } else {
-        console.log(item.response_time);
-        console.log(item.repair_time);
-        console.log(item.area);
-        console.log(4);
-
-      }*/
       if (!response.errorsExistFlag) {
         this.alertsData = response.items
       } else {
@@ -211,7 +193,7 @@ export class AlertsPage {
         if (!response.errorsExistFlag) {
           this.alerts.Success("Alerta actualizada")
           this.isEditAlertModalOpen = false
-          this.GetAlerts()
+          //this.GetAlerts()
         } else {
           this.alerts.Info(response.error)
         }

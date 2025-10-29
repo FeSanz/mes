@@ -92,6 +92,7 @@ export class KpisPage implements OnInit {
     this.selectedMachines = []
   }
   GetMachines() {
+    this.ResetData()
     this.apiService.GetRequestRender('orgResourceMachines/' + this.organizationSelected.OrganizationId).then((response: any) => {
       if (!response.items) {
         this.alerts.Info(response.message);
@@ -249,6 +250,14 @@ export class KpisPage implements OnInit {
     } else {
       this.selectedRowMachine = item;
       this.ViewDetails(item);
+      console.log(this.timeLineData);
+    }
+  }
+  onRowUnselect(selected: any) {
+    //this.timeLineData = this.timeLineData.filter((d: any) => d.name != item.name);
+    this.timeLineData = this.timeLineData.filter((item: any) => item.name != selected.Name);
+    if (this.selectedRowMachine && this.selectedRowMachine.Code === selected.Code) {
+      this.selectedRowMachine = null;
     }
   }
   ContarFallasPorArea(failures: any[]) {
@@ -416,8 +425,6 @@ export class KpisPage implements OnInit {
     }
 
     return merged;
-  }
-  onRowUnselect(event: any) {
   }
   protected readonly ToggleMenu = ToggleMenu;
 }

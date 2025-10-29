@@ -30,6 +30,7 @@ export type ChartOptions = {
   dataLabels: ApexDataLabels;
   plotOptions: ApexPlotOptions;
   xaxis: ApexXAxis;
+  noData: ApexNoData;
   grid: ApexGrid;
   colors: string[];
   legend: ApexLegend;
@@ -69,6 +70,15 @@ export class SimpleColumnBarComponent implements OnInit {
           data: [21, 22, 10, 28, 16]
         }
       ],
+      noData: {
+        text: "No hay datos para mostrar",
+        align: 'center',
+        verticalAlign: 'middle',
+        style: {
+          color: '#999',
+          fontSize: '16px'
+        }
+      },
       chart: {
         height: 350,
         type: "bar",

@@ -19,8 +19,8 @@
     </div>
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
-        <p-select [(ngModel)]="dateRange" inputId="date_range_select" [options]="dateRangeOptions" optionLabel="label" (onChange)="ResetData()"
-          optionValue="value" appendTo="body" />
+        <p-select [(ngModel)]="dateRange" inputId="date_range_select" [options]="dateRangeOptions" optionLabel="label"
+          (onChange)="ResetData()" optionValue="value" appendTo="body" />
         <label for="date_range_select">Período</label>
       </p-floatlabel>
     </div>
@@ -34,7 +34,8 @@
           <p-table #dtCampaigns [value]="machinesArray" dataKey="Code" styleClass="card-table-primeng wo-table-custom"
             [tableStyle]="{ 'height': '100%'}" [size]="'small'" [rowHover]="true" [paginator]="true"
             [rows]="rowsPerPage" [selectionMode]="'multiple'" [(selection)]="selectedMachines"
-            [globalFilterFields]="['code', 'name', 'status', 'coils']"(onRowSelect)="toggleRowSelection($event.data)" (onRowUnselect)="onRowUnselect($event.data)" 
+            [globalFilterFields]="['code', 'name', 'status', 'coils']" (onRowSelect)="toggleRowSelection($event.data)"
+            (onRowUnselect)="onRowUnselect($event.data)"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true"
             [scrollHeight]="scrollHeight" [sortOrder]="1">
@@ -101,15 +102,13 @@
                   <strong>{{ item.Name }}</strong>
                 </td>
                 <td class="td-center">
-                  <p-tag [value]="item.Status" [severity]="item.Status === 'No Signal'? 'warn': 
-        item.Status === 'Downtime'? 'danger': item.Status === 'Runtime'
-        ? 'success': 'danger'"></p-tag>
+                  <p-tag [value]="item.Status"
+                    [severity]="item.Status === 'No Signal' ? 'warn' : item.Status === 'Downtime' ? 'danger' : item.Status === 'Runtime' ? 'success' : 'danger'"></p-tag>
                 </td>
                 <td class="td-center action-cell">
                   <ion-icon *ngIf="selectedRowMachine == item" name="checkmark-circle" class="checkmark-icon"
                     color="success"></ion-icon>
                 </td>
-
                 <ion-ripple-effect></ion-ripple-effect>
               </tr>
             </ng-template>

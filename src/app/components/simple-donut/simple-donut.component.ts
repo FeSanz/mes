@@ -3,12 +3,14 @@ import { NgApexchartsModule, ChartComponent } from 'ng-apexcharts';
 import {
   ApexNonAxisChartSeries,
   ApexResponsive,
+  ApexNoData,
   ApexChart
 } from "ng-apexcharts";
 
 export type ChartOptions = {
   series: ApexNonAxisChartSeries;
   chart: ApexChart;
+  noData: ApexNoData;
   colors: string[],
   responsive: ApexResponsive[];
   labels: any;
@@ -33,10 +35,19 @@ export class SimpleDonutComponent implements OnInit {
   constructor() {
 
     this.chartOptions = {
-      series: [44, 55], // Para donut/pie, esto es correcto como array de números
+      series: [], // Para donut/pie, esto es correcto como array de números
       chart: {
         height: 350,
         type: "donut"
+      },
+      noData: {
+        text: "No hay datos para mostrar",
+        align: 'center',
+        verticalAlign: 'middle',
+        style: {
+          color: '#999',
+          fontSize: '16px'
+        }
       },
       labels: ["Runtime", "Downtime"],
       colors: ['#42a7f0', '#eb445a'],
@@ -60,9 +71,13 @@ export class SimpleDonutComponent implements OnInit {
   ngOnInit() {
   }
   updateChart() {
-    this.chartOptions.series = [this.data['runtimePercentage'], this.data['downtimePercentage']]
-    if (this.chart && this.chart.updateSeries) {
-      this.chart.updateSeries(this.chartOptions.series);
+    if (this.data['runtimePercentage']) {
+      this.chartOptions.series = [this.data['runtimePercentage'], this.data['downtimePercentage']]
+      if (this.chart && this.chart.updateSeries) {
+        this.chart.updateSeries(this.chartOptions.series);
+      }
+    } else {
+      this.chartOptions.series = []
     }
   }
 
