@@ -16,7 +16,7 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    // margin-top: 20px;    
+    // margin-top: 20px;
 }
 
 h3 {
@@ -62,7 +62,7 @@ ion-input {
 ion-content {
     --background: none; // Evita el fondo blanco por defecto
 
-    background-image: url('/assets/images/desktop.jpg');
+    background-image: url('/assets/images/background01.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -276,7 +276,7 @@ ion-toolbar {
         --offset-top: 0 !important;
 
         &::part(scroll) {
-            padding-top: 0 !important;            
+            padding-top: 0 !important;
         }
     }
 
@@ -356,7 +356,7 @@ ion-toolbar {
 
 ::ng-deep body .p-paginator {
     color: #ffffff !important;
-    
+
     .p-paginator-current,
     .p-paginator-first,
     .p-paginator-prev,
@@ -365,7 +365,7 @@ ion-toolbar {
     .p-paginator-last {
         color: #ffffff !important;
     }
-    
+
     .p-dropdown-label {
         color: #ffffff !important;
     }
@@ -379,16 +379,16 @@ ion-toolbar {
     left: 50% !important;
     transform: translateX(-50%) !important;
     z-index: 1000 !important;
-    
+
     // Fondo para mejor contraste
     background: rgba(0, 0, 0, 0.3) !important;
     padding: 8px 16px !important;
     border-radius: 20px !important;
   }
-  
+
   ::ng-deep .swiper-pagination-bullet {
     background: rgba(255, 255, 255, 0.7) !important;
-    
+
     &.swiper-pagination-bullet-active {
       background: #fd5d93 !important;
     }

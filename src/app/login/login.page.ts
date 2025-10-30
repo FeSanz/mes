@@ -2,8 +2,26 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent, IonHeader, IonTitle, IonText, IonButton, IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonCheckbox, IonInput, IonItem,
-  IonIcon, IonMenuButton, IonButtons, IonToolbar, IonInputPasswordToggle, IonFooter, IonToggle
+  IonContent,
+  IonHeader,
+  IonTitle,
+  IonText,
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardTitle,
+  IonCardHeader,
+  IonCheckbox,
+  IonInput,
+  IonItem,
+  IonIcon,
+  IonMenuButton,
+  IonButtons,
+  IonToolbar,
+  IonInputPasswordToggle,
+  IonFooter,
+  IonToggle,
+  IonAvatar
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { businessOutline, lockClosedOutline, personOutline } from 'ionicons/icons';
@@ -20,7 +38,7 @@ import { WebSocketService } from '../services/web-socket.service';
   styleUrls: ['./login.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, CommonModule, FormsModule, IonText, IonButton, IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonCheckbox,
-    IonInput, IonItem, IonIcon, IonMenuButton, IonButtons, IonToolbar, IonInputPasswordToggle, IonFooter, IonToggle]
+    IonInput, IonItem, IonIcon, IonMenuButton, IonButtons, IonToolbar, IonInputPasswordToggle, IonFooter, IonToggle, IonAvatar]
 })
 export class LoginPage {
   entity: string = ""

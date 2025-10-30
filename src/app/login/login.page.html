@@ -1,27 +1,24 @@
-<ion-header [translucent]="true" style="box-shadow: none !important;">
-  <ion-toolbar color="primary">
-    
+<ion-header [translucent]="true" class="ion-no-border" style="display: none;">
+  <ion-toolbar>
     <ion-title>Inicio de sesión</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding" [fullscreen]="true">
+<ion-content class="ion-padding" [fullscreen]="true" style="--offset-top: 0 !important;">
   <div class="login-container">
-    <ion-card class="login-card">
-      <ion-item lines="none" class="invisible">
-      </ion-item>
+    <ion-card class="login-card"><br>
       <ion-card-header>
         <ion-card-title class="login-title ion-text-center">Login</ion-card-title>
       </ion-card-header>
 
+      <div class="avatar-container">
+        <ion-avatar class="login-avatar">
+          <ion-icon name="person" size="large"></ion-icon>
+          <!--<img src="assets/icon/mes_logo_white_l.png" alt="avatar">-->
+        </ion-avatar>
+      </div>
+
       <ion-card-content>
-        <ion-item lines="none" class="invisible">
-        </ion-item>
-        <!--ion-item lines="none">
-          <ion-input placeholder="Entidad" fill="outline">
-            <ion-icon name="business-outline" slot="start" aria-hidden="true" color="white"></ion-icon>
-          </ion-input>
-        </ion-item-->
         <ion-item lines="none" class="invisible">
           <ion-input placeholder="Usuario" type="email" fill="outline" [(ngModel)]="username" name="username"
             autocomplete="username">
@@ -36,8 +33,11 @@
               style="--color: white; --placeholder-color: rgba(255, 255, 255, 0.5);"></ion-input-password-toggle>
           </ion-input>
         </ion-item>
-        <ion-item lines="none" class="invisible"><ion-checkbox justify="end" [(ngModel)]="authRemember"
-            color="primary"><span style="color: var(--ion-color-white)">Recordarme</span></ion-checkbox> </ion-item>
+        <ion-item lines="none" class="invisible">
+          <ion-checkbox justify="end" [(ngModel)]="authRemember"
+            color="primary"><span style="color: var(--ion-color-white)">Recordarme</span>
+          </ion-checkbox>
+        </ion-item>
         <ion-item lines="none" class="invisible"> </ion-item>
         <ion-button expand="block" class="login-btn" (click)="LogIn()">Iniciar sesión</ion-button>
 
@@ -45,7 +45,6 @@
           <ion-text color="medium">Olvidé mi contraseña</ion-text>
         </div>
 
-        <ion-item lines="none" class="invisible"> </ion-item>
         <ion-item lines="none" class="invisible"> </ion-item>
         <div class="signup ion-text-center">
           <ion-text style="color: white">No eres miembro <strong><span class="signup-link">Regístrate
