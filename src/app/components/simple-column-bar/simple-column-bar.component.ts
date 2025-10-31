@@ -90,9 +90,9 @@ export class SimpleColumnBarComponent implements OnInit {
       },
       colors: [
         "#008FFB",
+        "#FF4560",
         "#00E396",
         "#FEB019",
-        "#FF4560",
         "#775DD0",
       ],
       plotOptions: {

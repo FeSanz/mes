@@ -166,15 +166,15 @@
                 <ion-button *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time" size="small"
                   color="success" (click)="FinaliceAlert(item)"> Finalizar </ion-button-->
                   <ion-button size="small" shape="round" color="warning" (click)="AttendAlert(item)" title="Atender"
-                    *ngIf="permissions.isSuperAdmin() && !item.response_time && item.area">
+                    *ngIf="!permissions.isViewer() && !item.response_time && item.area">
                     <ion-icon slot="icon-only" name="hammer-outline"></ion-icon>
                   </ion-button>
                   <ion-button size="small" shape="round" color="secondary" (click)="EditAlert(item)" title="Editar"
-                    *ngIf="permissions.isSuperAdmin() && !item.response_time">
+                    *ngIf="!permissions.isViewer() && !item.response_time">
                     <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
                   </ion-button>
                   <ion-button size="small" shape="round" color="success" (click)="FinaliceAlert(item)" title="Finalizar"
-                    *ngIf="permissions.isSuperAdmin() && item.response_time && !item.repair_time">
+                    *ngIf="!permissions.isViewer() && item.response_time && !item.repair_time">
                     <ion-icon slot="icon-only" name="checkmark-outline"></ion-icon>
                   </ion-button>
                 </td>

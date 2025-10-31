@@ -336,7 +336,7 @@ export class AppComponent implements OnInit {
         if (!response.errorsExistFlag) {
           this.dashboardGroups = this.dashboardGroups.filter((dash: any) => dash.dashboard_group_id !== dashId);
           this.changeDetector.detectChanges()
-          this.alerts.Success("Dashboard eliminado");
+          this.alerts.Success("Grupo de dashboards eliminado");
         } else {
           this.alerts.Info(response.error);
         }

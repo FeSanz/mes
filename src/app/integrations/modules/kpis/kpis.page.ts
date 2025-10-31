@@ -45,6 +45,7 @@ export class KpisPage implements OnInit {
   donutData: any = []
   barsData: any = []
   timeLineData: any = []
+  donutFailuresData: any = []
   dateRangeOptions = [
     { label: 'Hoy', value: 'today' },
     { label: 'Últimas 24 horas', value: '24hours' },
@@ -88,8 +89,10 @@ export class KpisPage implements OnInit {
   ResetData() {
     this.donutData = []
     this.timeLineData = []
+    this.donutFailuresData = []
     this.selectedMachine = {}
     this.selectedMachines = []
+    this.selectedRowMachine = []
   }
   GetMachines() {
     this.ResetData()
@@ -122,8 +125,6 @@ export class KpisPage implements OnInit {
   }
   ViewDetails(item: any) {
     this.apiService.GetRequestRender('alertsInterval/' + item.MachineId + '/' + this.dateRange).then((response: any) => {
-      console.log(response);
-
       if (response.errorsExistFlag == true) {
         //this.alerts.Info(response.message);
       } else {
@@ -137,10 +138,22 @@ export class KpisPage implements OnInit {
           runtimeHours: 0,
           downtimeHours: 0
         }
-        this.barsData = response.items ? this.ContarFallasPorArea(response.items) : ''
-        this.donutData = donutRes
+        const failures = response.items ? this.ContarFallasPorArea(response.items) : ''
+        this.barsData = failures
+
+        this.donutData = {
+          "Runtime": true,
+          "Labels": ["Runtime", "Downtime"],
+          "Data": donutRes
+        }
+        this.donutFailuresData = {
+          "Failures": true,
+          "Labels": Object.keys(failures),
+          "Data": Object.values(failures)
+        }
         if (this.timeLineData.length == 0) {
           const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
+
           this.timeLineData = [timeLineRes[0]]
         } else {
           const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
@@ -250,7 +263,6 @@ export class KpisPage implements OnInit {
     } else {
       this.selectedRowMachine = item;
       this.ViewDetails(item);
-      console.log(this.timeLineData);
     }
   }
   onRowUnselect(selected: any) {

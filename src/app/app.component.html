@@ -245,14 +245,14 @@
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/grid-data']" routerLinkActive="selected" detail="false"
+                        <ion-item [routerLink]="['/grid-data']" routerLinkActive="selected" detail="false" *ngIf="permissions.isSuperAdmin()"
                           button lines="none" class="submenu-item">
                           <ion-icon slot="start" name="build-outline"></ion-icon>
                           <ion-label>Registros</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/fusion_connection']" routerLinkActive="selected" detail="false"
+                        <ion-item [routerLink]="['/fusion_connection']" routerLinkActive="selected" detail="false" *ngIf="permissions.isSuperAdmin()"
                           button lines="none" class="submenu-item">
                           <ion-icon slot="start" name="git-network-outline"></ion-icon>
                           <ion-label>Integraciones</ion-label>

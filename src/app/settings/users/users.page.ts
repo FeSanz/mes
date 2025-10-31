@@ -40,7 +40,7 @@ export class UsersPage implements OnInit {
   isModalOpen = false;
   isSmallScreen = false;
   user: any = {
-    role: 'Viewer',
+    role: 'Admin',
     name: '',
     organizations: [],
     type: 'USER',
@@ -188,7 +188,7 @@ export class UsersPage implements OnInit {
   }
   resetUser() {//se reinician los datos del usuario nuevo o a editar
     this.user = {
-      role: 'Viewer',
+      role: 'Admin',
       name: '',
       organizations: [],
       type: 'USER',

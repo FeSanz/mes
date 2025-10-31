@@ -49,8 +49,14 @@ export class SimpleDonutComponent implements OnInit {
           fontSize: '16px'
         }
       },
-      labels: ["Runtime", "Downtime"],
-      colors: ['#42a7f0', '#eb445a'],
+      labels: [],
+      colors: [
+        "#008FFB",
+        "#FF4560",
+        "#00E396",
+        "#FEB019",
+        "#775DD0"
+      ],
       responsive: [
         {
           breakpoint: 5,
@@ -71,10 +77,23 @@ export class SimpleDonutComponent implements OnInit {
   ngOnInit() {
   }
   updateChart() {
-    if (this.data['runtimePercentage']) {
-      this.chartOptions.series = [this.data['runtimePercentage'], this.data['downtimePercentage']]
-      if (this.chart && this.chart.updateSeries) {
-        this.chart.updateSeries(this.chartOptions.series);
+    if (this.data['Runtime']) {
+      this.chartOptions.series = [this.data['Data'].runtimePercentage, this.data['Data'].downtimePercentage]
+      this.chartOptions.labels = this.data['Labels']
+      if (this.chart && this.chart.updateOptions) {
+        this.chart.updateOptions({
+          series: this.chartOptions.series,
+          labels: this.chartOptions.labels
+        });
+      }
+    } else if (this.data['Failures']) {
+      this.chartOptions.series = this.data['Data']
+      this.chartOptions.labels = this.data['Labels']
+      if (this.chart && this.chart.updateOptions) {
+        this.chart.updateOptions({
+          series: this.chartOptions.series,
+          labels: this.chartOptions.labels
+        });
       }
     } else {
       this.chartOptions.series = []

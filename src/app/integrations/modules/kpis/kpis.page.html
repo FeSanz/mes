@@ -34,7 +34,7 @@
           <p-table #dtCampaigns [value]="machinesArray" dataKey="Code" styleClass="card-table-primeng wo-table-custom"
             [tableStyle]="{ 'height': '100%'}" [size]="'small'" [rowHover]="true" [paginator]="true"
             [rows]="rowsPerPage" [selectionMode]="'multiple'" [(selection)]="selectedMachines"
-            [globalFilterFields]="['code', 'name', 'status', 'coils']" (onRowSelect)="toggleRowSelection($event.data)"
+            [globalFilterFields]="['Code', 'Name', 'Status']" (onRowSelect)="toggleRowSelection($event.data)"
             (onRowUnselect)="onRowUnselect($event.data)"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
             [showCurrentPageReport]="true" [filterDelay]="0" stripedRows [scrollable]="true"
@@ -133,12 +133,22 @@
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-col size="6">
+      <ion-col size="4">
         <ion-card class="graphic">
           <ion-card-header>
             <ion-card-title>Estadísticas</ion-card-title>
           </ion-card-header>
           <app-simple-donut [data]="donutData"></app-simple-donut>
+          <ion-card-content>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="4">
+        <ion-card class="graphic">
+          <ion-card-header>
+            <ion-card-title>Fallas por área</ion-card-title>
+          </ion-card-header>
+          <app-simple-donut [data]="donutFailuresData"></app-simple-donut>
           <ion-card-content>
           </ion-card-content>
         </ion-card>
@@ -153,10 +163,10 @@
           </ion-card-content>
         </ion-card>
       </ion-col-->
-      <ion-col size="6">
+      <ion-col size="4">
         <ion-card class="graphic">
           <ion-card-header>
-            <ion-card-title>Areas más recurrentes</ion-card-title>
+            <ion-card-title>Fallas por area</ion-card-title>
           </ion-card-header>
           <app-simple-column-bar [data]="barsData"></app-simple-column-bar>
           <ion-card-content>
