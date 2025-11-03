@@ -65,8 +65,9 @@ export class KpisPage implements OnInit {
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
-    this.organizationSelected = this.userData.Company.Organizations[0];
     addIcons({ menuOutline, checkmarkCircle, trashOutline, pencilOutline, eyeOutline, hammerOutline, checkmarkOutline, timeOutline });
+    localStorage.getItem("organizationSelected") ? this.organizationSelected = JSON.parse(localStorage.getItem("organizationSelected") || '{}') : null
+    localStorage.getItem("dateRange") ? this.dateRange = localStorage.getItem("dateRange") : null
     //this.donutData = this.generarValores();
   }
   generarValores() {
@@ -87,6 +88,8 @@ export class KpisPage implements OnInit {
     this.GetMachines()
   }
   ResetData() {
+    localStorage.setItem("organizationSelected", JSON.stringify(this.organizationSelected))
+    localStorage.setItem("dateRange", this.dateRange)
     this.donutData = []
     this.timeLineData = []
     this.donutFailuresData = []

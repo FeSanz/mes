@@ -67,6 +67,7 @@ import { Platform } from '@ionic/angular';
 import { WebSocketService } from './services/web-socket.service';
 import { ToggleMenu } from "./models/design";
 import { ConfirmDialog } from "primeng/confirmdialog";
+import { Device } from '@capacitor/device';
 @Component({
   selector: 'app-root',
   styleUrls: ['app.component.scss'],
@@ -141,7 +142,7 @@ export class AppComponent implements OnInit {
     });
     this.initializeApp()
     if (this.platform.is('capacitor')) {
-      PushNotifications.requestPermissions().then(result => {
+      PushNotifications.requestPermissions().then(async result => {
         if (result.receive === 'granted') {
           // Register with Apple / Google to receive push via APNS/FCM
           PushNotifications.register();
@@ -164,12 +165,15 @@ export class AppComponent implements OnInit {
   initPush(user_id: any) {
     // On success, we should be able to receive notifications
     PushNotifications.addListener('registration',
-      (token: Token) => {
+      async (token: Token) => {
+        const info = await Device.getInfo();
         const body = {
           user_id: user_id,
-          token: token.value
-        }
+          token: token.value,
+          model : info.model
+        }        
         this.api.PostRequestRender('registerPushToken', body, false).then((response: any) => {
+        console.log(response);
           if (!response.errorsExistFlag) {
             this.changeDetector.detectChanges()
           } else {
