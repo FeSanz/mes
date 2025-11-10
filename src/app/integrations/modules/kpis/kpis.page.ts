@@ -66,7 +66,7 @@ export class KpisPage implements OnInit {
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     addIcons({ menuOutline, checkmarkCircle, trashOutline, pencilOutline, eyeOutline, hammerOutline, checkmarkOutline, timeOutline });
-    localStorage.getItem("organizationSelected") ? this.organizationSelected = JSON.parse(localStorage.getItem("organizationSelected") || '{}') : null
+    this.organizationSelected = localStorage.getItem("organizationSelected") ? JSON.parse(localStorage.getItem("organizationSelected") || '{}') : this.userData.Company.Organizations[0]
     localStorage.getItem("dateRange") ? this.dateRange = localStorage.getItem("dateRange") : null
     //this.donutData = this.generarValores();
   }

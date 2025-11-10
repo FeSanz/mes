@@ -2,11 +2,11 @@
   <p-confirmDialog [style]="{ width: '450px' }" />
   <ion-split-pane contentId="main-content" when="(min-width: 2000px)">
     <ion-menu contentId="main-content" type="overlay" *ngIf="showMenu">
-    <ion-header class="background-header">
-      <ion-toolbar>
-        <ion-title></ion-title>
-      </ion-toolbar>
-    </ion-header>
+      <ion-header class="background-header">
+        <ion-toolbar>
+          <ion-title></ion-title>
+        </ion-toolbar>
+      </ion-header>
       <div class="menu-wrapper">
         <!-- Panel completo -->
         <div class="menu-panel">
@@ -29,7 +29,8 @@
                   <h3>{{ username }}</h3>
                   <p>Ver perfil</p>
                 </div>
-                <ion-button fill="clear" id="popover-button-user" class="button-panel" (click)="$event.stopPropagation()">
+                <ion-button fill="clear" id="popover-button-user" class="button-panel"
+                  (click)="$event.stopPropagation()">
                   <ion-icon name="ellipsis-vertical-outline"></ion-icon>
                 </ion-button>
               </div>
@@ -66,8 +67,8 @@
                 <ion-text> NAVEGACIÓN</ion-text>
               </div>
               <!-- Acordeón de Tableros -->
-              <ion-accordion-group [multiple]="true" [value]="['dash']">
-                <ion-accordion value="dash">
+              <ion-accordion-group [multiple]="true" [value]="accordeon">
+                <ion-accordion value="dash" *ngIf="!permissions.isAndon()">
                   <ion-item slot="header" lines="none" button class="menu-header-item">
                     <ion-icon slot="start" name="pie-chart-outline" class="menu-icon"></ion-icon>
                     <ion-label class="menu-label">Tableros</ion-label>
@@ -138,7 +139,7 @@
                 </ion-accordion>
 
                 <!-- Sensores -->
-                <ion-accordion value="iot" *ngIf="!permissions.isViewer()">
+                <ion-accordion value="iot" *ngIf="!permissions.isViewer() && !permissions.isAndon()">
                   <ion-item slot="header" lines="none" button class="menu-header-item">
                     <ion-icon slot="start" name="radio-outline" class="menu-icon"></ion-icon>
                     <ion-label class="menu-label">Sensores</ion-label>
@@ -157,7 +158,7 @@
                 </ion-accordion>
 
                 <!-- Manufactura -->
-                <ion-accordion value="mfg" *ngIf="!permissions.isViewer()">
+                <ion-accordion value="mfg" *ngIf="!permissions.isViewer() && !permissions.isAndon()">
                   <ion-item slot="header" lines="none" button class="menu-header-item">
                     <ion-icon slot="start" name="cube-outline" class="menu-icon"></ion-icon>
                     <ion-label class="menu-label">Manufactura</ion-label>
@@ -206,7 +207,7 @@
                     <ion-list class="menu-list">
                       <ion-menu-toggle auto-hide="false">
                         <ion-item routerLinkActive="selected" detail="false" button [routerLink]="['/failures']"
-                                  lines="none" class="submenu-item">
+                          lines="none" class="submenu-item">
                           <ion-icon slot="start" name="warning-outline"></ion-icon>
                           <ion-label>Fallas</ion-label>
                         </ion-item>
@@ -230,7 +231,7 @@
                 </ion-accordion>
 
                 <!-- Configuraciones -->
-                <ion-accordion value="settings" *ngIf="!permissions.isViewer()">
+                <ion-accordion value="settings" *ngIf="!permissions.isViewer() && !permissions.isAndon()">
                   <ion-item slot="header" lines="none" button class="menu-header-item">
                     <ion-icon slot="start" name="settings-outline" class="menu-icon"></ion-icon>
                     <ion-label class="menu-label">Configuraciones</ion-label>
@@ -245,15 +246,15 @@
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/grid-data']" routerLinkActive="selected" detail="false" *ngIf="permissions.isSuperAdmin()"
-                          button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/grid-data']" routerLinkActive="selected" detail="false"
+                          *ngIf="permissions.isSuperAdmin()" button lines="none" class="submenu-item">
                           <ion-icon slot="start" name="build-outline"></ion-icon>
                           <ion-label>Registros</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
-                        <ion-item [routerLink]="['/fusion_connection']" routerLinkActive="selected" detail="false" *ngIf="permissions.isSuperAdmin()"
-                          button lines="none" class="submenu-item">
+                        <ion-item [routerLink]="['/fusion_connection']" routerLinkActive="selected" detail="false"
+                          *ngIf="permissions.isSuperAdmin()" button lines="none" class="submenu-item">
                           <ion-icon slot="start" name="git-network-outline"></ion-icon>
                           <ion-label>Integraciones</ion-label>
                         </ion-item>
@@ -268,7 +269,7 @@
           <!-- Footer -->
           <ion-footer class="menu-footer ion-no-border">
             <ion-toolbar>
-              <ion-item lines="none">
+              <ion-item lines="none" *ngIf="!permissions.isAndon()">
                 <ion-label>Servidor remoto</ion-label>
                 <ion-toggle slot="end" [(ngModel)]="remoteServer" (ionChange)="ChangeServerMode()"
                   color="primary"></ion-toggle>

@@ -90,6 +90,7 @@ export class AppComponent implements OnInit {
     created_by: "",
     isNew: true
   }
+  accordeon = ['dash']
   isModalOpen = false
   user: any = {}
   showMenu = false;
@@ -118,6 +119,7 @@ export class AppComponent implements OnInit {
     const rawData = localStorage.getItem("userData");
     try {
       this.user = rawData ? JSON.parse(rawData) : {};
+      this.accordeon = permissions.isAndon() ? ['mtto'] : ['dash']
     } catch (e) {
       this.user = {};
     }
@@ -170,10 +172,10 @@ export class AppComponent implements OnInit {
         const body = {
           user_id: user_id,
           token: token.value,
-          model : info.model
-        }        
+          model: info.model
+        }
         this.api.PostRequestRender('registerPushToken', body, false).then((response: any) => {
-        console.log(response);
+          //console.log(response);
           if (!response.errorsExistFlag) {
             this.changeDetector.detectChanges()
           } else {
@@ -381,20 +383,25 @@ export class AppComponent implements OnInit {
         this.alerts.Info(response.message);
       } else {
         this.permissions.reloadUserData()
-        this.dashboardGroups = response.items
-        //console.log(response.items);
-        if (response.items[0]) {
-          this.router.navigate(['/monitoring/' + response.items[0].dashboard_group_id], {
-            state: {
-              dash: response.items[0]
-            }
-          });
+        if (this.permissions.isAndon()) {
+          this.accordeon = ['mtto']
+          this.router.navigate(['/alerts']);
         } else {
-          this.router.navigate(['/settings/users'], {
-            state: {
-              dash: response.items[0]
-            }
-          });
+          this.dashboardGroups = response.items
+          //console.log(response.items);
+          if (response.items[0]) {
+            this.router.navigate(['/monitoring/' + response.items[0].dashboard_group_id], {
+              state: {
+                dash: response.items[0]
+              }
+            });
+          } else {
+            this.router.navigate(['/settings/users'], {
+              state: {
+                dash: response.items[0]
+              }
+            });
+          }
         }
       }
     })

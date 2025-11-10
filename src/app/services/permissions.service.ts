@@ -25,10 +25,15 @@ export class PermissionsService {
   isViewer(): boolean {
     return this.user?.Role === 'Viewer';
   }
+  
+  isAndon(): boolean {
+    return this.user?.Role === 'Andon';
+  }
 
   canEdit(): boolean {
     return this.isAdmin() || this.isSuperAdmin();
   }
+
   reloadUserData() {
     this.user = JSON.parse(String(localStorage.getItem("userData") == "undefined" ? "{}" : localStorage.getItem("userData")))
   }
