@@ -84,7 +84,11 @@ export class SimpleTimelineComponent implements OnInit {
         type: "solid"
       },
       xaxis: {
-        type: "datetime"
+        type: "datetime",
+        labels: {
+          datetimeUTC: false,
+          //format: 'hh:mm a' // ← 12 horas con AM/PM
+        }
       },
       legend: {
         position: "top"
@@ -150,8 +154,9 @@ export class SimpleTimelineComponent implements OnInit {
       }
     };
   }
-  ngOnInit() { }
+  ngOnInit() {
 
+  }
   updateChart() {
     if (this.data) {
       this.chartOptions.series = this.data['map']((group: any) => ({

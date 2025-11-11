@@ -98,7 +98,7 @@ export class AlertsPage {
   }
   GetAlerts() {
     const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
-    this.apiService.GetRequestRender(`alertsByOrganizations/pendings?organizations=${orgsIds}`).then((response: any) => {
+    this.apiService.GetRequestRender(`alertsByOrganizations/pendings?organizations=${orgsIds}` + (this.permissions.isAndon() ? '?start_date=' + new Date().setHours(10, 0, 0, 0) : '')).then((response: any) => {
       if (!response.errorsExistFlag) {
         this.alertsData = response.items
       } else {
