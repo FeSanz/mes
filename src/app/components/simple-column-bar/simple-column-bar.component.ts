@@ -89,11 +89,16 @@ export class SimpleColumnBarComponent implements OnInit {
         }
       },
       colors: [
-        "#008FFB",
-        "#FF4560",
-        "#00E396",
-        "#FEB019",
-        "#775DD0",
+        "#008FFB",  // Azul
+        "#FF4560",  // Rojo
+        "#00E396",  // Verde
+        "#FEB019",  // Naranja
+        "#775DD0",  // Morado
+        "#FF6178",  // Rosa
+        "#26A0FC",  // Azul claro
+        "#26E7A6",  // Verde menta
+        "#FEBC3B",  // Amarillo
+        "#FF6B9D"   // Rosa fuerte
       ],
       plotOptions: {
         bar: {

@@ -12,6 +12,8 @@ export type ChartOptions = {
   chart: ApexChart;
   noData: ApexNoData;
   colors: string[],
+  legend: ApexLegend,
+  plotOptions: ApexPlotOptions;
   responsive: ApexResponsive[];
   labels: any;
 };
@@ -33,9 +35,12 @@ export class SimpleDonutComponent implements OnInit {
   public chartOptions: ChartOptions;
   @Input() data: data = {};
   constructor() {
-
     this.chartOptions = {
       series: [], // Para donut/pie, esto es correcto como array de números
+      legend: {
+        position: "bottom",
+        horizontalAlign: "center"
+      },
       chart: {
         height: 350,
         type: "donut"
@@ -49,13 +54,25 @@ export class SimpleDonutComponent implements OnInit {
           fontSize: '16px'
         }
       },
+      plotOptions: {
+        bar: {
+          horizontal: true,
+          barHeight: "50%",
+          rangeBarGroupRows: true
+        }
+      },
       labels: [],
       colors: [
-        "#008FFB",
-        "#FF4560",
-        "#00E396",
-        "#FEB019",
-        "#775DD0"
+        "#008FFB",  // Azul
+        "#FF4560",  // Rojo
+        "#00E396",  // Verde
+        "#FEB019",  // Naranja
+        "#775DD0",  // Morado
+        "#FF6178",  // Rosa
+        "#26A0FC",  // Azul claro
+        "#26E7A6",  // Verde menta
+        "#FEBC3B",  // Amarillo
+        "#FF6B9D"   // Rosa fuerte
       ],
       responsive: [
         {

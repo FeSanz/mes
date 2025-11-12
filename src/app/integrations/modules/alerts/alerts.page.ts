@@ -68,7 +68,7 @@ export class AlertsPage {
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.company = this.userData.Company
-    this.userData.Company.Organizations = this.userData.Company.Organizations.filter((org: any) => org.WorkMethod != null);
+    //this.userData.Company.Organizations = this.userData.Company.Organizations.filter((org: any) => org.WorkMethod != null);
     this.organizationSelected = this.userData.Company.Organizations[0];
     addIcons({ menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline });
   }

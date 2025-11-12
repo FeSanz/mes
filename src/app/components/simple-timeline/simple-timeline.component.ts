@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 
 import {
   ChartComponent,
@@ -12,9 +12,6 @@ import {
   ApexTooltip,
   NgApexchartsModule
 } from "ng-apexcharts";
-import { AlertsService } from 'src/app/services/alerts.service';
-import { ApiService } from 'src/app/services/api.service';
-import { PermissionsService } from 'src/app/services/permissions.service';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -44,17 +41,7 @@ export class SimpleTimelineComponent implements OnInit {
   @Input() data: data = {};
   @ViewChild("timelineChart", { static: false }) chart: ChartComponent | undefined;
   public chartOptions: ChartOptions;
-  organizationSelected: string | any = '';
-  userData: any = {};
-  company: any = {}
-  constructor(
-    private alerts: AlertsService,
-    private apiService: ApiService,
-    public permissions: PermissionsService,
-    private changeDetector: ChangeDetectorRef) {
-    this.userData = JSON.parse(String(localStorage.getItem("userData")));
-    this.company = this.userData.Company
-    this.organizationSelected = this.userData.Company.Organizations[1];
+  constructor() {
     this.chartOptions = {
       series: [],
       chart: {
@@ -78,7 +65,16 @@ export class SimpleTimelineComponent implements OnInit {
         }
       },
       colors: [
-        "#008FFB"
+        "#008FFB",  // Azul
+        "#FF4560",  // Rojo
+        "#00E396",  // Verde
+        "#FEB019",  // Naranja
+        "#775DD0",  // Morado
+        "#FF6178",  // Rosa
+        "#26A0FC",  // Azul claro
+        "#26E7A6",  // Verde menta
+        "#FEBC3B",  // Amarillo
+        "#FF6B9D"   // Rosa fuerte
       ],
       fill: {
         type: "solid"

@@ -23,6 +23,7 @@ import { SimpleDonutComponent } from 'src/app/components/simple-donut/simple-don
 import { SimpleHeatmapComponent } from 'src/app/components/simple-heatmap/simple-heatmap.component';
 import { SimpleColumnBarComponent } from 'src/app/components/simple-column-bar/simple-column-bar.component';
 import { SimpleTimelineComponent } from 'src/app/components/simple-timeline/simple-timeline.component';
+import { SimpleStackedColumnsComponent } from 'src/app/components/simple-stacked-columns/simple-stacked-columns.component';
 
 @Component({
   selector: 'app-kpis',
@@ -31,7 +32,7 @@ import { SimpleTimelineComponent } from 'src/app/components/simple-timeline/simp
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [IonContent, IonHeader, IonTitle, SimpleDonutComponent, SimpleColumnBarComponent, SimpleHeatmapComponent, IonToolbar, CommonModule, IonMenuButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonRow,
-    IonGrid, FormsModule, Tag, ButtonModule, InputText, IconFieldModule, InputIconModule, DialogModule, Dialog, Select, TableModule, FloatLabel, SimpleTimelineComponent]
+    IonGrid, FormsModule, Tag, ButtonModule, InputText, IconFieldModule, InputIconModule, DialogModule, Dialog, Select, TableModule, FloatLabel, SimpleTimelineComponent, SimpleStackedColumnsComponent]
 })
 export class KpisPage implements OnInit {
   machinesArray: any = []
@@ -78,6 +79,7 @@ export class KpisPage implements OnInit {
   ngOnInit() {
   }
   ionViewDidEnter() {
+    this.ResetData()
     /*this.todayDate = this.formatLocalISO(new Date())
     this.campaignObj.end_date = this.formatLocalISO(
       new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
@@ -92,6 +94,7 @@ export class KpisPage implements OnInit {
     localStorage.setItem("dateRange", this.dateRange)
     this.donutData = []
     this.timeLineData = []
+    this.barsData = []
     this.donutFailuresData = []
     this.selectedMachine = {}
     this.selectedMachines = []
@@ -123,6 +126,7 @@ export class KpisPage implements OnInit {
         const hours = this.getDateRangeFromOption(this.dateRange)
         const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
         this.timeLineData = [...this.timeLineData, timeLineRes[0]]
+        this.barsData = [...this.barsData, timeLineRes[0]]
       }
     })
   }
@@ -141,9 +145,8 @@ export class KpisPage implements OnInit {
           runtimeHours: 0,
           downtimeHours: 0
         }
-        const failures = response.items ? this.ContarFallasPorArea(response.items) : ''
-        this.barsData = failures
-
+        const failures: any = response.items ? this.ContarFallasPorArea(response.items) : ''
+        const failures2: any = response.items ? this.ContarFallasPorNombre(response.items) : ''
         this.donutData = {
           "Runtime": true,
           "Labels": ["Runtime", "Downtime"],
@@ -156,11 +159,12 @@ export class KpisPage implements OnInit {
         }
         if (this.timeLineData.length == 0) {
           const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
-
           this.timeLineData = [timeLineRes[0]]
+          this.barsData = [{ ...failures2, MachineName: item.Name }]
         } else {
           const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
           this.timeLineData = [...this.timeLineData, timeLineRes[0]]
+          this.barsData = [...this.barsData, { ...failures2, MachineName: item.Name }]
         }
         this.changeDetector.detectChanges()
       }
@@ -271,6 +275,8 @@ export class KpisPage implements OnInit {
   onRowUnselect(selected: any) {
     //this.timeLineData = this.timeLineData.filter((d: any) => d.name != item.name);
     this.timeLineData = this.timeLineData.filter((item: any) => item.name != selected.Name);
+    this.barsData = this.barsData.filter((item: any) => item.MachineName != selected.Name);
+    //console.log(this.barsData);
     if (this.selectedRowMachine && this.selectedRowMachine.Code === selected.Code) {
       this.selectedRowMachine = null;
     }
@@ -279,6 +285,15 @@ export class KpisPage implements OnInit {
     const conteo = failures.reduce((acc, f) => {
       const area = f.Area || "Sin asignar";
       acc[area] = (acc[area] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return conteo;
+  }
+  ContarFallasPorNombre(failures: any[]) {
+    const conteo = failures.reduce((acc, f) => {
+      const nombre = f.Name || f.nombre || "Sin nombre"; // Ajusta según tu propiedad
+      acc[nombre] = (acc[nombre] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
