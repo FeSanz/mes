@@ -61,6 +61,7 @@ export class FailuresPage implements OnInit {
 
   isModalNewOpen: boolean = false
   isEditMode: boolean = false;
+  failureIdCurrent: number = 0;
 
   rowsPerPage: number = 23;
   rowsPerPageOptions: number[] = [5, 10, 20];
@@ -75,7 +76,12 @@ export class FailuresPage implements OnInit {
     type: '',
     area: ''
   };
+  // Agregar referencia a la tabla
+  @ViewChild('dtFailures') dtFailures: any;
 
+  // Definir columnas para exportación
+  cols: any[] = [];
+  exportColumns: any[] = [];
   constructor(
     public alerts: AlertsService,
     private apiService: ApiService,
@@ -88,7 +94,18 @@ export class FailuresPage implements OnInit {
   }
 
   ngOnInit() {
+    // Definir columnas para exportación
+    this.cols = [
+      { field: 'failure_id', header: 'ID' },
+      { field: 'name', header: 'Nombre de la falla' },
+      { field: 'type', header: 'Tipo' },
+      { field: 'area', header: 'Área' }
+    ];
 
+    this.exportColumns = this.cols.map((col) => ({
+      title: col.header,
+      dataKey: col.field
+    }));
   }
 
   ionViewDidEnter() {
@@ -130,21 +147,40 @@ export class FailuresPage implements OnInit {
     table.filterGlobal(target.value, 'contains');
   }
 
-  UploadSingleFailure() {
+  // Método para exportar a CSV
+  ExportCSV() {
+    this.dtFailures.exportCSV();
+  }
+
+  // Opcional: Exportar solo seleccionados
+  ExportSelectedCSV() {
+    if (this.selectedFailures.length === 0) {
+      this.alerts.Warning("Seleccione al menos un elemento para exportar");
+      return;
+    }
+    this.dtFailures.exportCSV({ selectionOnly: true });
+  }
+
+  CreateOrUpdateFailure() {
+    // Validar formulario
     if (!this.formFailure.name?.trim() || !this.formFailure.type || !this.formFailure.area) {
       this.alerts.Warning("Llene todos los campos requeridos");
       return;
     }
-    this.isModalNewOpen = false;
 
     const payload = {
       CompanyId: this.userData.Company.CompanyId,
-      Name: this.formFailure.name,
+      Name: this.formFailure.name.trim(),
       Type: this.formFailure.type,
       Area: this.formFailure.area,
     };
 
-    this.apiService.PostRequestRender('failures', payload).then(async (response: any) => {
+    const path = this.isEditMode ? `failures/${this.failureIdCurrent}` : 'failures';
+    const apiMethod = this.isEditMode
+      ? this.apiService.PutRequestRender(path, payload)
+      : this.apiService.PostRequestRender(path, payload);
+
+    apiMethod.then((response: any) => {
       if (response.errorsExistFlag) {
         this.isModalNewOpen = true;
         this.alerts.ToastZIndex();
@@ -152,33 +188,49 @@ export class FailuresPage implements OnInit {
       } else {
         this.alerts.Success(response.message);
 
-        // Crear el nuevo objeto con los datos que enviaste + el ID de la respuesta
-        const newFailure = {
-          failure_id: response.items[0].FailureId,
-          name: this.formFailure.name,
-          type: this.formFailure.type,
-          area: this.formFailure.area,
-          company_id: this.userData.Company.CompanyId
-        };
+        if (this.isEditMode) {
+          // Actualizar existente
+          const index = this.failuresData.items.findIndex(
+            (item: any) => item.failure_id === this.failureIdCurrent
+          );
 
-        // Agregar al inicio del arreglo (o al final con push)
-        this.failuresData.items = [newFailure, ...this.failuresData.items];
+          if (index !== -1) {
+            this.failuresData.items[index] = {
+              ...this.failuresData.items[index],
+              name: payload.Name,
+              type: payload.Type,
+              area: payload.Area
+            };
+          }
+        } else {
+          // Agregar nuevo
+          const newFailure = {
+            failure_id: response.items[0].FailureId,
+            name: payload.Name,
+            type: payload.Type,
+            area: payload.Area,
+            company_id: payload.CompanyId
+          };
 
-        // Actualizar totalResults si existe
-        if (this.failuresData.totalResults !== undefined) {
-          this.failuresData.totalResults++;
+          this.failuresData.items = [newFailure, ...this.failuresData.items];
+
+          if (this.failuresData.totalResults !== undefined) {
+            this.failuresData.totalResults++;
+          }
         }
 
+        // Resetear formulario
         this.formFailure = { name: '', type: '', area: '' };
-
-        // Forzar detección de cambios si es necesario
+        this.isModalNewOpen = false;
+        this.isEditMode = false;
+        this.failureIdCurrent = 0;
         this.changeDetector.detectChanges();
       }
     }).catch(error => {
       this.isModalNewOpen = true;
       this.alerts.ToastZIndex();
-      console.error('Error al crear:', error);
-      this.alerts.Error('Error al crear la falla');
+      console.error('Error:', error);
+      this.alerts.Error(`Error al ${this.isEditMode ? 'actualizar' : 'crear'} la falla`);
     });
   }
 
@@ -191,9 +243,17 @@ export class FailuresPage implements OnInit {
     );
   }
 
-  EdithFailure(failure: any) {
-
+  EditableForm(failure: any) {
+    this.isEditMode = true;
+    this.isModalNewOpen = true;
+    this.failureIdCurrent = failure.failure_id;
+    this.formFailure = {
+      name: failure.name,
+      type: failure.type,
+      area: failure.area
+    };
   }
+
   async DeleteFailure() {
     if (this.selectedFailures.length === 0) {
       this.alerts.Warning("Seleccione algún elemento para eliminar");

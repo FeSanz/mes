@@ -19,6 +19,7 @@
                    [value]="failuresData.items"
                    [(selection)]="selectedFailures"
                    dataKey="failure_id"
+                   [columns]="cols"
                    styleClass="card-table-primeng wo-table-custom"
                    [tableStyle]="{ 'height': '100%'}"
                    [size]="'small'"
@@ -32,8 +33,9 @@
                    stripedRows
                    [scrollable]="true"
                    [scrollHeight]="scrollHeight"
-                   [sortOrder]="1">
-            <ng-template #caption>
+                   [sortOrder]="1"
+                   [exportHeader]="'customExportHeader'">
+            <ng-template pTemplate="caption">
               <div class="table-caption-container">
                 <div class="left-section">
                   <p-button
@@ -64,6 +66,14 @@
                     variant="outlined"
                     severity="danger"
                     (click)="DeleteFailure()" />
+
+                  <p-button
+                    [outlined]="true"
+                    icon="fas fa-download"
+                    variant="outlined"
+                    severity="contrast"
+                    label="Exportar"
+                    (click)="ExportCSV()" />
 
                   <p-iconField iconPosition="left">
                     <p-inputIcon>
@@ -118,7 +128,7 @@
                   </div>
                 </th>
             </ng-template>
-            <ng-template #body let-item>
+            <ng-template pTemplate="body" let-item>
               <tr>
                 <td class="td-center">
                   <p-tableCheckbox [value]="item"/>
@@ -132,7 +142,7 @@
                   </p-tag>
                 </td>
                 <td class="td-center">
-                  <ion-button size="small" shape="round" color="success" (click)="EdithFailure(item)" title="Editar"
+                  <ion-button size="small" shape="round" color="success" (click)="EditableForm(item)" title="Editar"
                     *ngIf="permissions.isSuperAdmin()">
                     <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
                   </ion-button>
@@ -210,14 +220,9 @@
     <ng-template pTemplate="footer">
       <p-button label="Cancelar" severity="danger" (click)="isModalNewOpen = false;" />
       <p-button
-        label="Guardar"
-        severity="success"
-        (click)="UploadSingleFailure()"
-        [disabled]="!isFormValid()" />
-      <p-button
         [label]="isEditMode ? 'Actualizar' : 'Guardar'"
         severity="success"
-        (click)="UploadSingleFailure()"
+        (click)="CreateOrUpdateFailure()"
         [disabled]="!isFormValid()" />
     </ng-template>
   </p-dialog>
