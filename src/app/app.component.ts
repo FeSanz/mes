@@ -22,9 +22,6 @@ import {
   IonToolbar,
   IonToggle,
   IonAvatar,
-  IonCol,
-  IonGrid,
-  IonRow,
   IonModal,
   IonInput,
   IonTextarea,
@@ -38,7 +35,6 @@ import {
   IonReorderGroup,
   ItemReorderEventDetail,
   IonText,
-  IonMenuButton, IonSpinner
 } from '@ionic/angular/standalone';
 
 import { NavController } from '@ionic/angular';
@@ -75,8 +71,7 @@ import { Device } from '@capacitor/device';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [IonApp, RouterLink, IonMenu, IonToolbar, IonHeader, IonTitle, IonItem, IonIcon, IonLabel,
     IonButtons, IonButton, IonPopover, IonContent, IonList, IonMenuToggle, IonAccordionGroup, IonSplitPane, IonReorder, IonReorderGroup,
-    IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonCol, IonGrid,
-    IonRow, IonModal, IonInput, IonTextarea, IonText, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast, IonMenuButton, ConfirmDialog, IonSpinner]
+    IonAccordion, IonFooter, IonNote, RouterLinkActive, IonRouterOutlet, IonToggle, FormsModule, CommonModule, IonAvatar, IonModal, IonInput, IonTextarea, IonText, IonSelect, IonSelectOption, IonFab, IonFabButton, IonRouterLink, Toast, ConfirmDialog]
 })
 export class AppComponent implements OnInit {
   darkMode = false

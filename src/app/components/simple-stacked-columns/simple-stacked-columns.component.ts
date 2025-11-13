@@ -97,7 +97,7 @@ export class SimpleStackedColumnsComponent implements OnInit {
         categories: []
       },
       legend: {
-        position: "right"
+        position: "top"
       },
       fill: {
         opacity: 1
@@ -106,7 +106,7 @@ export class SimpleStackedColumnsComponent implements OnInit {
 
   }
   updateChart() {
-    if (this.data && this.data['length'] > 0) {
+    if (this.data) {
       // Obtener TODOS los tipos de fallas únicas de TODOS los registros
       const allFaultTypes = new Set<string>();
       this.data['forEach']((item: any) => {
@@ -149,10 +149,7 @@ export class SimpleStackedColumnsComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-
-    if (changes['data']) {
-      this.updateChart();
-    }
+    this.updateChart();
   }
   ngOnInit() {
 

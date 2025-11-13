@@ -146,7 +146,8 @@
       <ion-col size="5" size-sm="5" size-md="5" size-lg="5" size-xl="2.5">
         <ion-card class="graphic">
           <ion-card-header>
-            <ion-card-title>Estadísticas</ion-card-title>
+            <ion-card-title>Estadísticas <strong style="color: var(--ion-color-secondary);">{{ selectedRowMachine?.Name
+                ? selectedRowMachine.Name : ''}}</strong></ion-card-title>
           </ion-card-header>
           <ion-card-content>
             <app-simple-donut [data]="donutData"></app-simple-donut>
@@ -166,7 +167,8 @@
       <ion-col size="5" size-sm="5" size-md="5" size-lg="5" size-xl="2.5">
         <ion-card class="graphic">
           <ion-card-header>
-            <ion-card-title>Fallas por área</ion-card-title>
+            <ion-card-title>Fallas por área <strong style="color: var(--ion-color-secondary);">{{
+                selectedRowMachine?.Name ? selectedRowMachine.Name :''}}</strong></ion-card-title>
           </ion-card-header>
           <ion-card-content>
             <app-simple-donut [data]="donutFailuresData"></app-simple-donut>

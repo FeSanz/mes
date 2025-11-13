@@ -79,7 +79,7 @@ export class KpisPage implements OnInit {
   ngOnInit() {
   }
   ionViewDidEnter() {
-    this.ResetData()
+    //this.ResetData()
     /*this.todayDate = this.formatLocalISO(new Date())
     this.campaignObj.end_date = this.formatLocalISO(
       new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
