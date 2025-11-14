@@ -142,21 +142,58 @@
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yy HH:mm' }}</td>
                 <td class="td-center" [title]="getElapsedLegibleTime(item.start_date, item.response_time || '')">
                   <ng-container *ngIf="item.response_time; else elapsed">
-                    <!--{{ item.response_time | date: 'hh:mm a dd/MM/yyyy' }}-->
-                    {{ getElapsedStartEndTime(item.start_date, item.response_time) }}
+                    <ng-container *ngIf="getElapsedStartEndTime(item.start_date, item.response_time) as time">
+                      <ng-container *ngIf="time.split(':') as parts">
+                        <p-tag severity="contrast" [value]="parts[0]"></p-tag>
+                        :
+                        <p-tag severity="contrast" [value]="parts[1]"></p-tag>
+                        :
+                        <p-tag severity="contrast" [value]="parts[2]"></p-tag>
+                      </ng-container>
+                    </ng-container>
                   </ng-container>
                   <ng-template #elapsed>
-                    {{ getElapsedStartEndTime(item.start_date)}}
+                    <ng-container *ngIf="getElapsedStartEndTime(item.start_date) as time">
+                      <ng-container *ngIf="time.split(':') as parts">
+                        <p-tag severity="contrast" [value]="parts[0]"></p-tag>
+                        :
+                        <p-tag severity="contrast" [value]="parts[1]"></p-tag>
+                        :
+                        <p-tag severity="contrast" [value]="parts[2]"></p-tag>
+                      </ng-container>
+                    </ng-container>
                   </ng-template>
                 </td>
                 <td class="td-center"
                   [title]="item.response_time ? getElapsedLegibleTime(item.response_time, item.repair_time) : 'En espera'">
                   <ng-container *ngIf="item.repair_time; else elapsedRepair">
-                    {{ getElapsedStartEndTime(item.response_time, item.repair_time) }}
+                    <ng-container *ngIf="getElapsedStartEndTime(item.response_time, item.repair_time) as time">
+                      <ng-container *ngIf="time.split(':') as parts">
+                        <p-tag severity="contrast" [value]="parts[0]"></p-tag>
+                        :
+                        <p-tag severity="contrast" [value]="parts[1]"></p-tag>
+                        :
+                        <p-tag severity="contrast" [value]="parts[2]"></p-tag>
+                      </ng-container>
+                    </ng-container>
                     <!--{{ item.repair_time | date: 'hh:mm a dd/MM/yyyy' }}-->
                   </ng-container>
                   <ng-template #elapsedRepair>
-                    {{ item.response_time != null ? getElapsedStartEndTime(item.response_time) : 'En espera' }}
+                    <ng-container *ngIf="item.response_time == null; else showTime">
+                      <p-tag severity="contrast" value="En espera"></p-tag>
+                    </ng-container>
+                    <ng-template #showTime>
+                      <ng-container *ngIf="getElapsedStartEndTime(item.response_time) as time">
+                        <ng-container *ngIf="time.split(':') as parts">
+                          <p-tag severity="contrast" [value]="parts[0]"></p-tag>
+                          :
+                          <p-tag severity="contrast" [value]="parts[1]"></p-tag>
+                          :
+                          <p-tag severity="contrast" [value]="parts[2]"></p-tag>
+                        </ng-container>
+                      </ng-container>
+                    </ng-template>
+
                   </ng-template>
                 </td>
                 <td class="td-center">
@@ -195,8 +232,8 @@
         <ion-card>
           <p-table #dtFinalicedAlerts [value]="finalicedAlertsData" dataKey="alert_id"
             styleClass="card-table-primeng wo-table-custom" [tableStyle]="{ 'height': '100%'}" [size]="'small'"
-            [rowHover]="true" [globalFilterFields]="['alert_id', 'name', 'type', 'area', 'machine_name', 'status']" [filterDelay]="0" stripedRows
-            [scrollable]="true" [scrollHeight]="scrollHeight" [sortOrder]="1">
+            [rowHover]="true" [globalFilterFields]="['alert_id', 'name', 'type', 'area', 'machine_name', 'status']"
+            [filterDelay]="0" stripedRows [scrollable]="true" [scrollHeight]="scrollHeight" [sortOrder]="1">
             <ng-template #caption>
               <div class="table-caption">
                 <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearAlerts(dtAlerts)" />
@@ -311,10 +348,26 @@
                 </td-->
                 <td class="td-center">{{ item.start_date | date: 'dd/MM/yy HH:mm' }}</td>
                 <td class="td-center" [title]="item.responseLegibleTimeString">
-                  {{ item.responseTimeString }}
+                  <ng-container *ngIf="item.responseTimeString as time">
+                    <ng-container *ngIf="time.split(':') as parts">
+                      <p-tag severity="contrast" [value]="parts[0]"></p-tag>
+                      :
+                      <p-tag severity="contrast" [value]="parts[1]"></p-tag>
+                      :
+                      <p-tag severity="contrast" [value]="parts[2]"></p-tag>
+                    </ng-container>
+                  </ng-container>
                 </td>
                 <td class="td-center" [title]="item.repairLegibleTimeString">
-                  {{ item.repairTimeString }}
+                  <ng-container *ngIf="item.repairTimeString as time">
+                    <ng-container *ngIf="time.split(':') as parts">
+                      <p-tag severity="contrast" [value]="parts[0]"></p-tag>
+                      :
+                      <p-tag severity="contrast" [value]="parts[1]"></p-tag>
+                      :
+                      <p-tag severity="contrast" [value]="parts[2]"></p-tag>
+                    </ng-container>
+                  </ng-container>
                 </td>
                 <td class="td-center">
                   {{ item.repair_time | date: 'dd/MM/yy HH:mm' }}
