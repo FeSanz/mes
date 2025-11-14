@@ -284,6 +284,31 @@ export class ApiService {
     }
   }
 
+  async DeleteMultipleRequestRender(endPoint: string, payload: any) {
+    await this.alerts.ShowLoading();
+    const token = localStorage.getItem('tk')
+    try {
+      const options = {
+        url: `${this.urlRender}/${endPoint}`,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+        data: payload
+      };
+      const response: HttpResponse = await CapacitorHttp.delete(options);
+      this.RequestStatusCode(response.status);
+      return response.data;
+
+    } catch (error: any) {
+      console.log('Error (PG):', error);
+      await this.alerts.Error(`Error de conexión render: ${error.message || error}`);
+      return null;
+    } finally {
+      await this.alerts.HideLoading();
+    }
+  }
+
   RequestStatusCode(statusCode: number) {
     if (statusCode >= 200 && statusCode <= 202) {
       return;

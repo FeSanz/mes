@@ -117,5 +117,10 @@ export const routes: Routes = [
   {
     path: 'grid-data',
     loadComponent: () => import('./settings/registros/grid-data/grid-data.page').then( m => m.GridDataPage)
+  },
+  {
+    path: 'RegShifts',
+    loadComponent: () => import('./settings/registros/shifts/shifts.page').then( m => m.ShiftsPage)
   }
+
 ];

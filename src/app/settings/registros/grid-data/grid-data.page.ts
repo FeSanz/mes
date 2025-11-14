@@ -52,7 +52,7 @@ export class GridDataPage implements OnInit {
     {
       icon: 'alarm-outline',
       iconClass: 'bg-purple',
-      idModule: 'shifts',
+      idModule: 'RegShifts',
       moduleName: 'TURNOS'      
     },
     {
@@ -240,7 +240,7 @@ export class GridDataPage implements OnInit {
         document.activeElement.blur(); //Desenfocar el elemento activo antes de navegar
       }
 
-      const m_modules = ['organizations', 'shifts', 'wc', 'machines', 'items', 'wo'];
+      const m_modules = ['organizations', 'RegShifts', 'wc', 'machines', 'items', 'wo'];
 
       if (m_modules.includes(module)) {
         this.router.navigate([`/${module}`]);

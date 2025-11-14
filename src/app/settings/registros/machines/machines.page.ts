@@ -27,6 +27,11 @@ import { Dialog } from "primeng/dialog";
 import { PrimeTemplate } from "primeng/api";
 import { DialogModule } from 'primeng/dialog';
 import { IonBreadcrumb, IonBreadcrumbs } from '@ionic/angular/standalone';
+import { Tag } from "primeng/tag";
+import { ConfirmDialog } from "primeng/confirmdialog";
+import { Toast } from "primeng/toast";
+import { ProgressSpinner } from "primeng/progressspinner";
+import { ConfirmationService } from "primeng/api";
 
 @Component({
   selector: 'app-machines',
@@ -40,7 +45,7 @@ import { IonBreadcrumb, IonBreadcrumbs } from '@ionic/angular/standalone';
     IonButton, IonIcon, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle,
     TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, 
     DropdownModule,MultiSelectModule, Select, FloatLabel, IonText, Dialog, PrimeTemplate, 
-    DialogModule, IonBreadcrumb, IonBreadcrumbs]
+    DialogModule, IonBreadcrumb, IonBreadcrumbs, Tag, ConfirmDialog, Toast, ProgressSpinner]
 })
 
 export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
@@ -50,6 +55,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
   scrollHeight: string = '550px';
   rowsPerPage: number = 50;
   rowsPerPageOptions: number[] = [10, 25, 50];
+  selectedMachines: any[] = [];
 
   fusionOriginalData: any = {};
   fusionData: any = {};
@@ -68,8 +74,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     OrganizationId: null,
     Code: '',
     Name: '',
-    WorkCenterId: null,
-    WorkCenter: null,
+    WorkCenterId: null,    
     Class: '',
     Token: null
   };
@@ -83,9 +88,10 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private apiService: ApiService,
     private endPoints: EndpointsService,
-    private alerts: AlertsService,
+    public alerts: AlertsService,
     public permissions: PermissionsService,
-    private changeDetector: ChangeDetectorRef
+    private changeDetector: ChangeDetectorRef,
+    private confirmationService: ConfirmationService
   ) {
 
     addIcons({ menuOutline, checkmarkOutline, addOutline, ellipsisVerticalOutline, chevronForwardOutline, trashOutline, pencilOutline });
@@ -104,18 +110,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
         this.organizationSelected = sortedOrganizations[0];
         this.orgSelect = this.organizationSelected.OrganizationId;
 
-        let clause = `settingsFusionExist/${this.userData.Company.CompanyId}`;
-
-        this.apiService.GetRequestRender(clause).then((response: any) => {
-          if (response.items[0].count > 0) {
-            this.isFusion = true;
-          } else {
-            this.isFusion = false;
-          }
-
-          this.RefreshTables();
-        });
-
+        this.RefreshTables();                
 
       } else {
         this.alerts.Warning("No se encontraron organizaciones");
@@ -155,7 +150,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
       this.orgSelect = this.organizationSelected.OrganizationId;
       this.apiService.GetRequestRender(clause).then((response: any) => {
         response.totalResults == 0 && this.alerts.Warning(response.message);
-        this.dbData = response;
+        this.dbData = response;        
       });
     }
   }
@@ -165,15 +160,13 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     table.filterGlobal(target.value, 'contains');
   }
 
-  OpenAsNewResource() {
+  OpenAsNewResource() {    
     this.resetResource()
     this.isNewFlag = true
     this.resource.OrganizationId = this.orgSelect
     this.isModalOpen = true;
-
-    if (this.isFusion) {
-      this.getWorkCenters();
-    }
+    
+    this.getWorkCenters();    
 
     this.resource.Token = this.generateToken();
 
@@ -181,7 +174,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
     if (contentPart) {
       const rect = contentPart.getBoundingClientRect();
       this.modalSize = `Modal: ${Truncate(rect.width)} x ${Truncate(rect.height)} | Viewport: ${window.innerWidth} (${((rect.width / window.innerWidth) * 100).toFixed(2)}%)`;
-    }
+    }    
   }
 
   resetResource() {//se reinician los datos del usuario nuevo o a editar
@@ -189,18 +182,22 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
       OrganizationId: null,
       Code: '',
       Name: '',
-      WorkCenterId: null,
-      WorkCenter: null,
+      WorkCenterId: null,      
       Class: '',
       Token: null
     };
   }
 
-  AddOrEditResource() {
-    const itemsArray = [this.resource];
+  AddOrEditResource() {    
+    if (!this.resource.Code?.trim() || !this.resource.Name || !this.resource.Class) {
+      this.alerts.ShowAlert('Llene todos los campos requeridos', 'danger');
+      return;
+    }    
+
+    const itemsArray = [this.resource]; 
     const payload = {
       items: itemsArray
-    };
+    };    
 
     if (this.isNewFlag) {
       if (this.organizationSelected) {        
@@ -232,48 +229,79 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     }
+    this.alerts.HideLoading();
   }
 
-  async DeleteResource(mach: any) {
-    if (await this.alerts.ShowAlert("¿Deseas eliminar esta máquina?", "Alerta", "Cancelar", "Eliminar")) {
-      this.apiService.DeleteRequestRender('resourceMachines/' + mach.MachineId).then((response: any) => {
-        if (!response.errorsExistFlag) {
-          this.alerts.Success("Máquina eliminada");
-          this.RefreshTables();
-        } else {
-          this.alerts.Info(response.error);
+  async DeleteResources() {
+    if (this.selectedMachines.length === 0) {
+      this.alerts.Warning("Seleccione algún elemento para eliminar");
+      return;
+    }    
+
+    const payload = {
+      items: this.selectedMachines
+    }    
+    
+    this.confirmationService.confirm({
+      message: '¿Está seguro de que desea eliminar los elementos seleccionados?',
+      header: 'Confirm',
+      icon: 'fas fa-circle-exclamation',
+      rejectButtonProps: {
+        label: 'No',
+        severity: 'secondary',
+        variant: 'text'
+      },
+      acceptButtonProps: {
+        severity: 'danger',
+        label: 'Si'
+      },
+      accept: async () => {
+        try {        
+          this.apiService.DeleteMultipleRequestRender('resourceMachines', payload).then(async (response: any) => {
+          if (!response.errorsExistFlag) {
+            this.alerts.Success("Eliminación exitosa");
+            this.RefreshTables();
+          } else {
+            this.alerts.Info(response.error);
+          }
+        });
+
+        } catch (error) {
+          console.error('Error al eliminar:', error);
+          this.alerts.Error('Error al eliminar');
         }
-      })
-    }
+      }
+    });
   }
 
-  EditResource(mach: any) {
+  EditResource(mach: any) {      
     this.resource = mach;
     this.isNewFlag = false
     this.isModalOpen = true
-    this.changeDetector.detectChanges()
+    this.getWorkCenters()        
   }
 
   RefreshTables() {
     let clause = `orgResourceMachines/${this.organizationSelected.OrganizationId}`;
     this.apiService.GetRequestRender(clause).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
-      this.dbData = response;
+      this.dbData = response;      
     });
 
     this.searchValueDB = '';
   }
 
   getWorkCenters() {
-    this.apiService.GetRequestFusion(this.endPoints.Path('work_centers', this.organizationSelected.Code)).then((response: any) => {
-      const parsed = JSON.parse(response).items;
-      this.workCenters = parsed;
+    this.apiService.GetRequestRender(`workCenters/${this.organizationSelected.OrganizationId}`).then((response: any) => {
+      // const parsed = JSON.parse(response).items;
+      this.workCenters = response.items;           
+      this.changeDetector.detectChanges()
     });
   }
 
   OnWorkCenterSelected() {
-    this.resource.WorkCenterId = this.workCenterSelected.WorkCenterId;
-    this.resource.WorkCenter = this.workCenterSelected.WorkCenterName;
+    this.resource.WorkCenterId = this.resource.WorkCenterId;    
+    this.changeDetector.detectChanges()
   }
 
   generateToken(): string {
@@ -294,6 +322,13 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
       return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
 
+  }
+
+  get transformedWorkCenters() {
+    return this.workCenters.map(item => ({
+      label: item.WorkCenterName,
+      value: item.WorkCenterId.toString()
+    }));
   }
   protected readonly ToggleMenu = ToggleMenu;
 }
