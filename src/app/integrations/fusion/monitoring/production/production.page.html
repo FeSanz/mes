@@ -36,6 +36,9 @@
         <ion-card class="stats-card">
           <p-table #dtWorkOrders
                    [value]="workOrders.items"
+                   (onPage)="OnTableInteraction()"
+                   (onFilter)="OnTableInteraction()"
+                   (onSort)="OnTableInteraction()"
                    dataKey="WorkOrderNumber"
                    styleClass="card-table-primeng wo-table-custom "
                    [tableStyle]="{ 'min-width': '96rem','height': '100%'}"

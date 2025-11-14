@@ -328,7 +328,7 @@ export class WoPage implements OnInit, AfterViewInit, OnDestroy{
         ItemId: item.ItemId,
         PlannedQuantity: item.PlannedQuantity,
         DispatchedQuantity: item.CompletedQuantity,
-        CompletedQuantity: item.CompletedQuantity,
+        CompletedQuantity: 0,
         Status: item.CompletedQuantity > 0 ? 'IN_PROCESS' : 'RELEASED',
         StartDate: item.StartDate,
         CompletionDate: item.CompletionDate,

@@ -115,9 +115,9 @@
                 <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
-            <th pSortableColumn="CompletedQuantity" style="min-width: 10rem">
+            <th pSortableColumn="CompletedQuantity" style="min-width: 12rem">
               <div class="flex justify-between items-center">
-                Completo
+                Despachado
                 <p-sortIcon field="CompletedQuantity" />
                 <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
@@ -248,11 +248,11 @@
                 <p-columnFilter field="PlannedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
-            <th pSortableColumn="CompletedQuantity" style="min-width: 10rem">
+            <th pSortableColumn="DispatchedQuantity" style="min-width: 12rem">
               <div class="flex justify-between items-center">
-                Completo
-                <p-sortIcon field="CompletedQuantity" />
-                <p-columnFilter field="CompletedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
+                Despachado
+                <p-sortIcon field="DispatchedQuantity" />
+                <p-columnFilter field="DispatchedQuantity" matchMode="equals" display="menu" class="ml-auto"/>
               </div>
             </th>
             <th pSortableColumn="StartDate" style="min-width: 12rem">
@@ -280,7 +280,7 @@
             <td>{{ item.ItemNumber }}</td>
             <td>{{ item.ResourceCode }}</td>
             <td>{{ item.PlannedQuantity }}</td>
-            <td>{{ item.CompletedQuantity }}</td>
+            <td>{{ item.DispatchedQuantity }}</td>
             <td>{{ item.StartDate | date:'dd/MM/yy HH:mm' }}</td>
             <td>{{ item.CompletionDate | date:'dd/MM/yy HH:mm' }}</td>
           </tr>
