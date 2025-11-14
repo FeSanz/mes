@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
@@ -37,11 +37,10 @@ import { ConfirmationService } from "primeng/api";
   templateUrl: './shifts.page.html',
   styleUrls: ['./shifts.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule,
-    CommonModule, FormsModule, TableModule, CardModule, IonContent, IonTitle, IonToolbar,
-    CommonModule, FormsModule, IonButtons, IonMenuButton,
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, TableModule, 
+    CardModule, CommonModule, FormsModule, IonButtons, IonMenuButton,
     IonButton, IonIcon, IonItem, IonInput,
-    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,
+    ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,
     DropdownModule, MultiSelectModule, Select, FloatLabel, IonText, Dialog, PrimeTemplate,
     DialogModule, IonBreadcrumb, IonBreadcrumbs, IonLabel,
     DatePicker]
@@ -250,9 +249,7 @@ export class ShiftsPage implements OnInit {
 
     const payload = {
       items: this.selectedShifts
-    }
-
-    console.log(JSON.stringify(payload, null, 2));
+    }    
 
     this.confirmationService.confirm({
       message: '¿Está seguro de que desea eliminar los elementos seleccionados?',

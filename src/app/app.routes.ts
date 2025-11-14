@@ -121,6 +121,10 @@ export const routes: Routes = [
   {
     path: 'RegShifts',
     loadComponent: () => import('./settings/registros/shifts/shifts.page').then( m => m.ShiftsPage)
+  },  {
+    path: 'work-centers',
+    loadComponent: () => import('./settings/registros/work-centers/work-centers.page').then( m => m.WorkCentersPage)
   }
+
 
 ];

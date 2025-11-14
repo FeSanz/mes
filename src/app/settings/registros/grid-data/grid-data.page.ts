@@ -58,7 +58,7 @@ export class GridDataPage implements OnInit {
     {
       icon: 'git-network-outline',
       iconClass: 'bg-blue',
-      idModule: 'wc',
+      idModule: 'work-centers',
       moduleName: 'CENTROS DE TRABAJO'      
     },
     {
@@ -164,8 +164,7 @@ export class GridDataPage implements OnInit {
           ...(isUpdate ? {} : { Description: "Credenciales para conexión con REST API Fusion" })
         }
       ]
-    };
-    console.log(payload);
+    };    
 
     const apiCall = isUpdate
       ? await this.apiService.PutRequestRender('settingsFusion', payload)
@@ -240,7 +239,7 @@ export class GridDataPage implements OnInit {
         document.activeElement.blur(); //Desenfocar el elemento activo antes de navegar
       }
 
-      const m_modules = ['organizations', 'RegShifts', 'wc', 'machines', 'items', 'wo'];
+      const m_modules = ['organizations', 'RegShifts', 'work-centers', 'machines', 'items', 'wo'];
 
       if (m_modules.includes(module)) {
         this.router.navigate([`/${module}`]);

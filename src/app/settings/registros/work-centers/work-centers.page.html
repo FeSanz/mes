@@ -1,0 +1,224 @@
+<ion-header [translucent]="true" style="box-shadow: none !important;">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false">
+        <ion-button size="large" (click)="ToggleMenu()">
+          <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <ion-breadcrumbs>
+        <ion-breadcrumb href="/grid-data">Registros</ion-breadcrumb>
+        <ion-breadcrumb href="/work-centers">Centros de trabajo {{userData.Company.Name}}</ion-breadcrumb>
+      </ion-breadcrumbs>
+    </ion-title>
+    <div class="card-select flex flex-wrap justify-center items-end gap-4" slot="end">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
+          [options]="dbOrganizations.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
+          placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
+          [virtualScrollItemSize]="38" (onChange)="OnOrganizationSelected()" 
+          appendTo="body"/>
+        <label for="organization_select">Organización</label>
+      </p-floatlabel>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-margin">
+    <div>
+      <p-table #dtDB [value]="dbData.items" 
+        dataKey="WorkCenterId" 
+        [(selection)]="selectedWC"
+        styleClass="card-table-primeng"
+        class="ion-margin tabla-centrada" 
+        [tableStyle]="{ 'min-width': '50rem'}" 
+        [size]="'small'" 
+        [rowHover]="true"
+        [rows]="rowsPerPage"         
+        [showCurrentPageReport]="true" 
+        [rowsPerPageOptions]="rowsPerPageOptions"         
+        [paginator]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos" 
+        [filterDelay]="0"
+        [globalFilterFields]="['WorkCenterCode', 'WorkCenterName', 'WorkAreaCode', 'WorkAreaName']" 
+        stripedRows [scrollable]="true"
+        [scrollHeight]="GetScrollHeight()" 
+        [alwaysShowPaginator]="true">
+
+        <ng-template pTemplate="caption">
+          <div class="table-caption-container">
+            <div class="left-section">
+              <p-button 
+                [outlined]="true" 
+                icon="pi pi-filter-slash" 
+                label="Limpiar" 
+                (click)="dtDB.clear()" />
+
+              <p-button
+                [outlined]="true"
+                icon="pi pi-plus-circle"
+                label="Nuevo"
+                variant="outlined"
+                severity="info"
+                (click)="OpenAsNewWorkCenter()" />
+
+            </div>
+            <div class="right-section">
+              <p-button
+                    *ngIf="selectedWC.length > 0"
+                    [outlined]="true"
+                    icon="pi pi-delete-left"
+                    label="Eliminar"
+                    variant="outlined"
+                    severity="danger"
+                    (click)="DeleteWorkCenters()" />
+
+              <p-iconField iconPosition="left">
+                <p-inputIcon>
+                  <i class="fas fa-search"></i>
+                </p-inputIcon>
+                <input pInputText 
+                  type="text" 
+                  [(ngModel)]="searchValueDB" 
+                  (input)="OnFilterGlobal($event, dtDB)"
+                  placeholder="Buscar" 
+                />
+              </p-iconField>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 4rem" class="td-center">
+              <p-tableHeaderCheckbox/>
+            </th>
+            <th pSortableColumn="ID" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                ID
+                <p-sortIcon field="ID" />
+                <p-columnFilter type="text" field="ID" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="WorkCenterCode" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Código CT
+                <p-sortIcon field="WorkCenterCode" />
+                <p-columnFilter type="text" field="WorkCenterCode" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="WorkCenterName" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Nombre CT
+                <p-sortIcon field="WorkCenterName" />
+                <p-columnFilter type="text" field="WorkCenterName" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="WorkAreaCode" style="min-width: 14rem">
+              <div class="flex justify-between items-center">
+                Código Área
+                <p-sortIcon field="WorkAreaCode" />
+                <p-columnFilter type="text" field="WorkAreaCode" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="WorkAreaName" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Nombre Área
+                <p-sortIcon field="WorkAreaName" />
+                <p-columnFilter field="WorkAreaName" matchMode="equals" display="menu" class="ml-auto" />
+              </div>
+            </th>            
+            <th pSortableColumn="Acciones" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Editar
+                <p-sortIcon field="Acciones" />
+                <p-columnFilter field="Acciones" matchMode="equals" display="menu" class="ml-auto" />
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td class="td-center">
+              <p-tableCheckbox [value]="item"/>
+            </td>
+            <td>{{ item.WorkCenterId }}</td>
+            <td>{{ item.WorkCenterCode }}</td>
+            <td>{{ item.WorkCenterName }}</td>
+            <td>{{ item.WorkAreaCode }}</td>
+            <td>{{ item.WorkAreaName }}</td>            
+            <td>
+              <ion-button size="small" shape="round" color="success" title="Editar"
+                (click)="$event.stopPropagation(); EditWorkCenter(item)">
+                <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+              </ion-button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">No se encontraron Centros de Trabajo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <p-dialog [modal]="true" [(visible)]="isModalOpen" [style]="{ height: '60vh', 'max-height': '90vh' }"
+    [draggable]="true" [resizable]="true" [maximizable]="true" appendTo="body">
+
+    <!-- Header personalizado-->
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <span>
+          {{ isNewFlag ? 'Nuevo CT' : 'Editar CT' }}
+        </span>
+      </div>
+    </ng-template>
+
+    <!-- Contenido principal del diálogo -->
+    <div class="dialog-content-wrapper">
+      <ion-item>
+        <ion-input placeholder="Código CT" [(ngModel)]="wc.WorkCenterCode" name="WorkCenterCode" required>
+          <div slot="label"><ion-text color="primary">Código CT:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input placeholder="Nombre CT" [(ngModel)]="wc.WorkCenterName" name="WorkCenterName" required>
+          <div slot="label"><ion-text color="primary">Nombre CT:</ion-text></div>
+        </ion-input>
+      </ion-item>      
+      <ion-item>
+        <ion-input placeholder="Código Área" [(ngModel)]="wc.WorkAreaCode" name="WorkAreaCode" required>
+          <div slot="label"><ion-text color="primary">Código Área:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input placeholder="Nombre Área" [(ngModel)]="wc.WorkAreaName" name="WorkAreaName" required>
+          <div slot="label"><ion-text color="primary">Nombre Área:</ion-text></div>
+        </ion-input>
+      </ion-item>
+    </div>
+
+    <!-- Footer con botones -->
+    <ng-template pTemplate="footer">
+
+      <p-button 
+        label="Cancelar" 
+        severity="danger" 
+        (click)="isModalOpen = false;" 
+      />
+
+      <p-button 
+        [disabled]="!wc?.WorkCenterCode?.trim() || !wc?.WorkCenterName?.trim()" 
+        label="Guardar" 
+        severity="success" 
+        (click)="AddOrEditWorkCenter()"
+      />         
+
+    </ng-template>
+  </p-dialog>
+</ion-content>
