@@ -12,16 +12,22 @@ export class WebSocketService {
     this.webSocketServer = remoteServer ? "wss://iot-services-rd-ww45.onrender.com" : "ws://localhost:3000";
   }
 
-  SuscribeById(id: any, typews: string, onMessage: (data: any) => void): Promise<WebSocket> {
+  SuscribeById(id: any, typews: string, onMessage: (data: any) => void): Promise<{ ws: WebSocket, unsubscribe: () => void }> {
     return new Promise((resolve, reject) => {
       const ws = new WebSocket(this.webSocketServer);
+
+      const unsubscribe = () => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.close();
+        }
+      };
 
       ws.onopen = () => {
         ws.send(JSON.stringify({
           ...id,
           typews: typews
         }));
-        resolve(ws);
+        resolve({ ws, unsubscribe });
       };
 
       ws.onerror = (err) => {
@@ -38,11 +44,12 @@ export class WebSocketService {
         }
       };
 
-      ws.onclose = (event) => {
-        //console.log(`WebSocket ${typews} cerrado:`, event.code, event.reason);
+      ws.onclose = () => {
+        //console.log(`WebSocket cerrado: ${typews}`);
       };
     });
   }
+
   setSocketServer(remoteServer: boolean) {
     this.webSocketServer = remoteServer ? "wss://iot-services-rd-ww45.onrender.com" : "ws://localhost:3000";
   }

@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonLabel, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonSearchbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonMenuButton, IonIcon, IonButton } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
@@ -31,8 +31,8 @@ import { Dialog } from "primeng/dialog";
   styleUrls: ['./alerts.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonCardTitle, IonToolbar, IonButtons, IonLabel, IonIcon, IonFab, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption,
-    IonModal, IonSelect, IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule, DialogModule, Dialog, Tag, FloatLabel, Select]
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonIcon, IonButton,
+  IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule, DialogModule, Dialog, Tag, FloatLabel, Select]
 })
 export class AlertsPage {
   searchValueAl: string = '';
@@ -55,10 +55,10 @@ export class AlertsPage {
   selectedAlert: any = {}
   selectedArea = '';
   selectedType = '';
-  selectedMachine = 0;
   uniqueAreas: any = [];
   uniqueTypes: any[] = [];
   timer: any;
+  private wsSub: { ws: WebSocket, unsubscribe: () => void } | null = null;
   @ViewChild('dtAlerts') table!: Table;
   constructor(
     public alerts: AlertsService,
@@ -124,7 +124,6 @@ export class AlertsPage {
           const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
           this.apiService.GetRequestRender(`machinesByOrganizations?organizations=${orgsIds}`, false).then((response: any) => {
             this.machines = response.items
-            this.selectedMachine = response.items[0].machine_id
           })
         }).catch(error => {
           console.error('Error al obtener fallas:', error);
@@ -137,26 +136,38 @@ export class AlertsPage {
     });
   }
   startSubscription() {
-    this.websocket.SuscribeById({ organization_id: this.organizationSelected.OrganizationId }, "alerts", (response) => {
-      response.name = response.failure_name
-      if (response.action == 'new') {
-        this.alertsData = [response, ...this.alertsData];
-        this.changeDetector.detectChanges()
-        this.alerts.Warning("Nueva alerta")
-      } else if (response.action == 'update') {
-        this.alerts.Warning('Una alerta se modificado');
-        this.GetAlerts()
-        //console.log(response);
+    // Si entra varias veces, evitar crear más conexiones
+    if (this.wsSub) {
+      this.wsSub.unsubscribe();
+      this.wsSub = null;
+    }
 
-      } else if (response.action == 'delete') {
-        this.alerts.Error('Una alerta se ha eliminado');
-        this.GetAlerts()
+    this.websocket.SuscribeById(
+      { organization_id: this.organizationSelected.OrganizationId },
+      "alerts",
+      (response) => {
+        response.name = response.failure_name
+
+        if (response.action == 'new') {
+          this.alertsData = [response, ...this.alertsData];
+          this.changeDetector.detectChanges();
+          this.alerts.Warning("Nueva alerta");
+        }
+        else if (response.action == 'update') {
+          this.alerts.Warning('Una alerta se modificado');
+          this.GetAlerts();
+        }
+        else if (response.action == 'delete') {
+          this.alerts.Error('Una alerta se ha eliminado');
+          this.GetAlerts();
+        }
       }
-    }).then((ws) => {
-    }).catch(err => {
-      console.log(err);
-    });
+    ).then((sub) => {
+      this.wsSub = sub;
+    }).catch(err => console.log(err));
   }
+
+
   OnAdvanceFilter(values: number[], filterCallback: any) {
     this.progressValue = values;
     filterCallback(values);
@@ -313,6 +324,12 @@ export class AlertsPage {
   ngOnDestroy() {
     if (this.timer) {
       clearInterval(this.timer);
+    }
+  }
+  ionViewWillLeave() {
+    if (this.wsSub) {
+      this.wsSub.unsubscribe();
+      this.wsSub = null;
     }
   }
   onAreaFilterChange(selectedValue: any) {

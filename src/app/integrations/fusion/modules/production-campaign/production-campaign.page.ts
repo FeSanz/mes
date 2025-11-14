@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@a
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonToggle, IonModal, IonItem, IonInput, IonDatetime, IonMenuButton, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea,
+  IonContent, IonHeader, IonTitle, IonToolbar, IonItem, IonInput, IonMenuButton,
   IonBreadcrumb, IonBreadcrumbs, IonCol, IonButtons, IonButton, IonPopover, IonList, IonRippleEffect, IonSpinner
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
@@ -35,8 +35,8 @@ import { ToastModule } from 'primeng/toast';
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [MessageService],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonModal, IonSpinner, ProgressBar, ToastModule,
-    IonItem, IonInput, IonDatetime, IonMenuButton, IonDatetimeButton, IonSelect, IonSelectOption, IonTextarea, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonSpinner, ProgressBar, ToastModule,
+    IonItem, IonInput, IonMenuButton, Select, FloatLabel, IonBreadcrumb, IonBreadcrumbs, Tag, IonCol,
     ButtonModule, IonButtons, IonButton, InputText, IonPopover, IonList, IonRippleEffect, IconFieldModule, InputIconModule, DialogModule, Dialog, DatePicker, ReactiveFormsModule]
 })
 export class ProductionCampaignPage {

@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
-  IonButton, IonButtons, IonCard, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel,
-  IonMenuButton, IonRow, IonText, IonTitle, IonToolbar
+  IonButton, IonButtons, IonCard, IonCol, IonContent, IonGrid, IonHeader, IonIcon,
+  IonMenuButton, IonRow, IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
 
 import { ApiService } from "../../../services/api.service";
@@ -24,7 +24,7 @@ import { ToggleMenu } from 'src/app/models/design';
   styleUrls: ['./grid-data.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
-    IonIcon, IonItem, IonLabel, IonInput, IonButton, IonCard, IonText, IonGrid, IonRow, IonCol]
+    IonIcon, IonButton, IonCard, IonGrid, IonRow, IonCol]
 })
 export class GridDataPage implements OnInit {
   host: string = "";

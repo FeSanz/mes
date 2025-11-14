@@ -2,8 +2,8 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonButton, IonButtons, IonCard, IonCol, IonContent, IonFab, IonFabButton, IonFooter, IonGrid, IonHeader,
-  IonIcon, IonInput, IonItem, IonLabel, IonMenuButton, IonModal, IonRow, IonTitle, IonToolbar
+  IonButton, IonButtons, IonCard, IonCol, IonContent, IonGrid, IonHeader,
+  IonIcon, IonMenuButton, IonRow, IonTitle, IonToolbar
 } from '@ionic/angular/standalone';
 
 import { FloatLabel } from "primeng/floatlabel";
@@ -30,7 +30,8 @@ import { Platform } from "@ionic/angular";
 import { HeightTable } from "../../../../models/tables.prime";
 import { Round, Truncate } from "../../../../models/math.operations";
 import {
-  cloudUploadOutline, menuOutline } from 'ionicons/icons';
+  cloudUploadOutline, menuOutline
+} from 'ionicons/icons';
 import { addIcons } from "ionicons";
 import { ToggleMenu } from 'src/app/models/design';
 
@@ -40,7 +41,7 @@ import { ToggleMenu } from 'src/app/models/design';
   styleUrls: ['./transaction.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, FloatLabel, IonButtons, IonMenuButton,
-    Select, IonGrid, IonRow, IonCol, IonIcon, IonModal, IonButton, InputText, Button, IonFooter, IconField, InputIcon,
+    Select, IonGrid, IonRow, IonCol, IonIcon, IonButton, InputText, Button, IconField, InputIcon,
     IonCard, PrimeTemplate, TableModule, Tag, Dialog, DialogModule]
 })
 export class TransactionPage implements OnInit {
@@ -119,7 +120,7 @@ export class TransactionPage implements OnInit {
     private endPoints: EndpointsService,
     private alerts: AlertsService,
     private platform: Platform,) {
-    addIcons({menuOutline,cloudUploadOutline});
+    addIcons({ menuOutline, cloudUploadOutline });
   }
 
   ngOnInit() {

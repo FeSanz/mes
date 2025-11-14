@@ -8,12 +8,10 @@ import {
   IonCard,
   IonCol,
   IonContent,
-  IonFooter,
   IonGrid,
   IonHeader,
   IonIcon,
   IonMenuButton,
-  IonModal,
   IonRow,
   IonTitle,
   IonToolbar
@@ -49,7 +47,7 @@ import {Dialog} from "primeng/dialog";
   styleUrls: ['./costs.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, FloatLabel, IonButtons, IonMenuButton,
-    Select, IonGrid, IonRow, IonCol, IonIcon, IonModal, IonButton, InputText, Button, IonFooter, IconField, InputIcon,
+    Select, IonGrid, IonRow, IonCol, IonIcon, IonButton, InputText, Button, IconField, InputIcon,
     IonCard, PrimeTemplate, TableModule, Tag, Badge, Dialog]
 })
 export class CostsPage implements OnInit {

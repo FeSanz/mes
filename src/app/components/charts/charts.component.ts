@@ -183,7 +183,7 @@ export class ChartsComponent implements OnInit {
           }))
         };
       });
-      this.chartOptions.series = data;      
+      this.chartOptions.series = data;
       this.ajustarYaxis();
       if (this.chart && this.chart.updateOptions) {
         //console.log("UPDATE chart");
@@ -301,7 +301,7 @@ export class ChartsComponent implements OnInit {
             this.ajustarYaxis();
           }
         }
-      }).then((ws) => {
+      }).then((ws: any) => {
         this.conexionesLocales[sensor_id] = ws;
       }).catch(err => {
         console.error('Error suscribiendo a sensor', sensor_id, err);

@@ -1,17 +1,15 @@
-import {ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit, ViewChild} from '@angular/core';
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   IonContent,
   IonHeader,
   IonTitle,
   IonToolbar,
-  IonToggle,
   IonGrid,
   IonRow,
   IonCol,
   IonCard,
-  IonCardTitle,
   IonButton,
   IonIcon,
   IonButtons,
@@ -19,31 +17,26 @@ import {
   IonInput,
   IonItem,
   IonText,
-  IonSelect,
-  IonSelectOption, IonLabel
+  IonLabel
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
 import { PermissionsService } from 'src/app/services/permissions.service';
 
-import {ConfirmationService, PrimeTemplate} from "primeng/api";
+import { ConfirmationService } from "primeng/api";
 import { TableModule } from "primeng/table";
 import { pencilOutline, trashOutline, eyeOutline, menuOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import {FloatLabel} from "primeng/floatlabel";
-import {Select} from "primeng/select";
-import {ToggleMenu} from "../../../models/design";
-import {Button} from "primeng/button";
-import {IconField} from "primeng/iconfield";
-import {InputText} from "primeng/inputtext";
-import {InputIcon} from "primeng/inputicon";
-import {HeightSingleTable, HeightTable} from "../../../models/tables.prime";
-import {Platform} from "@ionic/angular";
-import {Tag} from "primeng/tag";
-import {ConfirmDialog} from "primeng/confirmdialog";
-import {Dialog} from "primeng/dialog";
-import {Toast} from "primeng/toast";
-import {ProgressSpinner} from "primeng/progressspinner";
+import { Select } from "primeng/select";
+import { ToggleMenu } from "../../../models/design";
+import { Button } from "primeng/button";
+import { IconField } from "primeng/iconfield";
+import { InputText } from "primeng/inputtext";
+import { InputIcon } from "primeng/inputicon";
+import { HeightSingleTable } from "../../../models/tables.prime";
+import { Platform } from "@ionic/angular";
+import { Tag } from "primeng/tag";
+import { Dialog } from "primeng/dialog";
 
 @Component({
   selector: 'app-failures',
@@ -51,11 +44,12 @@ import {ProgressSpinner} from "primeng/progressspinner";
   styleUrls: ['./failures.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, PrimeTemplate, TableModule, IonToggle, IonGrid, IonRow, IonCol, IonCard, IonCardTitle, IonButton, IonIcon, FloatLabel, IonButtons, IonMenuButton, Select, Button, IconField, InputText, InputIcon, Tag, ConfirmDialog, Dialog, IonInput, IonItem, IonText, IonSelect, IonSelectOption, IonLabel, ReactiveFormsModule, Toast, ProgressSpinner]
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, TableModule, IonGrid, IonRow, IonCol, IonCard,
+    IonButton, IonIcon, IonButtons, IonMenuButton, Select, Button, IconField, InputText, InputIcon, Tag, Dialog, IonInput, IonItem, IonText, IonLabel, ReactiveFormsModule]
 })
 
 export class FailuresPage implements OnInit {
-  failuresData: any = { items: []}
+  failuresData: any = { items: [] }
   selectedFailures: any[] = [];
   userData: any = {};
 

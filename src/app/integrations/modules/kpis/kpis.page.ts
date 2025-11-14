@@ -15,13 +15,10 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { ToggleMenu } from 'src/app/models/design';
 import { DialogModule } from 'primeng/dialog';
-import { Dialog } from "primeng/dialog";
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { SimpleDonutComponent } from 'src/app/components/simple-donut/simple-donut.component';
-import { SimpleHeatmapComponent } from 'src/app/components/simple-heatmap/simple-heatmap.component';
-import { SimpleColumnBarComponent } from 'src/app/components/simple-column-bar/simple-column-bar.component';
 import { SimpleTimelineComponent } from 'src/app/components/simple-timeline/simple-timeline.component';
 import { SimpleStackedColumnsComponent } from 'src/app/components/simple-stacked-columns/simple-stacked-columns.component';
 
@@ -31,8 +28,8 @@ import { SimpleStackedColumnsComponent } from 'src/app/components/simple-stacked
   styleUrls: ['./kpis.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonContent, IonHeader, IonTitle, SimpleDonutComponent, SimpleColumnBarComponent, SimpleHeatmapComponent, IonToolbar, CommonModule, IonMenuButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonRow,
-    IonGrid, FormsModule, Tag, ButtonModule, InputText, IconFieldModule, InputIconModule, DialogModule, Dialog, Select, TableModule, FloatLabel, SimpleTimelineComponent, SimpleStackedColumnsComponent]
+  imports: [IonContent, IonHeader, IonTitle, SimpleDonutComponent, IonToolbar, CommonModule, IonMenuButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonRow,
+    IonGrid, FormsModule, Tag, ButtonModule, InputText, IconFieldModule, InputIconModule, DialogModule, Select, TableModule, FloatLabel, SimpleTimelineComponent, SimpleStackedColumnsComponent]
 })
 export class KpisPage implements OnInit {
   machinesArray: any = []
@@ -79,14 +76,6 @@ export class KpisPage implements OnInit {
   ngOnInit() {
   }
   ionViewDidEnter() {
-    //this.ResetData()
-    /*this.todayDate = this.formatLocalISO(new Date())
-    this.campaignObj.end_date = this.formatLocalISO(
-      new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(12, 0, 0, 0))
-    );
-    this.campaignObj.start_date = this.formatLocalISO(
-      new Date(new Date(new Date().setDate(new Date().getDate() + 7)).setHours(12, 0, 0, 0))
-    );*/
     this.GetMachines()
   }
   ResetData() {
@@ -145,7 +134,7 @@ export class KpisPage implements OnInit {
           runtimeHours: 0,
           downtimeHours: 0
         }
-        const failures: any = response.items ? this.ContarFallasPorArea(response.items) : ''
+        const failures: any = response.items ? this.ContarFallasPorArea(response.items) : ''        
         const failures2: any = response.items ? this.ContarFallasPorNombre(response.items) : ''
         this.donutData = {
           "Runtime": true,

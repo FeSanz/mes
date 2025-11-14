@@ -2,9 +2,11 @@ import { ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, ViewChild
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pauseSharp, pencilOutline, menuOutline, timeOutline } from 'ionicons/icons';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonFab, IonFabButton, IonModal, IonItem, 
-  IonInput, IonSelect, IonSelectOption, IonToggle, IonText, IonLabel } from '@ionic/angular/standalone';
+import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline, menuOutline, timeOutline } from 'ionicons/icons';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonItem,
+  IonInput, IonText, IonLabel
+} from '@ionic/angular/standalone';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -21,39 +23,34 @@ import { ApiService } from "../../../services/api.service";
 import { EndpointsService } from "../../../services/endpoints.service";
 import { AlertsService } from "../../../services/alerts.service";
 import { PermissionsService } from 'src/app/services/permissions.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToggleMenu } from 'src/app/models/design';
 import { Truncate } from "../../../models/math.operations";
 import { Dialog } from "primeng/dialog";
 import { PrimeTemplate } from "primeng/api";
 import { DialogModule } from 'primeng/dialog';
 import { IonBreadcrumb, IonBreadcrumbs } from '@ionic/angular/standalone';
-import {Tag} from "primeng/tag";
-import {ConfirmDialog} from "primeng/confirmdialog";
-import {Toast} from "primeng/toast";
-import {ProgressSpinner} from "primeng/progressspinner";
 import { DatePicker } from 'primeng/datepicker';
-import {ConfirmationService} from "primeng/api";
+import { ConfirmationService } from "primeng/api";
 
 @Component({
   selector: 'app-shifts',
   templateUrl: './shifts.page.html',
   styleUrls: ['./shifts.page.scss'],
   standalone: true,
-    imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, 
-    CommonModule, FormsModule, TableModule, CardModule, IonContent, IonTitle, IonToolbar, 
-    CommonModule, FormsModule, IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
-    IonButton, IonIcon, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle,
-    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, 
-    DropdownModule,MultiSelectModule, Select, FloatLabel, IonText, Dialog, PrimeTemplate, 
-    DialogModule, IonBreadcrumb, IonBreadcrumbs, Toast, ConfirmDialog, Tag, ProgressSpinner, IonLabel,
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule,
+    CommonModule, FormsModule, TableModule, CardModule, IonContent, IonTitle, IonToolbar,
+    CommonModule, FormsModule, IonButtons, IonMenuButton,
+    IonButton, IonIcon, IonItem, IonInput,
+    TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule,
+    DropdownModule, MultiSelectModule, Select, FloatLabel, IonText, Dialog, PrimeTemplate,
+    DialogModule, IonBreadcrumb, IonBreadcrumbs, IonLabel,
     DatePicker]
 })
 
 
 export class ShiftsPage implements OnInit {
 
-  @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;  
+  @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
   modalSize: string = '';
   private resizeObserver!: ResizeObserver;
   scrollHeight: string = '550px';
@@ -97,8 +94,10 @@ export class ShiftsPage implements OnInit {
     private confirmationService: ConfirmationService
   ) {
 
-    addIcons({ menuOutline, checkmarkOutline, addOutline, ellipsisVerticalOutline, chevronForwardOutline, 
-      trashOutline, pencilOutline, timeOutline });    
+    addIcons({
+      menuOutline, checkmarkOutline, addOutline, ellipsisVerticalOutline, chevronForwardOutline,
+      trashOutline, pencilOutline, timeOutline
+    });
   }
 
   ngOnInit() {
@@ -113,8 +112,8 @@ export class ShiftsPage implements OnInit {
         const sortedOrganizations = organizations.sort((a, b) => a.OrganizationId - b.OrganizationId);
         this.organizationSelected = sortedOrganizations[0];
         this.orgSelect = this.organizationSelected.OrganizationId;
-        
-        this.RefreshTables();        
+
+        this.RefreshTables();
 
       } else {
         this.alerts.Warning("No se encontraron organizaciones");
@@ -164,11 +163,11 @@ export class ShiftsPage implements OnInit {
     table.filterGlobal(target.value, 'contains');
   }
 
-  OpenAsNewShift() {    
+  OpenAsNewShift() {
     this.resetShift()
     this.isNewFlag = true
     this.shift.OrganizationId = this.orgSelect
-    this.isModalOpen = true;  
+    this.isModalOpen = true;
 
     const contentPart = document.querySelector('ion-modal.dispach-modal')?.shadowRoot?.querySelector('[part="content"]');
     if (contentPart) {
@@ -180,7 +179,7 @@ export class ShiftsPage implements OnInit {
   resetShift() {//se reinician los datos del usuario nuevo o a editar
     this.shift = {
       ShiftId: null,
-      OrganizationId: null,      
+      OrganizationId: null,
       Name: '',
       StartTime: '',
       EndTime: '',
@@ -189,10 +188,10 @@ export class ShiftsPage implements OnInit {
     };
   }
 
-  AddOrEditShift() {   
-    const itemsArray = [this.shift]; 
-    this.shift.StartTime = this.formatTime(this.shift.StartTime); 
-    this.shift.EndTime = this.formatTime(this.shift.EndTime); 
+  AddOrEditShift() {
+    const itemsArray = [this.shift];
+    this.shift.StartTime = this.formatTime(this.shift.StartTime);
+    this.shift.EndTime = this.formatTime(this.shift.EndTime);
 
     const validation = this.isValidShift(this.shift);
     if (!validation.isValid) {
@@ -202,11 +201,11 @@ export class ShiftsPage implements OnInit {
     }
 
     if (this.isNewFlag) {
-      if (this.organizationSelected) {  
+      if (this.organizationSelected) {
         const payload = {
           OrganizationId: this.shift.OrganizationId,
           items: itemsArray
-        };             
+        };
 
         this.apiService.PostRequestRender('shifts', payload).then(async (response: any) => {
           if (response.errorsExistFlag) {
@@ -225,9 +224,9 @@ export class ShiftsPage implements OnInit {
         this.alerts.Info('Seleccione una organización');
       }
     } else {
-      const payload = {        
+      const payload = {
         items: itemsArray
-      };                
+      };
 
       this.apiService.PutRequestRender('shifts/' + this.shift.ShiftId, payload).then(async (response: any) => {
         if (response.errorsExistFlag) {
@@ -247,14 +246,14 @@ export class ShiftsPage implements OnInit {
     if (this.selectedShifts.length === 0) {
       this.alerts.Warning("Seleccione algún elemento para eliminar");
       return;
-    }    
+    }
 
     const payload = {
       items: this.selectedShifts
     }
 
     console.log(JSON.stringify(payload, null, 2));
-    
+
     this.confirmationService.confirm({
       message: '¿Está seguro de que desea eliminar los elementos seleccionados?',
       header: 'Confirm',
@@ -269,15 +268,15 @@ export class ShiftsPage implements OnInit {
         label: 'Si'
       },
       accept: async () => {
-        try {        
+        try {
           this.apiService.DeleteMultipleRequestRender('shifts', payload).then(async (response: any) => {
-          if (!response.errorsExistFlag) {
-            this.alerts.Success("Eliminación exitosa");
-            this.RefreshTables();
-          } else {
-            this.alerts.Info(response.error);
-          }
-        });
+            if (!response.errorsExistFlag) {
+              this.alerts.Success("Eliminación exitosa");
+              this.RefreshTables();
+            } else {
+              this.alerts.Info(response.error);
+            }
+          });
 
         } catch (error) {
           console.error('Error al eliminar:', error);
@@ -292,17 +291,17 @@ export class ShiftsPage implements OnInit {
     this.shift = sh;
     this.isNewFlag = false
     this.isModalOpen = true
-    this.changeDetector.detectChanges()    
+    this.changeDetector.detectChanges()
   }
 
   RefreshTables() {
     let clause = `shifts/${this.organizationSelected.OrganizationId}`;
     this.apiService.GetRequestRender(clause).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
-      this.dbData = response;           
+      this.dbData = response;
     });
 
-    this.searchValueDB = '';    
+    this.searchValueDB = '';
   }
 
   formatTime(timeValue: any): string {
@@ -310,16 +309,16 @@ export class ShiftsPage implements OnInit {
     if (this.isTimeString(timeValue)) {
       return timeValue;
     }
-    
+
     // Si es un objeto Date válido
     if (timeValue instanceof Date && !isNaN(timeValue.getTime())) {
       return this.extractTimeFromDate(timeValue);
     }
-    
+
     // Si es null, undefined o tipo no reconocido
     return timeValue || '';
   }
-  
+
   extractTimeFromDate(date: Date): string {
     if (!date) return '';
     const hours = date.getHours().toString().padStart(2, '0');
@@ -346,7 +345,7 @@ export class ShiftsPage implements OnInit {
 
       // Validación especial para turnos nocturnos (que cruzan medianoche)
       const isOvernightShift = newEnd <= newStart;
-      
+
       if (!isOvernightShift && newStart >= newEnd) {
         return { isValid: false, message: 'La hora de inicio debe ser menor a la hora de fin' };
       }
@@ -367,15 +366,15 @@ export class ShiftsPage implements OnInit {
 
         // Verificar solapamiento considerando turnos nocturnos
         if (this.isOverlapping(newStart, newEnd, existingStart, existingEnd, isOvernightShift, isExistingOvernight)) {
-          return { 
-            isValid: false, 
-            message: `El turno se solapa con "${existingShift.Name}" (${existingShift.StartTime} - ${existingShift.EndTime})` 
+          return {
+            isValid: false,
+            message: `El turno se solapa con "${existingShift.Name}" (${existingShift.StartTime} - ${existingShift.EndTime})`
           };
         }
       }
 
       return { isValid: true, message: '' };
-      
+
     } catch (error) {
       console.error('Error en validación de turno:', error);
       return { isValid: true, message: '' };
@@ -383,14 +382,14 @@ export class ShiftsPage implements OnInit {
   }
 
   private isOverlapping(
-    start1: number, 
-    end1: number, 
-    start2: number, 
+    start1: number,
+    end1: number,
+    start2: number,
     end2: number,
     isOvernight1: boolean = false,
     isOvernight2: boolean = false
   ): boolean {
-    
+
     // Caso 1: Ambos turnos son normales (no cruzan medianoche)
     if (!isOvernight1 && !isOvernight2) {
       // Permitir que un turno termine exactamente cuando otro comienza
@@ -431,9 +430,9 @@ export class ShiftsPage implements OnInit {
 
   private timeToMinutes(time: string | Date): number {
     if (!time) return 0;
-    
+
     let timeString: string;
-    
+
     if (time instanceof Date) {
       // Si es Date, extraer hora y minutos
       const hours = time.getHours().toString().padStart(2, '0');
@@ -442,7 +441,7 @@ export class ShiftsPage implements OnInit {
     } else {
       timeString = time;
     }
-    
+
     const [hours, minutes] = timeString.split(':').map(Number);
     return hours * 60 + minutes;
   }

@@ -2,8 +2,8 @@ import { ChangeDetectorRef, CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, ViewChild
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pauseSharp, pencilOutline, menuOutline } from 'ionicons/icons';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonFab, IonFabButton, IonModal, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonText } from '@ionic/angular/standalone';
+import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline, menuOutline } from 'ionicons/icons';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonItem, IonInput, IonText } from '@ionic/angular/standalone';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -27,10 +27,6 @@ import { Dialog } from "primeng/dialog";
 import { PrimeTemplate } from "primeng/api";
 import { DialogModule } from 'primeng/dialog';
 import { IonBreadcrumb, IonBreadcrumbs } from '@ionic/angular/standalone';
-import { Tag } from "primeng/tag";
-import { ConfirmDialog } from "primeng/confirmdialog";
-import { Toast } from "primeng/toast";
-import { ProgressSpinner } from "primeng/progressspinner";
 import { ConfirmationService } from "primeng/api";
 
 @Component({
@@ -41,11 +37,11 @@ import { ConfirmationService } from "primeng/api";
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, 
     CommonModule, FormsModule, TableModule, CardModule, IonContent, IonTitle, IonToolbar, 
-    CommonModule, FormsModule, IonButtons, IonMenuButton, IonFab, IonFabButton, IonModal,
-    IonButton, IonIcon, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle,
+    CommonModule, FormsModule, IonButtons, IonMenuButton,
+    IonButton, IonIcon, IonItem, IonInput,
     TableModule, ButtonModule, InputTextModule, IconFieldModule, InputIconModule, TagModule, 
     DropdownModule,MultiSelectModule, Select, FloatLabel, IonText, Dialog, PrimeTemplate, 
-    DialogModule, IonBreadcrumb, IonBreadcrumbs, Tag, ConfirmDialog, Toast, ProgressSpinner]
+    DialogModule, IonBreadcrumb, IonBreadcrumbs]
 })
 
 export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {

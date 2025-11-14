@@ -15,11 +15,8 @@ import {
   IonInput,
   IonItem,
   IonIcon,
-  IonMenuButton,
-  IonButtons,
   IonToolbar,
   IonInputPasswordToggle,
-  IonFooter,
   IonToggle,
   IonAvatar
 } from '@ionic/angular/standalone';
@@ -38,7 +35,7 @@ import { WebSocketService } from '../services/web-socket.service';
   styleUrls: ['./login.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, CommonModule, FormsModule, IonText, IonButton, IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonCheckbox,
-    IonInput, IonItem, IonIcon, IonMenuButton, IonButtons, IonToolbar, IonInputPasswordToggle, IonFooter, IonToggle, IonAvatar]
+    IonInput, IonItem, IonIcon, IonToolbar, IonInputPasswordToggle, IonToggle, IonAvatar]
 })
 export class LoginPage {
   entity: string = ""
