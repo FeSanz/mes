@@ -60,24 +60,30 @@
                    [sortOrder]="1"
           >
             <ng-template #caption>
-              <div class="table-caption">
-                <p-button
-                  [outlined]="true"
-                  icon="pi pi-filter-slash"
-                  label="Limpiar"
-                  (click)="ClearWorkOrders(dtWorkOrders)"/>
+              <div class="table-caption-container">
+                <div class="left-section">
+                  <p-button
+                    [outlined]="true"
+                    icon="pi pi-filter-slash"
+                    label="Limpiar"
+                    (click)="ClearWorkOrders(dtWorkOrders)"/>
+                </div>
 
-                <div></div> <!-- Spacer -->
+                <div class="right-section">
+                  <p-tag severity="secondary" [rounded]="false" value="{{lastWorkOrders.items[0]?.WorkOrderNumber || 0}}" />|
+                  <p-tag severity="secondary" [rounded]="false" value="{{lastWorkOrders.items[0]?.ExecutionNumber || 0}}" />|
+                  <p-tag severity="secondary" [rounded]="false" value="{{lastWorkOrders.items[0]?.Ready || 0}}"/>
 
-                <p-iconField iconPosition="left">
-                  <p-inputIcon>
-                    <i class="fas fa-search"></i>
-                  </p-inputIcon>
-                  <input pInputText type="text"
-                         [(ngModel)]="searchValueWO"
-                         (input)="OnFilterGlobal($event, dtWorkOrders)"
-                         placeholder="Buscar" />
-                </p-iconField>
+                  <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                      <i class="fas fa-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text"
+                           [(ngModel)]="searchValueWO"
+                           (input)="OnFilterGlobal($event, dtWorkOrders)"
+                           placeholder="Buscar" />
+                  </p-iconField>
+                </div>
               </div>
             </ng-template>
 
@@ -218,8 +224,6 @@
                    stripedRows
                    [scrollable]="true"
                    [scrollHeight]="scrollHeight"
-                   sortField="ExecutionDate"
-                   [sortOrder]="1"
           >
 
             <ng-template pTemplate="header">
@@ -227,50 +231,36 @@
                 <th pSortableColumn="ResourceCode" style="min-width: 9rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Máquina
-                    <p-sortIcon field="ResourceCode" />
-                    <p-columnFilter type="text" field="ResourceCode" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="WorkOrderNumber" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     O.T.
-                    <p-sortIcon field="WorkOrderNumber" />
-                    <p-columnFilter type="text" field="WorkOrderNumber" display="menu" class="ml-auto" />
                   </div>
                 </th>
                 <th pSortableColumn="ItemNumber" style="min-width: 9rem">
                   <div class="flex justify-between items-center">
                     Producto
-                    <p-sortIcon field="ItemNumber" />
-                    <p-columnFilter field="ItemNumber" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="Description" style="min-width: 9rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Descripción
-                    <p-sortIcon field="Description" />
-                    <p-columnFilter field="Description" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
-                <th pSortableColumn="CompletedNumber" style="min-width: 7rem" class="td-center">
+                <th pSortableColumn="ExecutionNumber" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Número
-                    <p-sortIcon field="CompletedNumber" />
-                    <p-columnFilter field="CompletedNumber" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
-                <th pSortableColumn="QuantityLatest" style="min-width: 7rem" class="td-center">
+                <th pSortableColumn="Ready" style="min-width: 7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Cantidad
-                    <p-sortIcon field="QuantityLatest" />
-                    <p-columnFilter field="QuantityLatest" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
                 <th pSortableColumn="ExecutionDate" style="min-width:7rem" class="td-center">
                   <div class="flex justify-between items-center">
                     Fecha
-                    <p-sortIcon field="ExecutionDate" />
-                    <p-columnFilter field="ExecutionDate" matchMode="equals" display="menu" class="ml-auto"/>
                   </div>
                 </th>
             </ng-template>
@@ -280,9 +270,9 @@
                 <td class="td-center"><strong>{{item.WorkOrderNumber}}</strong></td>
                 <td>{{ item.ItemNumber }}</td>
                 <td>{{ item.Description }}</td>
-                <td class="td-center">{{ item.Number }}</td>
-                <td class="td-center">{{ item.Quantity }}</td>
-                <td class="td-center">{{ item.ExecutionDate | date:'dd/MM/yy HH:mm' }}</td>
+                <td class="td-center">{{ item.ExecutionNumber }}</td>
+                <td class="td-center">{{ item.Ready }}</td>
+                <td class="td-center">{{ item.ExecutionDate | date:'dd/MM/yy HH:mm:ss' }}</td>
               </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">

@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener,
-  OnDestroy, OnInit, ViewChild } from '@angular/core';
+  OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {
@@ -20,7 +20,7 @@ import {Platform} from '@ionic/angular';
 import {ApiService} from "../../../../services/api.service";
 import {EndpointsService} from "../../../../services/endpoints.service";
 import {AlertsService} from "../../../../services/alerts.service";
-import {HeightTable} from "../../../../models/tables.prime";
+import {HeightTable, RowsPerPageProduction} from "../../../../models/tables.prime";
 import {FormatForDisplayFromISO} from "../../../../models/date.format";
 import {ToggleMenu} from "../../../../models/design";
 
@@ -55,7 +55,7 @@ import {addIcons} from "ionicons";
 })
 export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
   scrollHeight: string = '550px';
-  rowsPerPage: number = 10;
+  rowsPerPage: number = 18;
   rowsPerPageOptions: number[] = [5, 10, 20];
 
   userData: any = {};
@@ -72,7 +72,8 @@ export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
   private autoPaginationInterval: any;
   private readonly AUTO_PAGINATION_DELAY = 10000;
 
-  constructor(private apiService: ApiService,
+  constructor(private cdr: ChangeDetectorRef,
+              private apiService: ApiService,
               private endPoints: EndpointsService,
               private alerts: AlertsService,
               private platform: Platform,
@@ -95,6 +96,8 @@ export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
         this.alerts.Warning("No se encontraron organizaciones");
       }
     }
+
+    this.RowsPerPage();
   }
 
   ngAfterViewInit() {
@@ -107,6 +110,26 @@ export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
     this.websocket.unsubscribe('workorders-advance');*/
     this.StopAutoPagination();
     console.log('ngOnDestroy');
+  }
+
+  private RowsPerPage() {
+    const viewportHeight = window.innerHeight;
+
+    // Calcular filas por pagina
+    this.rowsPerPage = RowsPerPageProduction(viewportHeight);
+
+    // Actualizar opciones del selector
+    this.rowsPerPageOptions = [
+      Math.max(5, Math.floor(this.rowsPerPage / 2)),
+      this.rowsPerPage,
+      Math.min(50, this.rowsPerPage * 2)
+    ];
+
+    // Forzar actualización de la tabla si ya existe
+    if (this.dtWorkOrders) {
+      this.dtWorkOrders.rows = this.rowsPerPage;
+      this.cdr.detectChanges();
+    }
   }
 
   @HostListener('window:resize', ['$event'])
@@ -133,8 +156,21 @@ export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
       this.OnStartSuscriptionNewWO(this.organizationSelected.OrganizationId);
       this.OnSuscriptionAdvanceWO(this.organizationSelected.OrganizationId);
 
+      this.GetLastWorkOrders();
+
     }).catch(error => {
       console.error('Error al obtener OTs:', error);
+    });
+  }
+
+  GetLastWorkOrders(){
+    this.apiService.GetRequestRender(`lastWOCompleted/${this.organizationSelected.OrganizationId}`, false).then((response: any) => {
+      this.lastWorkOrders = response;
+
+      this.cdr.detectChanges();
+    }).catch(error => {
+      console.error('Error al obtener últimas OTs registradas:', error);
+      this.lastWorkOrders = { items: [] };
     });
   }
 
@@ -189,49 +225,8 @@ export class ProductionPage implements OnInit, AfterViewInit, OnDestroy  {
             ...this.workOrders.items.slice(orderIndex + 1)
           ];
 
-          const lastWO ={
-            WorkOrderId: updatedItem.WorkOrderId,
-            WorkOrderNumber: updatedItem.WorkOrderNumber,
-            ItemNumber: updatedItem.ItemNumber,
-            Description: updatedItem.Description,
-            PlannedQuantity: updatedItem.PlannedQuantity,
-            DispatchedQuantity: updatedItem.DispatchedQuantity,
-            CompletedQuantity: updatedItem.CompletedQuantity,
-            Status: updatedItem.Status,
-            ResourceCode: updatedItem.ResourceCode,
-
-            ExecutionDate: woAdvanced.ExecutionDate,
-            Number: woAdvanced.Number,
-            Quantity: woAdvanced.Quantity,
-          }
-
-          // Verificar si la orden ya existe en latestWO
-          const existingLastWO = this.lastWorkOrders.items.findIndex(
-            (item: any) => item.WorkOrderId === lastWO.WorkOrderId
-          );
-
-          if (existingLastWO !== -1) {
-            // Si existe, actualizar la orden existente
-            this.lastWorkOrders.items[existingLastWO] = lastWO;
-          } else {
-            // Si no existe, agregar la nueva orden
-            this.lastWorkOrders.items.push(lastWO);
-          }
-
-          // Ordenar por ExecutionDate (más reciente primero)
-          this.lastWorkOrders.items.sort((a: any, b: any) => {
-            const dateA = new Date(a.ExecutionDate).getTime();
-            const dateB = new Date(b.ExecutionDate).getTime();
-            return dateA - dateB; // Orden ascendente (más viejo primero)
-          });
-
-          // Mantener solo las últimas 5 órdenes
-          if (this.lastWorkOrders.items.length > 5) {
-            this.lastWorkOrders.items = this.lastWorkOrders.items.slice(0, 5);
-          }
-
-          // Crear un nuevo array para forzar la detección de cambios
-          this.lastWorkOrders.items = [...this.lastWorkOrders.items];
+          this.cdr.detectChanges();
+          this.GetLastWorkOrders();
 
         } else {
           console.warn(`No se encontró la orden con ID: ${woAdvanced.WorkOrderId}`);

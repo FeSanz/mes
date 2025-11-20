@@ -33,7 +33,7 @@ import { Button } from "primeng/button";
 import { IconField } from "primeng/iconfield";
 import { InputText } from "primeng/inputtext";
 import { InputIcon } from "primeng/inputicon";
-import { HeightSingleTable } from "../../../models/tables.prime";
+import {HeightSingleTable, RowsPerPageFull} from "../../../models/tables.prime";
 import { Platform } from "@ionic/angular";
 import { Tag } from "primeng/tag";
 import { Dialog } from "primeng/dialog";
@@ -77,6 +77,7 @@ export class FailuresPage implements OnInit {
   cols: any[] = [];
   exportColumns: any[] = [];
   constructor(
+    private cdr: ChangeDetectorRef,
     public alerts: AlertsService,
     private apiService: ApiService,
     public permissions: PermissionsService,
@@ -100,11 +101,33 @@ export class FailuresPage implements OnInit {
       title: col.header,
       dataKey: col.field
     }));
+
+    this.RowsPerPage();
   }
 
   ionViewDidEnter() {
     this.UpdateScrollHeight();
     this.GetFailures()
+  }
+
+  private RowsPerPage() {
+    const viewportHeight = window.innerHeight;
+
+    // Calcular filas por pagina
+    this.rowsPerPage = RowsPerPageFull(viewportHeight);
+
+    // Actualizar opciones del selector
+    this.rowsPerPageOptions = [
+      Math.max(5, Math.floor(this.rowsPerPage / 2)),
+      this.rowsPerPage,
+      Math.min(50, this.rowsPerPage * 2)
+    ];
+
+    // Forzar actualización de la tabla si ya existe
+    if (this.dtFailures) {
+      this.dtFailures.rows = this.rowsPerPage;
+      this.cdr.detectChanges();
+    }
   }
 
   @HostListener('window:resize', ['$event'])
@@ -141,7 +164,7 @@ export class FailuresPage implements OnInit {
     table.filterGlobal(target.value, 'contains');
   }
 
-  // Método para exportar a CSV
+  // Metodo para exportar a CSV
   ExportCSV() {
     this.dtFailures.exportCSV();
   }
