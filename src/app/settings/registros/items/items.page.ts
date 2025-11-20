@@ -5,44 +5,37 @@ import { addIcons } from 'ionicons';
 import { ellipsisVerticalOutline, chevronForwardOutline, checkmarkOutline, addOutline, trashOutline, pencilOutline, menuOutline, timeOutline } from 'ionicons/icons';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonButtons, IonIcon, IonMenuButton, IonItem,
-  IonInput, IonText, IonLabel
+  IonInput, IonText, IonLabel, IonToggle
 } from '@ionic/angular/standalone';
-import { CardModule } from 'primeng/card';
-import { TagModule } from 'primeng/tag';
 import { Button, ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconField, IconFieldModule } from 'primeng/iconfield';
 import { InputIcon, InputIconModule } from 'primeng/inputicon';
-import { DropdownModule } from 'primeng/dropdown';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { TableModule } from 'primeng/table';
 import { Select } from 'primeng/select';
 import { FloatLabel } from "primeng/floatlabel"
 import { HeightTable } from "../../../models/tables.prime";
 import { ApiService } from "../../../services/api.service";
-import { EndpointsService } from "../../../services/endpoints.service";
 import { AlertsService } from "../../../services/alerts.service";
-import { PermissionsService } from 'src/app/services/permissions.service';
 import { ToggleMenu } from 'src/app/models/design';
 import { Truncate } from "../../../models/math.operations";
 import { Dialog } from "primeng/dialog";
 import { PrimeTemplate } from "primeng/api";
 import { DialogModule } from 'primeng/dialog';
 import { IonBreadcrumb, IonBreadcrumbs } from '@ionic/angular/standalone';
-import { DatePicker } from 'primeng/datepicker';
 import { ConfirmationService } from "primeng/api";
 
 @Component({
-  selector: 'app-work-centers',
-  templateUrl: './work-centers.page.html',
-  styleUrls: ['./work-centers.page.scss'],
+  selector: 'app-items',
+  templateUrl: './items.page.html',
+  styleUrls: ['./items.page.scss'],
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonMenuButton,
     IonButton, IonIcon, IonBreadcrumbs, IonBreadcrumb, FloatLabel, Select, PrimeTemplate, TableModule, ButtonModule,
-    IonText, IonItem, DialogModule, Dialog, InputIconModule, IconFieldModule, IonInput, InputTextModule
-  ]
+    IonText, IonItem, DialogModule, Dialog, InputIconModule, IconFieldModule, IonInput, InputTextModule, IonLabel,
+    IonToggle]
 })
-export class WorkCentersPage implements OnInit {
+export class ItemsPage implements OnInit {
 
   @ViewChild('regionContainer', { static: false }) regionContainer!: ElementRef;
   modalSize: string = '';
@@ -52,25 +45,25 @@ export class WorkCentersPage implements OnInit {
   rowsPerPageOptions: number[] = [10, 25, 50];
 
   protected readonly ToggleMenu = ToggleMenu;
-  userData: any = {};
-  dbOrganizations: any = {};
-  organizationSelected: string | any = '';
-  orgSelect: any = {};
+  userData: any = {};    
   dbData: any = {};
   searchValueDB: string = '';
   
-  selectedWC: any[] = [];
+  selectedItems: any[] = [];
   isNewFlag: boolean = true;
   isModalOpen: boolean = false;
 
-  wc: any = {
-    WorkCenterId: null,
-    OrganizationId: null,
-    WorkCenterCode: '',
-    WorkCenterName: '',
-    WorkAreaCode: '',
-    WorkAreaName: '',
-    FusionId: null
+  companyId: number | undefined; 
+  lotFlag: boolean = false;
+
+  item: any = {
+    ItemId: null,
+    CompanyId: null,
+    Number: '',
+    Description: '',
+    UoM: '',
+    Type: '',
+    LotControl: ''
   };
 
   constructor(
@@ -85,24 +78,11 @@ export class WorkCentersPage implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.dbOrganizations = JSON.parse(String(localStorage.getItem("userData")));
+  ngOnInit() {    
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
-    if (this.userData && this.userData.Company && this.userData.Company.Organizations) {
-
-      const organizations = this.userData.Company.Organizations;
-
-      // Validar si hay organizaciones
-      if (organizations && Array.isArray(organizations) && organizations.length > 0) {
-        const sortedOrganizations = organizations.sort((a, b) => a.OrganizationId - b.OrganizationId);
-        this.organizationSelected = sortedOrganizations[0];
-        this.orgSelect = this.organizationSelected.OrganizationId;
-
-        this.RefreshTables();
-
-      } else {
-        this.alerts.Warning("No se encontraron organizaciones");
-      }
+    if (this.userData) {      
+      this.companyId = this.userData.Company.CompanyId;    
+      this.RefreshTables();      
     }
   }
 
@@ -117,24 +97,13 @@ export class WorkCentersPage implements OnInit {
   }
 
   RefreshTables() {
-    let clause = `workCenters/${this.organizationSelected.OrganizationId}`;
+    let clause = `items/${this.companyId}/Todos`;
     this.apiService.GetRequestRender(clause).then((response: any) => {
       response.totalResults == 0 && this.alerts.Warning(response.message);
       this.dbData = response;
     });
 
     this.searchValueDB = '';
-  }
-
-  OnOrganizationSelected() {
-    if (this.organizationSelected) {
-      let clause = `workCenters/${this.organizationSelected.OrganizationId}`;
-      this.orgSelect = this.organizationSelected.OrganizationId;
-      this.apiService.GetRequestRender(clause).then((response: any) => {
-        response.totalResults == 0 && this.alerts.Warning(response.message);
-        this.dbData = response;
-      });
-    }
   }
   
   GetScrollHeight(): string {
@@ -158,11 +127,12 @@ export class WorkCentersPage implements OnInit {
     table.filterGlobal(target.value, 'contains');
   }
 
-  OpenAsNewWorkCenter() {
-    this.resetWC()
+  OpenAsNewItem() {
+    this.resetItem()
     this.isNewFlag = true
-    this.wc.OrganizationId = this.orgSelect
+    this.item.CompanyId = this.companyId
     this.isModalOpen = true;
+    this.item.LotControl = false;
 
     const contentPart = document.querySelector('ion-modal.dispach-modal')?.shadowRoot?.querySelector('[part="content"]');
     if (contentPart) {
@@ -171,29 +141,29 @@ export class WorkCentersPage implements OnInit {
     }
   }
 
-  resetWC() {//se reinician los datos del usuario nuevo o a editar
-    this.wc = {
-      WorkCenterId: null,
-      OrganizationId: null,
-      WorkCenterCode: '',
-      WorkCenterName: '',
-      WorkAreaCode: '',
-      WorkAreaName: '',
-      FusionId: null      
+  resetItem() {//se reinician los datos del usuario nuevo o a editar
+    this.item = {
+      ItemId: null,
+      CompanyId: null,
+      Number: '',
+      Description: '',
+      UoM: '',
+      Type: '',
+      LotControl: ''      
     };
   } 
   
-  AddOrEditWorkCenter() {
-    const itemsArray = [this.wc];
+  AddOrEditItem() {
+    this.formatLotControl();
+    const itemsArray = [this.item];
 
-    if (this.isNewFlag) {
-      if (this.organizationSelected) {
+    if (this.isNewFlag) {    
         const payload = {
-          OrganizationId: this.wc.OrganizationId,
+          CompanyId: this.companyId,
           items: itemsArray
         };
-
-        this.apiService.PostRequestRender('workCenters', payload).then(async (response: any) => {
+        
+        this.apiService.PostRequestRender('items', payload).then(async (response: any) => {
           if (response.errorsExistFlag) {
             this.alerts.Info(response.message);
           } else {
@@ -205,16 +175,14 @@ export class WorkCentersPage implements OnInit {
 
           }
         });
+
         this.isModalOpen = false
-      } else {
-        this.alerts.Info('Seleccione una organización');
-      }
     } else {
       const payload = {
         items: itemsArray
       };
 
-      this.apiService.PutRequestRender('workCenters/' + this.wc.WorkCenterId, payload).then(async (response: any) => {
+      this.apiService.PutRequestRender('items/' + this.item.ItemId, payload).then(async (response: any) => {
         if (response.errorsExistFlag) {
           this.alerts.Info(response.message);
         } else {
@@ -228,14 +196,14 @@ export class WorkCentersPage implements OnInit {
     this.alerts.HideLoading();
   }
 
-  async DeleteWorkCenters() {
-    if (this.selectedWC.length === 0) {
+  async DeleteItems() {
+    if (this.selectedItems.length === 0) {
       this.alerts.Warning("Seleccione algún elemento para eliminar");
       return;
     }
 
     const payload = {
-      items: this.selectedWC
+      items: this.selectedItems
     }    
 
     this.confirmationService.confirm({
@@ -253,11 +221,11 @@ export class WorkCentersPage implements OnInit {
       },
       accept: async () => {
         try {
-          this.apiService.DeleteMultipleRequestRender('workCenters', payload).then(async (response: any) => {
+          this.apiService.DeleteMultipleRequestRender('items', payload).then(async (response: any) => {
             if (!response.errorsExistFlag) {
               this.alerts.Success("Eliminación exitosa");
               this.RefreshTables();
-              this.selectedWC = [];
+              this.selectedItems = [];
             } else {
               this.alerts.Info(response.error);
             }
@@ -272,16 +240,42 @@ export class WorkCentersPage implements OnInit {
 
   }
 
-  EditWorkCenter(ct: any) {
-    this.wc = ct;
+  EditItem(it: any) {    
+    // this.item = it;
+    this.item.ItemId = it.ItemId;
+    this.item.CompanyId = it.Company;
+    this.item.Number = it.Number;
+    this.item.Description = it.Description;
+    this.item.UoM = it.UoM;
+    this.item.Type = it.Type;
+
+    if (it.LotControl === null || it.LotControl == '' || it.LotControl === 'N'){
+      this.lotFlag = false;
+      this.item.LotControl = 'N';
+    }else{
+      this.lotFlag = true;
+      this.item.LotControl = 'Y';
+    }
+
+    console.log(JSON.stringify(this.item, null, 2));
     this.isNewFlag = false
     this.isModalOpen = true
+
     this.changeDetector.detectChanges()    
   }
-  
+
   ClearData(table: any) {
     table.clear();
     this.searchValueDB = '';
   }
 
+  formatLotControl(){    
+    if (this.lotFlag){
+      this.item.LotControl = 'Y'
+    } else {
+      this.item.LotControl = 'N'
+    }
+  }
+  
 }
+

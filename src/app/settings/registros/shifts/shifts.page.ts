@@ -270,6 +270,7 @@ export class ShiftsPage implements OnInit {
             if (!response.errorsExistFlag) {
               this.alerts.Success("Eliminación exitosa");
               this.RefreshTables();
+              this.selectedShifts = [];
             } else {
               this.alerts.Info(response.error);
             }
@@ -441,6 +442,11 @@ export class ShiftsPage implements OnInit {
 
     const [hours, minutes] = timeString.split(':').map(Number);
     return hours * 60 + minutes;
+  }
+
+  ClearData(table: any) {
+    table.clear();
+    this.searchValueDB = '';
   }
 
   protected readonly ToggleMenu = ToggleMenu;

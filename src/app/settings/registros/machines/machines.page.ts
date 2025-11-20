@@ -257,6 +257,7 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
           if (!response.errorsExistFlag) {
             this.alerts.Success("Eliminación exitosa");
             this.RefreshTables();
+            this.selectedMachines = [];
           } else {
             this.alerts.Info(response.error);
           }
@@ -326,6 +327,12 @@ export class MachinesPage implements OnInit, AfterViewInit, OnDestroy {
       value: item.WorkCenterId.toString()
     }));
   }
+
+  ClearData(table: any) {
+    table.clear();
+    this.searchValueDB = '';
+  }
+
   protected readonly ToggleMenu = ToggleMenu;
 }
 

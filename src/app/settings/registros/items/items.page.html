@@ -10,41 +10,31 @@
     <ion-title>
       <ion-breadcrumbs>
         <ion-breadcrumb href="/grid-data">Registros</ion-breadcrumb>
-        <ion-breadcrumb href="/RegShifts">Turnos {{userData.Company.Name}}</ion-breadcrumb>
+        <ion-breadcrumb href="/RegItems">Artículos {{userData.Company.Name}}</ion-breadcrumb>
       </ion-breadcrumbs>
-    </ion-title>
-    <div class="card-select flex flex-wrap justify-center items-end gap-4" slot="end">
-      <p-floatlabel class="w-full md:w-56" variant="on">
-        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
-          [options]="dbOrganizations.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
-          placeholder="Seleccione una organización" styleClass="w-full" [virtualScroll]="true"
-          [virtualScrollItemSize]="38" (onChange)="OnOrganizationSelected()" 
-          appendTo="body"/>
-        <label for="organization_select">Organización</label>
-      </p-floatlabel>
-    </div>
-
+    </ion-title>    
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <div class="ion-margin">
     <div>
-      <p-table #dtDB [value]="dbData.items" 
-        dataKey="ShiftId" 
-        [(selection)]="selectedShifts"
+      <p-table 
+        #dtDB [value]="dbData.items" 
+        dataKey="ItemId" 
         styleClass="card-table-primeng"
         class="ion-margin tabla-centrada" 
+        [(selection)]="selectedItems"
         [tableStyle]="{ 'min-width': '50rem'}" 
         [size]="'small'" 
         [rowHover]="true"
-        [rows]="rowsPerPage"         
+        [rows]="rowsPerPage" 
         [showCurrentPageReport]="true" 
-        [rowsPerPageOptions]="rowsPerPageOptions"         
+        [rowsPerPageOptions]="rowsPerPageOptions" 
         [paginator]="true"
         currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos" 
         [filterDelay]="0"
-        [globalFilterFields]="['Code', 'Name', 'Class']" 
+        [globalFilterFields]="['Number', 'Description', 'UoM', 'LotControl']" 
         stripedRows [scrollable]="true"
         [scrollHeight]="GetScrollHeight()" 
         [alwaysShowPaginator]="true">
@@ -53,7 +43,7 @@
           <div class="table-caption-container">
             <div class="left-section">
               <p-button 
-                [outlined]="true" 
+                [outlined]="true"
                 icon="pi pi-filter-slash" 
                 label="Limpiar" 
                 (click)="ClearData(dtDB)" />
@@ -64,18 +54,18 @@
                 label="Nuevo"
                 variant="outlined"
                 severity="info"
-                (click)="OpenAsNewShift()" />
+                (click)="OpenAsNewItem()" />
 
             </div>
             <div class="right-section">
               <p-button
-                    *ngIf="selectedShifts.length > 0"
+                    *ngIf="selectedItems.length > 0"
                     [outlined]="true"
                     icon="pi pi-delete-left"
                     label="Eliminar"
                     variant="outlined"
                     severity="danger"
-                    (click)="DeleteShifts()" />
+                    (click)="DeleteItems()" />
 
               <p-iconField iconPosition="left">
                 <p-inputIcon>
@@ -85,8 +75,7 @@
                   type="text" 
                   [(ngModel)]="searchValueDB" 
                   (input)="OnFilterGlobal($event, dtDB)"
-                  placeholder="Buscar" 
-                />
+                  placeholder="Buscar" />
               </p-iconField>
             </div>
           </div>
@@ -104,32 +93,39 @@
                 <p-columnFilter type="text" field="ID" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="Name" style="min-width: 10rem">
+            <th pSortableColumn="Number" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Nombre
-                <p-sortIcon field="Name" />
-                <p-columnFilter type="text" field="Name" display="menu" class="ml-auto" />
+                Número
+                <p-sortIcon field="Number" />
+                <p-columnFilter type="text" field="Number" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="StartTime" style="min-width: 14rem">
+            <th pSortableColumn="Description" style="min-width: 14rem">
               <div class="flex justify-between items-center">
-                Hora inicio
-                <p-sortIcon field="StartTime" />
-                <p-columnFilter type="text" field="StartTime" display="menu" class="ml-auto" />
+                Descripción
+                <p-sortIcon field="Description" />
+                <p-columnFilter type="text" field="Description" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="EndTime" style="min-width: 10rem">
+            <th pSortableColumn="UoM" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Hora fin
-                <p-sortIcon field="EndTime" />
-                <p-columnFilter field="EndTime" matchMode="equals" display="menu" class="ml-auto" />
+                UOM
+                <p-sortIcon field="UoM" />
+                <p-columnFilter field="UoM" matchMode="equals" display="menu" class="ml-auto" />
               </div>
             </th>
-            <th pSortableColumn="Duration" style="min-width: 10rem">
+            <th pSortableColumn="Type" style="min-width: 10rem">
               <div class="flex justify-between items-center">
-                Duración
-                <p-sortIcon field="Duration" />
-                <p-columnFilter field="Duration" matchMode="equals" display="menu" class="ml-auto" />
+                Tipo
+                <p-sortIcon field="Type" />
+                <p-columnFilter field="Type" matchMode="equals" display="menu" class="ml-auto" />
+              </div>
+            </th>
+            <th pSortableColumn="LotControl" style="min-width: 10rem">
+              <div class="flex justify-between items-center">
+                Ctrl. Lote
+                <p-sortIcon field="LotControl" />
+                <p-columnFilter field="LotControl" matchMode="equals" display="menu" class="ml-auto" />
               </div>
             </th>
             <th pSortableColumn="Acciones" style="min-width: 10rem">
@@ -146,14 +142,15 @@
             <td class="td-center">
               <p-tableCheckbox [value]="item"/>
             </td>
-            <td>{{ item.ShiftId }}</td>
-            <td>{{ item.Name }}</td>
-            <td>{{ item.StartTime }}</td>
-            <td>{{ item.EndTime }}</td>
-            <td>{{ item.Duration }}</td>
+            <td>{{ item.ItemId }}</td>            
+            <td>{{ item.Number }}</td>
+            <td>{{ item.Description }}</td>
+            <td>{{ item.UoM }}</td>
+            <td>{{ item.Type }}</td>
+            <td>{{ item.LotControl }}</td>
             <td>
               <ion-button size="small" shape="round" color="success" title="Editar"
-                (click)="$event.stopPropagation(); EditShift(item)">
+                (click)="$event.stopPropagation(); EditItem(item)">
                 <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
               </ion-button>
             </td>
@@ -161,7 +158,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="5">No se encontraron turnos.</td>
+            <td colspan="5">No se encontraron artículos.</td>
           </tr>
         </ng-template>
       </p-table>
@@ -175,7 +172,7 @@
     <ng-template pTemplate="header">
       <div class="dialog-header">
         <span>
-          {{ isNewFlag ? 'Nuevo turno' : 'Editar turno' }}
+          {{ isNewFlag ? 'Nuevo artículo' : 'Editar artículo' }}
         </span>
       </div>
     </ng-template>
@@ -183,76 +180,49 @@
     <!-- Contenido principal del diálogo -->
     <div class="dialog-content-wrapper">
       <ion-item>
-        <ion-input placeholder="Nombre" [(ngModel)]="shift.Name" name="Name" required>
-          <div slot="label"><ion-text color="primary">Nombre:</ion-text></div>
+        <ion-input placeholder="Número" [(ngModel)]="item.Number" name="Number" required>
+          <div slot="label"><ion-text color="primary">Número:</ion-text></div>
         </ion-input>
       </ion-item>
       <ion-item>
-        <ion-label style="color: var(--ion-color-primary);" slot="start">Hora inicio:</ion-label>         
-        <p-datepicker           
-          [(ngModel)]="shift.StartTime" 
-          [showIcon]="true"
-          [iconDisplay]="'input'"
-          [showTime]="true"           
-          [readonlyInput]="false"          
-          [timeOnly]="true"     
-          (onSelect)="validateShift()"      
-          appendTo="body" >        
-                      
-          <ng-template #inputicon let-clickCallBack="clickCallBack">
-              <i class="far fa-clock" (click)="clickCallBack($event)"></i>
-          </ng-template>      
-    
-        </p-datepicker>
+        <ion-input placeholder="Descripción" [(ngModel)]="item.Description" name="Description" required>
+          <div slot="label"><ion-text color="primary">Descripción:</ion-text></div>
+        </ion-input>
       </ion-item>
       <ion-item>
-        <ion-label style="color: var(--ion-color-primary);" slot="start">Hora fin:</ion-label>   
-        <p-datepicker           
-          [(ngModel)]="shift.EndTime" 
-          [showTime]="true"   
-          [showIcon]="true"        
-          [readonlyInput]="false"
-          [iconDisplay]="'input'"          
-          [timeOnly]="true"
-          (onSelect)="validateShift()"           
-          appendTo="body" > 
+        <ion-input placeholder="UOM" [(ngModel)]="item.UoM" name="UoM" required>
+          <div slot="label"><ion-text color="primary">UOM:</ion-text></div>
+        </ion-input>
+      </ion-item>
+      <ion-item>       
+        <ion-input placeholder="Tipo" [(ngModel)]="item.Type" name="Type" required>
+          <div slot="label"><ion-text color="primary">Tipo:</ion-text></div>
+        </ion-input>      
+      </ion-item>
 
-          <ng-template #inputicon let-clickCallBack="clickCallBack">
-              <i class="far fa-clock" (click)="clickCallBack($event)"></i>
-          </ng-template>     
-        </p-datepicker>
+      <ion-item>        
+        <ion-label color="primary">
+          Ctrl. Lote:          
+        </ion-label>
+        <ion-toggle [(ngModel)]="lotFlag" />        
       </ion-item>
-      <ion-item>
-        <ion-input placeholder="Duración" 
-          [(ngModel)]="shift.Duration" 
-          name="Duration" 
-          type="number" 
-          pattern="[0-9]*"
-          inputmode="numeric"
-          [min]="0"
-          [max]="8"
-          [step]="1"
-          required>
-          <div slot="label"><ion-text color="primary">Duración:</ion-text></div>
-        </ion-input>
-      </ion-item>
+
     </div>
 
     <!-- Footer con botones -->
     <ng-template pTemplate="footer">
-
+      
       <p-button 
         label="Cancelar" 
         severity="danger" 
-        (click)="isModalOpen = false;" 
-      />
-
+        (click)="isModalOpen = false;" />
+      
       <p-button 
-        [disabled]="!shift?.Name?.trim() || !shift.StartTime || !shift.EndTime || !shift?.Duration" 
+        [disabled]="!item.Number.trim() || !item.Description.trim() || !item.UoM"
         label="Guardar" 
         severity="success" 
-        (click)="AddOrEditShift()"
-      />         
+        (click)="AddOrEditItem()"
+      />
 
     </ng-template>
   </p-dialog>

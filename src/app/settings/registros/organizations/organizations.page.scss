@@ -1,0 +1,32 @@
+/* Asegurar que el mapa se expanda correctamente */
+#map {
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.map-dialog-content {
+    height: 100%;
+    position: relative;
+}
+
+/* Forzar el redimensionamiento del contenedor del diálogo */
+:host ::ng-deep .p-dialog .p-dialog-content {
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+:host ::ng-deep .p-dialog {
+    transition: all 0.3s ease;
+}
+
+/* Asegurar que el diálogo maximizado use todo el espacio disponible */
+:host ::ng-deep .p-dialog-maximized {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+:host ::ng-deep .p-dialog-maximized .p-dialog-content {
+    height: calc(100vh - 150px) !important;
+}
