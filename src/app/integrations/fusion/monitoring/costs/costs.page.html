@@ -28,16 +28,30 @@
     <ion-row>
       <ion-col size="12">
         <ion-card class="stats-card">
-          <p-table #dtWorkOrders [value]="workOrdersCost.items" dataKey="WorkOrderNumber"
-            styleClass="card-table-primeng wo-table-custom " [tableStyle]="{ 'min-width': '96rem','height': '100%'}"
-            [size]="'small'" [rowHover]="true" [rows]="rowsPerPage" [showCurrentPageReport]="true" [paginator]="true"
-            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos" [filterDelay]="0"
-            [globalFilterFields]="['WorkOrderNumber', 'ItemNumber']" stripedRows [scrollable]="true"
-            [scrollHeight]="scrollHeight" [alwaysShowPaginator]="true" sortField="WorkOrderNumber" [sortOrder]="1">
-            <ng-template #caption>
+          <p-table #dtCosts
+                   [value]="workOrdersCost.items"
+                   dataKey="WorkOrderNumber"
+                   styleClass="card-table-primeng wo-table-custom "
+                   [tableStyle]="{ 'height': '100%'}"
+                   [size]="'small'"
+                   [rowHover]="true"
+                   [rowsPerPageOptions]="rowsPerPageOptions"
+                   [rows]="rowsPerPage"
+                   [showCurrentPageReport]="true"
+                   [paginator]="true"
+                   currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+                   [filterDelay]="0"
+                   [globalFilterFields]="['WorkOrderNumber', 'ItemNumber']"
+                   stripedRows
+                   [scrollable]="true"
+                   [scrollHeight]="scrollHeight"
+                   [alwaysShowPaginator]="true"
+                   sortField="WorkOrderNumber"
+                   [sortOrder]="1">
+            <ng-template  pTemplate="caption">
               <div class="table-caption">
                 <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
-                  (click)="ClearWorkOrders(dtWorkOrders)" />
+                  (click)="ClearWorkOrders(dtCosts)" />
 
                 <div></div> <!-- Spacer -->
 
@@ -46,7 +60,7 @@
                     <i class="fas fa-search"></i>
                   </p-inputIcon>
                   <input pInputText type="text" [(ngModel)]="searchValueWO"
-                    (input)="OnFilterGlobal($event, dtWorkOrders)" placeholder="Buscar" />
+                    (input)="OnFilterGlobal($event, dtCosts)" placeholder="Buscar" />
                 </p-iconField>
               </div>
             </ng-template>

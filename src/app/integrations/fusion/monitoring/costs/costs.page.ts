@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import {Component, HostListener, OnInit, ChangeDetectorRef, ViewChild} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -32,7 +32,7 @@ import { Tag } from "primeng/tag";
 import { ApiService } from "../../../../services/api.service";
 import { EndpointsService } from "../../../../services/endpoints.service";
 import { Platform } from "@ionic/angular";
-import { HeightTable } from "../../../../models/tables.prime";
+import {HeightSingleTable, RowsPerPageFull} from "../../../../models/tables.prime";
 import { TruncatePoint } from "../../../../models/math.operations";
 import { cloudUploadOutline, readerOutline, menuOutline } from 'ionicons/icons';
 import { addIcons } from "ionicons";
@@ -53,7 +53,7 @@ import {Dialog} from "primeng/dialog";
 export class CostsPage implements OnInit {
 
   scrollHeight: string = '550px';
-  rowsPerPage: number = 15;
+  rowsPerPage: number = 25;
   rowsPerPageOptions: number[] = [5, 15, 20];
   userData: any = {};
   organizationSelected: string | any = '';
@@ -114,7 +114,12 @@ export class CostsPage implements OnInit {
     })
   };
 
-  constructor(private apiService: ApiService,
+  // Agregar referencia a la tabla
+  @ViewChild('dtFailures') dtCosts: any;
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private apiService: ApiService,
     private endPoints: EndpointsService,
     private alerts: AlertsService,
     private platform: Platform,) {
@@ -136,6 +141,32 @@ export class CostsPage implements OnInit {
         this.alerts.Warning("No se encontraron organizaciones");
       }
     }
+
+    this.RowsPerPage();
+  }
+
+  ionViewDidEnter() {
+    this.UpdateScrollHeight();
+  }
+
+  private RowsPerPage() {
+    const viewportHeight = window.innerHeight;
+
+    // Calcular filas por pagina
+    this.rowsPerPage = RowsPerPageFull(viewportHeight);
+
+    // Actualizar opciones del selector
+    this.rowsPerPageOptions = [
+      Math.max(5, Math.floor(this.rowsPerPage / 2)),
+      this.rowsPerPage,
+      Math.min(50, this.rowsPerPage * 2)
+    ];
+
+    // Forzar actualización de la tabla si ya existe
+    if (this.dtCosts) {
+      this.dtCosts.rows = this.rowsPerPage;
+      this.cdr.detectChanges();
+    }
   }
 
   @HostListener('window:resize', ['$event'])
@@ -144,7 +175,7 @@ export class CostsPage implements OnInit {
   }
 
   private UpdateScrollHeight() {
-    this.scrollHeight = HeightTable(this.platform.height());
+    this.scrollHeight = HeightSingleTable(this.platform.height());
   }
 
 
