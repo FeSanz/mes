@@ -21,6 +21,7 @@ import { PermissionsService } from 'src/app/services/permissions.service';
 import { SimpleDonutComponent } from 'src/app/components/simple-donut/simple-donut.component';
 import { SimpleTimelineComponent } from 'src/app/components/simple-timeline/simple-timeline.component';
 import { SimpleStackedColumnsComponent } from 'src/app/components/simple-stacked-columns/simple-stacked-columns.component';
+import { DatePicker } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-kpis',
@@ -28,7 +29,7 @@ import { SimpleStackedColumnsComponent } from 'src/app/components/simple-stacked
   styleUrls: ['./kpis.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonContent, IonHeader, IonTitle, SimpleDonutComponent, IonToolbar, CommonModule, IonMenuButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonRow,
+  imports: [IonContent, IonHeader, IonTitle, SimpleDonutComponent, IonToolbar, CommonModule, IonMenuButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonRow, DatePicker,
     IonGrid, FormsModule, Tag, ButtonModule, InputText, IconFieldModule, InputIconModule, DialogModule, Select, TableModule, FloatLabel, SimpleTimelineComponent, SimpleStackedColumnsComponent]
 })
 export class KpisPage implements OnInit {
@@ -57,6 +58,9 @@ export class KpisPage implements OnInit {
   dateRange: any = "24hours"
   selectedRowMachine: any = null;
   selectedMachines: any[] = [];
+  showDateTime = false
+  startDate: Date | undefined;
+  endDate: Date | undefined;
   constructor(
     private alerts: AlertsService,
     private apiService: ApiService,
@@ -66,12 +70,10 @@ export class KpisPage implements OnInit {
     addIcons({ menuOutline, checkmarkCircle, trashOutline, pencilOutline, eyeOutline, hammerOutline, checkmarkOutline, timeOutline });
     this.organizationSelected = localStorage.getItem("organizationSelected") ? JSON.parse(localStorage.getItem("organizationSelected") || '{}') : this.userData.Company.Organizations[0]
     localStorage.getItem("dateRange") ? this.dateRange = localStorage.getItem("dateRange") : null
-    //this.donutData = this.generarValores();
-  }
-  generarValores() {
-    const a = Math.floor(Math.random() * 101);
-    const b = 100 - a;
-    return [a, b];
+    this.SetDate()
+    if (this.dateRange == "custom") {
+      this.showDateTime = true
+    }
   }
   ngOnInit() {
   }
@@ -79,6 +81,11 @@ export class KpisPage implements OnInit {
     this.GetMachines()
   }
   ResetData() {
+    if (this.dateRange == "custom") {
+      this.showDateTime = true
+    } else {
+      this.showDateTime = false
+    }
     localStorage.setItem("organizationSelected", JSON.stringify(this.organizationSelected))
     localStorage.setItem("dateRange", this.dateRange)
     this.donutData = []
@@ -88,6 +95,17 @@ export class KpisPage implements OnInit {
     this.selectedMachine = {}
     this.selectedMachines = []
     this.selectedRowMachine = []
+  }
+
+  SetDate() {
+    const now = new Date();
+    // END: hoy a la hora actual
+    this.endDate = new Date(now);
+    // START: hace 7 días a las 12:00 pm
+    this.startDate = new Date(now);
+    this.startDate.setDate(now.getDate() - 7);
+    this.startDate.setHours(12, 0, 0, 0);
+
   }
   GetMachines() {
     this.ResetData()
@@ -108,11 +126,12 @@ export class KpisPage implements OnInit {
     table.filterGlobal(target.value, 'contains');
   }
   GetDataDB(item: any) {
-    this.apiService.GetRequestRender('alertsInterval/' + item.MachineId + '/' + this.dateRange).then((response: any) => {
+    let query = this.dateRange == 'custom' ? ('alertsIntervalBetween/' + item.MachineId + '/' + this.startDate?.toISOString().split('T')[0] + '/' + this.endDate?.toISOString().split('T')[0]) : ('alertsInterval/' + item.MachineId + '/' + this.dateRange)
+    this.apiService.GetRequestRender(query).then((response: any) => {
       if (response.errorsExistFlag == true) {
         //this.alerts.Info(response.message);
       } else {
-        const hours = this.getDateRangeFromOption(this.dateRange)
+        const hours = this.dateRange === 'custom' ? this.getDateRangeFromOption('custom', this.startDate, this.endDate) : this.getDateRangeFromOption(this.dateRange);
         const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
         this.timeLineData = [...this.timeLineData, timeLineRes[0]]
         this.barsData = [...this.barsData, timeLineRes[0]]
@@ -120,11 +139,12 @@ export class KpisPage implements OnInit {
     })
   }
   ViewDetails(item: any) {
-    this.apiService.GetRequestRender('alertsInterval/' + item.MachineId + '/' + this.dateRange).then((response: any) => {
+    let query = this.dateRange == 'custom' ? ('alertsIntervalBetween/' + item.MachineId + '/' + this.startDate?.toISOString().split('T')[0] + '/' + this.endDate?.toISOString().split('T')[0]) : ('alertsInterval/' + item.MachineId + '/' + this.dateRange)
+    this.apiService.GetRequestRender(query).then((response: any) => {
       if (response.errorsExistFlag == true) {
-        //this.alerts.Info(response.message);
+        this.alerts.Info(response.message);
       } else {
-        const hours = this.getDateRangeFromOption(this.dateRange)
+        const hours = this.dateRange === 'custom' ? this.getDateRangeFromOption('custom', this.startDate, this.endDate) : this.getDateRangeFromOption(this.dateRange);
         const donutRes = response.items ? this.calculateMachineMetrics(response.items, hours.start, hours.end) : {
           runtimeMinutes: 1,
           downtimeMinutes: 0,
@@ -134,7 +154,7 @@ export class KpisPage implements OnInit {
           runtimeHours: 0,
           downtimeHours: 0
         }
-        const failures: any = response.items ? this.ContarFallasPorArea(response.items) : ''        
+        const failures: any = response.items ? this.ContarFallasPorArea(response.items) : ''
         const failures2: any = response.items ? this.ContarFallasPorNombre(response.items) : ''
         this.donutData = {
           "Runtime": true,
@@ -159,41 +179,55 @@ export class KpisPage implements OnInit {
       }
     })
   }
-  getDateRangeFromOption(option: string): { start: Date; end: Date } {
+  getDateRangeFromOption(option: string, customStart?: Date, customEnd?: Date): { start: Date; end: Date } {
     const now = new Date();
-    const end = new Date(); // Fecha actual
     let start: Date;
+    let end: Date = new Date(); // por default hoy
     switch (option) {
       case 'today':
         start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        end = new Date(start); // mismo día
         break;
       case '24hours':
         start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        end = new Date(now);
         break;
       case '7days':
         start = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000);
         start.setHours(0, 0, 0, 0);
+        end = new Date(now);
         break;
       case 'week': {
         const dayOfWeek = now.getDay(); // 0 = domingo
         const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // lunes
-        start = new Date(now.setDate(diff));
+        start = new Date(now.getFullYear(), now.getMonth(), diff);
         start.setHours(0, 0, 0, 0);
+        end = new Date(now);
         break;
       }
       case '30days':
         start = new Date(now.getTime() - 29 * 24 * 60 * 60 * 1000);
         start.setHours(0, 0, 0, 0);
+        end = new Date(now);
         break;
       case 'month':
         start = new Date(now.getFullYear(), now.getMonth(), 1);
+        end = new Date(now);
         break;
-
+      case 'custom':
+        if (!customStart || !customEnd) {
+          throw new Error('Para la opción custom debes proporcionar customStart y customEnd');
+        }
+        start = new Date(customStart);
+        end = new Date(customEnd);
+        break;
       default:
         throw new Error('Opción de rango de fechas no válida');
     }
     return { start, end };
   }
+
+
   calculateMachineMetrics(
     alerts: any[],
     startDate?: Date,

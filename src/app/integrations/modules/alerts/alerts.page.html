@@ -6,8 +6,8 @@
           <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
         </ion-button>
       </ion-menu-button>
-    </ion-buttons><ion-title>Alertas {{userData.Company.Name}}</ion-title>
-
+    </ion-buttons>
+    <ion-title>Alertas {{userData.Company.Name}}</ion-title>
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
@@ -236,17 +236,25 @@
             [filterDelay]="0" stripedRows [scrollable]="true" [scrollHeight]="scrollHeight" [sortOrder]="1">
             <ng-template #caption>
               <div class="table-caption">
-                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearAlerts(dtAlerts)" />
-                <div style="font-size: 17px;">
-                  Alertas Finalizadas
+                <div class="table-caption-left">
+                  <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
+                    (click)="ClearAlerts(dtAlerts)" />
+                  <div style="font-size: 17px;">
+                    Alertas Finalizadas
+                  </div>
                 </div>
-                <p-iconField iconPosition="left">
-                  <p-inputIcon>
-                    <i class="fas fa-search"></i>
-                  </p-inputIcon>
-                  <input pInputText type="text" [(ngModel)]="searchValueAl" (input)="OnFilterGlobal($event, dtAlerts)"
-                    placeholder="Buscar" />
-                </p-iconField>
+
+                <div class="table-caption-right">
+                  <p-button [outlined]="true" icon="pi pi-history" label="Historial" variant="outlined"
+                    [routerLink]="['/alert-history']" severity="warn" />
+                  <p-iconField iconPosition="left">
+                    <p-inputIcon>
+                      <i class="fas fa-search"></i>
+                    </p-inputIcon>
+                    <input pInputText type="text" [(ngModel)]="searchValueAl" (input)="OnFilterGlobal($event, dtAlerts)"
+                      placeholder="Buscar" />
+                  </p-iconField>
+                </div>
               </div>
             </ng-template>
             <ng-template pTemplate="header">
@@ -350,22 +358,22 @@
                 <td class="td-center" [title]="item.responseLegibleTimeString">
                   <ng-container *ngIf="item.responseTimeString as time">
                     <ng-container *ngIf="time.split(':') as parts">
-                      <p-tag severity="contrast" [value]="parts[0]"></p-tag>
+                      <p-tag severity="secondary" [value]="parts[0]"></p-tag>
                       :
-                      <p-tag severity="contrast" [value]="parts[1]"></p-tag>
+                      <p-tag severity="secondary" [value]="parts[1]"></p-tag>
                       :
-                      <p-tag severity="contrast" [value]="parts[2]"></p-tag>
+                      <p-tag severity="secondary" [value]="parts[2]"></p-tag>
                     </ng-container>
                   </ng-container>
                 </td>
                 <td class="td-center" [title]="item.repairLegibleTimeString">
                   <ng-container *ngIf="item.repairTimeString as time">
                     <ng-container *ngIf="time.split(':') as parts">
-                      <p-tag severity="contrast" [value]="parts[0]"></p-tag>
+                      <p-tag severity="secondary" [value]="parts[0]"></p-tag>
                       :
-                      <p-tag severity="contrast" [value]="parts[1]"></p-tag>
+                      <p-tag severity="secondary" [value]="parts[1]"></p-tag>
                       :
-                      <p-tag severity="contrast" [value]="parts[2]"></p-tag>
+                      <p-tag severity="secondary" [value]="parts[2]"></p-tag>
                     </ng-container>
                   </ng-container>
                 </td>

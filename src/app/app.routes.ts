@@ -108,33 +108,34 @@ export const routes: Routes = [
   },
   {
     path: 'wc',
-    loadComponent: () => import('./integrations/fusion/modules/wc/wc.page').then( m => m.WcPage)
+    loadComponent: () => import('./integrations/fusion/modules/wc/wc.page').then(m => m.WcPage)
   },
   {
     path: 'kpis',
-    loadComponent: () => import('./integrations/modules/kpis/kpis.page').then( m => m.KpisPage)
-  },  
+    loadComponent: () => import('./integrations/modules/kpis/kpis.page').then(m => m.KpisPage)
+  },
   {
     path: 'grid-data',
-    loadComponent: () => import('./settings/registros/grid-data/grid-data.page').then( m => m.GridDataPage)
+    loadComponent: () => import('./settings/registros/grid-data/grid-data.page').then(m => m.GridDataPage)
   },
   {
     path: 'RegShifts',
-    loadComponent: () => import('./settings/registros/shifts/shifts.page').then( m => m.ShiftsPage)
+    loadComponent: () => import('./settings/registros/shifts/shifts.page').then(m => m.ShiftsPage)
   },
   {
     path: 'work-centers',
-    loadComponent: () => import('./settings/registros/work-centers/work-centers.page').then( m => m.WorkCentersPage)
+    loadComponent: () => import('./settings/registros/work-centers/work-centers.page').then(m => m.WorkCentersPage)
   },
   {
     path: 'RegOrganizations',
-    loadComponent: () => import('./settings/registros/organizations/organizations.page').then( m => m.OrganizationsPage)
+    loadComponent: () => import('./settings/registros/organizations/organizations.page').then(m => m.OrganizationsPage)
   },
   {
     path: 'RegItems',
-    loadComponent: () => import('./settings/registros/items/items.page').then( m => m.ItemsPage)
+    loadComponent: () => import('./settings/registros/items/items.page').then(m => m.ItemsPage)
+  },
+  {
+    path: 'alert-history',
+    loadComponent: () => import('./integrations/modules/alert-history/alert-history.page').then(m => m.AlertHistoryPage)
   }
-
-
-
 ];

@@ -1,10 +1,11 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonMenuButton, IonIcon, IonButton } from '@ionic/angular/standalone';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonMenuButton, IonIcon, IonButton, IonRouterLink,
+} from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
-import { EndpointsService } from 'src/app/services/endpoints.service';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 
 import { Button } from "primeng/button";
@@ -14,11 +15,10 @@ import { InputText } from "primeng/inputtext";
 import { PrimeTemplate } from "primeng/api";
 import { Table, TableModule } from "primeng/table";
 import { Tag } from "primeng/tag";
-import { ProgressBar } from "primeng/progressbar";
-import { Slider } from "primeng/slider";
 import { FloatLabel } from "primeng/floatlabel";
 import { Select } from "primeng/select";
 import { PermissionsService } from 'src/app/services/permissions.service';
+import { RouterLink } from "@angular/router";
 import { addIcons } from 'ionicons';
 import { addOutline, checkmarkOutline, closeOutline, hammerOutline, trashOutline, menuOutline, pencilOutline, timeOutline, hourglassOutline } from 'ionicons/icons';
 import { ToggleMenu } from 'src/app/models/design';
@@ -31,8 +31,8 @@ import { Dialog } from "primeng/dialog";
   styleUrls: ['./alerts.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonIcon, IonButton,
-  IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule, DialogModule, Dialog, Tag, FloatLabel, Select]
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonIcon, IonButton, IonRouterLink, RouterLink,
+    IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule, DialogModule, Dialog, Tag, FloatLabel, Select]
 })
 export class AlertsPage {
   searchValueAl: string = '';
@@ -166,8 +166,6 @@ export class AlertsPage {
       this.wsSub = sub;
     }).catch(err => console.log(err));
   }
-
-
   OnAdvanceFilter(values: number[], filterCallback: any) {
     this.progressValue = values;
     filterCallback(values);
@@ -176,7 +174,6 @@ export class AlertsPage {
     const target = event.target as HTMLInputElement;
     table.filterGlobal(target.value, 'contains');
   }
-
   ClearAlerts(table: any) {
     table.clear();
     this.searchValueAl = '';
@@ -204,7 +201,6 @@ export class AlertsPage {
         if (!response.errorsExistFlag) {
           this.alerts.Success("Alerta actualizada")
           this.isEditAlertModalOpen = false
-          //this.GetAlerts()
         } else {
           this.alerts.Info(response.error)
         }
@@ -226,11 +222,8 @@ export class AlertsPage {
   async FinaliceAlert(alert: any) {
     if (await this.alerts.ShowAlert("¿Deseas finalizar esta alerta?", "Alerta", "Atrás", "Finalizar")) {
       this.apiService.PutRequestRender('alerts/' + alert.alert_id + '/repair', { organization_id: this.organizationSelected.OrganizationId }).then((response: any) => {
-        //console.log(response);
-
         if (!response.errorsExistFlag) {
           this.alerts.Success("Alerta finalizada")
-          //alert.repair_time = new Date()
         } else {
           this.alerts.Info(response.error)
         }

@@ -16,13 +16,22 @@
           [virtualScrollItemSize]="38" (onChange)="GetMachines()" appendTo="body" />
         <label for="organization_select">Organización</label>
       </p-floatlabel>
-    </div>
-    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="dateRange" inputId="date_range_select" [options]="dateRangeOptions" optionLabel="label"
           (onChange)="ResetData()" optionValue="value" appendTo="body" />
         <label for="date_range_select">Período</label>
       </p-floatlabel>
+    </div>
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4" *ngIf="showDateTime">
+      <p-datepicker slot="end" [(ngModel)]="startDate" [showTime]="true" [showIcon]="true" [readonlyInput]="true"
+        (ngModelChange)="ResetData()" inputStyleClass="no-border-bg" [maxDate]="endDate" dateFormat="dd/mm/yy"
+        hourFormat="12" appendTo="body"> </p-datepicker>
+
+      <p-datepicker slot="end" [(ngModel)]="endDate" [showTime]="true" [showIcon]="true" [readonlyInput]="true"
+        (ngModelChange)="ResetData()" inputStyleClass="no-border-bg" [minDate]="startDate" dateFormat="dd/mm/yy"
+        hourFormat="12" appendTo="body">
+      </p-datepicker>
+
     </div>
   </ion-toolbar>
 </ion-header>
@@ -64,7 +73,6 @@
                 </div>
               </div>
             </ng-template>
-
             <ng-template pTemplate="header">
               <tr>
                 <th pSortableColumn="code" class="td-center">

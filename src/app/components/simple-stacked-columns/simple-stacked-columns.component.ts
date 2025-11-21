@@ -119,7 +119,7 @@ export class SimpleStackedColumnsComponent implements OnInit {
       const faultTypes = Array.from(allFaultTypes);
 
       // Si no hay tipos de fallas, crear un placeholder
-      const categories = faultTypes.length > 0 ? faultTypes : ['Sin áreas'];
+      const categories = faultTypes.length > 0 ? faultTypes : ['Sin fallas'];
 
       // Transformar los datos al formato de ApexCharts
       this.chartOptions.series = this.data['map']((item: any) => ({
