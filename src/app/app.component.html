@@ -139,7 +139,7 @@
                 </ion-accordion>
 
                 <!-- Sensores -->
-                <ion-accordion value="iot" *ngIf="!permissions.isViewer() && !permissions.isAndon()">
+                <ion-accordion value="iot" *ngIf="!permissions.isViewer()">
                   <ion-item slot="header" lines="none" button class="menu-header-item">
                     <ion-icon slot="start" name="radio-outline" class="menu-icon"></ion-icon>
                     <ion-label class="menu-label">Sensores</ion-label>
