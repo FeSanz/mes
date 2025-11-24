@@ -371,4 +371,50 @@
   <ion-button id="nextBtn" fill="clear" class="nav-button next-button" (click)="goNext()">
     <ion-icon name="chevron-forward-outline"></ion-icon>
   </ion-button>
+
+  <!-- Modal de código de verificación -->
+  <div class="modal-overlay">
+    <div class="codigo-container">
+        <!-- Header fijo -->
+      <div class="modal-header">
+        <ion-text color="white">
+          <h2>Acceso Requerido</h2>
+        </ion-text>
+      </div>
+
+        <!-- Contenido -->
+      <div class="modal-content">
+        <ion-icon name="lock-closed" color="light" size="large"></ion-icon>
+          
+        <ion-text color="white" class="instruction-text">
+          <p>Ingrese el código de acceso para continuar</p>
+        </ion-text>
+        <br>
+
+        <ion-item class="input-item" lines="none" >
+          <p-inputotp class="input-center" [(ngModel)]="verificationCode" [mask]="true" [length]="6" size="small"/>
+
+        </ion-item>
+
+        <ion-button 
+          expand="block"             
+          class="verify-btn"
+          (click)="verificarCodigoEnBD()" >
+          Verificar Código
+        </ion-button>
+
+          <!-- Mensaje de error -->
+        <ion-text *ngIf="mostrarError" color="danger" class="error-text">
+          <p>{{errorMessage}}</p>
+        </ion-text>
+
+        <br>
+        <ion-label class="input-item"> 
+          <a href="/login">            
+            <span class="input-center">Regresar</span>
+          </a>
+        </ion-label>
+      </div>
+    </div>
+  </div>
 </ion-content>

@@ -137,5 +137,9 @@ export const routes: Routes = [
   {
     path: 'alert-history',
     loadComponent: () => import('./integrations/modules/alert-history/alert-history.page').then(m => m.AlertHistoryPage)
+  },
+  {
+    path: 'verification-codes',
+    loadComponent: () => import('./settings/verification-codes/verification-codes.page').then( m => m.VerificationCodesPage)
   }
 ];

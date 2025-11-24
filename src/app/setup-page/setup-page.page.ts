@@ -10,7 +10,7 @@ import {
   arrowForwardOutline, atCircleOutline, cloudOutline, serverOutline, keyOutline, linkOutline,
   checkmarkCircle, timeOutline, syncOutline, globeOutline, alarmOutline, clipboardOutline, trash,
   arrowForward, checkmarkOutline, chevronBackOutline, chevronForwardOutline, optionsOutline,
-  codeWorkingOutline, locationOutline
+  codeWorkingOutline, locationOutline, arrowBackOutline
 } from 'ionicons/icons';
 import { ApiService } from '../services/api.service';
 import { NavController } from '@ionic/angular';
@@ -35,6 +35,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ModalController, MenuController, IonicModule } from '@ionic/angular';
 import { SelectLocationModalPage } from '../select-location-modal/select-location-modal.page'
+import { InputOtpModule } from 'primeng/inputotp';
 
 @Component({
   selector: 'app-setup-page',
@@ -45,6 +46,7 @@ import { SelectLocationModalPage } from '../select-location-modal/select-locatio
   imports: [
     CommonModule, FormsModule, MultiSelectModule, IonicModule,
     DropdownModule, InputIconModule, IconFieldModule, InputTextModule, ButtonModule, TagModule, TableModule,
+    InputOtpModule
     // IonContent, IonToolbar, IonItem, IonInput, IonIcon, IonToggle, IonInputPasswordToggle, IonText, IonTitle,
     // IonCard, IonButton, IonSelect
   ],
@@ -128,6 +130,9 @@ export class SetupPagePage implements OnInit, AfterViewInit {
 
   searchValueFusion: string = '';
   searchValueDB: string = '';
+  verificationCode: string = '';
+  mostrarError: boolean = false;
+  errorMessage: string = ''
 
   rowDataFS = [];
   rowDataDB = [];
@@ -140,7 +145,10 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     private zone: NgZone, private modalCtrl: ModalController,
     private menuCtrl: MenuController
   ) {
-    addIcons({ businessOutline, codeWorkingOutline, locationOutline, optionsOutline, personOutline, atCircleOutline, lockClosedOutline, serverOutline, keyOutline, linkOutline, syncOutline, cloudOutline, arrowForward, checkmarkOutline, chevronBackOutline, chevronForwardOutline, trash, arrowForwardOutline, checkmarkCircle, timeOutline, globeOutline, alarmOutline, clipboardOutline });
+    addIcons({ businessOutline, codeWorkingOutline, locationOutline, optionsOutline, personOutline, atCircleOutline, 
+      lockClosedOutline, serverOutline, keyOutline, linkOutline, syncOutline, cloudOutline, arrowForward, checkmarkOutline, 
+      chevronBackOutline, chevronForwardOutline, trash, arrowForwardOutline, checkmarkCircle, timeOutline, globeOutline, 
+      alarmOutline, clipboardOutline, arrowBackOutline });
 
     // this.userData = JSON.parse(String(localStorage.getItem("userData")))
   }
@@ -242,8 +250,9 @@ export class SetupPagePage implements OnInit, AfterViewInit {
               this.userSuperAdmin.organizations = this.orgs.map(id => ({ org_id: id }));
               this.userSuperAdmin.password = btoa(this.userSuperAdmin.password);
 
-              await this.apiService.PostRequestRender('users', this.userSuperAdmin).then((response: any) => {
+              await this.apiService.PostRequestRender('users', this.userSuperAdmin).then(async (response: any) => {
                 this.SaveOrUpdateConnection();
+                await this.apiService.PutRequestRender('codes/' + this.verificationCode + '/' + this.company_id, ''); 
                 this.router.navigate([`/login`]);
               });
 
@@ -265,13 +274,14 @@ export class SetupPagePage implements OnInit, AfterViewInit {
                 this.userSuperAdmin.organizations = this.orgs.map(id => ({ org_id: id }));
                 this.userSuperAdmin.password = btoa(this.userSuperAdmin.password);
 
-                await this.apiService.PostRequestRender('users', this.userSuperAdmin).then((response: any) => {
+                await this.apiService.PostRequestRender('users', this.userSuperAdmin).then(async (response: any) => {
+                  await this.apiService.PutRequestRender('codes/' + this.verificationCode + '/' + this.company_id, ''); 
                   this.router.navigate([`/login`]);
                 });
 
               });
             });
-          }
+          }          
 
         } else {
           this.alerts.Error(response.message);
@@ -549,6 +559,45 @@ export class SetupPagePage implements OnInit, AfterViewInit {
     } else {
       this.organization.Coordinates = null; // si se canceló el modal
       this.organization.Location = "";
+    }
+  }
+
+  ionViewDidEnter() {
+    const modal = document.querySelector('ion-modal');
+    if (modal) {
+      modal.setAttribute('can-dismiss', 'false');
+    }
+  }
+
+  async verificarCodigoEnBD(): Promise<boolean> {
+    try {
+      const response = await this.apiService.GetRequestRender('verifyCode/'+ this.verificationCode);      
+      if (response.rowCount === 1) {
+        console.log('Dar accesso');
+
+        this.mostrarError = false;
+
+        await this.apiService.PutRequestRender('codes/'+ this.verificationCode, '');   
+
+        this.habilitarRegistro();
+
+        return true; 
+      } else {
+        console.log('No dar accesso');
+        this.mostrarError = true;
+        this.errorMessage = 'Código inválido';
+        return false;
+      }
+    } catch (error) {    
+      console.error('Error al verificar código en BD:', error);
+      return false;
+    }
+  }
+
+  habilitarRegistro() {
+    const modal = document.querySelector('.modal-overlay') as HTMLElement;
+    if (modal) {
+      modal.style.display = 'none';
     }
   }
   

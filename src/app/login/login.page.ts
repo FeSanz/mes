@@ -44,7 +44,12 @@ export class LoginPage {
   authRemember: boolean = false
   remoteServer = true
 
-  constructor(private api: ApiService, private navCtrl: NavController, private endPoints: EndpointsService, private alerts: AlertsService, private app: AppComponent, private ws: WebSocketService) {
+  constructor(private api: ApiService, 
+    private navCtrl: NavController, 
+    private endPoints: EndpointsService, 
+    private alerts: AlertsService, 
+    private app: AppComponent, 
+    private ws: WebSocketService) {
     addIcons({ businessOutline, personOutline, lockClosedOutline });
     this.authRemember = localStorage.getItem("authRemember") == "true" ? true : false
     this.remoteServer = localStorage.getItem('remoteServer') == 'false' ? false : true
@@ -89,4 +94,5 @@ export class LoginPage {
     this.ws.setSocketServer(this.remoteServer)
     this.app.remoteServer = this.remoteServer
   }
+
 }

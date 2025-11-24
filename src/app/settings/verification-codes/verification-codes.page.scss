@@ -1,0 +1,101 @@
+.table-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  flex-wrap: wrap; // opcional si quieres que se adapten en pantallas pequeñas
+}
+
+.left-caption,
+.right-caption {
+  display: flex;
+  align-items: center;
+}
+
+.tabla-centrada ::ng-deep th,
+.tabla-centrada ::ng-deep td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+ion-title {
+  font-size: 20px; // Tamaño normal por defecto
+
+  @media (max-width: 400px) {
+    font-size: 16px; // Tamaño más pequeño en pantallas pequeñas
+  }
+}
+
+
+.dialog-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+::ng-deep {
+  .p-dialog {
+    // Default para >= 1921px
+    width: 60vw !important;
+
+    // 1721px - 1920px = 65%
+    @media (max-width: 1920px) {
+      width: 65vw !important;
+    }
+
+    // 1621px - 1720px = 70%
+    @media (max-width: 1720px) {
+      width: 70vw !important;
+    }
+
+    // 1501px - 1620px = 75%
+    @media (max-width: 1620px) {
+      width: 75vw !important;
+    }
+
+    // 1401px - 1500px = 80%
+    @media (max-width: 1500px) {
+      width: 80vw !important;
+    }
+
+    // 1321px - 1400px = 85%
+    @media (max-width: 1400px) {
+      width: 85vw !important;
+    }
+
+    // 1081px - 1320px = 90%
+    @media (max-width: 1320px) {
+      width: 90vw !important;
+    }
+
+    // 980px - 1080px = 95%
+    @media (max-width: 1080px) {
+      width: 95vw !important;
+    }
+
+    // < 980px = 98%
+    @media (max-width: 979px) {
+      width: 98vw !important;
+    }
+  }
+}
+
+/* En tu component.css */
+::ng-deep .p-dialog {
+  width: 600px !important;
+}
+
+::ng-deep .p-dialog .p-dialog-content {
+  width: 100% !important;
+}
+
+ion-toggle.disabled-toggle {
+  opacity: 1;
+  
+  --track-background: #FFFFFF; 
+  --handle-background: var(--ion-color-medium);
+  
+  --track-background-checked: #FFFFFF; 
+  --handle-background-checked: var(--ion-color-primary);
+}

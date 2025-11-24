@@ -30,6 +30,10 @@ export class PermissionsService {
     return this.user?.Role === 'Andon';
   }
 
+  isAccessManager(): boolean {
+    return this.user?.Role === 'AccessManager';
+  }
+
   canEdit(): boolean {
     return this.isAdmin() || this.isSuperAdmin();
   }

@@ -328,6 +328,10 @@ ion-toolbar {
         border-radius: 20px !important;
         // overflow: hidden !important;
     }
+    
+    swiper-container::part(pagination) {
+        bottom: 20px !important;
+    }
 }
 
 ::ng-deep swiper-slide ion-toolbar {
@@ -371,26 +375,128 @@ ion-toolbar {
     }
 }
 
-@media (max-width: 700px) {
-  ::ng-deep .swiper-pagination {
-    // Sacarlo del flujo normal
-    position: fixed !important;
-    bottom: 20px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 1000 !important;
+// @media (max-width: 700px) {
+//   ::ng-deep .swiper-pagination {
+//     // Sacarlo del flujo normal
+//     position: fixed !important;
+//     bottom: 20px !important;
+//     left: 50% !important;
+//     transform: translateX(-50%) !important;
+//     z-index: 1000 !important;
 
-    // Fondo para mejor contraste
-    background: rgba(0, 0, 0, 0.3) !important;
-    padding: 8px 16px !important;
-    border-radius: 20px !important;
+//     // Fondo para mejor contraste
+//     background: rgba(0, 0, 0, 0.3) !important;
+//     padding: 8px 16px !important;
+//     border-radius: 20px !important;
+//   }
+
+//   ::ng-deep .swiper-pagination-bullet {
+//     background: rgba(255, 255, 255, 0.7) !important;
+
+//     &.swiper-pagination-bullet-active {
+//       background: #fd5d93 !important;
+//     }
+//   }
+// }
+
+// codigo-modal.component.scss
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; // Muy alto para estar por encima de todo
+}
+
+.codigo-container {
+  width: 90%;
+  max-width: 400px;
+  background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  h2 {
+    margin: 0;
+    font-weight: 600;
   }
+}
 
-  ::ng-deep .swiper-pagination-bullet {
-    background: rgba(255, 255, 255, 0.7) !important;
-
-    &.swiper-pagination-bullet-active {
-      background: #fd5d93 !important;
-    }
+.modal-content {
+  padding: 30px 25px;
+  text-align: center;
+  
+  ion-icon {
+    margin-bottom: 20px;
   }
+}
+
+.instruction-text {
+  margin-bottom: 25px;
+  
+  p {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.9;
+  }
+}
+
+.input-item {
+//   --background: rgba(255, 255, 255, 0.1);
+    --border-radius: 12px;
+    margin-bottom: 20px;
+  
+  .codigo-input {
+    --color: white;
+    --placeholder-color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+}
+
+.verify-btn {
+  --background: linear-gradient(90deg, var(--ion-color-secondary), var(--ion-color-primary));
+  --border-radius: 12px;
+  --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.error-text {
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+// Prevenir cualquier interacción no deseada
+ion-modal {
+  --backdrop-opacity: 1 !important;
+  
+  &::part(backdrop) {
+    background: rgba(0, 0, 0, 0.95) !important;
+  }
+  
+  &::part(content) {
+    pointer-events: auto !important;
+  }
+}
+
+.input-center {
+  margin-left: auto;
+  margin-right: auto;
 }
