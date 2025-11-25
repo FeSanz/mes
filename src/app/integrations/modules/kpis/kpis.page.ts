@@ -132,7 +132,7 @@ export class KpisPage implements OnInit {
         //this.alerts.Info(response.message);
       } else {
         const hours = this.dateRange === 'custom' ? this.getDateRangeFromOption('custom', this.startDate, this.endDate) : this.getDateRangeFromOption(this.dateRange);
-        const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
+        const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, item.Status, hours.start, hours.end)
         this.timeLineData = [...this.timeLineData, timeLineRes[0]]
         this.barsData = [...this.barsData, timeLineRes[0]]
       }
@@ -167,11 +167,11 @@ export class KpisPage implements OnInit {
           "Data": Object.values(failures)
         }
         if (this.timeLineData.length == 0) {
-          const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
+          const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, item.Status, hours.start, hours.end)
           this.timeLineData = [timeLineRes[0]]
           this.barsData = [{ ...failures2, MachineName: item.Name }]
         } else {
-          const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, hours.start, hours.end)
+          const timeLineRes = this.generateSeparateTimelineData(response.items || [], item.Name, item.Status, hours.start, hours.end)
           this.timeLineData = [...this.timeLineData, timeLineRes[0]]
           this.barsData = [...this.barsData, { ...failures2, MachineName: item.Name }]
         }
@@ -346,49 +346,41 @@ export class KpisPage implements OnInit {
   generateSeparateTimelineData(
     alerts: any[],
     machineName: string,
+    machineState: "Runtime" | "Downtime",
     startDate?: Date,
     endDate?: Date
   ) {
     const now = endDate || new Date();
     const periodStart = startDate || new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
 
-    // Filtrar y mapear alertas válidas
+    // Mapear alertas válidas
     const validAlerts = alerts.map(alert => {
       const start = new Date(alert.StartDate).getTime();
-      let end: number;
+      const end = alert.RepairDate
+        ? new Date(alert.RepairDate).getTime()
+        : now.getTime();
 
-      // Si tiene RepairDate, el downtime es hasta esa fecha
-      if (alert.RepairDate) {
-        end = new Date(alert.RepairDate).getTime();
-      }
-      // Si no tiene RepairDate, sigue activo hasta ahora
-      else {
-        end = now.getTime();
-      }
-
-      return {
-        start: start,
-        end: end
-      };
-    })
-      .sort((a, b) => a.start - b.start);
+      return { start, end };
+    }).sort((a, b) => a.start - b.start);
 
     const timelineData: any[] = [];
     const endTimeMs = now.getTime();
 
-    // Si no hay alertas válidas, toda la línea es runtime
+    // ✔️ CASO 1: No hay alertas → depende del estado de máquina
     if (validAlerts.length === 0) {
+      const color = machineState === "Downtime" ? "#dc3545" : "#007bff";
+
       return [{
         name: machineName,
         data: [{
           x: machineName,
           y: [periodStart.getTime(), endTimeMs],
-          fillColor: "#007bff"
+          fillColor: color
         }]
       }];
     }
 
-    // Fusionar alertas solapadas para obtener períodos de downtime continuos
+    // ✔️ CASO 2: Sí hay alertas → comportamiento normal
     const mergedDowntimes: { start: number; end: number }[] = [];
 
     for (const alert of validAlerts) {
@@ -397,41 +389,35 @@ export class KpisPage implements OnInit {
       } else {
         const last = mergedDowntimes[mergedDowntimes.length - 1];
 
-        // Si la alerta actual se solapa o está contigua con la anterior
         if (alert.start <= last.end) {
-          // Extender el downtime hasta el máximo de ambas
           last.end = Math.max(last.end, alert.end);
         } else {
-          // Nueva alerta separada
           mergedDowntimes.push({ start: alert.start, end: alert.end });
         }
       }
     }
 
-    // Generar los segmentos de runtime y downtime
+    // Generar segmentos runtime / downtime
     let currentTime = periodStart.getTime();
 
     for (const downtime of mergedDowntimes) {
-      // Runtime antes del downtime (solo si el downtime está después del inicio)
       if (currentTime < downtime.start) {
         timelineData.push({
           x: machineName,
           y: [currentTime, downtime.start],
-          fillColor: "#007bff"
+          fillColor: "#007bff" // runtime
         });
       }
 
-      // Downtime (desde StartDate hasta RepairDate o ahora)
       timelineData.push({
         x: machineName,
         y: [downtime.start, downtime.end],
-        fillColor: "#dc3545"
+        fillColor: "#dc3545" // downtime
       });
 
       currentTime = downtime.end;
     }
 
-    // Runtime final si queda tiempo
     if (currentTime < endTimeMs) {
       timelineData.push({
         x: machineName,
@@ -445,6 +431,7 @@ export class KpisPage implements OnInit {
       data: timelineData
     }];
   }
+
   mergeDowntimeIntervals(intervals: Array<{ start: Date; end: Date; alerts: any[] }>): Array<{ start: Date; end: Date; alerts: any[] }> {
     if (intervals.length === 0) return [];
 

@@ -4,18 +4,22 @@ import {
   ApexNonAxisChartSeries,
   ApexResponsive,
   ApexNoData,
-  ApexChart
+  ApexChart,
+  ApexTooltip
 } from "ng-apexcharts";
 
 export type ChartOptions = {
   series: ApexNonAxisChartSeries;
   chart: ApexChart;
+  labels: string[];
+  colors?: string[];
+  legend?: ApexLegend;
   noData: ApexNoData;
-  colors: string[],
-  legend: ApexLegend,
-  plotOptions: ApexPlotOptions;
-  responsive: ApexResponsive[];
-  labels: any;
+  responsive?: ApexResponsive[];
+  stroke?: ApexStroke;
+  fill?: ApexFill;
+  plotOptions?: ApexPlotOptions;
+  tooltip?: ApexTooltip;
 };
 
 export interface data {
@@ -62,6 +66,8 @@ export class SimpleDonutComponent implements OnInit {
         }
       },
       labels: [],
+      tooltip: {
+      },
       colors: [
         "#008FFB",  // Azul
         "#FF4560",  // Rojo
@@ -95,12 +101,42 @@ export class SimpleDonutComponent implements OnInit {
   }
   updateChart() {
     if (this.data['Runtime']) {
-      this.chartOptions.series = [this.data['Data'].runtimePercentage, this.data['Data'].downtimePercentage]
+      this.chartOptions.series = [this.data['Data'].runtimePercentage,
+      this.data['Data'].downtimePercentage]
       this.chartOptions.labels = this.data['Labels']
+      this.chartOptions.tooltip = {
+        y: {
+          formatter: (value: number, { seriesIndex }) => {
+            // seriesIndex 0 = runtime  |  1 = downtime
+            const runtimeHours = this.data['Data'].runtimeHours;
+            const downtimeHours = this.data['Data'].downtimeHours;
+
+            return seriesIndex === 0
+              ? `${runtimeHours} h`
+              : `${downtimeHours} h`;
+          }
+        }
+      }
+      this.chartOptions.legend = {
+        position: "bottom",
+        horizontalAlign: "center",
+        formatter: (val, opts) => {
+          const runtimeHours = this.data?.['Data']?.runtimeHours ?? 0;
+          const downtimeHours = this.data?.['Data']?.downtimeHours ?? 0;
+
+          if (opts.seriesIndex === 0) {
+            return `${val} — ${runtimeHours} h`;
+          } else {
+            return `${val} — ${downtimeHours} h`;
+          }
+        }
+      }
       if (this.chart && this.chart.updateOptions) {
         this.chart.updateOptions({
           series: this.chartOptions.series,
-          labels: this.chartOptions.labels
+          labels: this.chartOptions.labels,
+          tooltip: this.chartOptions.tooltip,
+          legend: this.chartOptions.legend
         });
       }
     } else if (this.data['Failures']) {
