@@ -59,7 +59,7 @@ export class GridDataPage implements OnInit {
     {
       icon: 'clipboard-outline',
       iconClass: 'bg-red',
-      idModule: 'wo',
+      idModule: 'work-orders',
       moduleName: 'ORDENES DE TRABAJO'      
     }
   ];
@@ -79,7 +79,7 @@ export class GridDataPage implements OnInit {
         document.activeElement.blur(); //Desenfocar el elemento activo antes de navegar
       }
 
-      const m_modules = ['RegOrganizations', 'RegShifts', 'work-centers', 'machines', 'RegItems', 'wo'];
+      const m_modules = ['RegOrganizations', 'RegShifts', 'work-centers', 'machines', 'RegItems', 'work-orders'];
 
       if (m_modules.includes(module)) {
         this.router.navigate([`/${module}`]);
