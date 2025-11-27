@@ -27,12 +27,24 @@
     <ion-row>
       <ion-col size="12">
         <ion-card class="stats-card">
-          <p-table #dtWorkOrders [value]="workOrdersToDispatch.items" dataKey="WorkOrderNumber"
-            styleClass="card-table-primeng wo-table-custom " [tableStyle]="{ 'min-width': '96rem','height': '100%'}"
-            [size]="'small'" [rowHover]="true" [rows]="rowsPerPage" [showCurrentPageReport]="true" [paginator]="true"
-            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos" [filterDelay]="0"
-            [globalFilterFields]="['WorkOrderNumber', 'ResourceCode', 'ItemNumber']" stripedRows [scrollable]="true"
-            [scrollHeight]="scrollHeight" [alwaysShowPaginator]="true" sortField="WorkOrderNumber" [sortOrder]="1">
+          <p-table #dtWorkOrders
+                   [value]="workOrdersToDispatch.items"
+                   dataKey="WorkOrderNumber"
+                   styleClass="card-table-primeng wo-table-custom "
+                   [tableStyle]="{ 'min-width': '96rem','height': '100%'}"
+                   [size]="'small'"
+                   [rowHover]="true"
+                   [rows]="rowsPerPage"
+                   [showCurrentPageReport]="true"
+                   [paginator]="true"
+                   currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} datos"
+                   [filterDelay]="0"
+                   [globalFilterFields]="['WorkOrderNumber', 'ResourceCode', 'ItemNumber']"
+                   stripedRows [scrollable]="true"
+                   [scrollHeight]="scrollHeight"
+                   [alwaysShowPaginator]="true"
+                   sortField="WorkOrderNumber"
+                   [sortOrder]="1">
             <ng-template #caption>
               <div class="table-caption">
                 <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
@@ -220,7 +232,7 @@
             </ion-row>
 
             <ion-row class="data-row" *ngFor="let output of OutputsForOperation(operation.OperationSequenceNumber)">
-              <ion-col size="12" size-sm="4" class="text-list">{{ output.ItemNumber }}</ion-col>
+              <ion-col size="12" size-sm="4" class="text-list" [title]="output.ItemDescription">{{ output.ItemNumber }}</ion-col>
               <ion-col size="12" size-sm="2" class="data-center">
                 <span class="std-consume">[ {{ Truncate(output.Standard) }} ]</span>
               </ion-col>
@@ -248,15 +260,17 @@
               <ion-col size="12" size-md="2">
                 <br><strong class="section-title">MATERIALES</strong>
               </ion-col>
-              <ion-col size="12" size-md="8" class="text-red text-list">
+              <ion-col size="12" size-md="8" class="text-red text-list" *ngIf="hasInsufficientStock">
                 <br>Sin stock suficiente en algunos materiales
               </ion-col>
             </ion-row>
 
             <ion-row class="data-row" *ngFor="let material of MaterialsForOperation(operation.OperationSequenceNumber)">
-              <ion-col size="12" size-sm="4" class="text-list">{{ material.ItemNumber }}</ion-col>
+              <ion-col size="12" size-sm="4" class="text-list" [title]="material.ItemDescription">{{ material.ItemNumber }}</ion-col>
               <ion-col size="12" size-sm="2" class="data-center">
-                <span class="std-consume text-green">[ {{900}} / {{ Truncate(material.Standard) }} ] </span>
+                 <span class="std-consume" [ngClass]="material.AvailableToTransact > 0 ? 'text-green' : 'text-red'">
+                  [ {{ Truncate(material.AvailableToTransact) }} / {{ Truncate(material.Standard) }} ]
+                </span>
               </ion-col>
               <ion-col size="12" size-sm="2">
                 <p-floatlabel variant="on">
@@ -285,7 +299,7 @@
 
             <ion-row class="data-row"
               *ngFor="let equipment of EquipmentResourcesForOperation(operation.OperationSequenceNumber)">
-              <ion-col size="12" size-sm="4" class="text-list">{{ equipment.ResourceName }}</ion-col>
+              <ion-col size="12" size-sm="4" class="text-list" [title]="equipment.ResourceCode">{{ equipment.ResourceName }}</ion-col>
               <ion-col size="12" size-sm="2" class="data-center">
                 <span class="std-consume">[ {{ Truncate(equipment.Standard) }} ] </span>
               </ion-col>
@@ -316,7 +330,7 @@
 
             <ion-row class="data-row"
               *ngFor="let labor of LaborResourcesForOperation(operation.OperationSequenceNumber)">
-              <ion-col size="12" size-sm="4" class="text-list">{{ labor.ResourceName }}</ion-col>
+              <ion-col size="12" size-sm="4" class="text-list" [title]="labor.ResourceCode">{{ labor.ResourceName }}</ion-col>
               <ion-col size="12" size-sm="2" class="data-center">
                 <span class="std-consume">[ {{ Truncate(labor.Standard) }} ] </span>
               </ion-col>
@@ -341,7 +355,7 @@
     <!-- Footer con botones -->
     <ng-template pTemplate="footer">
       <p-button label="Cancelar" severity="danger" (click)="isModaldispatchOpen = false" />
-      <p-button label="Guardar" severity="success" (click)="OnSaveDispatch()" />
+      <p-button label="Guardar" severity="success" (click)="OnSaveDispatch()" [disabled]="hasInsufficientStock" />
     </ng-template>
   </p-dialog>
 </ion-content>

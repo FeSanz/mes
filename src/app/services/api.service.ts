@@ -104,9 +104,9 @@ export class ApiService {
     }
   }
 
-  async PostRequestFusion(endPoint: string, payload: any) {
+  async PostRequestFusion(endPoint: string, payload: any, show: boolean = true) {
     try {
-      await this.alerts.ShowLoading()
+      if (show) { await this.alerts.ShowLoading(); }
       const options = {
         url: `${this.urlFusion}/${endPoint}`,
         headers: {
@@ -126,7 +126,7 @@ export class ApiService {
       await this.alerts.Error(`Error de conexión: ${error.message || error}`);
       return null;
     } finally {
-      await this.alerts.HideLoading()
+      if (show) { await this.alerts.HideLoading(); }
     }
   }
   async PostRequestBatchFusion(endPoint: string, payload: any) {

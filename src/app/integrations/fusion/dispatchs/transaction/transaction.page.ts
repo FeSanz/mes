@@ -116,6 +116,12 @@ export class TransactionPage implements OnInit {
     })
   };
 
+  //Variables para OnHand
+  private materialOnHandCache: Map<string, any> = new Map();
+  private loadingMaterials: Set<string> = new Set();
+  // Propiedad para controlar si hay stock insuficiente
+  hasInsufficientStock: boolean = false;
+
   constructor(private apiService: ApiService,
     private endPoints: EndpointsService,
     private alerts: AlertsService,
@@ -192,6 +198,10 @@ export class TransactionPage implements OnInit {
 
     this.totalGlobal = this.completeGlobal + this.scrapGlobal + this.rejectGlobal;
 
+    // Limpiar cache al abrir nuevo WO
+    this.materialOnHandCache.clear();
+    this.loadingMaterials.clear();
+
     const path = WOSelectedData.Type === 'P' ? 'wo_process_dispatch' : 'wo_discrete_dispatch';
     this.apiService.GetRequestFusion(this.endPoints.Path(path, this.organizationSelected.Code, WOSelectedData.WorkOrderNumber)).then(async (response: any) => {
       const data = JSON.parse(response);
@@ -210,11 +220,14 @@ export class TransactionPage implements OnInit {
       this.selectedWorkOrder = restructuredData[0] || {};
 
       this.isModaldispatchOpen = true;
+
+      // Cargar cantidades on-hand DESPUÉS de que el modal esté visible
+      await this.LoadAllMaterialsOnHand();
     });
   }
 
   OnSaveDispatch() {
-    this.alerts.ShowLoading("Prueba...");
+    //this.alerts.ShowLoading("Prueba...");
   }
 
   Operations() {
@@ -250,40 +263,92 @@ export class TransactionPage implements OnInit {
       material.Standard = (material.Quantity || 0) / plannedQuantity;
       material.StandardReal = (material.Standard || 0) * (this.totalGlobal || 0);
 
-      //material.QuantityOnhand = material.QuantityOnhand || 0;
-      //material.AvailableToTransact = material.AvailableToTransact || 0;
-      //material.OnHandMessage = material.OnHandMessage || 'Cargando...';
+      // Usar cache si existe
+      const cacheKey = `${material.ItemNumber}_${material.SupplySubinventory}`;
+      const cached = this.materialOnHandCache.get(cacheKey);
 
-      //this.LoadMaterialOnHand(material);
+      if (cached) {
+        material.QuantityOnhand = cached.QuantityOnhand;
+        material.AvailableToTransact = cached.AvailableToTransact;
+        material.OnHandMessage = cached.OnHandMessage;
+      } else {
+        material.QuantityOnhand = material.QuantityOnhand ?? 0;
+        material.AvailableToTransact = material.AvailableToTransact ?? 0;
+        material.OnHandMessage = material.OnHandMessage ?? 'Pendiente...';
+      }
     });
 
     return filtered;
   }
 
-  private async LoadMaterialOnHand(material: any) {
-    const payload = {
-      OrganizationCode: this.organizationSelected.Code,
-      ItemNumber: material.ItemNumber,
-      SupplySubinventory: material.SupplySubinventory
-    };
+  //Función para cargar todos los materiales de una vez
+  private async LoadAllMaterialsOnHand() {
+    const materials = this.selectedWorkOrder?.Materials?.items || [];
 
-    try {
-      const response: any = await this.apiService.PostRequestFusion('availableQuantityDetails', payload);
+    if (!materials.length) return;
 
-      if (response.ReturnStatus === 'SUCCESS') {
-        material.QuantityOnhand = response.QuantityOnhand;
-        material.AvailableToTransact = response.AvailableToTransact;
-        material.OnHandMessage = response.ReturnStatus;
-      } else {
-        material.QuantityOnhand = response.QuantityOnhand || 0;
-        material.AvailableToTransact = response.AvailableToTransact || 0;
-        material.OnHandMessage = response.ReturnStatus;
+    const promises = materials.map(async (material: any) => {
+      const cacheKey = `${material.ItemNumber}_${material.SupplySubinventory}`;
+
+      // Evitar llamadas duplicadas
+      if (this.materialOnHandCache.has(cacheKey) || this.loadingMaterials.has(cacheKey)) {
+        return;
       }
-    } catch (error: any) {
-      material.QuantityOnhand = 0;
-      material.AvailableToTransact = 0;
-      material.OnHandMessage = `Error: ${error.message || error}`;
-    }
+
+      this.loadingMaterials.add(cacheKey);
+
+      const payload = {
+        OrganizationCode: this.organizationSelected.Code,
+        ItemNumber: material.ItemNumber,
+        Subinventory: material.SupplySubinventory
+      };
+
+
+      try {
+        const response: any = await this.apiService.PostRequestFusion('availableQuantityDetails', payload, false);
+
+        // Parsear si viene como string
+        const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
+
+        const result = {
+          QuantityOnhand: parsedResponse.QuantityOnhand || 0,
+          AvailableToTransact: parsedResponse.AvailableToTransact || 0,
+          OnHandMessage: parsedResponse.ReturnStatus
+        };
+
+
+        this.materialOnHandCache.set(cacheKey, result);
+
+        // Actualizar el material original
+        material.QuantityOnhand = result.QuantityOnhand;
+        material.AvailableToTransact = result.AvailableToTransact;
+        material.OnHandMessage = result.OnHandMessage;
+
+      } catch (error: any) {
+        const result = {
+          QuantityOnhand: 0,
+          AvailableToTransact: 0,
+          OnHandMessage: `Error: ${error.message || error}`
+        };
+        this.materialOnHandCache.set(cacheKey, result);
+      } finally {
+        this.loadingMaterials.delete(cacheKey);
+      }
+    });
+
+    await Promise.all(promises);
+    // Validar stock después de cargar todos los materiales
+    this.validateMaterialStock();
+  }
+
+  //Metodo para validar stock
+  private validateMaterialStock() {
+    const materials = this.selectedWorkOrder?.Materials?.items || [];
+    this.hasInsufficientStock = materials.some((material: any) => {
+      const cacheKey = `${material.ItemNumber}_${material.SupplySubinventory}`;
+      const cached = this.materialOnHandCache.get(cacheKey);
+      return cached && cached.AvailableToTransact <= 0;
+    });
   }
 
   EquipmentResourcesForOperation(operationSequence: number) {
