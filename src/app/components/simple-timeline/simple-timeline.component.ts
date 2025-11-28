@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Input, OnInit, SimpleChanges, ViewChild, OnDestroy } from '@angular/core';
 
 import {
   ChartComponent,
@@ -28,6 +28,7 @@ export type ChartOptions = {
 export interface data {
   [key: string]: any;
 }
+
 @Component({
   selector: 'app-simple-timeline',
   templateUrl: './simple-timeline.component.html',
@@ -36,11 +37,18 @@ export interface data {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [NgApexchartsModule]
 })
-export class SimpleTimelineComponent implements OnInit {
+export class SimpleTimelineComponent implements OnInit, OnDestroy {
 
   @Input() data: data = {};
+  @Input() enableRealTimeUpdate: boolean = false; // Habilitar/deshabilitar actualización en tiempo real
+  @Input() updateInterval: number = 1000; // Intervalo de actualización en ms (default: 1 minuto)
+
   @ViewChild("timelineChart", { static: false }) chart: ChartComponent | undefined;
   public chartOptions: ChartOptions;
+
+  private intervalId: any;
+  private originalData: any[] = []; // Guardamos los datos originales
+
   constructor() {
     this.chartOptions = {
       series: [],
@@ -94,7 +102,6 @@ export class SimpleTimelineComponent implements OnInit {
         type: "datetime",
         labels: {
           datetimeUTC: false,
-          //format: 'hh:mm a' // ← 12 horas con AM/PM
         }
       },
       legend: {
@@ -161,21 +168,124 @@ export class SimpleTimelineComponent implements OnInit {
       }
     };
   }
-  ngOnInit() {
 
+  ngOnInit() {
+    this.startRealTimeUpdate();
   }
+
+  ngOnDestroy() {
+    this.stopRealTimeUpdate();
+  }
+
+  /**
+   * Inicia la actualización en tiempo real
+   */
+  startRealTimeUpdate() {
+    if (this.enableRealTimeUpdate) {
+      this.intervalId = setInterval(() => {
+        this.updateLastBarsToNow();
+      }, this.updateInterval);
+    }
+  }
+
+  /**
+   * Detiene la actualización en tiempo real
+   */
+  stopRealTimeUpdate() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+  }
+
+  /**
+   * Actualiza la última barra de cada máquina extendiendo su tiempo final hasta "ahora"
+   */
+  updateLastBarsToNow() {
+    if (!this.chartOptions.series || this.chartOptions.series.length === 0) {
+      return;
+    }
+
+    const now = new Date().getTime();
+    let hasUpdates = false;
+
+    // Recorrer cada serie (cada máquina)
+    const updatedSeries = this.chartOptions.series.map((serie: any) => {
+      if (!serie.data || serie.data.length === 0) {
+        return serie;
+      }
+
+      // Clonar los datos para no mutar el original
+      const updatedData = [...serie.data];
+
+      // Obtener la última barra
+      const lastBar = updatedData[updatedData.length - 1];
+
+      // Actualizar el tiempo final (y[1]) al tiempo actual
+      // Solo si la barra aún no ha terminado o está activa
+      if (lastBar && lastBar.y && lastBar.y[1]) {
+        const lastEndTime = new Date(lastBar.y[1]).getTime();
+
+        // Solo actualizamos si el tiempo actual es mayor que el tiempo final registrado
+        if (now > lastEndTime) {
+          updatedData[updatedData.length - 1] = {
+            ...lastBar,
+            y: [lastBar.y[0], now] // Mantener inicio, actualizar fin
+          };
+          hasUpdates = true;
+        }
+      }
+
+      return {
+        ...serie,
+        data: updatedData
+      };
+    });
+
+    // Solo actualizar el chart si hubo cambios
+    if (hasUpdates && this.chart && this.chart.updateSeries) {
+      this.chartOptions.series = updatedSeries;
+      this.chart.updateSeries(updatedSeries, false); // false = no animar
+    }
+  }
+
+  /**
+   * Actualiza el chart con nuevos datos
+   */
   updateChart() {
     if (this.data) {
-      this.chartOptions.series = this.data['map']((group: any) => ({
+      // Guardar datos originales
+      this.originalData = this.data['map']((group: any) => ({
         name: group.name,
         data: group.data
       }));
+
+      this.chartOptions.series = this.originalData;
+
       if (this.chart && this.chart.updateSeries) {
         this.chart.updateSeries(this.chartOptions.series);
       }
     }
   }
+
   ngOnChanges(changes: SimpleChanges) {
-    this.updateChart()
+    if (changes['data']) {
+      this.updateChart();
+    }
+    if (Boolean(changes['data']?.firstChange) == false) {
+      if (this.enableRealTimeUpdate) {
+        this.stopRealTimeUpdate();
+        this.startRealTimeUpdate();
+      } else {
+        this.stopRealTimeUpdate();
+      }
+    }
+  }
+
+  /**
+   * Método público para forzar una actualización manual
+   */
+  forceUpdate() {
+    this.updateLastBarsToNow();
   }
 }

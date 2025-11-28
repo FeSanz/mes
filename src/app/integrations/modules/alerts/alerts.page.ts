@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, ViewChild } from 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonMenuButton, IonIcon, IonButton, IonRouterLink,
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonMenuButton, IonIcon, IonButton, IonRouterLink, IonRefresher, RefresherCustomEvent, IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { ApiService } from 'src/app/services/api.service';
@@ -31,7 +31,7 @@ import { Dialog } from "primeng/dialog";
   styleUrls: ['./alerts.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonIcon, IonButton, IonRouterLink, RouterLink,
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonIcon, IonButton, IonRouterLink, RouterLink, IonRefresher, IonRefresherContent,
     IonMenuButton, Button, IconField, InputIcon, InputText, PrimeTemplate, TableModule, DialogModule, Dialog, Tag, FloatLabel, Select]
 })
 export class AlertsPage {
@@ -68,13 +68,23 @@ export class AlertsPage {
     private changeDetector: ChangeDetectorRef) {
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.company = this.userData.Company
-    //this.userData.Company.Organizations = this.userData.Company.Organizations.filter((org: any) => org.WorkMethod != null);
-    this.organizationSelected = this.userData.Company.Organizations[0];
+    this.organizationSelected = localStorage.getItem("organizationSelected") ? JSON.parse(localStorage.getItem("organizationSelected") || '{}') : this.userData.Company.Organizations[0]
     addIcons({ menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline });
   }
   ionViewDidEnter() {
     this.GetAlerts()
     this.startSubscription()
+  }
+
+  handleRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      this.userData = JSON.parse(String(localStorage.getItem("userData")));
+      this.company = this.userData.Company
+      this.organizationSelected = localStorage.getItem("organizationSelected") ? JSON.parse(localStorage.getItem("organizationSelected") || '{}') : this.userData.Company.Organizations[0]
+      addIcons({ menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline });
+      this.ionViewDidEnter()
+      event.target.complete();
+    }, 10);
   }
   ngOnInit() {
     this.timer = setInterval(() => {
@@ -97,6 +107,7 @@ export class AlertsPage {
     }, 100);
   }
   GetAlerts() {
+    localStorage.setItem("organizationSelected", JSON.stringify(this.organizationSelected))
     const orgsIds = this.organizationSelected.OrganizationId//this.userData.Company.Organizations.map((org: any) => org.OrganizationId).join(',');//IDs separados por coma (,)
     this.apiService.GetRequestRender(`alertsByOrganizations/pendings?organizations=${orgsIds}` + (this.permissions.isAndon() ? '?start_date=' + new Date().setHours(10, 0, 0, 0) : '')).then((response: any) => {
       if (!response.errorsExistFlag) {
@@ -196,7 +207,7 @@ export class AlertsPage {
     this.isEditAlertModalOpen = true
   }
   async UpdateFailureOfAlert() {
-    if (await this.alerts.ShowAlert("¿Deseas asignar la falla seleccionada a esta alerta?", "Alerta", "Atrás", "Asignar")) {
+    if (true/*await this.alerts.ShowAlert("¿Deseas asignar la falla seleccionada a esta alerta?", "Alerta", "Atrás", "Asignar")*/) {
       this.apiService.PutRequestRender('alerts/' + this.selectedAlert.alert_id + '/failure', { failure_id: this.selectedFailure.failure_id }).then((response: any) => {
         if (!response.errorsExistFlag) {
           this.alerts.Success("Alerta actualizada")

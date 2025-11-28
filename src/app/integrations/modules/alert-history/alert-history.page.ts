@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCol, IonRow, IonGrid, IonBackButton } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCol, IonRow, IonGrid, IonBackButton, RefresherCustomEvent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { menuOutline, timeOutline, hammerOutline, pencilOutline, checkmarkOutline, trashOutline, eyeOutline, checkmarkCircle } from 'ionicons/icons';
 import { Tag } from "primeng/tag";
@@ -26,10 +26,10 @@ import { Table, TableModule } from "primeng/table";
   styleUrls: ['./alert-history.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, IonCard, IonCol, IonRow, DatePicker, IonBackButton,
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, IonCard, IonCol, IonRow, DatePicker, IonBackButton, IonRefresher, IonRefresherContent,
     IonGrid, FormsModule, Tag, ButtonModule, InputText, IconFieldModule, InputIconModule, DialogModule, Select, TableModule, FloatLabel]
 })
-export class AlertHistoryPage implements OnInit {
+export class AlertHistoryPage {
 
   rowsPerPage: number = 26;
   rowsPerPageOptions: number[] = [5, 10, 20];
@@ -57,8 +57,8 @@ export class AlertHistoryPage implements OnInit {
     private apiService: ApiService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
-    this.userData = JSON.parse(String(localStorage.getItem("userData")));
     addIcons({ menuOutline, checkmarkCircle, trashOutline, pencilOutline, eyeOutline, hammerOutline, checkmarkOutline, timeOutline });
+    this.userData = JSON.parse(String(localStorage.getItem("userData")));
     this.organizationSelected = localStorage.getItem("organizationSelected") ? JSON.parse(localStorage.getItem("organizationSelected") || '{}') : this.userData.Company.Organizations[0]
     localStorage.getItem("dateRange") ? this.dateRange = localStorage.getItem("dateRange") : null
     this.SetDate()
@@ -67,9 +67,19 @@ export class AlertHistoryPage implements OnInit {
     }
   }
 
-  ngOnInit() {
+  handleRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      this.userData = JSON.parse(String(localStorage.getItem("userData")));
+      this.organizationSelected = localStorage.getItem("organizationSelected") ? JSON.parse(localStorage.getItem("organizationSelected") || '{}') : this.userData.Company.Organizations[0]
+      localStorage.getItem("dateRange") ? this.dateRange = localStorage.getItem("dateRange") : null
+      this.SetDate()
+      if (this.dateRange == "custom") {
+        this.showDateTime = true
+      }
+      this.ionViewDidEnter()
+      event.target.complete();
+    }, 10);
   }
-
 
   ionViewDidEnter() {
     this.GetAlerts()

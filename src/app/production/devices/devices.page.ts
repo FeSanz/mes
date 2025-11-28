@@ -1,9 +1,12 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonMenuButton, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard,
+  RefresherCustomEvent, IonRefresher, IonRefresherContent, IonMenuButton, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addCircleOutline, checkmarkOutline, copyOutline, documentOutline, flashOutline, hardwareChipOutline, speedometerOutline, sunnyOutline, thermometerOutline, trashOutline, waterOutline, ellipsisVertical, pencilOutline, helpOutline, menu, menuOutline } from 'ionicons/icons';
+import { addCircleOutline, checkmarkOutline, copyOutline, documentOutline, flashOutline, hardwareChipOutline, speedometerOutline, sunnyOutline, thermometerOutline, trashOutline, waterOutline, ellipsisVertical, pencilOutline, helpOutline, menu, menuOutline, addOutline } from 'ionicons/icons';
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { Clipboard } from '@capacitor/clipboard';
@@ -17,7 +20,8 @@ import { ToggleMenu } from 'src/app/models/design';
   templateUrl: './devices.page.html',
   styleUrls: ['./devices.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard, IonMenuButton, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption],
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem,
+    IonRefresher, IonRefresherContent, IonText, IonNote, IonCard, IonMenuButton, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class DevicesPage implements OnInit {
@@ -44,10 +48,17 @@ export class DevicesPage implements OnInit {
     private endPoints: EndpointsService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
-    addIcons({menuOutline,hardwareChipOutline,ellipsisVertical,addCircleOutline,pencilOutline,trashOutline,copyOutline,checkmarkOutline,documentOutline,thermometerOutline,waterOutline,speedometerOutline,sunnyOutline,flashOutline,helpOutline});
+    addIcons({ menuOutline, hardwareChipOutline, ellipsisVertical, addCircleOutline, pencilOutline, trashOutline, copyOutline, addOutline, checkmarkOutline, documentOutline, thermometerOutline, waterOutline, speedometerOutline, sunnyOutline, flashOutline, helpOutline });
     this.user = JSON.parse(String(localStorage.getItem("userData")))
   }
 
+  handleRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      this.user = JSON.parse(String(localStorage.getItem("userData")))
+      this.ionViewDidEnter()
+      event.target.complete();
+    }, 10);
+  }
   ngOnInit() {
   }
   ionViewDidEnter() {

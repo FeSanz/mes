@@ -1,9 +1,9 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonMenuButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonRow, IonGrid } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonMenuButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonRow, IonGrid, IonButton, IonButtons, IonIcon, RefresherCustomEvent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { menuOutline, timeOutline, hammerOutline, pencilOutline, checkmarkOutline, trashOutline, eyeOutline, checkmarkCircle } from 'ionicons/icons';
+import { menuOutline, timeOutline, hammerOutline, pencilOutline, checkmarkOutline, trashOutline, eyeOutline, checkmarkCircle, logIn, playOutline, pauseOutline } from 'ionicons/icons';
 import { Tag } from "primeng/tag";
 
 import { TableModule } from "primeng/table";
@@ -22,6 +22,7 @@ import { SimpleDonutComponent } from 'src/app/components/simple-donut/simple-don
 import { SimpleTimelineComponent } from 'src/app/components/simple-timeline/simple-timeline.component';
 import { SimpleStackedColumnsComponent } from 'src/app/components/simple-stacked-columns/simple-stacked-columns.component';
 import { DatePicker } from 'primeng/datepicker';
+import { WebSocketService } from 'src/app/services/web-socket.service';
 
 @Component({
   selector: 'app-kpis',
@@ -29,10 +30,10 @@ import { DatePicker } from 'primeng/datepicker';
   styleUrls: ['./kpis.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonContent, IonHeader, IonTitle, SimpleDonutComponent, IonToolbar, CommonModule, IonMenuButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonRow, DatePicker,
+  imports: [IonContent, IonHeader, IonTitle, SimpleDonutComponent, IonToolbar, CommonModule, IonMenuButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonButton, IonButtons, IonIcon, IonCol, IonRow, DatePicker, IonRefresher, IonRefresherContent,
     IonGrid, FormsModule, Tag, ButtonModule, InputText, IconFieldModule, InputIconModule, DialogModule, Select, TableModule, FloatLabel, SimpleTimelineComponent, SimpleStackedColumnsComponent]
 })
-export class KpisPage implements OnInit {
+export class KpisPage {
   machinesArray: any = []
   rowsPerPage: number = 8;
   rowsPerPageOptions: number[] = [5, 10, 20];
@@ -44,6 +45,7 @@ export class KpisPage implements OnInit {
   donutData: any = []
   barsData: any = []
   timeLineData: any = []
+  enableRealTimeUpdate = false
   donutFailuresData: any = []
   dateRangeOptions = [
     { label: 'Hoy', value: 'today' },
@@ -58,16 +60,18 @@ export class KpisPage implements OnInit {
   dateRange: any = "24hours"
   selectedRowMachine: any = null;
   selectedMachines: any[] = [];
-  showDateTime = false
+  showDateTime = true
   startDate: Date | undefined;
   endDate: Date | undefined;
+  private wsSub: { ws: WebSocket, unsubscribe: () => void } | null = null;
   constructor(
     private alerts: AlertsService,
+    private websocket: WebSocketService,
     private apiService: ApiService,
     public permissions: PermissionsService,
-    private changeDetector: ChangeDetectorRef) {
+    public changeDetector: ChangeDetectorRef) {
+    addIcons({ menuOutline, checkmarkCircle, playOutline, pauseOutline, trashOutline, pencilOutline, eyeOutline, hammerOutline, checkmarkOutline, timeOutline });
     this.userData = JSON.parse(String(localStorage.getItem("userData")));
-    addIcons({ menuOutline, checkmarkCircle, trashOutline, pencilOutline, eyeOutline, hammerOutline, checkmarkOutline, timeOutline });
     this.organizationSelected = localStorage.getItem("organizationSelected") ? JSON.parse(localStorage.getItem("organizationSelected") || '{}') : this.userData.Company.Organizations[0]
     localStorage.getItem("dateRange") ? this.dateRange = localStorage.getItem("dateRange") : null
     this.SetDate()
@@ -75,10 +79,95 @@ export class KpisPage implements OnInit {
       this.showDateTime = true
     }
   }
-  ngOnInit() {
+
+  handleRefresh(event: RefresherCustomEvent) {
+    setTimeout(() => {
+      this.userData = JSON.parse(String(localStorage.getItem("userData")));
+      this.organizationSelected = localStorage.getItem("organizationSelected") ? JSON.parse(localStorage.getItem("organizationSelected") || '{}') : this.userData.Company.Organizations[0]
+      localStorage.getItem("dateRange") ? this.dateRange = localStorage.getItem("dateRange") : null
+      this.SetDate()
+      if (this.dateRange == "custom") {
+        this.showDateTime = true
+      }
+      this.ionViewDidEnter()
+      event.target.complete();
+    }, 10);
   }
   ionViewDidEnter() {
     this.GetMachines()
+  }
+  startSubscription() {
+    // Si entra varias veces, evitar crear más conexiones
+    if (this.wsSub) {
+      this.wsSub.unsubscribe();
+      this.wsSub = null;
+    }
+
+    this.websocket.SuscribeById(
+      { organization_id: this.organizationSelected.OrganizationId },
+      "alerts",
+      (response) => {
+        response.name = response.failure_name
+
+        if (response.action == 'new') {
+          this.updateTimeline({ machine_name: response.machine_name, color: "#dc3545", rangeName: "Downtime" })
+          //this.alertsData = [response, ...this.alertsData];
+          this.changeDetector.detectChanges();
+          //this.alerts.Warning("Nueva alerta");
+        }
+        else if (response.action == 'update') {
+          if (response.status == "runtime") {
+            this.updateTimeline({ machine_name: response.machine_name, color: "#007bff", rangeName: "Runtime" })
+          }
+          //this.alerts.Warning('Una alerta se modificado');
+        }
+        else if (response.action == 'delete') {
+          //this.alerts.Error('Una alerta se ha eliminado');
+        }
+      }
+    ).then((sub) => {
+      this.wsSub = sub;
+    }).catch(err => console.log(err));
+  }
+  updateTimeline(response: { machine_name: string; color: string; rangeName: string }) {
+    const now = Date.now();
+
+    this.timeLineData = this.timeLineData.map((group: any) => {
+      // Si no es el grupo de la máquina, lo regresamos igual
+      if (group.name !== response.machine_name) {
+        return group;
+      }
+
+      // Si es el grupo que buscamos:
+      const data = [...group.data]; // copiamos arreglo actual
+
+      const lastEntry = data[data.length - 1];
+      const lastEnd = lastEntry?.y?.[1] ?? now;
+
+      // Nuevo registro
+      const newEntry = {
+        x: response.machine_name,
+        y: [lastEnd, now],
+        fillColor: response.color,
+        rangeName: response.rangeName
+      };
+
+      // Nuevo objeto del grupo
+      return {
+        ...group,
+        data: [...data, newEntry]
+      };
+    });
+
+    console.log(this.timeLineData);
+  }
+
+
+  ionViewWillLeave() {
+    if (this.wsSub) {
+      this.wsSub.unsubscribe();
+      this.wsSub = null;
+    }
   }
   ResetData() {
     if (this.dateRange == "custom") {
@@ -95,6 +184,11 @@ export class KpisPage implements OnInit {
     this.selectedMachine = {}
     this.selectedMachines = []
     this.selectedRowMachine = []
+    if (this.wsSub) {
+      this.wsSub.unsubscribe();
+      this.wsSub = null;
+    }
+    this.startSubscription()
   }
 
   SetDate() {
@@ -105,7 +199,6 @@ export class KpisPage implements OnInit {
     this.startDate = new Date(now);
     this.startDate.setDate(now.getDate() - 7);
     this.startDate.setHours(12, 0, 0, 0);
-
   }
   GetMachines() {
     this.ResetData()
@@ -185,8 +278,8 @@ export class KpisPage implements OnInit {
     let end: Date = new Date(); // por default hoy
     switch (option) {
       case 'today':
-        start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        end = new Date(start); // mismo día
+        start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0); // 00:00
+        end = new Date(now); // hora actual
         break;
       case '24hours':
         start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -352,7 +445,6 @@ export class KpisPage implements OnInit {
   ) {
     const now = endDate || new Date();
     const periodStart = startDate || new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-
     // Mapear alertas válidas
     const validAlerts = alerts.map(alert => {
       const start = new Date(alert.StartDate).getTime();

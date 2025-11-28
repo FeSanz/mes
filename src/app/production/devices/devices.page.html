@@ -12,6 +12,9 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-grid *ngFor="let org of organizations">
     <div class="line-with-text">
       <span>{{org.organization_name}}</span>
@@ -198,7 +201,7 @@
         </ion-item>
         <div class="ion-text-center">
           <ion-button fill="outline" (click)="addNewSensor()">
-            <ion-icon slot="start" name="add"></ion-icon>
+            <ion-icon slot="start" name="add-outline"></ion-icon>
             Agregar sensor</ion-button>
         </div>
         <ion-fab slot="fixed" vertical="bottom" horizontal="start" *ngIf="!machine.isNew && permissions.isSuperAdmin()">

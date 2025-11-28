@@ -7,7 +7,7 @@
         </ion-button>
       </ion-menu-button>
     </ion-buttons>
-    <ion-title>Alertas {{userData.Company.Name}}</ion-title>
+    <ion-title>Alertas</ion-title>
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
         <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
@@ -20,6 +20,9 @@
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-grid>
     <ion-row>
       <ion-col size="12">
@@ -32,12 +35,13 @@
             [scrollHeight]="scrollHeight" [sortOrder]="1">
             <ng-template #caption>
               <div class="table-caption">
-                <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar" (click)="ClearAlerts(dtAlerts)" />
-
-                <div style="font-size: 17px;">
-                  Alertas pendientes
+                <div class="table-caption-left">
+                  <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
+                    (click)="ClearAlerts(dtAlerts)" />
+                  <div style="font-size: 17px;">
+                    Alertas Pendientes
+                  </div>
                 </div>
-
                 <p-iconField iconPosition="left">
                   <p-inputIcon>
                     <i class="fas fa-search"></i>
