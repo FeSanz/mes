@@ -93,6 +93,25 @@
           </ion-input>
         </ion-item>
 
+        <ion-item lines="none" class="invisible">
+          <h3>Permisos</h3>          
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-label class="toggle-label">Alertas</ion-label>
+          <ion-toggle [(ngModel)]="alertsFlag" ></ion-toggle>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-label class="toggle-label">Notificaciones push</ion-label>
+          <ion-toggle [(ngModel)]="pushFlag" ></ion-toggle>
+        </ion-item>
+
+        <ion-item lines="none" class="invisible">
+          <ion-label class="toggle-label">Emails</ion-label>
+          <ion-toggle [(ngModel)]="emailsFlag" ></ion-toggle>
+        </ion-item>
+
         <ion-button class="btn-inferior" (click)="finalize()"
           [disabled]="!userSuperAdmin.name.trim() || !userSuperAdmin.email.trim() || !userSuperAdmin.password.trim()">Finalizar</ion-button>
       </div>

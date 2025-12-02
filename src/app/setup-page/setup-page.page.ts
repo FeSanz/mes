@@ -137,6 +137,10 @@ export class SetupPagePage implements OnInit, AfterViewInit {
   rowDataFS = [];
   rowDataDB = [];
 
+  alertsFlag: boolean = false;
+  pushFlag: boolean = false;
+  emailsFlag: boolean = false;
+
   constructor(private navCtrl: NavController,
     private endPoints: EndpointsService, private alerts: AlertsService,
     private app: AppComponent, private apiService: ApiService,
@@ -253,6 +257,7 @@ export class SetupPagePage implements OnInit, AfterViewInit {
               await this.apiService.PostRequestRender('users', this.userSuperAdmin).then(async (response: any) => {
                 this.SaveOrUpdateConnection();
                 await this.apiService.PutRequestRender('codes/' + this.verificationCode + '/' + this.company_id, ''); 
+                this.SaveConfiguration();
                 this.router.navigate([`/login`]);
               });
 
@@ -276,13 +281,14 @@ export class SetupPagePage implements OnInit, AfterViewInit {
 
                 await this.apiService.PostRequestRender('users', this.userSuperAdmin).then(async (response: any) => {
                   await this.apiService.PutRequestRender('codes/' + this.verificationCode + '/' + this.company_id, ''); 
+                  this.SaveConfiguration();
                   this.router.navigate([`/login`]);
                 });
 
               });
             });
           }          
-
+          
         } else {
           this.alerts.Error(response.message);
         }
@@ -600,6 +606,35 @@ export class SetupPagePage implements OnInit, AfterViewInit {
       modal.style.display = 'none';
     }
   }
-  
+
+  async SaveConfiguration() {    
+
+    const payload = {
+      CompanyId: this.company_id,
+      User: 'Unknown',
+      items: [
+        {
+          Name: "ALERTS_FLAG",
+          Value: this.alertsFlag,
+          Description: "Permiso para recibir alertas",
+          Type: "ALERTS"
+        },
+        {
+          Name: "PUSH_FLAG",
+          Value: this.pushFlag,
+          Description: "Permiso para recibir notificaciones push",
+          Type: "ALERTS"
+        },
+        {
+          Name: "EMAILS_FLAG",
+          Value: this.emailsFlag,
+          Description: "Permiso para recibir emails",
+          Type: "ALERTS"
+        }
+      ]
+    };   
+    
+    await this.apiService.PostRequestRender('settings', payload);
+  }  
 }
 
