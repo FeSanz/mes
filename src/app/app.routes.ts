@@ -144,6 +144,10 @@ export const routes: Routes = [
   },  {
     path: 'work-orders',
     loadComponent: () => import('./settings/registros/work-orders/work-orders.page').then( m => m.WorkOrdersPage)
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./settings/settings/settings.page').then( m => m.SettingsPage)
   }
 
 ];
