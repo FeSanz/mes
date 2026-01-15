@@ -2,8 +2,23 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonButton, IonButtons, IonCard, IonCol, IonContent, IonGrid, IonHeader,
-  IonIcon, IonMenuButton, IonRow, IonTitle, IonToolbar
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonHeader,
+  IonIcon,
+  IonLabel,
+  IonMenuButton,
+  IonRow,
+  IonSegment,
+  IonSegmentButton,
+  IonSegmentContent,
+  IonSegmentView,
+  IonTitle,
+  IonToolbar
 } from '@ionic/angular/standalone';
 
 import { FloatLabel } from "primeng/floatlabel";
@@ -34,6 +49,7 @@ import {
 } from 'ionicons/icons';
 import { addIcons } from "ionicons";
 import { ToggleMenu } from 'src/app/models/design';
+import {DatePicker} from "primeng/datepicker";
 
 @Component({
   selector: 'app-transaction',
@@ -42,11 +58,13 @@ import { ToggleMenu } from 'src/app/models/design';
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, FloatLabel, IonButtons, IonMenuButton,
     Select, IonGrid, IonRow, IonCol, IonIcon, IonButton, InputText, Button, IconField, InputIcon,
-    IonCard, PrimeTemplate, TableModule, Tag, Dialog, DialogModule]
+    IonCard, PrimeTemplate, TableModule, Tag, Dialog, DialogModule, IonSegment, IonSegmentButton, IonLabel, IonSegmentView, IonSegmentContent, DatePicker]
 })
 export class TransactionPage implements OnInit {
   private resizeTimeout: any;
   modalSize: string = '';
+
+  segmentSelected: string = 'general';
 
   scrollHeight: string = '550px';
   rowsPerPage: number = 10;
@@ -58,6 +76,9 @@ export class TransactionPage implements OnInit {
   isModaldispatchOpen: boolean = false;
 
   workOrdersToDispatch: any = { items: [] };
+
+  workOrdersToDispachByShift: any = { items: [] }
+
   selectedWorkOrder: any = {
     WorkOrderNumber: '',
     Operations: { items: [] },
@@ -163,18 +184,41 @@ export class TransactionPage implements OnInit {
     this.scrollHeight = HeightTable(this.platform.height());
   }
 
+  onSegmentChange(event: any) {
+    this.segmentSelected = event.detail.value;
+    this.GetWorkOrders();
+  }
 
   GetWorkOrders() {
-    this.workOrdersToDispatch = { items: [] };
-    this.apiService.GetRequestRender(`dispatchPending/${this.organizationSelected.OrganizationId}`).then((response: any) => {
+    if(!this.organizationSelected)
+    {
+      this.alerts.Warning("Seleccione una organización");
+      return;
+    }
 
-      if (response.items && Array.isArray(response.items)) {
-        this.workOrdersToDispatch = response;
-      }
+    if(this.segmentSelected === 'general') {
+      this.workOrdersToDispatch = { items: [] };
+      this.apiService.GetRequestRender(`dispatchPending/${this.organizationSelected.OrganizationId}`).then((response: any) => {
+        if (response.items && Array.isArray(response.items)) {
+          this.workOrdersToDispatch = response;
+          //console.log(this.workOrdersToDispatch);
+        }
+      }).catch(error => {
+        console.error('Error al obtener OTs:', error);
+      });
+    }else if(this.segmentSelected === 'shift') {
+      this.workOrdersToDispachByShift = { items: [] };
 
-    }).catch(error => {
-      console.error('Error al obtener OTs:', error);
-    });
+      this.apiService.GetRequestRender(`dispatchByShiftPending/${this.organizationSelected.OrganizationId}`).then((response: any) => {
+        if (response.items && Array.isArray(response.items)) {
+          this.workOrdersToDispachByShift = response;
+          //console.log(this.workOrdersToDispachByShift);
+        }
+      }).catch(error => {
+        console.error('Error al obtener OTs:', error);
+      });
+    }
+
   }
 
   OpenDispatch(WOSelected: any) {
@@ -218,6 +262,7 @@ export class TransactionPage implements OnInit {
       const restructuredData = data.items.map((item: any) => transformer(item));
 
       this.selectedWorkOrder = restructuredData[0] || {};
+      console.log(this.selectedWorkOrder);
 
       this.isModaldispatchOpen = true;
 
