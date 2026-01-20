@@ -141,18 +141,12 @@ export class HeatmapComponent implements OnInit {
     const endStr = end.toISOString()
     const sensors = this.widgetData.sensors;
     const sensorIDsString = sensors.map((sensor: any) => sensor.sensor_id).join(',');
-    console.log(startStr);
-    console.log(endStr);
-    
     try {
       const response: any = await this.api.GetRequestRender(
         `sensorsDataHM/?sensors=${sensorIDsString}&start=${startStr}&end=${endStr}`, false
       );
-      console.log(`sensorsDataHM/?sensors=${sensorIDsString}&start=${startStr}&end=${endStr}`)
       const series = this.generateHeatmapMatrix(response.items[0].data);
       this.chartOptions.series = series
-      console.log(response);
-      
       this.startSubscriptions()
       this.adjustColorScale()
       if (this.chart && this.chart.updateOptions) {
