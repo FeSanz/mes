@@ -41,7 +41,8 @@ export type ChartOptions = {
   styleUrls: ['./monitoring.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, CounterComponent, NumericComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
+  imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, CounterComponent, NumericComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule,
+     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
     IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule, IonRippleEffect, IonToggle]
 })
 export class MonitoringPage {
@@ -521,7 +522,6 @@ export class MonitoringPage {
     setTimeout(() => this.shouldRefresh = false, 100);
   }
   isFullscreen = false;
-
   enterFullScreen() {
     const el = document.documentElement;
     this.isFullscreen = true;
@@ -531,7 +531,6 @@ export class MonitoringPage {
     else if ((el as any).mozRequestFullScreen) (el as any).mozRequestFullScreen();
     else if ((el as any).msRequestFullscreen) (el as any).msRequestFullscreen();
   }
-
   exitFullScreen() {
     this.isFullscreen = false;
 
