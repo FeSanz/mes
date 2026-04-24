@@ -306,15 +306,15 @@
               <ion-row class="data-row" *ngFor="let output of OutputsForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ output.ItemNumber }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume text-green">$ [ <strong>{{ TruncatePoint(output.CostData?.items[0].TotalCost)
+                  <span class="std-consume text-green">$ [ <strong>{{ TruncatePoint(output.CostData?.items[0]?.TotalCost)
                       }}</strong> ]</span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
                   <input pInputText type="text"
-                    [value]="TruncatePoint(output.CostData?.items[0].TotalStandardCost) || 0" pSize="small"
+                    [value]="TruncatePoint(output.CostData?.items[0]?.TotalStandardCost) || 0" pSize="small"
                     [disabled]="true" class="input-standard" />
                 </ion-col>
-                <ion-col size="12" size-sm="1">{{ output.CostData?.items[0].CurrencyCode }}</ion-col>
+                <ion-col size="12" size-sm="1">{{ output.CostData?.items[0]?.CurrencyCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
                   <span class="text-blue">
                     [<strong> {{ TruncatePoint(output.OutputQuantity) }} </strong> ] {{output.UOMCode}}
@@ -338,14 +338,14 @@
                 <ion-col size="12" size-sm="4" class="text-list">{{ material.ItemNumber }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
                   <span class="std-consume text-green">$ [ <strong>{{
-                      TruncatePoint(material.CostData?.items[0].TotalCost) }}</strong> ]</span>
+                      TruncatePoint(material.CostData?.items[0]?.TotalCost) }}</strong> ]</span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
                   <input pInputText type="text"
-                    [value]="TruncatePoint(material.CostData?.items[0].TotalStandardCost) || 0" pSize="small"
+                    [value]="TruncatePoint(material.CostData?.items[0]?.TotalStandardCost) || 0" pSize="small"
                     [disabled]="true" class="input-standard" />
                 </ion-col>
-                <ion-col size="12" size-sm="1">{{ material.CostData?.items[0].CurrencyCode }}</ion-col>
+                <ion-col size="12" size-sm="1">{{ material.CostData?.items[0]?.CurrencyCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
                   <span class="text-blue">
                     [<strong> {{ TruncatePoint(material.Quantity) }} </strong> ] {{material.UOMCode}}
@@ -369,14 +369,14 @@
                 <ion-col size="12" size-sm="4" class="text-list">{{ equipment.ResourceName }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
                   <span class="std-consume text-green">$ [ <strong>{{
-                      TruncatePoint(equipment.RateData?.items[0].TotalRate) }}</strong> ]</span>
+                      TruncatePoint(equipment.RateData?.items[0]?.TotalRate) }}</strong> ]</span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
                   <input pInputText type="text"
-                    [value]="TruncatePoint(equipment.RateData?.items[0].TotalStandardCost) || 0" pSize="small"
+                    [value]="TruncatePoint(equipment.RateData?.items[0]?.TotalStandardCost) || 0" pSize="small"
                     [disabled]="true" class="input-standard" />
                 </ion-col>
-                <ion-col size="12" size-sm="1">{{ equipment.RateData?.items[0].CurrencyCode }}</ion-col>
+                <ion-col size="12" size-sm="1">{{ equipment.RateData?.items[0]?.CurrencyCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
                   <span class="text-blue">
                     [<strong> {{ TruncatePoint(equipment.RequiredUsage) }} </strong> ] {{equipment.UOMCode}}
@@ -399,14 +399,14 @@
                 *ngFor="let labor of LaborResourcesForOperation(operation.OperationSequenceNumber)">
                 <ion-col size="12" size-sm="4" class="text-list">{{ labor.ResourceName }}</ion-col>
                 <ion-col size="12" size-sm="2" class="data-center">
-                  <span class="std-consume text-green">$ [ <strong>{{ TruncatePoint(labor.RateData?.items[0].TotalRate)
+                  <span class="std-consume text-green">$ [ <strong>{{ TruncatePoint(labor.RateData?.items[0]?.TotalRate)
                       }}</strong> ]</span>
                 </ion-col>
                 <ion-col size="12" size-sm="2">
-                  <input pInputText type="text" [value]="TruncatePoint(labor.RateData?.items[0].TotalStandardCost) || 0"
+                  <input pInputText type="text" [value]="TruncatePoint(labor.RateData?.items[0]?.TotalStandardCost) || 0"
                     pSize="small" [disabled]="true" class="input-standard" />
                 </ion-col>
-                <ion-col size="12" size-sm="1">{{ labor.RateData?.items[0].CurrencyCode }}</ion-col>
+                <ion-col size="12" size-sm="1">{{ labor.RateData?.items[0]?.CurrencyCode }}</ion-col>
                 <ion-col size="12" size-sm="3" class="data-center">
                   <span class="text-blue">
                     [<strong> {{ TruncatePoint(labor.RequiredUsage) }} </strong> ] {{labor.UOMCode}}

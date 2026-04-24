@@ -222,7 +222,7 @@ export class CostsPage implements OnInit {
       };
 
       const filters = this.FilterItemsAndResources();
-      const today: string = TodayDateForFusion();
+      const today: string = '2025-09-17'//TodayDateForFusion();**********************************************************************
 
       const [itemsCostResponse, resorcesCostResponse] = await Promise.all([
         this.apiService.GetRequestFusion(this.endPoints.Path('standard_costs',
@@ -242,6 +242,8 @@ export class CostsPage implements OnInit {
 
       const dataCostItems = JSON.parse(itemsCostResponse);
       const dataCostResources = JSON.parse(resorcesCostResponse);
+
+      console.log(dataCostItems);
 
       this.CombineCostData(dataCostItems, dataCostResources);
 
