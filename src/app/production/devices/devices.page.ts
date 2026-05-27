@@ -230,9 +230,10 @@ export class DevicesPage implements OnInit {
       this.changeDetector.detectChanges();
     } else
       if (await this.alerts.ShowAlert("¿Deseas eliminar este sensor?", "Alerta", "Atrás", "Eliminar")) {
-        this.api.DeleteRequestRender('sensors' + sensor.sensor_id).then((response: any) => {
+        this.api.DeleteRequestRender('sensors/' + sensor.sensor_id).then((response: any) => {
           //console.log(response);
           this.machine.sensors = this.machine.sensors.filter((se: any) => se !== sensor);
+          this.getMachines()
           this.changeDetector.detectChanges()
         })
       }
