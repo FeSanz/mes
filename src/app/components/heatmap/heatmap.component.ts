@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild, Input, OnChanges, SimpleChanges, EventEmitter, Output, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton,
+  IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonItemOption, IonItemOptions, IonItemSliding,
   IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle
 } from '@ionic/angular/standalone';
 import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, NgApexchartsModule, ApexXAxis, ApexPlotOptions, ApexTooltip, ChartComponent } from "ng-apexcharts";
@@ -36,7 +36,8 @@ export type ChartOptions = {
   styleUrls: ['./heatmap.component.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput,
+  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons,
+     IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput, IonItemOption, IonItemOptions, IonItemSliding,
     IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton, IonToggle],
 })
 export class HeatmapComponent implements OnInit {
@@ -507,7 +508,7 @@ export class HeatmapComponent implements OnInit {
     this.changeDetector.detectChanges()
     this.loadSensorData(new Date(this.customStartDate), new Date(selectedValue))
   }
-  
+
   deleteChart() {
     this.remove.emit(this.widgetData.id);
   }

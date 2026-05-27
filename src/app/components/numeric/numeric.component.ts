@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader,
+  IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonItemOption, IonItemOptions, IonItemSliding,
   IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonToggle
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -21,7 +21,7 @@ export interface NumericData {
   templateUrl: './numeric.component.html',
   styleUrls: ['./numeric.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule, NgxColorsModule, IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList,
+  imports: [FormsModule, CommonModule, NgxColorsModule, IonCard, IonCardTitle, IonCardContent, IonButtons, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItemOption, IonItemOptions, IonItemSliding,
     IonItem, IonFab, IonFabButton, IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, CdkDragHandle, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -91,7 +91,7 @@ export class NumericComponent implements OnInit {
       });
     });
   }
-  
+
   deleteChart() {
     this.remove.emit(this.widgetData.id);
   }

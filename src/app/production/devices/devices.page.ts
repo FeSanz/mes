@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, inj
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonText, IonNote, IonCard,
+  IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItem, IonText, IonNote, IonCard, IonItemOption, IonItemOptions, IonItemSliding,
   RefresherCustomEvent, IonRefresher, IonRefresherContent, IonMenuButton, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -20,7 +20,7 @@ import { ToggleMenu } from 'src/app/models/design';
   templateUrl: './devices.page.html',
   styleUrls: ['./devices.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem,
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonItemSliding,
     IonRefresher, IonRefresherContent, IonText, IonNote, IonCard, IonMenuButton, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
