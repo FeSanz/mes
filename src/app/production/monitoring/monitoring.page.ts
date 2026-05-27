@@ -42,7 +42,7 @@ export type ChartOptions = {
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, CounterComponent, NumericComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule,
-     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
     IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule, IonRippleEffect, IonToggle]
 })
 export class MonitoringPage {
@@ -348,6 +348,23 @@ export class MonitoringPage {
       })
     }
   }
+  async duplicateWidget(id: number) {
+    if (await this.alerts.ShowAlert("¿Deseas duplicar este dashboard?", "Alerta", "Cancelar", "Duplicar")) {
+      this.api.PostRequestRender('dashboardsDuplicate/' + id, {}).then((response: any) => {
+        if (!response.existError) {
+          this.widgets.push(response.items);
+          this.changeDetector.detectChanges();
+          this.alerts.Success("Dashboard duplicado con éxito");
+          this.GetDasboards()
+        } else {
+          this.alerts.Error(response.message || "Error al duplicar");
+        }
+      }).catch(error => {
+        console.error('Error:', error);
+        this.alerts.Error("Error de conexión");
+      });
+    }
+  }
   async addNewSensor() {
     this.newWidgetData.sensors.push({
       machine_id: "",
@@ -581,5 +598,5 @@ export class MonitoringPage {
       }
     })
   }
-    protected readonly ToggleMenu = ToggleMenu;
+  protected readonly ToggleMenu = ToggleMenu;
 }

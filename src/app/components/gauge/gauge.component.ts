@@ -32,6 +32,7 @@ export interface GaugeData {
 export class GaugeComponent implements OnInit {
 
   @Output() remove = new EventEmitter<number>();
+  @Output() duplicate = new EventEmitter<number>();
   widgetData: any = {}
   private humiditySubject = new BehaviorSubject<number>(0);
   public currentValue$ = this.humiditySubject.asObservable();
@@ -76,8 +77,12 @@ export class GaugeComponent implements OnInit {
       console.log(err);
     });
   }
+  
   deleteChart() {
     this.remove.emit(this.widgetData.id);
+  }
+  duplicateChart() {
+    this.duplicate.emit(this.widgetData.id);
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))

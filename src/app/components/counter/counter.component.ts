@@ -37,6 +37,7 @@ export class CounterComponent implements OnInit {
   show = false
   @Input() data: CounterData = {};
   @Output() remove = new EventEmitter<number>();
+  @Output() duplicate = new EventEmitter<number>();
   countStr: number = 0
   isPaused = false;
   nowDate = ''
@@ -256,8 +257,12 @@ export class CounterComponent implements OnInit {
     const localDate = new Date(localString);
     return localDate.toISOString();
   }
+  
   deleteChart() {
     this.remove.emit(this.widgetData.id);
+  }
+  duplicateChart() {
+    this.duplicate.emit(this.widgetData.id);
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))

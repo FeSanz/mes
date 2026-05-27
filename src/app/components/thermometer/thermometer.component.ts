@@ -34,6 +34,7 @@ export interface ThermoData {
 export class ThermometerComponent implements OnInit {
   widgetData: any = {}
   @Output() remove = new EventEmitter<number>();
+  @Output() duplicate = new EventEmitter<number>();
   private temperatureSubject = new BehaviorSubject<number>(0);
   public temperature$ = this.temperatureSubject.asObservable();
   copyWidgetData: any = {}
@@ -53,8 +54,12 @@ export class ThermometerComponent implements OnInit {
     this.initializeConfig();
   }
 
+  
   deleteChart() {
     this.remove.emit(this.widgetData.id);
+  }
+  duplicateChart() {
+    this.duplicate.emit(this.widgetData.id);
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))

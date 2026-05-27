@@ -41,6 +41,7 @@ export class NumericComponent implements OnInit {
 
   @Input() data: NumericData = {};
   @Output() remove = new EventEmitter<number>();
+  @Output() duplicate = new EventEmitter<number>();
   constructor(
     private changeDetector: ChangeDetectorRef,
     private ws: WebSocketService,
@@ -90,8 +91,12 @@ export class NumericComponent implements OnInit {
       });
     });
   }
+  
   deleteChart() {
     this.remove.emit(this.widgetData.id);
+  }
+  duplicateChart() {
+    this.duplicate.emit(this.widgetData.id);
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))

@@ -12,7 +12,7 @@ import { ApiService } from 'src/app/services/api.service';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { EndpointsService } from 'src/app/services/endpoints.service';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, moveOutline, pencilOutline, trashOutline } from 'ionicons/icons';
+import { copyOutline, duplicateOutline, ellipsisVertical, moveOutline, pencilOutline, trashOutline } from 'ionicons/icons';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 
@@ -45,6 +45,7 @@ export class ChartsComponent implements OnInit {
   @Input() data: SplineData = {};
   @Input() refreshData: boolean = false;
   @Output() remove = new EventEmitter<number>();
+  @Output() duplicate = new EventEmitter<number>();
   public chartOptions: ChartOptions;
   widgetData: any = {}
   copyWidgetData: any = {}
@@ -62,7 +63,7 @@ export class ChartsComponent implements OnInit {
     private ws: WebSocketService,
     private endPoints: EndpointsService,
     private api: ApiService) {
-    addIcons({ ellipsisVertical, pencilOutline, trashOutline, moveOutline })
+    addIcons({ ellipsisVertical, pencilOutline, trashOutline, moveOutline, duplicateOutline })
     this.chartOptions = {
       series: [],
       chart: {
@@ -380,8 +381,12 @@ export class ChartsComponent implements OnInit {
       }
     })
   }
+
   deleteChart() {
     this.remove.emit(this.widgetData.id);
+  }
+  duplicateChart() {
+    this.duplicate.emit(this.widgetData.id);
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))

@@ -45,6 +45,7 @@ export class HeatmapComponent implements OnInit {
   @Input() data: HeatmapData = {};
   @Input() refreshData: boolean = false;
   @Output() remove = new EventEmitter<number>();
+  @Output() duplicate = new EventEmitter<number>();
   public chartOptions: ChartOptions;
   title = "Heatmap"
   copyWidgetData: any = {}
@@ -506,8 +507,12 @@ export class HeatmapComponent implements OnInit {
     this.changeDetector.detectChanges()
     this.loadSensorData(new Date(this.customStartDate), new Date(selectedValue))
   }
+  
   deleteChart() {
     this.remove.emit(this.widgetData.id);
+  }
+  duplicateChart() {
+    this.duplicate.emit(this.widgetData.id);
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))

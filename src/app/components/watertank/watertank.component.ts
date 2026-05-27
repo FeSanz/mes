@@ -59,6 +59,7 @@ export class WaterTankComponent implements OnInit {
     high: 75
   }
   @Output() remove = new EventEmitter<number>();
+  @Output() duplicate = new EventEmitter<number>();
   copyWidgetData: any = {}
   isModalOpen = false;
   lastDate: any = ""
@@ -186,8 +187,12 @@ export class WaterTankComponent implements OnInit {
     const roundedLevel = Math.round(clampedLevel * Math.pow(10, 1)) / Math.pow(10, 1);
     this.waterLevelSubject.next(roundedLevel);
   }
+  
   deleteChart() {
     this.remove.emit(this.widgetData.id);
+  }
+  duplicateChart() {
+    this.duplicate.emit(this.widgetData.id);
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))

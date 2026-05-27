@@ -37,6 +37,7 @@ export class OnoffComponent implements OnInit {
   lastValue = 0
   @Input() data: OnOffData = {};
   @Output() remove = new EventEmitter<number>();
+  @Output() duplicate = new EventEmitter<number>();
   constructor(
     private changeDetector: ChangeDetectorRef,
     private ws: WebSocketService,
@@ -72,8 +73,12 @@ export class OnoffComponent implements OnInit {
       console.log(err);
     });
   }
+  
   deleteChart() {
     this.remove.emit(this.widgetData.id);
+  }
+  duplicateChart() {
+    this.duplicate.emit(this.widgetData.id);
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))

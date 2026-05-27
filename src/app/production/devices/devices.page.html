@@ -120,7 +120,7 @@
     <ng-template>
       <ion-header>
         <ion-toolbar color="primary">
-          <ion-title>Agregar nuevo dispositivo</ion-title>
+          <ion-title>{{machine.machine_name ? 'Editar dispositivo' : 'Agregar nuevo dispositivo'}}</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="isModalOpen = false">Cerrar</ion-button>
           </ion-buttons>
