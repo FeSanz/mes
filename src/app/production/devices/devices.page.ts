@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, inj
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItem, IonText, IonNote, IonCard, IonItemOption, IonItemOptions, IonItemSliding,
+  IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItem, IonText, IonNote, IonCard, IonItemOption, IonItemOptions, IonItemSliding, IonToggle,
   RefresherCustomEvent, IonRefresher, IonRefresherContent, IonMenuButton, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -20,7 +20,7 @@ import { ToggleMenu } from 'src/app/models/design';
   templateUrl: './devices.page.html',
   styleUrls: ['./devices.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonItemSliding,
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonFab, IonFabButton, IonButtons, IonButton, IonIcon, IonItemOption, IonItemOptions, IonItem, IonItemSliding, IonToggle,
     IonRefresher, IonRefresherContent, IonText, IonNote, IonCard, IonMenuButton, IonCardContent, IonPopover, IonList, IonModal, IonInput, IonCol, IonGrid, IonRow, IonSelect, IonSelectOption],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
@@ -88,7 +88,7 @@ export class DevicesPage implements OnInit {
         }, {})
       ).sort((a: any, b: any) => a.organization_name.localeCompare(b.organization_name));
 
-      //console.log(this.organizations);
+      console.log(this.organizations);
 
     })
   }
@@ -238,7 +238,10 @@ export class DevicesPage implements OnInit {
         })
       }
   }
-
+  DeactiveDev(event: any, machineId: number) {
+    const isChecked = event.detail.checked;
+    console.log(`Cambiando estado de máquina ${machineId} a: ${isChecked}`);
+  }
   isDarkColor(hexColor: string): boolean {
     const hex = hexColor.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);

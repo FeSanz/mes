@@ -29,6 +29,9 @@
               <span [ngStyle]="{'color': widgetTextColor}">{{ machine.machine_name }}</span>
             </ion-card-title>
             <ion-buttons slot="end">
+              <ion-toggle [checked]="machine.is_active" (ionChange)="DeactiveDev($event, machine.machine_id)"
+                style="margin-right: 10px;">
+              </ion-toggle>
               <ion-button id="popover-spline-${{machine['machine_id']}}" title="Opciones">
                 <ion-icon slot="icon-only" name="ellipsis-vertical" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
               </ion-button>

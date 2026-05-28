@@ -37,7 +37,7 @@ export type ChartOptions = {
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons,
-     IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput, IonItemOption, IonItemOptions, IonItemSliding,
+    IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput, IonItemOption, IonItemOptions, IonItemSliding,
     IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton, IonToggle],
 })
 export class HeatmapComponent implements OnInit {
@@ -110,7 +110,10 @@ export class HeatmapComponent implements OnInit {
         }
       },
       dataLabels: {
-        enabled: false
+        enabled: true,
+        style: {
+          colors: ['#fff'],
+        },
       }
     };
 

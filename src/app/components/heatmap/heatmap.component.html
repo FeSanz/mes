@@ -95,17 +95,23 @@
           Borde
         </ion-toggle>
       </ion-item>
+      <ion-item lines="none">
+        <ion-toggle [checked]="copyWidgetData.borderFlag == 'Y'"
+          (ionChange)="copyWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">
+          Mostrar valor
+        </ion-toggle>
+      </ion-item>
       <!--ion-item-sliding *ngFor="let sensor of copyWidgetData.sensors; let i = index"-->
-      <ion-item *ngFor="let sensor of copyWidgetData.sensors; let i = index">
-        <ion-select label="Máquina:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating"
+      <ion-item><!--/ion-item> *ngFor="let sensor of copyWidgetData.sensors; let i = index"-->
+        <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id" label-placement="floating"
           interface="popover">
           <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
             {{ mach.machine_name }}
           </ion-select-option>
         </ion-select>
-        <ion-select label="Sensor:" color="primary" [(ngModel)]="sensor.sensor_id" label-placement="floating"
+        <ion-select label="Sensor:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].sensor_id" label-placement="floating"
           interface="popover">
-          <ion-select-option *ngFor="let s of getSensorsForMachine(sensor.machine_id)" [value]="s.sensor_id">
+          <ion-select-option *ngFor="let s of getSensorsForMachine(copyWidgetData.sensors[0].machine_id)" [value]="s.sensor_id">
             {{ s.sensor_name }}
           </ion-select-option>
         </ion-select>
