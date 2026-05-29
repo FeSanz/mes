@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild, Input, OnChanges, SimpleChanges, EventEmitter, Output, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectorRef } from '@angular/core';
 import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonPopover, IonList, IonItem, IonFab, IonFabButton, IonItemOption, IonItemOptions, IonItemSliding,
-  IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle
+  IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle, IonRange
 } from '@ionic/angular/standalone';
 import { ApexAxisChartSeries, ApexTitleSubtitle, ApexDataLabels, ApexChart, NgApexchartsModule, ApexXAxis, ApexPlotOptions, ApexTooltip, ChartComponent } from "ng-apexcharts";
 import { FormsModule } from '@angular/forms';
@@ -36,7 +36,7 @@ export type ChartOptions = {
   styleUrls: ['./heatmap.component.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons,
+  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonRange,
     IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput, IonItemOption, IonItemOptions, IonItemSliding,
     IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton, IonToggle],
 })
@@ -103,7 +103,9 @@ export class HeatmapComponent implements OnInit {
       },
       plotOptions: {
         heatmap: {
-          useFillColorAsStroke: true,
+          enableShades: true, // <--- ESTO ES LO QUE ELIMINA EL DEGRADADO
+          radius: 0,//redondeado
+          useFillColorAsStroke: true,//borde en la celda
           colorScale: {
             ranges: [
             ]
@@ -111,7 +113,7 @@ export class HeatmapComponent implements OnInit {
         }
       },
       dataLabels: {
-        enabled: true,
+        enabled: true,//número sobre celda
         style: {
           colors: ['#fff'],
         },
@@ -123,24 +125,34 @@ export class HeatmapComponent implements OnInit {
     this.initializeConfig();
   }
   initializeConfig() {
-    this.widgetData = this.data
-    //console.log(this.widgetData);
+    this.widgetData = this.data;
+    // 1. Asignar reglas de color
     if (this.chartOptions?.plotOptions?.heatmap?.colorScale) {
-      this.chartOptions.plotOptions.heatmap.colorScale.ranges = this.widgetData.rules
+      this.chartOptions.plotOptions.heatmap.colorScale.ranges = this.widgetData.rules;
     }
-    /*if (
-      this.chartOptions?.plotOptions?.heatmap?.colorScale?.ranges?.[0] &&
-      this.widgetData?.sensors?.[0]?.color
-    ) {
-      this.chartOptions.plotOptions.heatmap.colorScale.ranges[0].color =
-        this.widgetData.sensors[0].color;
-    }*/
 
+    // 2. Asignar el borde (widgetData.border tiene 'Y'/'N' según tu DB)
+    if (this.chartOptions?.plotOptions?.heatmap) {
+      // Si border es 'Y', ponemos un ancho de 1 (o el que desees), si es 'N', 0.
+      this.chartOptions.plotOptions.heatmap.useFillColorAsStroke = this.widgetData.border === 'N'
+      // 3. Asignar el radius
+      this.chartOptions.plotOptions.heatmap.radius = this.widgetData.radius || 0;
+      this.chartOptions.plotOptions.heatmap.enableShades = this.widgetData.shades === 'Y'
+    }
+
+    // 4. Asignar mostrar/ocultar números (showNumber es booleano o 'Y'/'N')
+    this.chartOptions.dataLabels = {
+      ...this.chartOptions.dataLabels,
+      enabled: this.widgetData.showNumber === 'Y'
+    };
+
+    // Actualizar el gráfico
     this.chart?.updateOptions(this.chartOptions);
+
     const { start, end } = this.getDateRangeFromOption(this.widgetData.dateRange);
-    this.nowDate = this.formatLocalISO(new Date())
-    this.loadSensorData(start, end)
-    this.changeDetector.detectChanges()
+    this.nowDate = this.formatLocalISO(new Date());
+    this.loadSensorData(start, end);
+    this.changeDetector.detectChanges();
   }
   async loadSensorData(start: Date, end: Date) {
     const startStr = start.toISOString()
@@ -358,6 +370,10 @@ export class HeatmapComponent implements OnInit {
         selectedTimeRange: this.copyWidgetData.selectedTimeRange,
         chartType: this.copyWidgetData.chartType,
         sensors: this.copyWidgetData.sensors,
+        border: this.copyWidgetData.border || false,
+        radius: this.copyWidgetData.radius || 0,
+        shades: this.copyWidgetData.shades || 0,
+        showNumber: this.copyWidgetData.showNumber || false
       }
     }
     this.isModalOpen = false;

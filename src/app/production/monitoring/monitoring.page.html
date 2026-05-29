@@ -125,13 +125,50 @@
             <ion-select-option value="bar">Barras</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item *ngIf="newWidgetData.widgetType == 'number'">
+        <ion-item *ngIf="newWidgetData.widgetType == 'heatmap'">
           <ion-select label="Tamaño:" color="primary" [(ngModel)]="newWidgetData.font_size" interface="popover">
             <ion-select-option value="50px">Pequeño</ion-select-option>
             <ion-select-option value="100px">Mediano</ion-select-option>
             <ion-select-option value="150px">Grande</ion-select-option>
           </ion-select>
         </ion-item>
+        <!--Heatmap START-->
+        <ion-item lines="none" *ngIf="newWidgetData.widgetType == 'number'">
+          <ion-toggle [checked]="newWidgetData.borderFlag == 'Y'"
+            (ionChange)="newWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">
+            Borde
+          </ion-toggle>
+        </ion-item>
+        <div style="display: flex; gap: 40px; padding: 10px; justify-content: center;"
+          *ngIf="newWidgetData.widgetType == 'heatmap'">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+            <ion-label style="font-size: 13px; font-weight: bold;" color="primary">Mostrar valor</ion-label>
+            <ion-toggle [checked]="newWidgetData.showNumber === 'Y'"
+              (ionChange)="newWidgetData.showNumber = $event.detail.checked ? 'Y' : 'N'">
+            </ion-toggle>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+            <ion-label style="font-size: 13px; font-weight: bold;" color="primary">Borde en celda</ion-label>
+            <ion-toggle [checked]="newWidgetData.border === 'Y'"
+              (ionChange)="newWidgetData.border = $event.detail.checked ? 'Y' : 'N'">
+            </ion-toggle>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+            <ion-label style="font-size: 13px; font-weight: bold;" color="primary">Degradado entre reglas</ion-label>
+            <ion-toggle [checked]="newWidgetData.shades === 'Y'"
+              (ionChange)="newWidgetData.shades = $event.detail.checked ? 'Y' : 'N'">
+            </ion-toggle>
+          </div>
+        </div>
+        <div style="padding: 10px 20px;" *ngIf="newWidgetData.widgetType == 'heatmap'">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+            <ion-label color="primary" style="font-size: 13px; font-weight: bold;">Redondeo de celda:</ion-label>
+            <ion-badge color="primary">{{ newWidgetData.radius }}</ion-badge>
+          </div>
+          <ion-range [(ngModel)]="newWidgetData.radius" min="0" max="100" pin="true">
+          </ion-range>
+        </div>
+        <!--Heatmap END-->
         <ion-item lines="none">
           <ion-toggle [checked]="newWidgetData.borderFlag == 'Y'"
             (ionChange)="newWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">

@@ -14,7 +14,7 @@ import { CounterComponent } from 'src/app/components/counter/counter.component';
 import { ThermometerComponent } from 'src/app/components/thermometer/thermometer.component';
 import { OnoffComponent } from 'src/app/components/onoff/onoff.component';
 import { addIcons } from 'ionicons';
-import { addCircleOutline, addOutline, checkmark, contractOutline, expandOutline, menuOutline, trashOutline, pencilOutline } from 'ionicons/icons';
+import { addCircleOutline, addOutline, checkmark, contractOutline, expandOutline, menuOutline, trashOutline, pencilOutline, duplicateOutline } from 'ionicons/icons';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PermissionsService } from 'src/app/services/permissions.service';
@@ -80,7 +80,11 @@ export class MonitoringPage {
       color: "#003699ff"
     }],
     widgetType: "",
-    chartType: ""
+    chartType: "",
+    border: 'Y',
+    radius: 0,
+    showNumber: 'N',
+    shades: 'N'
   }
   user: any = {}
   widgets: any = []
@@ -98,7 +102,7 @@ export class MonitoringPage {
     private alerts: AlertsService,
     public permissions: PermissionsService,
     private changeDetector: ChangeDetectorRef) {
-    addIcons({ menuOutline, pencilOutline, addCircleOutline, trashOutline, checkmark, addOutline, contractOutline, expandOutline });
+    addIcons({ menuOutline, pencilOutline, addCircleOutline, trashOutline, checkmark, addOutline, contractOutline, expandOutline, duplicateOutline });
     this.user = JSON.parse(String(localStorage.getItem("userData")))
     const nav = this.router.getCurrentNavigation();
     const state: any = nav?.extras?.state;
@@ -214,6 +218,10 @@ export class MonitoringPage {
       this.newWidgetData.widgetType = "chart"
       this.newWidgetData.chartType = "area"
       this.newWidgetData.borderFlag = "Y"
+      this.newWidgetData.border = 'Y'
+      this.newWidgetData.radius = 0
+      this.newWidgetData.showNumber = 'N'
+      this.newWidgetData.shades = 'N'
       this.newWidgetData.rules = [{
         from: 0,
         to: 100,
@@ -229,6 +237,10 @@ export class MonitoringPage {
         this.newWidgetData.widgetType = "chart"
         this.newWidgetData.chartType = "area"
         this.newWidgetData.borderFlag = "Y"
+        this.newWidgetData.border = 'Y'
+        this.newWidgetData.radius = 0
+        this.newWidgetData.showNumber = 'N'
+        this.newWidgetData.shades = 'N'
         this.newWidgetData.sensors[0].machine_id = this.machines[0].machine_id
         this.newWidgetData.sensors[0].sensor_id = this.machines[0].sensors[0].sensor_id
         this.newWidgetData.rules = [{
@@ -264,6 +276,10 @@ export class MonitoringPage {
         size: this.newWidgetData.font_size,
         ...(this.newWidgetData.widgetType == 'heatmap' ? { rules: this.newWidgetData.rules } : {}),
         "sensors": this.newWidgetData.sensors,
+        border: this.newWidgetData.border,
+        radius: this.newWidgetData.radius,
+        shades: this.newWidgetData.shades,
+        showNumber: this.newWidgetData.showNumber
       },
       "created_by": this.user.UserId,
       "updated_by": this.user.UserId

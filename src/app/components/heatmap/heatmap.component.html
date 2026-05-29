@@ -95,23 +95,49 @@
           Borde
         </ion-toggle>
       </ion-item>
-      <ion-item lines="none">
-        <ion-toggle [checked]="copyWidgetData.borderFlag == 'Y'"
-          (ionChange)="copyWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">
-          Mostrar valor
-        </ion-toggle>
-      </ion-item>
+      <div style="display: flex; gap: 40px; padding: 10px; justify-content: center;">
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+          <ion-label style="font-size: 13px; font-weight: bold;" color="primary">Mostrar valor</ion-label>
+          <ion-toggle [checked]="copyWidgetData.showNumber === 'Y'"
+            (ionChange)="copyWidgetData.showNumber = $event.detail.checked ? 'Y' : 'N'">
+          </ion-toggle>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+          <ion-label style="font-size: 13px; font-weight: bold;" color="primary">Borde en celda</ion-label>
+          <ion-toggle [checked]="copyWidgetData.border === 'Y'"
+            (ionChange)="copyWidgetData.border = $event.detail.checked ? 'Y' : 'N'">
+          </ion-toggle>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+          <ion-label style="font-size: 13px; font-weight: bold;" color="primary">Degradado entre reglas</ion-label>
+          <ion-toggle [checked]="copyWidgetData.shades === 'Y'"
+            (ionChange)="copyWidgetData.shades = $event.detail.checked ? 'Y' : 'N'">
+          </ion-toggle>
+        </div>
+      </div>
+      <div style="padding: 10px 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <ion-label color="primary" style="font-size: 13px; font-weight: bold;">Redondeo de celda:</ion-label>
+          <ion-badge color="primary">{{ copyWidgetData.radius }}</ion-badge>
+        </div>
+        <ion-range [(ngModel)]="copyWidgetData.radius" min="0" max="100" pin="true">
+        </ion-range>
+      </div>
       <!--ion-item-sliding *ngFor="let sensor of copyWidgetData.sensors; let i = index"-->
       <ion-item><!--/ion-item> *ngFor="let sensor of copyWidgetData.sensors; let i = index"-->
-        <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id" label-placement="floating"
-          interface="popover">
+        <ion-select label="Máquina:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].machine_id"
+          label-placement="floating" interface="popover">
           <ion-select-option *ngFor="let mach of machines" [value]="mach.machine_id">
             {{ mach.machine_name }}
           </ion-select-option>
         </ion-select>
-        <ion-select label="Sensor:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].sensor_id" label-placement="floating"
-          interface="popover">
-          <ion-select-option *ngFor="let s of getSensorsForMachine(copyWidgetData.sensors[0].machine_id)" [value]="s.sensor_id">
+        <ion-select label="Sensor:" color="primary" [(ngModel)]="copyWidgetData.sensors[0].sensor_id"
+          label-placement="floating" interface="popover">
+          <ion-select-option *ngFor="let s of getSensorsForMachine(copyWidgetData.sensors[0].machine_id)"
+            [value]="s.sensor_id">
             {{ s.sensor_name }}
           </ion-select-option>
         </ion-select>

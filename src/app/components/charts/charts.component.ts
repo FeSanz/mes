@@ -28,7 +28,8 @@ export type ChartOptions = {
   stroke: ApexStroke;
   tooltip: ApexTooltip;
   dataLabels: ApexDataLabels;
-  legend: ApexLegend
+  legend: ApexLegend,
+  annotations: ApexAnnotations; // <--- Agrégala aquí
 };
 
 @Component({
@@ -37,7 +38,7 @@ export type ChartOptions = {
   styleUrls: ['./charts.component.scss'],
   standalone: true,
   imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon,
-     IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput, IonItemOption, IonItemOptions, IonItemSliding,
+    IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput, IonItemOption, IonItemOptions, IonItemSliding,
     IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
@@ -67,6 +68,38 @@ export class ChartsComponent implements OnInit {
     addIcons({ ellipsisVertical, pencilOutline, trashOutline, moveOutline, duplicateOutline })
     this.chartOptions = {
       series: [],
+      annotations: {
+        yaxis: [
+          {
+            y: 1200, // Ajusta este valor al rango de tus sensores
+            borderColor: '#00E396',
+            label: {
+              borderColor: '#00E396',
+              style: {
+                color: '#fff',
+                background: '#00E396',
+              },
+              text: 'Límite Superior',
+            },
+          },
+          {
+            y: 1600,
+            y2: 2000, // Crea una banda sombreada de advertencia
+            borderColor: '#000',
+            fillColor: '#FEB019',
+            opacity: 0.2, // La opacidad es clave para que no tape los datos
+            label: {
+              borderColor: '#333',
+              style: {
+                fontSize: '10px',
+                color: '#333',
+                background: '#FEB019',
+              },
+              text: 'Rango de Precaución',
+            },
+          },
+        ],
+      },
       chart: {
         animations: {
           enabled: true,
