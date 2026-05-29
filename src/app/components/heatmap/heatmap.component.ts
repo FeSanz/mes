@@ -103,10 +103,11 @@ export class HeatmapComponent implements OnInit {
       },
       plotOptions: {
         heatmap: {
+          useFillColorAsStroke: true,
           colorScale: {
             ranges: [
             ]
-          }
+          },
         }
       },
       dataLabels: {
