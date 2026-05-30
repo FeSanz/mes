@@ -161,7 +161,7 @@ export class HeatmapComponent implements OnInit {
     const sensorIDsString = sensors.map((sensor: any) => sensor.sensor_id).join(',');
     try {
       const response: any = await this.api.GetRequestRender(
-        `sensorsDataHM/?sensors=${sensorIDsString}&start=${startStr}&end=${endStr}`, false
+        `sensorsDataHM/?sensors=${sensorIDsString}&start=${startStr}&end=${endStr}&aggregation=${this.widgetData.aggregation}`, false
       );
       const series = this.generateHeatmapMatrix(response.items[0].data);
       this.chartOptions.series = series
@@ -373,6 +373,7 @@ export class HeatmapComponent implements OnInit {
         border: this.copyWidgetData.border || false,
         radius: this.copyWidgetData.radius || 0,
         shades: this.copyWidgetData.shades || 0,
+        aggregation: this.copyWidgetData.aggregation,
         showNumber: this.copyWidgetData.showNumber || false
       }
     }

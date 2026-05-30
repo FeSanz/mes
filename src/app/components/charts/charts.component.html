@@ -101,6 +101,52 @@
           Borde
         </ion-toggle>
       </ion-item>
+      <ion-accordion-group>
+        <ion-accordion value="annotations">
+          <ion-item slot="header" color="light">
+            <ion-label>Configurar Anotaciones</ion-label>
+          </ion-item>
+
+          <div slot="content" class="ion-padding">
+
+            <ion-item-sliding *ngFor="let annot of copyWidgetData.annotations; let i = index">
+              <ion-item>
+                <div style="display: flex; flex-direction: column; width: 100%; gap: 10px; padding: 5px 0;">
+
+                  <ion-input label="Etiqueta:" label-placement="floating" [(ngModel)]="annot.text"
+                    fill="outline"></ion-input>
+
+                  <div style="display: flex; gap: 10px;">
+                    <ion-input type="number" label="Y:" label-placement="floating" [(ngModel)]="annot.y"
+                      fill="outline"></ion-input>
+                    <ion-input type="number" label="Y2 (opcional):" label-placement="floating" [(ngModel)]="annot.y2"
+                      fill="outline"></ion-input>
+                  </div>
+
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <ion-label>Color:</ion-label>
+                    <ngx-colors ngx-colors-trigger [(ngModel)]="annot.borderColor"></ngx-colors>
+                  </div>
+                </div>
+              </ion-item>
+
+              <ion-item-options side="end">
+                <ion-item-option color="danger" (click)="removeAnnotation(i)">
+                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
+            </ion-item-sliding>
+
+            <div class="ion-text-center" style="margin-top: 15px;">
+              <ion-button fill="outline" size="small" (click)="addNewAnnotation()">
+                <ion-icon slot="start" name="add"></ion-icon>
+                Agregar Anotación
+              </ion-button>
+            </div>
+
+          </div>
+        </ion-accordion>
+      </ion-accordion-group>
       <ion-item-sliding *ngFor="let sensor of copyWidgetData.sensors; let i = index">
         <ion-item>
           <ion-select label="Máquina:" color="primary" [(ngModel)]="sensor.machine_id" label-placement="floating"

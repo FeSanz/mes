@@ -83,6 +83,7 @@ export class MonitoringPage {
     chartType: "",
     border: 'Y',
     radius: 0,
+    aggregation: 'avg',
     showNumber: 'N',
     shades: 'N'
   }
@@ -220,6 +221,8 @@ export class MonitoringPage {
       this.newWidgetData.borderFlag = "Y"
       this.newWidgetData.border = 'Y'
       this.newWidgetData.radius = 0
+      this.newWidgetData.annotations = []
+      this.newWidgetData.aggregation = 'avg'
       this.newWidgetData.showNumber = 'N'
       this.newWidgetData.shades = 'N'
       this.newWidgetData.rules = [{
@@ -239,6 +242,7 @@ export class MonitoringPage {
         this.newWidgetData.borderFlag = "Y"
         this.newWidgetData.border = 'Y'
         this.newWidgetData.radius = 0
+        this.newWidgetData.aggregation = 'avg'
         this.newWidgetData.showNumber = 'N'
         this.newWidgetData.shades = 'N'
         this.newWidgetData.sensors[0].machine_id = this.machines[0].machine_id
@@ -278,6 +282,8 @@ export class MonitoringPage {
         "sensors": this.newWidgetData.sensors,
         border: this.newWidgetData.border,
         radius: this.newWidgetData.radius,
+        annotations: this.newWidgetData.annotations,
+        aggregation: this.newWidgetData.aggregation,
         shades: this.newWidgetData.shades,
         showNumber: this.newWidgetData.showNumber
       },

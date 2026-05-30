@@ -70,7 +70,7 @@ export class ChartsComponent implements OnInit {
       series: [],
       annotations: {
         yaxis: [
-          {
+          /*{
             y: 1200, // Ajusta este valor al rango de tus sensores
             borderColor: '#00E396',
             label: {
@@ -97,7 +97,7 @@ export class ChartsComponent implements OnInit {
               },
               text: 'Rango de Precaución',
             },
-          },
+          },*/
         ],
       },
       chart: {
@@ -191,11 +191,17 @@ export class ChartsComponent implements OnInit {
   initializeChart() {
     if (this.widgetData.chartType) {
       this.chartOptions.chart.type = this.widgetData.chartType;
-      this.chart?.updateOptions(this.chartOptions);
     }
+
+    // Asignación limpia
+    if (this.widgetData.annotations) {
+      this.chartOptions.annotations.yaxis = this.prepareAnnotations(this.widgetData.annotations);
+    }
+
+    this.chart?.updateOptions(this.chartOptions);
+
     const { start, end } = this.getDateRangeFromOption(this.widgetData.dateRange);
-    this.nowDate = this.formatLocalISO(new Date())
-    this.loadSensorData(start, end)
+    this.loadSensorData(start, end);
   }
   async loadSensorData(start: Date, end: Date) {
     const startStr = start.toISOString()
@@ -399,9 +405,11 @@ export class ChartsComponent implements OnInit {
         selectedTimeRange: this.copyWidgetData.selectedTimeRange,
         chartType: this.copyWidgetData.chartType,
         sensors: this.copyWidgetData.sensors,
+        annotations: this.copyWidgetData.annotations || [],
       }
     }
     this.showChart = false;
+    console.log(body.parameters)
     this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
@@ -430,6 +438,53 @@ export class ChartsComponent implements OnInit {
       //this.newWidgetData.machine = response.data[0].MachineId + ""
       //console.log(response.data[0].MachineId);
     })
+  }
+  // Agregar una nueva anotación por defecto
+  async addNewAnnotation() {
+    // Obtenemos una posición base (puedes basarte en el último valor si existe)
+    const lastY = this.copyWidgetData.annotations?.length > 0
+      ? this.copyWidgetData.annotations[this.copyWidgetData.annotations.length - 1].y + 100
+      : 1000;
+
+    this.copyWidgetData.annotations.push({
+      text: "Anotación " + (this.copyWidgetData.annotations.length + 1),
+      y: lastY,
+      y2: null, // Si es null o undefined, el guardado lo interpretará como línea
+      borderColor: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+    });
+  }
+  private prepareAnnotations(annotations: any[]) {
+    return annotations.map(a => {
+      const isRange = a.y2 != null && a.y2 > a.y;
+
+      // Objeto limpio siguiendo la estructura que SÍ funciona
+      const annot: any = {
+        y: a.y,
+        borderColor: a.borderColor,
+        label: {
+          text: a.text,
+          borderColor: a.borderColor,
+          style: {
+            color: '#fff',
+            background: a.borderColor
+          }
+        }
+      };
+
+      // Solo añadimos y2 si realmente existe
+      if (isRange) {
+        annot.y2 = a.y2;
+        annot.fillColor = a.borderColor;
+        annot.opacity = 0.2;
+      }
+
+      return annot;
+    });
+  }
+  // Eliminar una anotación
+  async removeAnnotation(index: number) {
+    this.copyWidgetData.annotations.splice(index, 1);
+    this.changeDetector.detectChanges();
   }
   getSensorsForMachine(MachineId: number) {
     const machine: any = this.machines.find((m: any) => m.machine_id == MachineId);

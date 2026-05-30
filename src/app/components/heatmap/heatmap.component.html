@@ -89,6 +89,17 @@
         <ion-label color="primary" slot="start">Tipo:</ion-label>
         <ion-label slot="end"><strong>Mapa de calor</strong></ion-label>
       </ion-item>
+      <ion-item>
+        <ion-select label="Tipo de cálculo:"  [(ngModel)]="copyWidgetData.aggregation"
+          interface="popover">
+          <ion-select-option value="avg">Promedio</ion-select-option>
+          <ion-select-option value="max">Valor Máximo</ion-select-option>
+          <ion-select-option value="min">Valor Mínimo</ion-select-option>
+          <ion-select-option value="median">Mediana</ion-select-option>
+          <ion-select-option value="sum">Suma Total</ion-select-option>
+          <ion-select-option value="count">Conteo de muestras</ion-select-option>
+        </ion-select>
+      </ion-item>
       <ion-item lines="none">
         <ion-toggle [checked]="copyWidgetData.borderFlag == 'Y'"
           (ionChange)="copyWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">

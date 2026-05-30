@@ -132,6 +132,17 @@
             <ion-select-option value="150px">Grande</ion-select-option>
           </ion-select>
         </ion-item>
+        <ion-item>
+          <ion-select label="Tipo de cálculo:" [(ngModel)]="newWidgetData.aggregation"
+            *ngIf="newWidgetData.widgetType == 'heatmap'" interface="popover">
+            <ion-select-option value="avg">Promedio</ion-select-option>
+            <ion-select-option value="max">Valor Máximo</ion-select-option>
+            <ion-select-option value="min">Valor Mínimo</ion-select-option>
+            <ion-select-option value="median">Mediana</ion-select-option>
+            <ion-select-option value="sum">Suma Total</ion-select-option>
+            <ion-select-option value="count">Conteo de muestras</ion-select-option>
+          </ion-select>
+        </ion-item>
         <!--Heatmap START-->
         <ion-item lines="none" *ngIf="newWidgetData.widgetType == 'number'">
           <ion-toggle [checked]="newWidgetData.borderFlag == 'Y'"
