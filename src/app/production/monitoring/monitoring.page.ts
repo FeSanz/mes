@@ -1,7 +1,10 @@
 import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, IonRippleEffect, IonToggle } from '@ionic/angular/standalone';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonItem, IonButton, IonSelectOption, IonAccordion, IonAccordionGroup,
+  IonText, IonModal, IonInput, IonSelect, IonLoading, IonRippleEffect, IonToggle
+} from '@ionic/angular/standalone';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
@@ -42,7 +45,7 @@ export type ChartOptions = {
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule, GaugeComponent, ChartsComponent, HeatmapComponent, CounterComponent, NumericComponent, ThermometerComponent, OnoffComponent, WaterTankComponent, NgxColorsModule,
-    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton,
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonMenuButton, IonIcon, IonFab, IonFabButton, IonAccordion, IonAccordionGroup,
     IonItem, IonButton, IonSelectOption, IonText, IonModal, IonInput, IonSelect, IonLoading, DragDropModule, ResizableModule, IonRippleEffect, IonToggle]
 })
 export class MonitoringPage {
@@ -486,6 +489,54 @@ export class MonitoringPage {
     // Reiniciar bandera para permitir futuros refresh
     setTimeout(() => this.shouldRefresh = false, 100);
 
+  }
+
+  // Agregar una nueva anotación por defecto
+  async addNewAnnotation() {
+    // Obtenemos una posición base (puedes basarte en el último valor si existe)
+    const lastY = this.newWidgetData.annotations?.length > 0
+      ? this.newWidgetData.annotations[this.newWidgetData.annotations.length - 1].y + 100
+      : 1000;
+
+    this.newWidgetData.annotations.push({
+      text: "Anotación " + (this.newWidgetData.annotations.length + 1),
+      y: lastY,
+      y2: null, // Si es null o undefined, el guardado lo interpretará como línea
+      borderColor: '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')
+    });
+  }
+  private prepareAnnotations(annotations: any[]) {
+    return annotations.map(a => {
+      const isRange = a.y2 != null && a.y2 > a.y;
+
+      // Objeto limpio siguiendo la estructura que SÍ funciona
+      const annot: any = {
+        y: a.y,
+        borderColor: a.borderColor,
+        label: {
+          text: a.text,
+          borderColor: a.borderColor,
+          style: {
+            color: '#fff',
+            background: a.borderColor
+          }
+        }
+      };
+
+      // Solo añadimos y2 si realmente existe
+      if (isRange) {
+        annot.y2 = a.y2;
+        annot.fillColor = a.borderColor;
+        annot.opacity = 0.2;
+      }
+
+      return annot;
+    });
+  }
+  // Eliminar una anotación
+  async removeAnnotation(index: number) {
+    this.newWidgetData.annotations.splice(index, 1);
+    this.changeDetector.detectChanges();
   }
   onResizing(event: ResizeEvent, widget: any): void {
     const row = document.querySelector('.drag-row');

@@ -132,9 +132,8 @@
             <ion-select-option value="150px">Grande</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item>
-          <ion-select label="Tipo de cálculo:" [(ngModel)]="newWidgetData.aggregation"
-            *ngIf="newWidgetData.widgetType == 'heatmap'" interface="popover">
+        <ion-item *ngIf="newWidgetData.widgetType == 'heatmap'">
+          <ion-select label="Tipo de cálculo:" [(ngModel)]="newWidgetData.aggregation" interface="popover">
             <ion-select-option value="avg">Promedio</ion-select-option>
             <ion-select-option value="max">Valor Máximo</ion-select-option>
             <ion-select-option value="min">Valor Mínimo</ion-select-option>
@@ -143,13 +142,60 @@
             <ion-select-option value="count">Conteo de muestras</ion-select-option>
           </ion-select>
         </ion-item>
-        <!--Heatmap START-->
         <ion-item lines="none" *ngIf="newWidgetData.widgetType == 'number'">
           <ion-toggle [checked]="newWidgetData.borderFlag == 'Y'"
             (ionChange)="newWidgetData.borderFlag = $event.detail.checked ? 'Y' : 'N'">
-            Borde
+            Borde:
           </ion-toggle>
         </ion-item>
+
+        <ion-accordion-group>
+          <ion-accordion value="annotations">
+            <ion-item slot="header">
+              <ion-label>Configurar Anotaciones</ion-label>
+            </ion-item>
+
+            <div slot="content" class="ion-padding">
+
+              <ion-item-sliding *ngFor="let annot of newWidgetData.annotations; let i = index">
+                <ion-item>
+                  <div style="display: flex; flex-direction: column; width: 100%; gap: 10px; padding: 5px 0;">
+
+                    <ion-input label="Etiqueta:" label-placement="floating" [(ngModel)]="annot.text"
+                      fill="outline"></ion-input>
+
+                    <div style="display: flex; gap: 10px;">
+                      <ion-input type="number" label="Y:" label-placement="floating" [(ngModel)]="annot.y"
+                        fill="outline"></ion-input>
+                      <ion-input type="number" label="Y2 (opcional):" label-placement="floating" [(ngModel)]="annot.y2"
+                        fill="outline"></ion-input>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                      <ion-label>Color:</ion-label>
+                      <ngx-colors ngx-colors-trigger [(ngModel)]="annot.borderColor"></ngx-colors>
+                    </div>
+                  </div>
+                </ion-item>
+
+                <ion-item-options side="end">
+                  <ion-item-option color="danger" (click)="removeAnnotation(i)">
+                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                  </ion-item-option>
+                </ion-item-options>
+              </ion-item-sliding>
+
+              <div class="ion-text-center" style="margin-top: 15px;">
+                <ion-button fill="outline" size="small" (click)="addNewAnnotation()">
+                  <ion-icon slot="start" name="add"></ion-icon>
+                  Agregar Anotación
+                </ion-button>
+              </div>
+
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+        <!--Heatmap START-->
         <div style="display: flex; gap: 40px; padding: 10px; justify-content: center;"
           *ngIf="newWidgetData.widgetType == 'heatmap'">
           <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
@@ -176,7 +222,7 @@
             <ion-label color="primary" style="font-size: 13px; font-weight: bold;">Redondeo de celda:</ion-label>
             <ion-badge color="primary">{{ newWidgetData.radius }}</ion-badge>
           </div>
-          <ion-range [(ngModel)]="newWidgetData.radius" min="0" max="100" pin="true">
+          <ion-range [(ngModel)]="newWidgetData.radius" min="0" max="100" pin="true" [ticks]="true" [snaps]="true">
           </ion-range>
         </div>
         <!--Heatmap END-->

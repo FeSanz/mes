@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnChanges, SimpleChanges, ViewChild, Input, ChangeDetectorRef, EventEmitter, Output, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import {
-  IonCard, IonCardHeader, IonText, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonItemOption, IonItemOptions, IonItemSliding,
-  IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle
+  IonCard, IonCardHeader, IonText, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonHeader, IonItemOption, IonItemOptions,
+  IonItemSliding, IonAccordion, IonAccordionGroup, IonTitle, IonSelect, IonSelectOption, IonModal, IonInput, IonDatetime, IonDatetimeButton, IonToggle
 } from '@ionic/angular/standalone';
 import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexDataLabels, ApexTooltip, ApexStroke, NgApexchartsModule, ChartType, ChartComponent } from "ng-apexcharts";
 import { NgxColorsModule } from 'ngx-colors';
@@ -37,7 +37,7 @@ export type ChartOptions = {
   templateUrl: './charts.component.html',
   styleUrls: ['./charts.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon,
+  imports: [FormsModule, CommonModule, NgApexchartsModule, NgxColorsModule, IonText, IonCard, IonCardTitle, IonCardContent, IonButtons, IonButton, IonIcon, IonAccordion, IonAccordionGroup,
     IonToolbar, IonPopover, IonContent, IonList, IonItem, IonFab, IonFabButton, IonInput, IonItemOption, IonItemOptions, IonItemSliding,
     IonHeader, IonTitle, IonSelect, IonSelectOption, IonModal, CdkDragHandle, IonDatetime, IonDatetimeButton, IonToggle],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

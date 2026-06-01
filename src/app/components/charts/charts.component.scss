@@ -15,10 +15,10 @@ ion-select::part(label) {
 }
 
 ion-toolbar {
-  padding-left: 0.5rem;
-  flex-shrink: 0;
-  position: relative;
-} 
+    padding-left: 0.5rem;
+    flex-shrink: 0;
+    position: relative;
+}
 
 ion-card {
     --background: var(--ion-color-back-shade, #fff);
@@ -47,9 +47,13 @@ ion-card-title {
 }
 
 ::ng-deep .opened {
-  background: var(--ion-color-back) !important;
+    background: var(--ion-color-back) !important;
 }
 
 ::ng-deep .opened button {
-  color: var(--ion-color-dark) !important;
+    color: var(--ion-color-dark) !important;
+}
+
+ion-accordion {
+    background: transparent !important;
 }
