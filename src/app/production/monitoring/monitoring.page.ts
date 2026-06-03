@@ -88,7 +88,9 @@ export class MonitoringPage {
     radius: 0,
     aggregation: 'avg',
     showNumber: 'N',
-    shades: 'N'
+    shades: 'N',
+    yMax: '',
+    yMin: ''
   }
   user: any = {}
   widgets: any = []
@@ -234,6 +236,8 @@ export class MonitoringPage {
       this.newWidgetData.selectedIcon = 'motor'
       this.newWidgetData.showNumber = 'N'
       this.newWidgetData.shades = 'N'
+      this.newWidgetData.yMax = ''
+      this.newWidgetData.yMin = ''
       this.newWidgetData.rules = [{
         from: 0,
         to: 100,
@@ -255,6 +259,8 @@ export class MonitoringPage {
         this.newWidgetData.aggregation = 'avg'
         this.newWidgetData.showNumber = 'N'
         this.newWidgetData.shades = 'N'
+        this.newWidgetData.yMax = ''
+        this.newWidgetData.yMin = ''
         this.newWidgetData.sensors[0].machine_id = this.machines[0].machine_id
         this.newWidgetData.sensors[0].sensor_id = this.machines[0].sensors[0].sensor_id
         this.newWidgetData.rules = [{
@@ -295,6 +301,8 @@ export class MonitoringPage {
         annotations: this.newWidgetData.annotations,
         aggregation: this.newWidgetData.aggregation,
         shades: this.newWidgetData.shades,
+        yMax: this.newWidgetData.yMax,
+        yMin: this.newWidgetData.yMin,
         selectedIcon: this.newWidgetData.selectedIcon,
         showNumber: this.newWidgetData.showNumber
       },

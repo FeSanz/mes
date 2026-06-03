@@ -125,6 +125,25 @@
             <ion-select-option value="bar">Barras</ion-select-option>
           </ion-select>
         </ion-item>
+        <ion-item *ngIf="newWidgetData.widgetType == 'chart'">
+          <ion-row style="width: 100%; align-items: center;">
+            <ion-col size="4">
+              <ion-label color="primary">Rango eje Y:</ion-label>
+            </ion-col>
+
+            <ion-col size="4">
+              <ion-input type="number" placeholder="Mín (opcional)" [(ngModel)]="newWidgetData.yMin" fill="outline"
+                size="small">
+              </ion-input>
+            </ion-col>
+
+            <ion-col size="4">
+              <ion-input type="number" placeholder="Máx (opcional)" [(ngModel)]="newWidgetData.yMax" fill="outline"
+                size="small">
+              </ion-input>
+            </ion-col>
+          </ion-row>
+        </ion-item>
         <ion-item *ngIf="newWidgetData.widgetType == 'heatmap'">
           <ion-select label="Tamaño:" color="primary" [(ngModel)]="newWidgetData.font_size" interface="popover">
             <ion-select-option value="50px">Pequeño</ion-select-option>
@@ -162,7 +181,7 @@
           </div>
         </ion-item>
         <ion-accordion-group *ngIf="newWidgetData.widgetType == 'chart'">
-          <ion-accordion value="annotations" >
+          <ion-accordion value="annotations">
             <ion-item slot="header">
               <ion-label>Configurar Anotaciones</ion-label>
             </ion-item>

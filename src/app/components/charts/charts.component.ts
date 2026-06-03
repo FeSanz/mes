@@ -70,34 +70,6 @@ export class ChartsComponent implements OnInit {
       series: [],
       annotations: {
         yaxis: [
-          /*{
-            y: 1200, // Ajusta este valor al rango de tus sensores
-            borderColor: '#00E396',
-            label: {
-              borderColor: '#00E396',
-              style: {
-                color: '#fff',
-                background: '#00E396',
-              },
-              text: 'Límite Superior',
-            },
-          },
-          {
-            y: 1600,
-            y2: 2000, // Crea una banda sombreada de advertencia
-            borderColor: '#000',
-            fillColor: '#FEB019',
-            opacity: 0.2, // La opacidad es clave para que no tape los datos
-            label: {
-              borderColor: '#333',
-              style: {
-                fontSize: '10px',
-                color: '#333',
-                background: '#FEB019',
-              },
-              text: 'Rango de Precaución',
-            },
-          },*/
         ],
       },
       chart: {
@@ -203,6 +175,7 @@ export class ChartsComponent implements OnInit {
     const { start, end } = this.getDateRangeFromOption(this.widgetData.dateRange);
     this.loadSensorData(start, end);
   }
+
   async loadSensorData(start: Date, end: Date) {
     const startStr = start.toISOString()
     const endStr = end.toISOString()
@@ -225,7 +198,15 @@ export class ChartsComponent implements OnInit {
         };
       });
       this.chartOptions.series = data;
-      this.ajustarYaxis();
+      // Primero, extraemos los valores y validamos que sean números reales
+      const minVal = this.widgetData.yMin;
+      const maxVal = this.widgetData.yMax;
+
+      this.chartOptions.yaxis = {
+        ...this.chartOptions.yaxis, // Preserva otras configuraciones del eje Y
+        ...(typeof minVal === 'number' && { min: minVal }),
+        ...(typeof maxVal === 'number' && { max: maxVal })
+      };
       if (this.chart && this.chart.updateOptions) {
         //console.log("UPDATE chart");
         this.chart.updateOptions(this.chartOptions);
@@ -405,11 +386,12 @@ export class ChartsComponent implements OnInit {
         selectedTimeRange: this.copyWidgetData.selectedTimeRange,
         chartType: this.copyWidgetData.chartType,
         sensors: this.copyWidgetData.sensors,
+        yMin: this.copyWidgetData.yMin || '',
+        yMax: this.copyWidgetData.yMax || '',
         annotations: this.copyWidgetData.annotations || [],
       }
     }
     this.showChart = false;
-    console.log(body.parameters)
     this.api.PutRequestRender('dashboards/' + this.widgetData.dashboard_id, body).then((response: any) => {
       if (response.errorsExistFlag) {
         this.alerts.Info(response.message);
