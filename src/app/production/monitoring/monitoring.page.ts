@@ -99,6 +99,11 @@ export class MonitoringPage {
   }
   shouldRefresh = false;
   id: any = null
+  availableIcons = [
+    { name: 'motor', file: 'motor.png' },
+    { name: 'pump', file: 'pump.png' },
+    { name: 'idea', file: 'idea.png' }
+  ];
   constructor(
     private api: ApiService,
     private router: Router,
@@ -226,6 +231,7 @@ export class MonitoringPage {
       this.newWidgetData.radius = 0
       this.newWidgetData.annotations = []
       this.newWidgetData.aggregation = 'avg'
+      this.newWidgetData.selectedIcon = 'motor'
       this.newWidgetData.showNumber = 'N'
       this.newWidgetData.shades = 'N'
       this.newWidgetData.rules = [{
@@ -245,6 +251,7 @@ export class MonitoringPage {
         this.newWidgetData.borderFlag = "Y"
         this.newWidgetData.border = 'Y'
         this.newWidgetData.radius = 0
+        this.newWidgetData.selectedIcon = 'motor'
         this.newWidgetData.aggregation = 'avg'
         this.newWidgetData.showNumber = 'N'
         this.newWidgetData.shades = 'N'
@@ -288,6 +295,7 @@ export class MonitoringPage {
         annotations: this.newWidgetData.annotations,
         aggregation: this.newWidgetData.aggregation,
         shades: this.newWidgetData.shades,
+        selectedIcon: this.newWidgetData.selectedIcon,
         showNumber: this.newWidgetData.showNumber
       },
       "created_by": this.user.UserId,

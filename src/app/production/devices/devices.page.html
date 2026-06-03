@@ -20,46 +20,44 @@
       <span>{{org.organization_name}}</span>
     </div>
     <ion-row>
-      <ion-col size="12" size-sm="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let machine of org.devices">
-        <ion-card color="light" class="card-button ion-activatable ripple-parent"
-          [ngStyle]="{'border': '.2px solid var(--ion-color-secondary)'}">
-          <ion-toolbar [ngStyle]="{'--background': 'var(--ion-color-secondary)'}">
+      <ion-col size="12" size-sm="12" size-md="6" size-lg="4" size-xl="3" *ngFor="let machine of org.devices"><ion-card
+          color="light" class="card-button ion-activatable ripple-parent"
+          [class.disabled-card]="machine.is_active === 'N'" [ngStyle]="{ 'border': machine.is_active === 'N' ? '.2px solid #a0a0a0' : '.2px solid var(--ion-color-secondary)' }">
+
+          <ion-toolbar [ngStyle]="{'--background': machine.is_active === 'N' ? 'gray' : 'var(--ion-color-secondary)'}">
             <ion-card-title>
               <ion-icon name="hardware-chip-outline" slot="start" style="margin-right: 8px;"></ion-icon>
               <span [ngStyle]="{'color': widgetTextColor}">{{ machine.machine_name }}</span>
             </ion-card-title>
+
             <ion-buttons slot="end">
-              <ion-toggle [checked]="machine.is_active" (ionChange)="DeactiveDev($event, machine.machine_id)"
+              <ion-toggle [checked]="machine.is_active !== 'N'" (ionChange)="DeactiveDev($event, machine)"
                 style="margin-right: 10px;">
               </ion-toggle>
-              <ion-button id="popover-spline-${{machine['machine_id']}}" title="Opciones">
+
+              <ion-button [disabled]="machine.is_active === 'N'" id="popover-spline-${{machine['machine_id']}}">
                 <ion-icon slot="icon-only" name="ellipsis-vertical" [ngStyle]="{'color': widgetTextColor}"></ion-icon>
               </ion-button>
             </ion-buttons>
           </ion-toolbar>
-          <ion-card-content button>
+
+          <ion-card-content [attr.disabled]="machine.is_active === 'N' ? true : null">
             <ion-note>Token: <strong>{{ machine.token }}</strong></ion-note>
             <ion-row justify-content-start>
               <ion-col size="auto" *ngFor="let sensor of machine.sensors" style="text-align: center;">
-                <ion-button fill="clear" size="large" shape="round"
-                  [title]="sensor.sensor_name + '\n' + (sensor.last_date_time | date: 'short')">
+                <ion-button fill="clear" size="large" shape="round" [disabled]="machine.is_active === 'N'">
                   <ion-icon [name]="sensor.sensor_icon" slot="icon-only"></ion-icon>
                 </ion-button>
-                <div class="sensor-value">
-                  {{ sensor.last_value !== null ? sensor.last_value : '—' }}
-                </div>
+                <div class="sensor-value">{{ sensor.last_value !== null ? sensor.last_value : '—' }}</div>
               </ion-col>
+
               <ion-col size="auto" style="text-align: center;">
-                <ion-button fill="clear" size="large" shape="round" title="Agregar nuevo sensor"
+                <ion-button fill="clear" size="large" shape="round" [disabled]="machine.is_active === 'N'"
                   (click)="openAsEditMachine(machine)">
                   <ion-icon name="add-circle-outline" slot="icon-only"></ion-icon>
                 </ion-button>
-                <div class="sensor-value">
-                  Agregar
-                </div>
+                <div class="sensor-value">Agregar</div>
               </ion-col>
-              <!--ion-col size="auto" *ngFor="let sensor of machine.sensors" class="ion-text-center">
-                </ion-col-->
             </ion-row>
           </ion-card-content>
         </ion-card>

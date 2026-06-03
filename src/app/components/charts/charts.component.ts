@@ -373,7 +373,7 @@ export class ChartsComponent implements OnInit {
       });
     });
     if (allYValues.length === 0) return;
-    const min = Math.min(...allYValues);
+    /*const min = Math.min(...allYValues);
     const max = Math.max(...allYValues);
     const padding = 2;
     const newYaxis = {
@@ -385,7 +385,7 @@ export class ChartsComponent implements OnInit {
       this.chart.updateOptions({
         yaxis: newYaxis
       });
-    }
+    }*/
   }
   ionViewWillLeave() {
     this.stopSubscriptions()

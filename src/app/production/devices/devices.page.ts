@@ -87,9 +87,6 @@ export class DevicesPage implements OnInit {
           return acc;
         }, {})
       ).sort((a: any, b: any) => a.organization_name.localeCompare(b.organization_name));
-
-      console.log(this.organizations);
-
     })
   }
   addNewSensor() {
@@ -142,6 +139,7 @@ export class DevicesPage implements OnInit {
       code: this.machine.machine_code,
       token: this.machine.token,
       name: this.machine.machine_name,
+      is_active: 'Y',
       work_center_id: 5,
       work_center: "Centro de Mecanizado",
       machine_class: "A1"
@@ -168,6 +166,7 @@ export class DevicesPage implements OnInit {
       machine_id: this.machine.machine_id,
       machine_name: this.machine.machine_name,
       machine_code: this.machine.machine_code,
+      is_active: this.machine.is_active,
       sensors: this.machine.sensors.map((sensor: any) => {
         return {
           ...(sensor.sensor_id ? { sensor_id: sensor.sensor_id } : {}),
@@ -239,9 +238,19 @@ export class DevicesPage implements OnInit {
         })
       }
   }
-  DeactiveDev(event: any, machineId: number) {
+  DeactiveDev(event: any, machine: any) {
     const isChecked = event.detail.checked;
-    console.log(`Cambiando estado de máquina ${machineId} a: ${isChecked}`);
+    machine.is_active = isChecked ? 'Y' : 'N'
+    this.api.PutRequestRender('updateMachineStatus/' + machine.machine_id, { is_active: isChecked ? 'Y' : 'N' }).then((response: any) => {
+      //console.log(response);
+      if (response.errorsExistFlag) {
+        this.alerts.Info(response.message);
+      } else {
+        this.alerts.Success(response.message);
+        this.getMachines()
+        this.isModalOpen = false;
+      }
+    })
   }
   isDarkColor(hexColor: string): boolean {
     const hex = hexColor.replace('#', '');

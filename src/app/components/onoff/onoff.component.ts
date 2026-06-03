@@ -35,6 +35,12 @@ export class OnoffComponent implements OnInit {
   showChart: boolean = true;
   machines: any = []
   lastValue = 0
+  // Define esto dentro de tu clase de componente
+  availableIcons = [
+    { name: 'motor', file: 'motor.png' },
+    { name: 'pump', file: 'pump.png' },
+    { name: 'idea', file: 'idea.png' }
+  ];
   @Input() data: OnOffData = {};
   @Output() remove = new EventEmitter<number>();
   @Output() duplicate = new EventEmitter<number>();
@@ -82,6 +88,7 @@ export class OnoffComponent implements OnInit {
   }
   editChart() {
     this.copyWidgetData = JSON.parse(JSON.stringify(this.widgetData))
+    this.copyWidgetData.selectedIconCopy = this.widgetData.selectedIcon
     this.api.GetRequestRender('machinesAndSensorsByOrganizations?organizations=' + this.widgetData.organization_id).then((response: any) => {
       //console.log(response);
       this.machines = response.items
@@ -119,6 +126,7 @@ export class OnoffComponent implements OnInit {
         widgetType: this.copyWidgetData.widgetType,
         chartType: this.copyWidgetData.chartType,
         sensors: this.copyWidgetData.sensors,
+        selectedIcon: this.copyWidgetData.selectedIconCopy,
       }
     }
     //console.log(body);
@@ -131,6 +139,7 @@ export class OnoffComponent implements OnInit {
       this.initializeConfig()
       this.isModalOpen = false
       this.changeDetector.detectChanges()
+      this.widgetData.selectedIcon = this.copyWidgetData.selectedIconCopy
     })
   }
   onSensorChange(event: any) {

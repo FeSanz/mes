@@ -148,9 +148,21 @@
             Borde:
           </ion-toggle>
         </ion-item>
-
-        <ion-accordion-group>
-          <ion-accordion value="annotations">
+        <ion-item *ngIf="newWidgetData.widgetType == 'onoff'">
+          <div style="display: flex; align-items: center; width: 100%; gap: 15px;">
+            <ion-label color="primary" style="flex-shrink: 0; margin: 0;">Icono:</ion-label>
+            <div class="icon-selector" style="display: flex; gap: 12px; align-items: center;">
+              <div *ngFor="let icon of availableIcons" class="icon-option"
+                [class.selected]="newWidgetData.selectedIcon === icon.name"
+                (click)="newWidgetData.selectedIcon = icon.name">
+                <img [src]="'assets/icon/' + icon.file" [alt]="icon.name"
+                  style="width: 36px; height: 36px; display: block;">
+              </div>
+            </div>
+          </div>
+        </ion-item>
+        <ion-accordion-group *ngIf="newWidgetData.widgetType == 'chart'">
+          <ion-accordion value="annotations" >
             <ion-item slot="header">
               <ion-label>Configurar Anotaciones</ion-label>
             </ion-item>
