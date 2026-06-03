@@ -155,6 +155,17 @@
                       </ion-menu-toggle>
                     </ion-list>
                   </div>
+                  <div slot="content" class="accordion-content">
+                    <ion-list class="menu-list">
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/historical']" routerLinkActive="selected" detail="false" button
+                          lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="podium-outline"></ion-icon>
+                          <ion-label>Histórico de datos</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                    </ion-list>
+                  </div>
                 </ion-accordion>
 
                 <!-- Manufactura -->

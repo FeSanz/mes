@@ -1,0 +1,29 @@
+<ion-header [translucent]="true" style="box-shadow: none !important;">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false">
+        <ion-button size="large" (click)="ToggleMenu()">
+          <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-menu-button>
+    </ion-buttons>
+    <ion-title>Histórico de datos</ion-title>
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
+          [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
+          placeholder="Seleccione una organización" [virtualScroll]="true" [virtualScrollItemSize]="38"
+          (onChange)="GetDevices()" appendTo="body" />
+        <label for="organization_select">Organización</label> <!-- [closable]="!alerts.pd.loading"-->
+      </p-floatlabel>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">historical</ion-title>
+    </ion-toolbar>
+  </ion-header>
+</ion-content>

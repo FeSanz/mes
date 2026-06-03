@@ -141,13 +141,18 @@ export const routes: Routes = [
   {
     path: 'verification-codes',
     loadComponent: () => import('./settings/verification-codes/verification-codes.page').then( m => m.VerificationCodesPage)
-  },  {
+  },
+  {
     path: 'work-orders',
     loadComponent: () => import('./settings/registros/work-orders/work-orders.page').then( m => m.WorkOrdersPage)
   },
   {
     path: 'settings',
     loadComponent: () => import('./settings/settings/settings.page').then( m => m.SettingsPage)
+  },
+  {
+    path: 'historical',
+    loadComponent: () => import('./production/historical/historical.page').then( m => m.HistoricalPage)
   }
 
 ];

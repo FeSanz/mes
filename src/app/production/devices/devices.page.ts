@@ -167,6 +167,7 @@ export class DevicesPage implements OnInit {
     const machineBody = {
       machine_id: this.machine.machine_id,
       machine_name: this.machine.machine_name,
+      machine_code: this.machine.machine_code,
       sensors: this.machine.sensors.map((sensor: any) => {
         return {
           ...(sensor.sensor_id ? { sensor_id: sensor.sensor_id } : {}),

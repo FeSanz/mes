@@ -43,7 +43,7 @@ import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import {
   person, ellipsisVerticalOutline, personOutline, settingsOutline, powerOutline, homeOutline, cubeOutline,
-  statsChartOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline,
+  statsChartOutline, hardwareChipOutline, hammerOutline, warningOutline, timeOutline, peopleOutline, podiumOutline,
   gitNetworkOutline, closeOutline, barChartOutline, pieChartOutline, addOutline, checkmark, pencilOutline, trashOutline,
   reorderThreeOutline, reorderTwoOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline,
   cashOutline, notificationsOutline, calendarOutline, buildOutline, addCircleOutline, createOutline, albumsOutline,
@@ -102,7 +102,7 @@ export class AppComponent implements OnInit {
   ) {
     addIcons({
       ellipsisVerticalOutline, settingsOutline, powerOutline, pieChartOutline, pencilOutline, closeOutline, statsChartOutline,
-      reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline,
+      reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline, podiumOutline,
       timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline,
       person, homeOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline, cashOutline, notificationsOutline, calendarOutline,
       buildOutline, addCircleOutline, createOutline, albumsOutline, layersOutline

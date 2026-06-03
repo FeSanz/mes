@@ -125,7 +125,7 @@ export class CounterComponent implements OnInit {
         `sensorsData/?sensors=${sensorIDsString}&start=${startStr}&end=${endStr}`, false
       );
       const suma = response.items[0].data.reduce((sum: any, item: any) => sum + Number(item.value), 0);
-      this.lastDate = response.items[0].data[0].time
+      this.lastDate = response.items[0].data[0]?.time
       this.countStr = 0
       this.updateCounterDisplay(Math.round(suma))
       //this.startSubscriptions();

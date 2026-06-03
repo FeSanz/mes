@@ -73,7 +73,7 @@ export class OnoffComponent implements OnInit {
       console.log(err);
     });
   }
-  
+
   deleteChart() {
     this.remove.emit(this.widgetData.id);
   }
