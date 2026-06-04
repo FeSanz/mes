@@ -443,7 +443,8 @@
     <ion-label
       style="margin-right: auto"></ion-label><!-- [color]="alerts.pd.color" *ngIf="alerts.pd.message"{{alerts.pd.message}}-->
     <p-button label="Cancelar" severity="danger" (click)="isEditAlertModalOpen = false;" />
-    <p-button label="Guardar" severity="success" (click)="UpdateFailureOfAlert()" />
+    <p-button label="Guardar" severity="success" (click)="UpdateFailureOfAlert()"
+      [disabled]="selectedFailure.failure_id === 200 || selectedFailure.failure_id === undefined" />
     <!--[disabled]="alerts.pd.loading"--><!--[disabled]="alerts.pd.loading"-->
   </ng-template>
 </p-dialog>
