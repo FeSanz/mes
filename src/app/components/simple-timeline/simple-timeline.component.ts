@@ -119,7 +119,7 @@ export class SimpleTimelineComponent implements OnInit, OnDestroy {
           const label = isDowntime ? 'Downtime' : 'Runtime';
           const labelColor = isDowntime ? '#ef4444' : '#22c55e';
 
-          let html = '<div class="apexcharts-tooltip-rangebar" style="padding: 10px; min-width: 200px; background-color: var(--ion-color-light);">';
+          let html = '<div class="apexcharts-tooltip-rangebar" style="padding: 10px; min-width: 200px; background-color: var(--ion-color-back);">';
 
           // Título con color
           html += `<div style="font-weight: bold; margin-bottom: 8px; color: ${labelColor}; font-size: 14px;">`;
