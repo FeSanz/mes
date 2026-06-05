@@ -119,7 +119,7 @@ export class SimpleTimelineComponent implements OnInit, OnDestroy {
           const label = isDowntime ? 'Downtime' : 'Runtime';
           const labelColor = isDowntime ? '#ef4444' : '#22c55e';
 
-          let html = '<div class="apexcharts-tooltip-rangebar" style="padding: 10px; min-width: 200px;">';
+          let html = '<div class="apexcharts-tooltip-rangebar" style="padding: 10px; min-width: 200px; background-color: var(--ion-color-light);">';
 
           // Título con color
           html += `<div style="font-weight: bold; margin-bottom: 8px; color: ${labelColor}; font-size: 14px;">`;
@@ -128,36 +128,36 @@ export class SimpleTimelineComponent implements OnInit, OnDestroy {
 
           // Máquina
           html += '<div style="margin-bottom: 6px;">';
-          html += `<span style="color: var(--ion-color-light);">Máquina: </span>`;
+          html += `<span style="color: var(--ion-color-dark);">Máquina: </span>`;
           html += `<span style="color: var(--ion-color-secondary); font-weight: 600;">${data.x}</span>`;
           html += '</div>';
 
           // Si es Downtime, mostrar información de las alertas
           if (isDowntime && data.alertName) {
             html += '<div style="margin-bottom: 6px; border-top: 1px solid #475569; padding-top: 6px;">';
-            html += `<div style="color: var(--ion-color-light); font-weight: 600; margin-bottom: 4px;">${data.alertName}</div>`;
+            html += `<div style="color: var(--ion-color-dark); font-weight: 600; margin-bottom: 4px;">${data.alertName}</div>`;
 
             if (data.alertType) {
-              html += `<div style="color: var(--ion-color-light); font-size: 12px;">Tipo: ${data.alertType}</div>`;
+              html += `<div style="color: var(--ion-color-dark); font-size: 12px;">Tipo: ${data.alertType}</div>`;
             }
 
             if (data.area) {
-              html += `<div style="color: var(--ion-color-light); font-size: 12px;">Área: ${data.area}</div>`;
+              html += `<div style="color: var(--ion-color-dark); font-size: 12px;">Área: ${data.area}</div>`;
             }
 
             html += '</div>';
           }
 
           // Horarios
-          html += '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--ion-color-light);">';
-          html += `<div style="color: var(--ion-color-light); font-size: 12px;">Inicio: <span style="color: var(--ion-color-light);">${start.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span></div>`;
-          html += `<div style="color: var(--ion-color-light); font-size: 12px;">Fin: <span style="color: var(--ion-color-light);">${end.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span></div>`;
+          html += '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--ion-color-dark);">';
+          html += `<div style="color: var(--ion-color-dark); font-size: 12px;">Inicio: <span style="color: var(--ion-color-dark);">${start.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span></div>`;
+          html += `<div style="color: var(--ion-color-dark); font-size: 12px;">Fin: <span style="color: var(--ion-color-dark);">${end.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span></div>`;
           html += '</div>';
 
           // Duración
           const hours = Math.floor(duration / 60);
           const minutes = duration % 60;
-          html += '<div style="margin-top: 8px; font-weight: bold; color: var(--ion-color-light); font-size: 14px;">';
+          html += '<div style="margin-top: 8px; font-weight: bold; color: var(--ion-color-dark); font-size: 14px;">';
           html += `Duración: ${hours}h ${minutes}m`;
           html += '</div>';
 
