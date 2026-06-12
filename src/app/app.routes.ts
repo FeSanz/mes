@@ -153,6 +153,10 @@ export const routes: Routes = [
   {
     path: 'historical',
     loadComponent: () => import('./production/historical/historical.page').then( m => m.HistoricalPage)
+  },  {
+    path: 'historical-details',
+    loadComponent: () => import('./production/historical-details/historical-details.page').then( m => m.HistoricalDetailsPage)
   }
+
 
 ];

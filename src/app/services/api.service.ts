@@ -210,7 +210,31 @@ export class ApiService {
       if (show) await this.alerts.HideLoading()
     }
   }
+  async GetRequestExport(endPoint: string, show: boolean = true) {
+    try {
+      if (show) await this.alerts.ShowLoading();
 
+      const token = localStorage.getItem('tk');
+      const options = {
+        url: `${this.urlRender}/${endPoint}`,
+        headers: { 'Authorization': 'Bearer ' + token },
+        responseType: 'blob' as const // Esto es clave
+      };
+
+      const response: HttpResponse = await CapacitorHttp.get(options);
+
+      // VERIFICACIÓN IMPORTANTE: 
+      // Si la respuesta es un Blob, lo retornamos. 
+      // Si viene como string base64 (a veces pasa en Capacitor), hay que convertirlo.
+      return response.data;
+
+    } catch (error: any) {
+      console.log('Error (Export):', error);
+      return null;
+    } finally {
+      if (show) await this.alerts.HideLoading();
+    }
+  }
   async PostRequestRender(endPoint: string, payload: any, show: boolean = true) {
     try {
       if (show) await this.alerts.ShowLoading()

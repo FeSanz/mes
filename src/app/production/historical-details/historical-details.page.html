@@ -1,0 +1,136 @@
+<ion-header [translucent]="true" style="box-shadow: none !important;">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false">
+        <ion-button size="large" (click)="ToggleMenu()">
+          <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-menu-button>
+    </ion-buttons>
+    <ion-title>Histórico de datos</ion-title>
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected" inputId="organization_select" name="orgSelection"
+          [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
+          placeholder="Seleccione una organización" [virtualScroll]="true" [virtualScrollItemSize]="38"
+          (onChange)="loadInitialData()" appendTo="body" />
+        <label for="organization_select">Organización</label> <!-- [closable]="!alerts.pd.loading"-->
+      </p-floatlabel>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item class="filter-bar">
+    <ion-select label="Dispositivo:" label-placement="floating" [(ngModel)]="selectedMachine"
+      (ionChange)="onMachineChange()">
+      <ion-select-option *ngFor="let m of machines" [value]="m">{{ m.machine_name }}</ion-select-option>
+    </ion-select>
+
+    <ion-select label="Sensor:" label-placement="floating" [(ngModel)]="selectedSensor" (ionChange)="loadHistory()">
+      <ion-select-option *ngFor="let s of selectedMachine?.sensors" [value]="s.sensor_id">
+        {{ s.sensor_name }}
+      </ion-select-option>
+    </ion-select>
+
+    <ion-select label="Periodo:" label-placement="floating" [(ngModel)]="selectedPeriod" (ionChange)="onPeriodChange()">
+      <ion-select-option value="last_hour">Última hora</ion-select-option>
+      <ion-select-option value="today">Hoy</ion-select-option>
+      <ion-select-option value="yesterday">Ayer</ion-select-option>
+      <ion-select-option value="last_week">Esta semana</ion-select-option>
+      <ion-select-option value="custom">Personalizado</ion-select-option>
+    </ion-select>
+
+    <div class="date-container" *ngIf="selectedPeriod === 'custom'">
+      <div class="date-group">
+        <ion-label>Desde</ion-label>
+        <ion-datetime-button datetime="start" color="primary"></ion-datetime-button>
+      </div>
+      <div class="date-group">
+        <ion-label color="primary">Hasta</ion-label>
+        <ion-datetime-button datetime="end"></ion-datetime-button>
+      </div>
+    </div>
+
+    <ion-modal #modalStart [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime id="start" presentation="date-time" [(ngModel)]="startDate" locale="es-MX" hourCycle="h12"
+          show-default-buttons="true" cancel-text="Cancelar" done-text="Confirmar"
+          (ionChange)="onDateChange('start', modalStart)">
+        </ion-datetime>
+      </ng-template>
+    </ion-modal>
+
+    <ion-modal #modalEnd [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime id="end" presentation="date-time" [(ngModel)]="endDate" locale="es-MX" hourCycle="h12"
+          show-default-buttons="true" cancel-text="Cancelar" done-text="Confirmar"
+          (ionChange)="onDateChange('end', modalEnd)">
+        </ion-datetime>
+      </ng-template>
+    </ion-modal>
+  </ion-item>
+  <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [dataLabels]="chartOptions.dataLabels"
+    [markers]="chartOptions.markers" [title]="chartOptions.title" [fill]="chartOptions.fill"
+    [theme]="chartOptions.theme" [noData]="chartOptions.noData" [yaxis]="chartOptions.yaxis"
+    [xaxis]="chartOptions.xaxis" [tooltip]="chartOptions.tooltip">
+  </apx-chart>
+  <div class="search-actions-container">
+    <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+      placeholder="Buscar valor o id" class="search-input" />
+
+    <ion-buttons id="popover-button">
+      <ion-button>
+        <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-popover trigger="popover-button" [dismissOnSelect]="true">
+      <ng-template>
+        <ion-content>
+          <ion-list>
+            <ion-item button (click)="exportarExcel()" [disabled]="historyData.length < 1">
+              <ion-icon slot="start" name="document-text-outline" color="success"></ion-icon>
+              <ion-label>Exportar a Excel</ion-label>
+            </ion-item>
+            <ion-item button (click)="exportTo('pdf')" disabled>
+              <ion-icon slot="start" name="document-outline" color="danger"></ion-icon>
+              <ion-label>Exportar a PDF</ion-label>
+            </ion-item>
+            <ion-item button (click)="sendEmail()" disabled>
+              <ion-icon slot="start" name="mail-outline" color="secondary"></ion-icon>
+              <ion-label>Enviar por correo</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+  </div>
+
+  <p-table #dt [value]="historyData" [paginator]="true" [rows]="15" [rowsPerPageOptions]="[5, 10, 15, 20, 50, 100]"
+    styleClass="p-datatable-sm" [globalFilterFields]="['sensor_data_id', 'date_time', 'value', 'comment']">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="sensor_data_id">ID <p-sortIcon field="sensor_data_id"></p-sortIcon></th>
+        <th pSortableColumn="date_time">Fecha <p-sortIcon field="date_time"></p-sortIcon></th>
+        <th pSortableColumn="value">Valor <p-sortIcon field="value"></p-sortIcon></th>
+        <th>Comentario</th>
+        <th style="width: 50px;">Acción</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{item.sensor_data_id}}</td>
+        <td>{{item.date_time | date:'HH:mm a dd/MM/YYYY'}}</td>
+        <td><strong>{{item.value}}</strong></td>
+        <td>{{item.comment}}</td>
+        <td class="ion-text-center">
+          <ion-button fill="clear" color="danger" (click)="deleteData(item)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</ion-content>

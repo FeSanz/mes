@@ -1,0 +1,94 @@
+.machine-wrapper {
+  margin-bottom: 24px;
+}
+
+.machine-title {
+  font-size: 1.1rem;
+  color: var(--ion-color-medium);
+  margin-left: 8px;
+}
+
+.sensor-item {
+  --background: var(--ion-color-back);
+  ;
+  --border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f4f4f4;
+  --min-height: 70px;
+}
+
+.sensor-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.sensor-value-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px; // Espacio entre valor y fecha
+}
+
+.value-badge {
+  background-color: var(--ion-color-primary);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  min-width: 50px;
+  display: inline-block;
+
+  &.empty {
+    background-color: var(--ion-color-step-300);
+    color: var(--ion-color-medium);
+  }
+}
+
+.sensor-time {
+  font-size: 0.7rem;
+  color: var(--ion-color-medium);
+  line-height: 1.1;
+  text-align: center;
+  margin-top: 2px;
+}
+.chart-col {
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+/* Cabecera de tabla */
+.header-row {
+  padding: 0 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+
+.chart-container {
+  width: 100px !important;
+  height: 60px !important;
+  background-color: #f9f9f9;
+  /* Color de fondo suave para ver el área */
+  border: 1px solid #e0e0e0;
+}
+
+.chart-container-sparkline {
+  width: 100%;
+  height: 60px;
+  // Eliminamos 'pointer-events: none' para que el tooltip funcione
+  // Añadimos esto para que el scroll en móvil siga siendo fluido:
+  touch-action: pan-y;
+
+  apx-chart {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}

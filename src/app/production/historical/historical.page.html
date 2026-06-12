@@ -10,7 +10,7 @@
     <ion-title>Histórico de datos</ion-title>
     <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
       <p-floatlabel class="w-full md:w-56" variant="on">
-        <p-select [(ngModel)]="organizationSelected" inputId="organization_select"
+        <p-select [(ngModel)]="organizationSelected" inputId="organization_select" name="orgSelection"
           [options]="userData.Company.Organizations" optionLabel="Name" [filter]="true" filterBy="Name"
           placeholder="Seleccione una organización" [virtualScroll]="true" [virtualScrollItemSize]="38"
           (onChange)="GetDevices()" appendTo="body" />
@@ -20,10 +20,60 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">historical</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-select label="Seleccione dispositivos:" [(ngModel)]="selectedMachineIds" (ionChange)="applyFilter()"
+      placeholder="Todas las máquinas" multiple="true">
+      <ion-select-option *ngFor="let m of devices" [value]="m.machine_id">
+        {{ m.machine_name }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+  <div *ngFor="let machine of filteredDevices" class="machine-wrapper">
+    <h3 class="machine-title" style="color: var(--ion-color-dark)">{{ machine.machine_name }}</h3>
+
+    <ion-row class="header-row">
+      <ion-col size="2" style="color: var(--ion-color-secondary)">Sensor</ion-col>
+      <ion-col size="2" class="ion-text-center" style="color: var(--ion-color-secondary)">Último valor:</ion-col>
+      <ion-col size="8" class="ion-text-center" style="color: var(--ion-color-secondary)">Tendencia (últimos 15
+        valores)</ion-col>
+    </ion-row>
+
+    <ion-list>
+      <ion-item *ngFor="let sensor of machine.sensors" button="true" detail="false" class="sensor-item" lines="none"
+        (click)="onSensorClick(sensor)">
+
+        <ion-grid>
+          <ion-row class="ion-align-items-center">
+            <ion-col size="2">
+              <div class="sensor-name">{{ sensor.sensor_name }}</div>
+              <!--div class="sensor-time">{{ sensor.last_date_time | date:'HH:mm a' }}</div-->
+            </ion-col>
+
+            <ion-col size="2" class="ion-text-center">
+              <div class="sensor-value-container">
+                <span class="value-badge" [class.empty]="sensor.last_value === null">
+                  {{ sensor.last_value ?? 'N/A' }}
+                </span>
+                <div class="sensor-time">
+                  {{ sensor.last_date_time | date:'dd/MM/yyyy' }}<br>
+                  {{ sensor.last_date_time | date:'HH:mm a' }}
+                </div>
+              </div>
+            </ion-col>
+
+            <ion-col size="8" class="chart-col" style="flex: 1; min-width: 0;">
+              <div class="chart-container-sparkline">
+                <apx-chart [series]="[{ name: 'Valor', data: getChartData(sensor.values) }]" [colors]="sparklineOptions.colors"
+                  [xaxis]="{ type: 'datetime' }" [tooltip]="sparklineOptions.tooltip" [chart]="sparklineOptions.chart"
+                  [legend]="sparklineOptions.legend" [stroke]="sparklineOptions.stroke" [fill]="sparklineOptions.fill"
+                  [noData]="sparklineOptions.noData">
+                </apx-chart>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    </ion-list>
+  </div>
 </ion-content>

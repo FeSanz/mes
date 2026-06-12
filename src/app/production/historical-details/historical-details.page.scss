@@ -1,0 +1,176 @@
+ion-select::part(label) {
+    color: var(--ion-color-primary);
+}
+
+.history-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+
+    .header-item {
+        --background: var(--ion-color-step-100);
+        font-weight: bold;
+        border-bottom: 2px solid var(--ion-color-step-200);
+    }
+
+    ion-item {
+        --padding-start: 16px;
+        --padding-end: 16px;
+    }
+
+    ion-note {
+        font-size: 1.1rem; // Hace que el valor resalte más
+    }
+}
+
+// Estilo para el botón de borrar al deslizar
+ion-item-option {
+    width: 80px;
+}
+
+.filter-bar {
+    --background: transparent;
+    padding: 10px;
+
+    // Contenedor principal: permite saltos de línea
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end; // Alinea los elementos al pie para que coincidan visualmente
+    gap: 16px; // Espacio uniforme entre todos los elementos
+
+    ion-select {
+        flex: 1 1 200px; // Crece, se encoge, pero base de 200px
+        min-width: 180px;
+    }
+
+    .date-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        flex: 1 1 300px; // El contenedor de fechas necesita más espacio, por eso es 300px
+        align-items: flex-end;
+    }
+
+    .date-group {
+        display: flex;
+        flex-direction: column; // Label arriba, botón abajo
+        align-items: flex-start;
+        gap: 4px;
+        flex: 1 1 140px; // Se adaptan a 140px mínimo cada uno
+
+        ion-label {
+            font-size: 0.75rem;
+            color: var(--ion-color-primary);
+            font-weight: 600;
+        }
+    }
+}
+
+// Ajustar el botón de borrar para que no ocupe tanto espacio
+.action-btn {
+    --padding-start: 0;
+    --padding-end: 0;
+    height: 30px;
+    width: 30px;
+    margin: 0;
+}
+
+.search-container {
+    padding: 10px;
+    margin-bottom: 10px;
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--ion-color-medium-tint);
+        border-radius: 8px;
+    }
+}
+
+:host ::ng-deep {
+    .p-datatable {
+
+        // Fondo más suave que el negro puro
+        .p-datatable-thead>tr>th {
+            background: var(--ion-color-step-100);
+            color: var(--ion-color-step-800);
+            border-bottom: 2px solid var(--ion-color-primary);
+            padding: 12px 16px;
+        }
+
+        .p-datatable-tbody>tr {
+            background: var(--ion-color-back);
+            transition: background 0.2s;
+
+            &:hover {
+                background: var(--ion-color-step-50);
+            }
+
+            >td {
+                border-bottom: 1px solid var(--ion-color-step-150);
+                padding: 10px 16px;
+            }
+        }
+    }
+
+    // Estilo elegante para el buscador
+    .search-container {
+        .p-inputtext {
+            background: var(--ion-color-step-100);
+            border: 1px solid var(--ion-color-step-200);
+            color: var(--ion-text-color);
+            border-radius: 12px;
+            padding: 12px;
+            width: 100%;
+
+            &::placeholder {
+                color: var(--ion-color-step-400);
+            }
+        }
+    }
+
+    // Paginador más limpio
+    .p-paginator {
+        background: transparent !important;
+
+        .p-paginator-page {
+            border-radius: 8px;
+
+            &.p-highlight {
+                background: var(--ion-color-primary) !important;
+            }
+        }
+    }
+}
+
+:host ::ng-deep {
+    .p-datatable {
+
+        .p-datatable-thead>tr>th,
+        .p-datatable-tbody>tr>td {
+            padding: 4px 8px !important; // Ajusta estos valores (actualmente: 4px arriba/abajo, 8px lados)
+            line-height: 1; // Reduce el interlineado
+        }
+    }
+}
+
+.search-actions-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+
+    .search-input {
+        flex-grow: 1;
+        padding: 12px;
+        border: 1px solid var(--ion-color-step-200);
+        border-radius: 8px;
+        background: var(--ion-color-step-50);
+    }
+
+    ion-button {
+        height: 44px;
+        width: 44px;
+        margin: 0;
+    }
+}
