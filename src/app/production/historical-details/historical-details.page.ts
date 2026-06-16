@@ -29,7 +29,7 @@ export type ChartOptions = {
   tooltip: ApexTooltip;
   dataLabels: ApexDataLabels;
   legend: ApexLegend,
-  annotations: ApexAnnotations; // <--- Agrégala aquí
+  annotations: ApexAnnotations;
 };
 
 @Component({
@@ -73,8 +73,8 @@ export class HistoricalDetailsPage {
       stacked: false,
       height: 350,
       zoom: {
-        type: 'x',
         enabled: true,
+        type: 'x',
         autoScaleYaxis: true,
       },
       animations: { enabled: false },
@@ -82,7 +82,7 @@ export class HistoricalDetailsPage {
     },
     dataLabels: { enabled: false },
     markers: { size: 0 },
-    title: { text: 'Historial de Sensor', align: 'left' },
+    //title: { text: 'Historial de Sensor', align: 'left' },
     fill: {
       type: 'gradient',
       gradient: {
@@ -96,7 +96,6 @@ export class HistoricalDetailsPage {
     yaxis: {
       labels: {
         show: true,
-        minWidth: 40, // Asegura un ancho mínimo para que el texto sea visible
         formatter: (val: number) => (val)
       },
       title: {

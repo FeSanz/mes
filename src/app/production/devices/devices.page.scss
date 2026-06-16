@@ -87,3 +87,92 @@ ion-card {
     font-size: 18px;
   }
 }
+
+.sensor-con-formula {
+  color: #FFD700;
+  // Puedes agregar un efecto de glow si quieres que resalte más
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.block-container {
+  display: flex;
+  gap: 8px;
+  min-height: 50px;
+  padding: 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+  /* Permite scroll si la fórmula es muy larga */
+}
+
+/* Efecto visual al arrastrar */
+.cdk-drag-preview {
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden; // Esto hace que parezcan un solo elemento
+  background: #fff;
+
+  input {
+    border: none;
+    padding: 8px 12px;
+    width: 60px;
+    outline: none;
+  }
+
+  .add-btn {
+    background: var(--ion-color-light);
+    border: none;
+    border-left: 1px solid #ccc;
+    padding: 0 12px;
+    cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Ocultamos el icono por defecto */
+.block-chip .delete-icon {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  color: var(--ion-color-medium);
+}
+
+/* Cuando pasas el mouse por el chip, mostramos el icono */
+.block-chip:hover .delete-icon {
+  opacity: 1;
+}
+
+/* Al pasar el mouse por el icono, se vuelve rojo */
+.block-chip .delete-icon:hover {
+  color: var(--ion-color-danger) !important;
+  cursor: pointer;
+}
+
+ion-chip {
+  cursor: pointer;
+  transition: transform 0.2s;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.block-chip ion-label {
+  font-weight: 500;
+
+  // Añadimos un pequeño efecto visual para indicar que es editable
+  &:hover {
+    text-decoration: underline;
+  }
+}

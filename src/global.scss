@@ -46,3 +46,18 @@
 @use "./theme/leaflet.scss";
 @use "./theme/style.startup.scss";
 @use "./theme/swiper.scss";
+
+.my-custom-tooltip {
+  position: fixed;
+  background: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: pre-line;
+  font-size: 12px;
+  z-index: 9999;
+  transform: translateX(-50%);
+  pointer-events: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  border: 1px solid #444;
+}
