@@ -176,3 +176,14 @@ ion-chip {
     text-decoration: underline;
   }
 }
+
+.formula-block-editor {
+  /* Evita que los gestos táctiles se propaguen al ion-item-sliding en dispositivos móviles */
+  touch-action: pan-y !important;
+}
+
+.block-chip {
+  cursor: grab;
+  /* Asegura que el touch action se concentre en el chip */
+  touch-action: none !important;
+}

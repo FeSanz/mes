@@ -109,7 +109,7 @@ export class DevicesPage implements OnInit {
       let type: 'variable' | 'operator' | 'function' | 'number' = 'number';
 
       if (['+', '-', '*', '/'].includes(token)) type = 'operator';
-      else if (token.includes('X') || token.toLowerCase().includes('var')) type = 'variable';
+      else if (token.includes('X') || token.toLowerCase().includes('sensor_value')) type = 'variable';
       else if (token.includes('(')) type = 'function';
 
       return {
@@ -318,7 +318,7 @@ export class DevicesPage implements OnInit {
     // 2. Definimos el tipo de bloque según el valor
     let tipo: 'variable' | 'operator' | 'function' | 'number' = 'number';
     if (['+', '-', '*', '/'].includes(valor.trim())) tipo = 'operator';
-    else if (valor.includes('var_value')) tipo = 'variable';
+    else if (valor.includes('sensor_value')) tipo = 'variable';
     else if (valor.includes('(')) tipo = 'function';
 
     // 3. Empujamos el objeto al array, NO un string
@@ -448,5 +448,6 @@ export class DevicesPage implements OnInit {
     this.editingBlock.value = `map(X, ${this.mapData.inMin}, ${this.mapData.inMax}, ${this.mapData.outMin}, ${this.mapData.outMax})`;
     this.popoverMap.dismiss();
   }
+  isDraggingBlock: boolean = false;
   protected readonly ToggleMenu = ToggleMenu;
 }

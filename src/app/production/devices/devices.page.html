@@ -54,8 +54,8 @@
                 <div class="sensor-value">{{ sensor.last_value !== null ? sensor.last_value : '—' }}</div>
               </ion-col>
               <ion-col size="auto" style="text-align: center;">
-                <ion-button fill="clear" size="large" shape="round" [disabled]="machine.is_active === 'N'" color="secondary"
-                  (click)="openAsEditMachine(machine)">
+                <ion-button fill="clear" size="large" shape="round" [disabled]="machine.is_active === 'N'"
+                  color="secondary" (click)="openAsEditMachine(machine)">
                   <ion-icon name="open-outline" slot="icon-only"></ion-icon>
                 </ion-button>
                 <div class="sensor-value">Abrir</div>
@@ -159,7 +159,8 @@
               *ngFor="let org of user.Company.Organizations">{{org.Name}}</ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item-sliding *ngFor="let sensor of machine.sensors; let i = index" lines="full">
+        <ion-item-sliding *ngFor="let sensor of machine.sensors; let i = index" lines="full"
+          [disabled]="isDraggingBlock">
           <!-- Contenido principal -->
           <ion-item style="--background: var(--ion-color-back-shade, #fff); --border-radius: 8px;">
             <ion-grid>
@@ -195,13 +196,13 @@
               <ion-row>
                 <ion-col size="12">
                   <div class="formula-toolbar" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px;">
-                    <ion-chip outline="true" (click)="insertarEnFormula(' + ', sensor)">+</ion-chip>
-                    <ion-chip outline="true" (click)="insertarEnFormula(' - ', sensor)">-</ion-chip>
-                    <ion-chip outline="true" (click)="insertarEnFormula(' * ', sensor)">*</ion-chip>
-                    <ion-chip outline="true" (click)="insertarEnFormula(' / ', sensor)">/</ion-chip>
+                    <ion-chip outline="true" (click)="insertarEnFormula(' + ', sensor)" appCustomTooltip="suma">+</ion-chip>
+                    <ion-chip outline="true" (click)="insertarEnFormula(' - ', sensor)" appCustomTooltip="resta">-</ion-chip>
+                    <ion-chip outline="true" (click)="insertarEnFormula(' * ', sensor)" appCustomTooltip="multiplicación">*</ion-chip>
+                    <ion-chip outline="true" (click)="insertarEnFormula(' / ', sensor)" appCustomTooltip="división">/</ion-chip>
                     <ion-chip outline="true"
-                      (click)="insertarEnFormula('map(X, 0, 1023, 0, 100)', sensor)">MAP</ion-chip>
-                    <ion-chip outline="true" (click)="insertarEnFormula('var_value', sensor)">var_value</ion-chip>
+                      (click)="insertarEnFormula('map(X, 0, 1023, 0, 100)', sensor)" appCustomTooltip="map">MAP</ion-chip>
+                    <ion-chip outline="true" (click)="insertarEnFormula('sensor_value', sensor)" appCustomTooltip="valor del sensor">sensor_value</ion-chip>
 
                     <div class="input-group">
                       <input type="number" #numInput placeholder="0">
@@ -210,56 +211,14 @@
                       </button>
                     </div>
                   </div>
-                  <ion-popover #popoverNumber triggerAction="click">
-                    <ng-template>
-                      <ion-content class="ion-padding">
-                        <ion-item>
-                          <ion-label position="stacked">Editar Valor</ion-label>
-                          <ion-input type="number" [(ngModel)]="valorTemporal"></ion-input>
-                        </ion-item>
-                        <ion-button expand="block" (click)="guardarNumero()">Guardar</ion-button>
-                      </ion-content>
-                    </ng-template>
-                  </ion-popover>
+                  <div class="formula-block-editor" (mousedown)="$event.stopPropagation()"
+                    (touchstart)="$event.stopPropagation()">
 
-                  <ion-popover #popoverMap triggerAction="click" (didDismiss)="onPopoverDismiss($event)">
-                    <ng-template>
-                      <ion-content class="ion-padding">
-                        <ion-item>
-                          <ion-label position="stacked">Entrada (Min - Max)</ion-label>
-                          <ion-row>
-                            <ion-col><ion-input type="number" [(ngModel)]="mapData.inMin"
-                                placeholder="0"></ion-input></ion-col>
-                            <ion-col><ion-input type="number" [(ngModel)]="mapData.inMax"
-                                placeholder="1023"></ion-input></ion-col>
-                          </ion-row>
-                        </ion-item>
-                        <ion-item>
-                          <ion-label position="stacked">Salida (Min - Max)</ion-label>
-                          <ion-row>
-                            <ion-col><ion-input type="number" [(ngModel)]="mapData.outMin"
-                                placeholder="0"></ion-input></ion-col>
-                            <ion-col><ion-input type="number" [(ngModel)]="mapData.outMax"
-                                placeholder="100"></ion-input></ion-col>
-                          </ion-row>
-                        </ion-item>
-                        <ion-button expand="block" (click)="guardarMapa()">Guardar</ion-button>
-                      </ion-content>
-                    </ng-template>
-                  </ion-popover>
-                  <div class="formula-block-editor">
                     <div cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="drop($event, sensor)"
                       class="block-container">
-                      <!--ion-chip cdkDrag *ngFor="let block of sensor.blocks; let i = index"
-                        [color]="getBlockColor(block.type)"
-                        (click)="block.value.includes('map') ? editarMap(sensor, i, $event) : removerBloque(sensor, i)">
 
-                        <ion-label>{{ block.value }}</ion-label>
-                        <ion-icon name="create-outline" *ngIf="block.value.includes('map')"></ion-icon>
-                        <ion-icon name="close-circle-outline" *ngIf="!block.value.includes('map')"></ion-icon>
-                      </ion-chip-->
-                      <ion-chip cdkDrag *ngFor="let block of sensor.blocks; let i = index" class="block-chip"
-                        [color]="getBlockColor(block.type)">
+                      <ion-chip cdkDrag cdkDragHandle *ngFor="let block of sensor.blocks; let i = index"
+                        class="block-chip" [color]="getBlockColor(block.type)">
 
                         <ion-label (click)="manejarClick(sensor, i, $event)">
                           {{ block.value }}
@@ -269,6 +228,7 @@
                           (click)="$event.stopPropagation(); removerBloque(sensor, i)">
                         </ion-icon>
                       </ion-chip>
+
                       <div *ngIf="!sensor.blocks || sensor.blocks.length === 0"
                         style="padding: 10px; color: #999; font-style: italic;">
                         Arrastra o agrega bloques aquí...
@@ -285,6 +245,42 @@
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
+
+        <ion-popover #popoverNumber triggerAction="click">
+          <ng-template>
+            <ion-content class="ion-padding">
+              <ion-item>
+                <ion-label position="stacked">Editar Valor</ion-label>
+                <ion-input type="number" [(ngModel)]="valorTemporal"></ion-input>
+              </ion-item>
+              <ion-button expand="block" (click)="guardarNumero()">Guardar</ion-button>
+            </ion-content>
+          </ng-template>
+        </ion-popover>
+
+        <ion-popover #popoverMap triggerAction="click" (didDismiss)="onPopoverDismiss($event)">
+          <ng-template>
+            <ion-content class="ion-padding">
+              <ion-item>
+                <ion-label position="stacked">Entrada (Min - Max)</ion-label>
+                <ion-row>
+                  <ion-col><ion-input type="number" [(ngModel)]="mapData.inMin" placeholder="0"></ion-input></ion-col>
+                  <ion-col><ion-input type="number" [(ngModel)]="mapData.inMax"
+                      placeholder="1023"></ion-input></ion-col>
+                </ion-row>
+              </ion-item>
+              <ion-item>
+                <ion-label position="stacked">Salida (Min - Max)</ion-label>
+                <ion-row>
+                  <ion-col><ion-input type="number" [(ngModel)]="mapData.outMin" placeholder="0"></ion-input></ion-col>
+                  <ion-col><ion-input type="number" [(ngModel)]="mapData.outMax"
+                      placeholder="100"></ion-input></ion-col>
+                </ion-row>
+              </ion-item>
+              <ion-button expand="block" (click)="guardarMapa()">Guardar</ion-button>
+            </ion-content>
+          </ng-template>
+        </ion-popover>
         <ion-item lines="none">
         </ion-item>
         <div class="ion-text-center">
