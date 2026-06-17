@@ -1,26 +1,5 @@
 ion-select::part(label) {
-    color: var(--ion-color-primary);
-}
-
-.history-card {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-
-    .header-item {
-        --background: var(--ion-color-step-100);
-        font-weight: bold;
-        border-bottom: 2px solid var(--ion-color-step-200);
-    }
-
-    ion-item {
-        --padding-start: 16px;
-        --padding-end: 16px;
-    }
-
-    ion-note {
-        font-size: 1.1rem; // Hace que el valor resalte más
-    }
+    color: var(--ion-color-secondary);
 }
 
 // Estilo para el botón de borrar al deslizar
@@ -173,4 +152,49 @@ ion-item-option {
         width: 44px;
         margin: 0;
     }
+}
+
+.chart-settings-panel {
+    --background: var(--ion-color-back-shade, #fff);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    margin-left: 8px;
+    height: calc(100% - 17px); // Se estira a la par de la gráfica
+
+    ion-card-title {
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+.setting-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 12px;
+    background: transparent;
+
+    ion-select,
+    ion-range,
+    ion-toggle {
+        width: 100%;
+        --padding-start: 4px;
+    }
+}
+
+// En pantallas móviles colapsará abajo automáticamente gracias al sistema responsivo de grid.
+@media (max-width: 991px) {
+    .chart-settings-panel {
+        margin-left: 0;
+        margin-top: 16px;
+    }
+}
+
+::ng-deep .opened {
+    background: var(--ion-color-back) !important;
+}
+
+::ng-deep .opened button {
+    color: var(--ion-color-dark) !important;
 }

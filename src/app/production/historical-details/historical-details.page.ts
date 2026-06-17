@@ -2,14 +2,14 @@ import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@a
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonMenuButton, IonIcon, IonButton, IonRow, IonCol, IonGrid, IonList, IonItem,
-  IonSelectOption, IonSelect, IonItemOption, IonItemOptions, IonItemSliding, IonItemGroup, IonDatetime, IonModal, IonDatetimeButton, IonPopover
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonLabel, IonMenuButton, IonIcon, IonButton, IonRow, IonCol, IonGrid, IonList, IonItem, IonCard, IonCardContent, IonCardHeader,
+  IonSelectOption, IonSelect, IonItemOption, IonItemOptions, IonItemSliding, IonItemGroup, IonDatetime, IonModal, IonDatetimeButton, IonPopover, IonRange, IonToggle, IonBadge
 } from '@ionic/angular/standalone';
 import { ToggleMenu } from 'src/app/models/design';
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { PermissionsService } from 'src/app/services/permissions.service';
-import { menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline, documentOutline, textOutline, mailOutline } from 'ionicons/icons';
+import { menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline, documentOutline, textOutline, mailOutline, save } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ActivatedRoute } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -18,6 +18,8 @@ import { ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexDataLabels, A
 import { MultiSelectModule } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
 import { FloatLabel } from "primeng/floatlabel"
+import { NgxColorsModule } from 'ngx-colors';
+import { CustomTooltipDirective } from 'app-tooltip.directive';
 
 
 export type ChartOptions = {
@@ -38,8 +40,8 @@ export type ChartOptions = {
   styleUrls: ['./historical-details.page.scss'],
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [NgApexchartsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonLabel, IonMenuButton, IonIcon, IonButton, IonRow, TableModule, MultiSelectModule, Select,
-    IonCol, IonGrid, IonList, IonItem, IonSelectOption, IonSelect, IonItemOption, IonItemOptions, IonItemSliding, IonItemGroup, IonDatetime, IonModal, IonDatetimeButton, InputTextModule, IonPopover, FloatLabel
+  imports: [NgApexchartsModule, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButtons, IonLabel, IonMenuButton, IonIcon, IonButton, IonRow, TableModule, MultiSelectModule, Select, IonCard, IonCardContent, IonCardHeader, IonToggle, IonRange,
+    IonCol, IonGrid, IonList, IonItem, IonSelectOption, IonSelect, IonItemOption, IonItemOptions, IonItemSliding, IonItemGroup, IonDatetime, IonModal, IonDatetimeButton, InputTextModule, IonPopover, FloatLabel, NgxColorsModule, CustomTooltipDirective, IonBadge
 
   ]
 })
@@ -64,12 +66,14 @@ export class HistoricalDetailsPage {
   public selectedPeriod: string = 'today';
   // Datos del historial
   public historyData: any[] = [];
-
+  groupByPeriod: string = '';       // Por defecto "Sin lapso"
+  selectedAggregation: string = 'avg'; // Cálculo por defecto cuando se active
+  mostrarPuntos: boolean = false;
   // Define el tipo para evitar errores de compilación (si usas TypeScript estricto)
   public chartOptions: any = {
     series: [{ name: 'Sensor Data', data: [] }], // Se inicializa vacío
     chart: {
-      type: 'area',
+      type: 'area', // Tu valor por defecto inicial (puedes cambiarlo a 'line')
       stacked: false,
       height: 350,
       zoom: {
@@ -80,9 +84,16 @@ export class HistoricalDetailsPage {
       animations: { enabled: false },
       toolbar: { autoSelected: 'zoom' },
     },
+    // ─── NUEVO: REQUISITO PARA EL CONTROL DE GROSOR Y CURVATURA ───
+    stroke: {
+      curve: 'smooth', // 'smooth', 'straight', o 'stepline'
+      width: 3         // El valor inicial (1 a 10) que leerá tu ion-range
+    },
+    // ─── NUEVO: REQUISITO PARA EL CONTROL DE COLOR EN TIEMPO REAL ───
+    colors: ['#3880ff'], // Color inicial de la gráfica (azul primario de Ionic)
+
     dataLabels: { enabled: false },
-    markers: { size: 0 },
-    //title: { text: 'Historial de Sensor', align: 'left' },
+    markers: { size: 0 },/*
     fill: {
       type: 'gradient',
       gradient: {
@@ -92,11 +103,11 @@ export class HistoricalDetailsPage {
         opacityTo: 0,
         stops: [0, 90, 100],
       },
-    },
+    },*/
     yaxis: {
       labels: {
         show: true,
-        formatter: (val: number) => (val)
+        formatter: (val: number) => val
       },
       title: {
         text: 'Valor',
@@ -112,9 +123,18 @@ export class HistoricalDetailsPage {
         format: 'dd/MM HH:mm tt'
       },
       y: {
-        formatter: (val: number) => (val)
+        formatter: (val: number) => val
       },
     },
+    noData: {
+      text: 'No hay datos para este sensor y este rango de fechas',
+      align: 'center',
+      verticalAlign: 'middle',
+      style: {
+        color: 'var(--ion-color-medium)',
+        fontSize: '14px'
+      }
+    }
   };
   constructor(
     private api: ApiService,
@@ -131,6 +151,7 @@ export class HistoricalDetailsPage {
     yesterday.setDate(yesterday.getDate() - 1);
     this.startDate = yesterday.toISOString(); // Fecha de ayer
     this.endDate = new Date().toISOString();  // Fecha actual
+    this.loadChartPreferences();
   }
   ionViewDidEnter() {
     this.loadInitialData();
@@ -143,18 +164,34 @@ export class HistoricalDetailsPage {
       this.historyData = response.history;
     });
   }
+
   async deleteData(item: any) {
-    // 1. Aquí llamarías a tu API para borrar
-    // await this.api.deleteRecord(item.sensor_data_id);
+    const sensorObj = this.selectedMachine.sensors.find((s: any) => s.sensor_id === this.selectedSensor);
+    const sensorName = sensorObj ? sensorObj.sensor_name : 'Sensor';
+    if (await this.alerts.ShowAlert("¿Deseas eliminar el dato (" + item.value + ") del sensor " + sensorName + "?", "Alerta", "Atrás", "Eliminar")) {
 
-    // 2. Eliminar del array local para que desaparezca de la UI
-    this.historyData = this.historyData.filter((d: any) => d.sensor_data_id !== item.sensor_data_id);
-
-    // 3. Importante: Cierra los items deslizados
-    const list = document.querySelector('ion-list');
-    if (list) await list.closeSlidingItems();
+      this.api.DeleteRequestRender('sensorData/' + item.sensor_data_id).then((response: any) => {
+        if (!response.errorsExistFlag) {
+          this.historyData = this.historyData.filter((data: any) => data.sensor_data_id !== item.sensor_data_id);
+          this.chartOptions = {
+            ...this.chartOptions,
+            series: [{
+              name: 'Valor',
+              data: this.historyData.map((d: any) => ({
+                x: new Date(d.date_time).getTime(), // Nota: usamos 'date_time' porque es la propiedad mapeada en historyData
+                y: d.value
+              }))
+            }]
+          };
+          // Forzamos el renderizado para que Ionic/Angular actualice la lista
+          this.changeDetector.detectChanges();
+          this.alerts.Success("Dato del sensor " + sensorName + " eliminado");
+        } else {
+          this.alerts.Info(response.error);
+        }
+      });
+    }
   }
-
   // 1. Carga inicial
   async loadInitialData() {
     localStorage.setItem("organizationSelected", JSON.stringify(this.organizationSelected))
@@ -186,21 +223,29 @@ export class HistoricalDetailsPage {
   async loadHistory() {
     if (!this.selectedSensor) return;
 
-    const url = `sensorsData?sensors=${this.selectedSensor}&start=${this.startDate}&end=${this.endDate}`;
+    // 1. Construcción dinámica de la URL con los nuevos parámetros opcionales
+    let url = `sensorsData?sensors=${this.selectedSensor}&start=${this.startDate}&end=${this.endDate}`;
+
+    // Si el usuario seleccionó un lapso de tiempo válido, lo anexamos junto con la operación
+    if (this.groupByPeriod && this.groupByPeriod !== '') {
+      url += `&period=${this.groupByPeriod}&aggregation=${this.selectedAggregation}`;
+    }
+
     const res: any = await this.api.GetRequestRender(url);
 
-    // 1. Procesamos los datos para la tabla y el gráfico
+    // 2. Procesamos los datos para la tabla y el gráfico
     const rawData = res.items[0]?.data || [];
-
+    console.log(rawData)
     this.historyData = rawData.map((d: any) => ({
       sensor_data_id: d.id,
       date_time: d.time,
       value: d.value,
-      comment: d.comment
+      comment: d.comment,// Mandamos las propiedades del lapso por si quieres usarlas en el frontend
+      //time_end: d.date_time_end || null
+      date_time_end: d.date_time_end, // NUEVO: Fecha de fin del lapso agrupado
     }));
 
-    // 2. Actualizamos la serie del gráfico
-    // Nota: Creamos un nuevo objeto para asegurar que ApexCharts detecte el cambio (inmutabilidad)
+    // 3. Actualizamos la serie del gráfico asegurando la reactividad (inmutabilidad)
     this.chartOptions = {
       ...this.chartOptions,
       series: [{
@@ -211,6 +256,9 @@ export class HistoricalDetailsPage {
         }))
       }]
     };
+
+    // 4. Forzamos la detección de cambios para renderizar los nuevos datos e interfaz al instante
+    this.changeDetector.detectChanges();
   }
   exportTo(format: string) {
     /*this.api.GetRequestExport(format, this.selectedSensor, this.startDate, this.endDate)
@@ -229,25 +277,27 @@ export class HistoricalDetailsPage {
       });*/
   }
   async exportarExcel() {
-    // 1. Preparamos los nombres y fechas
-    // Usamos replace para quitar caracteres que no son válidos en nombres de archivo
     const sensorObj = this.selectedMachine.sensors.find((s: any) => s.sensor_id === this.selectedSensor);
     const sensorName = sensorObj ? sensorObj.sensor_name : 'Sensor';
 
-    // 2. Limpieza para el nombre del archivo
+    // Limpieza para el nombre del archivo
     const safeSensor = sensorName.replace(/[^a-z0-9]/gi, '_');
     const safeDevice = this.selectedMachine.machine_id.toString().replace(/[^a-z0-9]/gi, '_');
     const dateRange = `${this.startDate}_al_${this.endDate}`.replace(/[^a-z0-9]/gi, '_');
 
-    // Resultado: Reporte_MEDIO_PISO_122_2026_06_11_al_2026_06_12.xlsx
     const fileName = `Reporte_${safeSensor}_${safeDevice}_${dateRange}.xlsx`;
 
-    const endpoint = `sensorsData/export?type=excel&sensor=${this.selectedSensor}&start=${this.startDate}&end=${this.endDate}`;
+    // 1. NUEVO: Agregamos las variables de agrupación a la URL del Endpoint
+    let endpoint = `sensorsData/export?type=excel&sensor=${this.selectedSensor}&start=${this.startDate}&end=${this.endDate}`;
+
+    if (this.groupByPeriod && this.groupByPeriod !== '') {
+      endpoint += `&period=${this.groupByPeriod}&aggregation=${this.selectedAggregation}`;
+    }
+
     const data = await this.api.GetRequestExport(endpoint);
 
     if (data) {
       let blob: Blob;
-
       if (typeof data === 'string') {
         const byteCharacters = atob(data);
         const byteNumbers = new Array(byteCharacters.length);
@@ -260,11 +310,10 @@ export class HistoricalDetailsPage {
         blob = data as Blob;
       }
 
-      // 2. Usamos el nombre dinámico aquí
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = fileName; // Aquí se aplica el nombre generado
+      a.download = fileName;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -310,6 +359,68 @@ export class HistoricalDetailsPage {
   }
   sendEmail() {
     // Lógica para preparar el reporte y enviarlo
+  }
+  updateChartSettings() {
+    this.chartOptions = {
+      ...this.chartOptions,
+      chart: { ...this.chartOptions.chart },
+      stroke: { ...this.chartOptions.stroke }
+    };
+
+    this.saveChartPreferences();
+
+    this.changeDetector.detectChanges();
+  }
+
+  toggleMarkers() {
+    this.chartOptions = {
+      ...this.chartOptions,
+      markers: {
+        size: this.mostrarPuntos ? 5 : 0
+      }
+    };
+
+    // 💾 Guardamos el cambio en LocalStorage
+    this.saveChartPreferences();
+
+    this.changeDetector.detectChanges();
+  }
+  cambiarColorGrafico(event: any) {
+    const nuevoColor = event.target.value;
+    this.chartOptions = {
+      ...this.chartOptions,
+      colors: [nuevoColor]
+    };
+    this.changeDetector.detectChanges();
+  }
+  saveChartPreferences() {
+    const preferences = {
+      type: this.chartOptions.chart.type,
+      curve: this.chartOptions.stroke.curve,
+      width: this.chartOptions.stroke.width,
+      color: this.chartOptions.colors[0],
+      mostrarPuntos: this.mostrarPuntos
+    };
+
+    localStorage.setItem('mes_chart_prefs', JSON.stringify(preferences));
+    const savedPrefs = localStorage.getItem('mes_chart_prefs');
+  }
+  // 2. Recupera las opciones y las aplica al objeto chartOptions
+  loadChartPreferences() {
+    const savedPrefs = localStorage.getItem('mes_chart_prefs');
+    if (savedPrefs) {
+      const preferences = JSON.parse(savedPrefs);
+
+      // Aplicamos los valores recuperados al objeto base
+      this.chartOptions.chart.type = preferences.type || 'area';
+      this.chartOptions.stroke.curve = preferences.curve || 'smooth';
+      this.chartOptions.stroke.width = preferences.width || 3;
+      this.chartOptions.colors = [preferences.color || '#3880ff'];
+      this.mostrarPuntos = preferences.mostrarPuntos ?? false;
+
+      // Sincronizamos el tamaño de los marcadores (puntos) basados en la preferencia
+      this.chartOptions.markers.size = this.mostrarPuntos ? 5 : 0;
+    }
   }
   protected readonly ToggleMenu = ToggleMenu;
 }

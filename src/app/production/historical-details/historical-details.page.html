@@ -41,6 +41,28 @@
       <ion-select-option value="custom">Personalizado</ion-select-option>
     </ion-select>
 
+    <ion-select label="Agrupar cada:" label-placement="floating" [(ngModel)]="groupByPeriod"
+      (ionChange)="loadHistory()">
+      <ion-select-option value="">Sin lapso (Todo)</ion-select-option>
+      <ion-select-option value="minute">1 minuto</ion-select-option>
+      <ion-select-option value="5_minutes">5 minutos</ion-select-option>
+      <ion-select-option value="15_minutes">15 minutos</ion-select-option>
+      <ion-select-option value="30_minutes">30 minutos</ion-select-option>
+      <ion-select-option value="hour">1 hora</ion-select-option>
+      <ion-select-option value="5_hours">5 horas</ion-select-option>
+      <ion-select-option value="day">1 día</ion-select-option>
+    </ion-select>
+
+    <ion-select label="Cálculo:" label-placement="floating" [(ngModel)]="selectedAggregation"
+      (ionChange)="loadHistory()" *ngIf="groupByPeriod && groupByPeriod !== ''">
+      <ion-select-option value="avg">Promedio</ion-select-option>
+      <ion-select-option value="max">Valor Máximo</ion-select-option>
+      <ion-select-option value="min">Valor Mínimo</ion-select-option>
+      <ion-select-option value="median">Mediana</ion-select-option>
+      <ion-select-option value="sum">Suma Total</ion-select-option>
+      <ion-select-option value="count">Conteo de muestras</ion-select-option>
+    </ion-select>
+
     <div class="date-container" *ngIf="selectedPeriod === 'custom'">
       <div class="date-group">
         <ion-label>Desde</ion-label>
@@ -70,11 +92,90 @@
       </ng-template>
     </ion-modal>
   </ion-item>
-  <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [dataLabels]="chartOptions.dataLabels"
+  <ion-grid fixed="false" class="ion-no-padding">
+    <ion-row>
+
+      <ion-col size="12" size-lg="10">
+        <ion-card class="ion-padding">
+          <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [dataLabels]="chartOptions.dataLabels"
+            [markers]="chartOptions.markers" [title]="chartOptions.title" [fill]="chartOptions.fill"
+            [theme]="chartOptions.theme" [noData]="chartOptions.noData" [yaxis]="chartOptions.yaxis"
+            [xaxis]="chartOptions.xaxis" [tooltip]="chartOptions.tooltip" [stroke]="chartOptions.stroke"
+            [colors]="chartOptions.colors">
+          </apx-chart>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="12" size-lg="2">
+        <ion-card class="chart-settings-panel" style="background-color: var(--ion-color-back);">
+          <ion-card-header>
+            <ion-card-title style="font-size: 1.1rem;">
+              <ion-icon name="options-outline" slot="start"></ion-icon> Personalizar Gráfico
+            </ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <ion-list lines="none" style="padding-top: 0; padding-bottom: 0;">
+
+              <ion-item class="setting-item" style="--min-height: 40px; margin-bottom: 4px;">
+                <ion-select label="Tipo de gráfico" label-placement="start" [(ngModel)]="chartOptions.chart.type"
+                  (ionChange)="updateChartSettings()">
+                  <ion-select-option value="line">Línea</ion-select-option>
+                  <ion-select-option value="bar">Barras</ion-select-option>
+                  <ion-select-option value="area">Área</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item class="setting-item" *ngIf="chartOptions.chart.type !== 'bar'"
+                style="--min-height: 40px; margin-bottom: 4px;">
+                <ion-select label="Curvatura" label-placement="start" [(ngModel)]="chartOptions.stroke.curve"
+                  (ionChange)="updateChartSettings()">
+                  <ion-select-option value="smooth">Suave</ion-select-option>
+                  <ion-select-option value="straight">Recta</ion-select-option>
+                  <ion-select-option value="stepline">Escalón</ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item class="setting-item" style="--min-height: 40px; margin-bottom: 4px;">
+                <div style="width: 100%; display: flex; align-items: center; gap: 10px;">
+                  <ion-label style="color: var(--ion-color-secondary); white-space: nowrap;">
+                    Grosor
+                  </ion-label>
+                  <ion-range min="1" max="10" step="1" [(ngModel)]="chartOptions.stroke.width"
+                    (ionChange)="updateChartSettings()">
+                  </ion-range>
+                </div>
+              </ion-item>
+
+              <ion-item class="setting-item" style="--min-height: 40px; margin-bottom: 4px;">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                  <ion-label style="color: var(--ion-color-secondary);">
+                    Color
+                  </ion-label>
+                  <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
+                    [(ngModel)]="chartOptions.colors[0]" (change)="updateChartSettings()">
+                  </ngx-colors>
+                </div>
+              </ion-item>
+
+              <ion-item class="setting-item" style="--min-height: 40px; margin-bottom: 0;">
+                <ion-toggle [(ngModel)]="mostrarPuntos" (ionChange)="toggleMarkers()">
+                  Mostrar puntos
+                </ion-toggle>
+              </ion-item>
+
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+  <!--apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [dataLabels]="chartOptions.dataLabels"
     [markers]="chartOptions.markers" [title]="chartOptions.title" [fill]="chartOptions.fill"
     [theme]="chartOptions.theme" [noData]="chartOptions.noData" [yaxis]="chartOptions.yaxis"
     [xaxis]="chartOptions.xaxis" [tooltip]="chartOptions.tooltip">
-  </apx-chart>
+    </apx-chart-->
   <div class="search-actions-container">
     <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
       placeholder="Buscar valor o id" class="search-input" />
@@ -107,26 +208,64 @@
   </div>
 
   <p-table #dt [value]="historyData" [paginator]="true" [rows]="15" [rowsPerPageOptions]="[5, 10, 15, 20, 50, 100]"
-    styleClass="p-datatable-sm" [globalFilterFields]="['sensor_data_id', 'date_time', 'value', 'comment']">
-
-    <ng-template pTemplate="header">
+    styleClass="p-datatable-sm" [globalFilterFields]="['sensor_data_id', 'date_time', 'value', 'comment']"
+    [style]="{'width': '100%', 'table-layout': 'fixed'}"> <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="sensor_data_id">ID <p-sortIcon field="sensor_data_id"></p-sortIcon></th>
-        <th pSortableColumn="date_time">Fecha <p-sortIcon field="date_time"></p-sortIcon></th>
-        <th pSortableColumn="value">Valor <p-sortIcon field="value"></p-sortIcon></th>
-        <th>Comentario</th>
-        <th style="width: 50px;">Acción</th>
+        <th pSortableColumn="sensor_data_id" style="width: 10%;" class="ion-text-start">
+          ID <p-sortIcon field="sensor_data_id"></p-sortIcon>
+        </th>
+
+        <th pSortableColumn="date_time" style="width: 25%;" class="ion-text-center">
+          Fecha / Periodo <p-sortIcon field="date_time"></p-sortIcon>
+        </th>
+
+        <th pSortableColumn="value" style="width: 15%;" class="ion-text-center">
+          Valor <p-sortIcon field="value"></p-sortIcon>
+        </th>
+
+        <th class="ion-text-center" style="width: 40%;">
+          Detalle / Comentario
+        </th>
+
+        <th style="width: 100px;" class="ion-text-center" style="width: 10%;">
+          Acción
+        </th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-item>
       <tr>
-        <td>{{item.sensor_data_id}}</td>
-        <td>{{item.date_time | date:'HH:mm a dd/MM/YYYY'}}</td>
-        <td><strong>{{item.value}}</strong></td>
-        <td>{{item.comment}}</td>
+        <td class="ion-text-start" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+          <span *ngIf="item.sensor_data_id">{{ item.sensor_data_id }}</span>
+          <span *ngIf="!item.sensor_data_id" style="color: var(--ion-color-medium); font-style: italic;">-</span>
+        </td>
+
         <td class="ion-text-center">
-          <ion-button fill="clear" color="danger" (click)="deleteData(item)">
+          {{ item.date_time | date:'HH:mm a dd/MM/YYYY' }}
+        </td>
+
+        <td class="ion-text-center">
+          <strong>{{ item.value }}</strong>
+        </td>
+
+        <td class="ion-text-center">
+          <span *ngIf="!item.sensor_data_id"
+            style="display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px;">
+            <ion-badge color="secondary" mode="ios" style="font-size: 11px;">{{selectedAggregation}}</ion-badge>
+            <span style="font-size: 0.95rem;">Lapso de: <strong>{{ item.date_time | date:'HH:mm a' }}</strong> a
+              <strong>{{ item.date_time_end | date:'HH:mm a dd/MM/YYYY' }}</strong></span>
+          </span>
+
+          <span *ngIf="item.sensor_data_id"
+            style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">
+            {{ item.comment || '-' }}
+          </span>
+        </td>
+
+        <td class="ion-text-center">
+          <ion-button fill="clear" [color]="item.sensor_data_id ? 'danger' : 'medium'"
+            (click)="item.sensor_data_id ? deleteData(item) : null" style="margin: 0; --opacity: 0.5;"
+            [appCustomTooltip]="item.sensor_data_id ? 'Eliminar registro' : 'Los datos agrupados no se pueden eliminar'">
             <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
           </ion-button>
         </td>
