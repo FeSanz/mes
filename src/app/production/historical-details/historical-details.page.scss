@@ -154,20 +154,6 @@ ion-item-option {
     }
 }
 
-.chart-settings-panel {
-    --background: var(--ion-color-back-shade, #fff);
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-    margin-left: 8px;
-    height: calc(100% - 17px); // Se estira a la par de la gráfica
-
-    ion-card-title {
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-}
 
 .setting-item {
     --padding-start: 0;

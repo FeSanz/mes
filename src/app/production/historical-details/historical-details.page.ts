@@ -9,7 +9,7 @@ import { ToggleMenu } from 'src/app/models/design';
 import { ApiService } from 'src/app/services/api.service';
 import { AlertsService } from 'src/app/services/alerts.service';
 import { PermissionsService } from 'src/app/services/permissions.service';
-import { menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline, documentOutline, textOutline, mailOutline, save } from 'ionicons/icons';
+import { menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline, documentOutline, textOutline, mailOutline, save, refreshOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ActivatedRoute } from '@angular/router';
 import { TableModule } from 'primeng/table';
@@ -75,7 +75,7 @@ export class HistoricalDetailsPage {
     chart: {
       type: 'area', // Tu valor por defecto inicial (puedes cambiarlo a 'line')
       stacked: false,
-      height: 350,
+      height: 424,
       zoom: {
         enabled: true,
         type: 'x',
@@ -114,13 +114,19 @@ export class HistoricalDetailsPage {
         margin: 10 // Margen entre el título y las etiquetas
       }
     },
-    xaxis: { type: 'datetime' },
+    xaxis: {
+      type: 'datetime',
+      labels: {
+        datetimeUTC: false,
+        format: "dd/MM/yy hh:mm"
+      }
+    },
     tooltip: {
       theme: 'dark',
       enabled: true,
       shared: false,
       x: {
-        format: 'dd/MM HH:mm tt'
+        format: 'dd/MM hh:mm'
       },
       y: {
         formatter: (val: number) => val
@@ -136,6 +142,16 @@ export class HistoricalDetailsPage {
       }
     }
   };
+  public summaryMetrics = {
+    firstDate: null as Date | null,
+    lastDate: null as Date | null,
+    totalRecords: 0,
+    maxValue: null as number | null,
+    maxValueDate: null as any,
+    minValue: null as number | null,
+    minValueDate: null as any,
+    avgValue: null as number | null
+  };
   constructor(
     private api: ApiService,
     public alerts: AlertsService,
@@ -146,7 +162,7 @@ export class HistoricalDetailsPage {
     this.userData = JSON.parse(String(localStorage.getItem("userData") || '{}'));
     this.organizationSelected = localStorage.getItem("organizationSelected") ? JSON.parse(localStorage.getItem("organizationSelected")!) : this.userData.Company?.Organizations[0];
     this.user = this.userData;
-    addIcons({ menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline, documentOutline, textOutline, mailOutline });
+    addIcons({ menuOutline, timeOutline, hammerOutline, hourglassOutline, pencilOutline, checkmarkOutline, trashOutline, addOutline, closeOutline, documentOutline, textOutline, mailOutline, refreshOutline });
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     this.startDate = yesterday.toISOString(); // Fecha de ayer
@@ -155,14 +171,6 @@ export class HistoricalDetailsPage {
   }
   ionViewDidEnter() {
     this.loadInitialData();
-  }
-  loadSensorHistory() {
-    const url = `sensorHistory?sensor_id=${this.sensorId}&start_date=${this.startDate}&end_date=${this.endDate}`;
-    this.api.GetRequestRender(url).then((response: any) => {
-      this.sensorDetails = response.sensor;
-      this.siblingSensors = response.siblings; // Lista para mostrar en un select o menú
-      this.historyData = response.history;
-    });
   }
 
   async deleteData(item: any) {
@@ -215,49 +223,143 @@ export class HistoricalDetailsPage {
 
   // 2. Cuando cambia la máquina, reiniciamos la selección del sensor
   onMachineChange() {
-    this.selectedSensor = null;
+    this.selectedSensor = this.selectedMachine.sensors[0].sensor_id;
+    this.loadHistory()
     this.historyData = [];
   }
 
-  // 3. Cuando cambia el sensor o las fechas, llamamos al nuevo endpoint
+  // 2. Tu función modificada:
   async loadHistory() {
     if (!this.selectedSensor) return;
 
-    // 1. Construcción dinámica de la URL con los nuevos parámetros opcionales
+    // ─── 🕒 RECÁLCULO DE FECHAS EN TIEMPO REAL ───
+    // Si el periodo NO es personalizado, recalculamos start y end basándonos en el "ahora" exacto
+    if (this.selectedPeriod && this.selectedPeriod !== 'custom') {
+      const now = new Date();
+      let start = new Date();
+      let end = new Date(); // Por defecto, el fin es este preciso instante
+
+      switch (this.selectedPeriod) {
+        case 'last_hour':
+          start.setHours(now.getHours() - 1);
+          break;
+
+        case 'today':
+          start.setHours(0, 0, 0, 0);
+          break;
+
+        case 'yesterday':
+          start.setDate(now.getDate() - 1);
+          start.setHours(0, 0, 0, 0);
+          end.setDate(now.getDate() - 1);
+          end.setHours(23, 59, 59, 999);
+          break;
+
+        case 'this_week':
+          const currentDay = now.getDay();
+          const distanceToMonday = currentDay === 0 ? 6 : currentDay - 1;
+          start.setDate(now.getDate() - distanceToMonday);
+          start.setHours(0, 0, 0, 0);
+          break;
+
+        case 'last_7_days':
+          start.setDate(now.getDate() - 7);
+          break;
+
+        case 'this_month':
+          start.setDate(1);
+          start.setHours(0, 0, 0, 0);
+          break;
+
+        case 'last_30_days':
+          start.setDate(now.getDate() - 30);
+          break;
+
+        case 'last_month_calendar':
+          start.setMonth(now.getMonth() - 1, 1);
+          start.setHours(0, 0, 0, 0);
+          end.setMonth(now.getMonth(), 0);
+          end.setHours(23, 59, 59, 999);
+          break;
+
+        case 'last_2_months':
+          start.setMonth(now.getMonth() - 2);
+          break;
+
+        case 'last_6_months':
+          start.setMonth(now.getMonth() - 6);
+          break;
+      }
+
+      // Actualizamos las variables globales con valores frescos
+      this.startDate = start.toISOString();
+      this.endDate = end.toISOString();
+    }
+    // ─────────────────────────────────────────────
+
+    // 2. Construcción dinámica de la URL con parámetros actualizados al segundo
     let url = `sensorsData?sensors=${this.selectedSensor}&start=${this.startDate}&end=${this.endDate}`;
 
-    // Si el usuario seleccionó un lapso de tiempo válido, lo anexamos junto con la operación
     if (this.groupByPeriod && this.groupByPeriod !== '') {
       url += `&period=${this.groupByPeriod}&aggregation=${this.selectedAggregation}`;
     }
 
     const res: any = await this.api.GetRequestRender(url);
-
-    // 2. Procesamos los datos para la tabla y el gráfico
     const rawData = res.items[0]?.data || [];
-    console.log(rawData)
+    console.log(rawData);
+
+    // Mapeo para la tabla
     this.historyData = rawData.map((d: any) => ({
       sensor_data_id: d.id,
       date_time: d.time,
       value: d.value,
-      comment: d.comment,// Mandamos las propiedades del lapso por si quieres usarlas en el frontend
-      //time_end: d.date_time_end || null
-      date_time_end: d.date_time_end, // NUEVO: Fecha de fin del lapso agrupado
+      comment: d.comment,
+      date_time_end: d.date_time_end
     }));
 
-    // 3. Actualizamos la serie del gráfico asegurando la reactividad (inmutabilidad)
+    // ─── 📊 EXTRACCIÓN DE MÉTRICAS VISUALES ───
+    if (rawData.length > 0) {
+      const numericValues = rawData.map((d: any) => Number(d.value)).filter((v: any) => !isNaN(v));
+      const totalSum = numericValues.reduce((acc: number, val: number) => acc + val, 0);
+
+      const maxRecord = rawData.reduce((max: any, current: any) =>
+        Number(current.value) > Number(max.value) ? current : max, rawData[0]
+      );
+
+      const minRecord = rawData.reduce((min: any, current: any) =>
+        Number(current.value) < Number(min.value) ? current : min, rawData[0]
+      );
+
+      // Tip: Añadido el replace('Z', '') para corregir también el desfase del Chart e Historial en tus KPIs locales
+      this.summaryMetrics = {
+        totalRecords: rawData.length,
+        lastDate: new Date(rawData[0].time.replace('Z', '')),
+        firstDate: new Date(rawData[rawData.length - 1].time.replace('Z', '')),
+
+        maxValue: Number(maxRecord.value),
+        maxValueDate: new Date(maxRecord.time.replace('Z', '')),
+
+        minValue: Number(minRecord.value),
+        minValueDate: new Date(minRecord.time.replace('Z', '')),
+
+        avgValue: numericValues.length ? Number((totalSum / numericValues.length).toFixed(2)) : 0
+      };
+    } else {
+      this.summaryMetrics = { firstDate: null, lastDate: null, totalRecords: 0, maxValue: null, minValue: null, maxValueDate: null, minValueDate: null, avgValue: null };
+    }
+
+    // ─── 🛠️ ACTUALIZACIÓN DEL CHART CON Z-CLEANING ───
     this.chartOptions = {
       ...this.chartOptions,
       series: [{
         name: 'Valor',
         data: rawData.map((d: any) => ({
-          x: new Date(d.time).getTime(),
+          x: new Date(d.time.replace('Z', '')).getTime(), // Evita desfase de +6 horas en ApexCharts
           y: d.value
         }))
       }]
     };
 
-    // 4. Forzamos la detección de cambios para renderizar los nuevos datos e interfaz al instante
     this.changeDetector.detectChanges();
   }
   exportTo(format: string) {
@@ -323,30 +425,84 @@ export class HistoricalDetailsPage {
   onPeriodChange() {
     const now = new Date();
     let start = new Date();
+    let end = new Date(); // Por defecto, el fin de la búsqueda es el momento actual
 
     switch (this.selectedPeriod) {
       case 'last_hour':
+        this.groupByPeriod = ""
         start.setHours(now.getHours() - 1);
         break;
+
       case 'today':
+        this.groupByPeriod = ""
         start.setHours(0, 0, 0, 0);
         break;
+
       case 'yesterday':
+        // Desde las 00:00:00 de ayer hasta las 23:59:59 de ayer
+        this.groupByPeriod = ""
         start.setDate(now.getDate() - 1);
         start.setHours(0, 0, 0, 0);
-        now.setDate(now.getDate() - 1);
-        now.setHours(23, 59, 59);
+        end.setDate(now.getDate() - 1);
+        end.setHours(23, 59, 59, 999);
         break;
-      case 'last_week':
+
+      case 'this_week': // Tu regla: Desde el Lunes de esta semana a hoy
+        this.groupByPeriod = "minute"
+        const currentDay = now.getDay(); // 0 = Domingo, 1 = Lunes, etc.
+        // Si hoy es Domingo (0), restamos 6 días para ir al Lunes pasado; si no, restamos (día - 1)
+        const distanceToMonday = currentDay === 0 ? 6 : currentDay - 1;
+        start.setDate(now.getDate() - distanceToMonday);
+        start.setHours(0, 0, 0, 0);
+        break;
+
+      case 'last_7_days': // Tu regla: Desde hace 7 días naturales atrás
+        this.groupByPeriod = "5_minutes"
         start.setDate(now.getDate() - 7);
         break;
+
+      case 'this_month': // Tu regla: Del día 1 del mes en curso a hoy
+        this.groupByPeriod = "5_minutes"
+        start.setDate(1);
+        start.setHours(0, 0, 0, 0);
+        break;
+
+      case 'last_30_days': // Tu regla: Hace 1 mes = 30 días atrás directos
+        this.groupByPeriod = "15_minutes"
+        start.setDate(now.getDate() - 30);
+        break;
+
+      case 'last_month_calendar': // Extra: Todo el mes calendario anterior (ej: del 1 al 31 de mayo completo)
+        this.groupByPeriod = "15_minutes"
+        start.setMonth(now.getMonth() - 1, 1);
+        start.setHours(0, 0, 0, 0);
+        end.setMonth(now.getMonth(), 0); // Día 0 del mes actual equivale al último día del mes pasado
+        end.setHours(23, 59, 59, 999);
+        break;
+
+      case 'last_2_months': // Hace 2 meses relativos a hoy
+        this.groupByPeriod = "hour"
+        start.setMonth(now.getMonth() - 2);
+        break;
+
+      case 'last_6_months': // Hace 6 meses relativos a hoy
+        this.groupByPeriod = "5_hours"
+        start.setMonth(now.getMonth() - 6);
+        break;
+
       case 'custom':
-        // No hacemos nada, dejamos que el usuario elija
+        // No hacemos nada, el usuario controlará el cambio mediante los modales de ion-datetime
+        return;
+
+      default:
         return;
     }
 
+    // Convertimos a formato ISO String que es lo que tus Inputs y Endpoints esperan
     this.startDate = start.toISOString();
-    this.endDate = now.toISOString();
+    this.endDate = end.toISOString();
+
+    // Ejecutamos la consulta automática con el nuevo rango calculado
     this.loadHistory();
   }
   // Función para manejar el cambio y cerrar

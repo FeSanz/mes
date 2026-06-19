@@ -37,7 +37,13 @@
       <ion-select-option value="last_hour">Última hora</ion-select-option>
       <ion-select-option value="today">Hoy</ion-select-option>
       <ion-select-option value="yesterday">Ayer</ion-select-option>
-      <ion-select-option value="last_week">Esta semana</ion-select-option>
+      <ion-select-option value="this_week">Esta semana (Lunes a hoy)</ion-select-option>
+      <ion-select-option value="last_7_days">Hace una semana (7 días atrás)</ion-select-option>
+      <ion-select-option value="this_month">Este mes (Día 1 a hoy)</ion-select-option>
+      <ion-select-option value="last_30_days">Hace 1 mes (30 días atrás)</ion-select-option>
+      <ion-select-option value="last_month_calendar">Mes pasado (Mes calendario)</ion-select-option>
+      <ion-select-option value="last_2_months">Hace 2 meses</ion-select-option>
+      <ion-select-option value="last_6_months">Hace 6 meses</ion-select-option>
       <ion-select-option value="custom">Personalizado</ion-select-option>
     </ion-select>
 
@@ -91,12 +97,17 @@
         </ion-datetime>
       </ng-template>
     </ion-modal>
+
+    <ion-buttons>
+      <ion-button (click)="loadHistory()" appCustomTooltip="Refrescar">
+        <ion-icon slot="icon-only" name="refresh-outline" color="secondary"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-item>
   <ion-grid fixed="false" class="ion-no-padding">
     <ion-row>
-
       <ion-col size="12" size-lg="10">
-        <ion-card class="ion-padding">
+        <ion-card>
           <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [dataLabels]="chartOptions.dataLabels"
             [markers]="chartOptions.markers" [title]="chartOptions.title" [fill]="chartOptions.fill"
             [theme]="chartOptions.theme" [noData]="chartOptions.noData" [yaxis]="chartOptions.yaxis"
@@ -107,19 +118,60 @@
       </ion-col>
 
       <ion-col size="12" size-lg="2">
-        <ion-card class="chart-settings-panel" style="background-color: var(--ion-color-back);">
-          <ion-card-header>
-            <ion-card-title style="font-size: 1.1rem;">
-              <ion-icon name="options-outline" slot="start"></ion-icon> Personalizar Gráfico
-            </ion-card-title>
-          </ion-card-header>
 
-          <ion-card-content>
+        <div *ngIf="summaryMetrics.totalRecords > 0" style="margin-bottom: 10px;">
+
+          <ion-card
+            style="margin: 0 0 6px 0; padding: 10px; border-left: 4px solid var(--ion-color-primary); background-color: var(--ion-color-back);">
+            <ion-card-subtitle
+              style="font-size: 10px; text-transform: uppercase; color: var(--ion-color-medium); margin: 0;">
+              Total de muestras
+            </ion-card-subtitle>
+            <ion-card-title
+              style="font-size: 1.4rem; font-weight: bold; margin: 2px 0 0 0; color: var(--ion-color-dark); display: flex; flex-direction: column; gap: 2px;">
+              {{ summaryMetrics.totalRecords }}
+
+              <span style="font-size: 0.75rem; font-weight: normal; color: var(--ion-color-medium);">
+                Desde {{ summaryMetrics.firstDate | date:'HH:mm a dd/MM/YYYY' }} hasta {{ summaryMetrics.lastDate |
+                date:'HH:mm a dd/MM/YYYY' }}
+              </span>
+            </ion-card-title>
+          </ion-card>
+          <ion-card
+            style="margin: 0 0 6px 0; padding: 10px; border-left: 4px solid var(--ion-color-warning); background-color: var(--ion-color-back);">
+            <ion-card-subtitle
+              style="font-size: 10px; text-transform: uppercase; color: var(--ion-color-medium); margin: 0 0 4px 0;">
+              Límites Detectados
+            </ion-card-subtitle>
+            <div
+              style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--ion-color-dark);">
+              <span appCustomTooltip="{{summaryMetrics.maxValueDate | date:'HH:mm a dd/MM/YYYY'}}">🔺 Max: <strong>{{
+                  summaryMetrics.maxValue }}</strong></span>
+              <span appCustomTooltip="{{summaryMetrics.minValueDate | date:'HH:mm a dd/MM/YYYY'}}">🔻 Min: <strong>{{
+                  summaryMetrics.minValue }}</strong></span>
+            </div>
+          </ion-card>
+          <ion-card
+            style="margin: 0; padding: 10px; border-left: 4px solid var(--ion-color-success); background-color: var(--ion-color-back);">
+            <ion-card-subtitle
+              style="font-size: 10px; text-transform: uppercase; color: var(--ion-color-medium); margin: 0;">
+              Promedio Total
+            </ion-card-subtitle>
+            <ion-card-title
+              style="font-size: 1.3rem; font-weight: bold; margin: 2px 0 0 0; color: var(--ion-color-success);">
+              {{ summaryMetrics.avgValue }}
+            </ion-card-title>
+          </ion-card>
+        </div>
+
+        <ion-card class="chart-settings-panel" style="background-color: var(--ion-color-back); margin: 0;">
+          <ion-card-content style="padding-top: 0;">
             <ion-list lines="none" style="padding-top: 0; padding-bottom: 0;">
 
               <ion-item class="setting-item" style="--min-height: 40px; margin-bottom: 4px;">
                 <ion-select label="Tipo de gráfico" label-placement="start" [(ngModel)]="chartOptions.chart.type"
-                  (ionChange)="updateChartSettings()">
+                  (ionChange)="updateChartSettings()"
+                  style="--color: var(--ion-color-secondary); color: var(--ion-color-secondary); font-size: 13px;">
                   <ion-select-option value="line">Línea</ion-select-option>
                   <ion-select-option value="bar">Barras</ion-select-option>
                   <ion-select-option value="area">Área</ion-select-option>
@@ -129,7 +181,8 @@
               <ion-item class="setting-item" *ngIf="chartOptions.chart.type !== 'bar'"
                 style="--min-height: 40px; margin-bottom: 4px;">
                 <ion-select label="Curvatura" label-placement="start" [(ngModel)]="chartOptions.stroke.curve"
-                  (ionChange)="updateChartSettings()">
+                  (ionChange)="updateChartSettings()"
+                  style="--color: var(--ion-color-secondary); color: var(--ion-color-secondary); font-size: 13px;">
                   <ion-select-option value="smooth">Suave</ion-select-option>
                   <ion-select-option value="straight">Recta</ion-select-option>
                   <ion-select-option value="stepline">Escalón</ion-select-option>
@@ -138,18 +191,19 @@
 
               <ion-item class="setting-item" style="--min-height: 40px; margin-bottom: 4px;">
                 <div style="width: 100%; display: flex; align-items: center; gap: 10px;">
-                  <ion-label style="color: var(--ion-color-secondary); white-space: nowrap;">
+                  <ion-label style="color: var(--ion-color-secondary); white-space: nowrap; font-size: 13px;">
                     Grosor
                   </ion-label>
                   <ion-range min="1" max="10" step="1" [(ngModel)]="chartOptions.stroke.width"
-                    (ionChange)="updateChartSettings()">
+                    (ionChange)="updateChartSettings()"
+                    style="--bar-background-active: var(--ion-color-secondary); --knob-background: var(--ion-color-secondary); padding-top: 0; padding-bottom: 0;">
                   </ion-range>
                 </div>
               </ion-item>
 
               <ion-item class="setting-item" style="--min-height: 40px; margin-bottom: 4px;">
                 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                  <ion-label style="color: var(--ion-color-secondary);">
+                  <ion-label style="color: var(--ion-color-secondary); font-size: 13px;">
                     Color
                   </ion-label>
                   <ngx-colors ngx-colors-trigger acceptLabel="Aceptar" cancelLabel="Cancelar"
@@ -159,7 +213,8 @@
               </ion-item>
 
               <ion-item class="setting-item" style="--min-height: 40px; margin-bottom: 0;">
-                <ion-toggle [(ngModel)]="mostrarPuntos" (ionChange)="toggleMarkers()">
+                <ion-toggle [(ngModel)]="mostrarPuntos" (ionChange)="toggleMarkers()"
+                  style="--color: var(--ion-color-secondary); color: var(--ion-color-secondary); --checked-color: var(--ion-color-secondary); font-size: 13px;">
                   Mostrar puntos
                 </ion-toggle>
               </ion-item>
@@ -167,6 +222,7 @@
             </ion-list>
           </ion-card-content>
         </ion-card>
+
       </ion-col>
 
     </ion-row>
