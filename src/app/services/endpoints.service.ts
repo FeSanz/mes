@@ -55,12 +55,27 @@ export class EndpointsService {
                                   'ProcessWorkOrderOutput:OperationSequenceNumber,OutputSequenceNumber,ItemNumber,ItemDescription,OutputType,OutputQuantity,CompletedQuantity,UOMCode,PrimaryFlag,ComplSubinventoryCode' +
                           '&q=OrganizationCode=\'{0}\' and WorkOrderNumber=\'{1}\'',
 
-    'wo_discrete_dispatch': '/workOrders?' + this._params +
+'wo_discrete_dispatch': '/workOrders?' + this._params +
                           '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,Description,PlannedStartQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,UOMCode,PlannedStartDate,PlannedCompletionDate;' +
                                   'WorkOrderOperation:OperationSequenceNumber,OperationName,ReadyQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,UnitOfMeasure;' +
                                   'WorkOrderMaterial:OperationSequenceNumber,MaterialSequenceNumber,ItemNumber,ItemDescription,SupplySubinventory,Quantity,IssuedQuantity,UOMCode;' +
                                   'WorkOrderResource:OperationSequenceNumber,ResourceSequenceNumber,ResourceCode,ResourceName,ResourceType,RequiredUsage,ActualResourceUsage,UOMCode' +
                           '&q=OrganizationCode=\'{0}\' and WorkOrderNumber=\'{1}\'',
+
+    'wo_process_by_item': '/processWorkOrders?' + this._params +
+                          '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,Description,PrimaryProductQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,PrimaryProductUOMCode,PlannedStartDate,PlannedCompletionDate;' +
+                                  'Operation:OperationSequenceNumber,OperationName,ReadyQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,UnitOfMeasure;' +
+                                  'ProcessWorkOrderMaterial:OperationSequenceNumber,MaterialSequenceNumber,ItemNumber,ItemDescription,SupplySubinventory,Quantity,IssuedQuantity,UOMCode;' +
+                                  'ProcessWorkOrderResource:OperationSequenceNumber,ResourceSequenceNumber,ResourceCode,ResourceName,ResourceType,RequiredUsage,ActualResourceUsage,UOMCode;' +
+                                  'ProcessWorkOrderOutput:OperationSequenceNumber,OutputSequenceNumber,ItemNumber,ItemDescription,OutputType,OutputQuantity,CompletedQuantity,UOMCode,PrimaryFlag,ComplSubinventoryCode' +
+                          '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\' and ItemNumber=\'{1}\'',
+
+    'wo_discrete_by_item': '/workOrders?' + this._params +
+                          '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,InventoryItemId,ItemNumber,Description,PlannedStartQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,UOMCode,PlannedStartDate,PlannedCompletionDate;' +
+                                  'WorkOrderOperation:OperationSequenceNumber,OperationName,ReadyQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,UnitOfMeasure;' +
+                                  'WorkOrderMaterial:OperationSequenceNumber,MaterialSequenceNumber,ItemNumber,ItemDescription,SupplySubinventory,Quantity,IssuedQuantity,UOMCode;' +
+                                  'WorkOrderResource:OperationSequenceNumber,ResourceSequenceNumber,ResourceCode,ResourceName,ResourceType,RequiredUsage,ActualResourceUsage,UOMCode' +
+                          '&q=OrganizationCode=\'{0}\' and WorkOrderSystemStatusCode=\'RELEASED\' and ItemNumber=\'{1}\'',
 
     'wo_process_cost': '/processWorkOrders?' + this._params +
                           '&fields=WorkOrderId,WorkOrderNumber,WorkDefinitionId,PrimaryProductId,ItemNumber,Description,PrimaryProductQuantity,CompletedQuantity,ScrappedQuantity,RejectedQuantity,PrimaryProductUOMCode,PlannedStartDate,PlannedCompletionDate;' +

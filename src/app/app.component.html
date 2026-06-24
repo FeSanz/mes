@@ -197,6 +197,13 @@
                           <ion-label>Despachos</ion-label>
                         </ion-item>
                       </ion-menu-toggle>
+                       <ion-menu-toggle auto-hide="false">
+                        <ion-item [routerLink]="['/movil']" routerLinkActive="selected" detail="false"
+                          button lines="none" class="submenu-item">
+                          <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+                          <ion-label>Movil</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
                       <ion-menu-toggle auto-hide="false">
                         <ion-item [routerLink]="['/costs']" routerLinkActive="selected" detail="false" button
                           lines="none" class="submenu-item">

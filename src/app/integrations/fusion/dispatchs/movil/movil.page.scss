@@ -1,0 +1,271 @@
+/* ==========================================================================
+   MOVIL PAGE — Despacho por escaneo
+   ========================================================================== */
+
+// ── Diálogos responsive ──────────────────────────────────────────────────────
+::ng-deep {
+  .p-dialog {
+    width: 60vw !important;
+
+    @media (max-width: 1920px) { width: 65vw !important; }
+    @media (max-width: 1720px) { width: 70vw !important; }
+    @media (max-width: 1620px) { width: 75vw !important; }
+    @media (max-width: 1500px) { width: 80vw !important; }
+    @media (max-width: 1400px) { width: 85vw !important; }
+    @media (max-width: 1320px) { width: 90vw !important; }
+    @media (max-width: 1080px) { width: 95vw !important; }
+    @media (max-width: 979px)  { width: 98vw !important; }
+  }
+}
+
+// ── Tarjeta de escaneo ───────────────────────────────────────────────────────
+// Toda la sección de escaneo está centrada, con el input grande
+// al estilo de terminal de punto de venta / pantalla industrial.
+.scan-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 16px 16px;
+
+  // SelectButton de modo de búsqueda: centrado y ocupa el ancho disponible (máx 480px)
+  ::ng-deep .p-selectbutton {
+    width: 100%;
+    max-width: 480px;
+
+    .p-button {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 16px;
+    }
+  }
+}
+
+// Bloque del input + botones de acción
+.scan-input-group {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+// Fila que contiene: ícono de barcode | input | botones de acción
+.scan-input-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.scan-icon {
+  color: var(--ion-color-medium);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+// Input estilo terminal: letras espaciadas, centradas, altura reducida
+.scan-input {
+  flex: 1 !important;
+  border-radius: 12px !important;
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  letter-spacing: 3px !important;
+  text-align: center !important;
+  height: 48px !important;
+  min-width: 0 !important;
+
+  @media (max-width: 480px) {
+    font-size: 18px !important;
+    height: 42px !important;
+    letter-spacing: 2px !important;
+  }
+}
+
+// Botones icon-only a la derecha del input
+.scan-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── Lista de coincidencias múltiples ────────────────────────────────────────
+.match-list {
+  width: 100%;
+  max-width: 520px;
+  border-top: 1px solid var(--ion-color-light-shade);
+  padding-top: 12px;
+}
+
+.match-title {
+  font-size: 13px;
+  color: var(--ion-color-medium);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.match-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: var(--ion-color-light-shade); }
+}
+
+.match-description {
+  font-size: 13px;
+  color: var(--ion-color-medium-shade);
+}
+
+// ── Tabla de historial ───────────────────────────────────────────────────────
+.table-caption-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .left-section, .right-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.td-center {
+  text-align: center;
+  vertical-align: middle;
+}
+
+// ── Diálogo de despacho (modal activo) ──────────────────────────────────────
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.dialog-content-wrapper {
+  overflow-y: auto;
+}
+
+// Fila de encabezado (FALTANTE / DESPERDICIO / RECHAZO / COMPLETO) y encabezados de detalle
+.section-header {
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: grey;
+}
+
+.section-title {
+  font-weight: bold;
+}
+
+// Fila de operación con inputs — fondo gris que adapta a modo oscuro
+.operation-row {
+  background-color: var(--ion-color-medium-shade);
+  border-radius: 5px;
+  align-items: center;
+}
+
+.data-row {
+  align-items: center;
+}
+
+.data-center {
+  text-align: center;
+  align-items: center;
+}
+
+.input-operation {
+  width: 100%;
+  font-weight: bold;
+  text-align: center;
+}
+
+// Borde verde en el campo de cantidad a completar
+.input-complete {
+  border-color: #28a745 !important;
+  box-shadow: 0 0 0 1px #28a74540 !important;
+}
+
+.input-standard {
+  width: 100%;
+  text-align: center;
+}
+
+// ── Colores de texto ─────────────────────────────────────────────────────────
+.text-red    { color: red;     font-weight: bold; }
+.text-orange { color: orange;  font-weight: bold; }
+.text-purple { color: purple;  font-weight: bold; }
+.text-green  { color: green;   font-weight: bold; }
+.text-blue   { color: #007bff; font-size: 13px;   }
+
+.text-opname {
+  color: #f3dd8b;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.line-divider {
+  border-bottom: 1px solid #ccc;
+  margin: 5px 0 2px;
+}
+
+.text-list {
+  font-size: 15px;
+}
+
+.std-consume {
+  font-size: 13px;
+  text-align: center;
+}
+
+// ── Diálogo de detalle — filas del resumen por operación ─────────────────────
+
+// Encabezado de cada operación (fondo similar a .operation-row)
+.detail-op-header {
+  background-color: var(--ion-color-medium-shade);
+  border-radius: 5px;
+  align-items: center;
+  padding: 6px 0;
+}
+
+// Etiqueta de resultado de la operación (verde / rojo)
+.detail-op-status {
+  font-size: 13px;
+  font-style: italic;
+}
+
+// Fila de ítem con error: fondo rojo suave
+.detail-row-error {
+  background: rgba(220, 53, 69, 0.07);
+}
+
+// Mensaje expandido de error debajo del ítem
+.detail-error-msg {
+  font-size: 12px;
+  padding: 3px 16px 6px;
+  line-height: 1.4;
+  background: rgba(220, 53, 69, 0.04);
+}
+
+// Etiqueta de número de lote en filas de materiales/salidas
+.lot-tag {
+  font-size: 10px;
+  opacity: 0.8;
+}

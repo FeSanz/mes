@@ -1,0 +1,594 @@
+<ion-header [translucent]="true" style="box-shadow: none !important;">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false">
+        <ion-button size="large" (click)="ToggleMenu()">
+          <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-menu-button>
+    </ion-buttons>
+    <ion-title>Despacho Móvil</ion-title>
+
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4">
+      <p-floatlabel class="w-full md:w-56" variant="on">
+        <p-select [(ngModel)]="organizationSelected"
+                  inputId="organization_select"
+                  [options]="userData.Company.Organizations"
+                  optionLabel="Name"
+                  [filter]="true"
+                  filterBy="Name"
+                  styleClass="w-full"
+                  appendTo="body"
+                  (onChange)="OnOrganizationChange()"/>
+        <label for="organization_select">Organización</label>
+      </p-floatlabel>
+
+      <p-floatlabel class="w-full md:w-48" variant="on">
+        <p-select [(ngModel)]="historyInterval"
+                  inputId="period_select"
+                  [options]="intervalOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  styleClass="w-full"
+                  appendTo="body"
+                  (onChange)="OnIntervalChange()"/>
+        <label for="period_select">Período</label>
+      </p-floatlabel>
+    </div>
+
+    <div slot="end" class="card-select flex flex-wrap justify-center items-end gap-4" *ngIf="showDatePickers">
+      <p-datepicker [(ngModel)]="historyStartDate"
+                    [showTime]="false" [showIcon]="true" [readonlyInput]="true"
+                    dateFormat="dd/mm/yy" [maxDate]="historyEndDate"
+                    placeholder="Fecha inicio" appendTo="body"
+                    (ngModelChange)="OnDateRangeChange()"/>
+      <p-datepicker [(ngModel)]="historyEndDate"
+                    [showTime]="false" [showIcon]="true" [readonlyInput]="true"
+                    dateFormat="dd/mm/yy" [minDate]="historyStartDate"
+                    placeholder="Fecha fin" appendTo="body"
+                    (ngModelChange)="OnDateRangeChange()"/>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-grid>
+
+    <!-- ── Escaneo ── -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-card class="stats-card">
+          <div class="scan-wrapper">
+
+            <!-- Selector de modo -->
+            <p-selectButton [options]="searchModes" [(ngModel)]="searchMode"
+                            optionLabel="label" optionValue="value"
+                            (onChange)="OnModeChange()"/>
+
+            <!-- Input + acciones -->
+            <div class="scan-input-wrapper">
+              <i class="fas fa-barcode scan-icon"></i>
+              <input #scanInput pInputText type="text" [(ngModel)]="scanValue"
+                     (keyup.enter)="OnScan()" class="scan-input"
+                     placeholder="ESCANEAR CÓDIGO" autocomplete="off"/>
+
+              <!-- Botones icon-only a la derecha: aparecen al primer carácter -->
+              <div class="scan-actions" *ngIf="scanValue.length > 0">
+                <p-button icon="pi pi-eraser" severity="danger" [outlined]="true"
+                          [rounded]="true" pTooltip="Limpiar" (click)="ClearScan()"/>
+                <p-button icon="pi pi-clone" severity="secondary" [outlined]="true"
+                          [rounded]="true" pTooltip="Copiar" (click)="CopyScan()"/>
+              </div>
+            </div>
+
+            <!-- Coincidencias múltiples (búsqueda por item) -->
+            <div class="match-list" *ngIf="matchList.length > 0">
+              <p class="match-title">Se encontraron {{ matchList.length }} órdenes de trabajo:</p>
+              <div class="match-item" *ngFor="let match of matchList" (click)="SelectMatch(match)">
+                <p-tag [value]="match.raw.WorkOrderNumber" severity="contrast"/>
+                <span class="match-description">{{ match.raw.ItemNumber }} · {{ match.raw.Description }}</span>
+              </div>
+            </div>
+
+          </div>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <!-- ── Historial de despachos ── -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-card class="stats-card">
+          <p-table #dtHistory
+                   [value]="dispatchHistory"
+                   dataKey="WorkDispatchId"
+                   styleClass="card-table-primeng wo-table-custom"
+                   [tableStyle]="{ 'min-width': '52rem' }"
+                   [size]="'small'"
+                   [rowHover]="true"
+                   [rows]="rowsPerPage"
+                   [rowsPerPageOptions]="rowsPerPageOptions"
+                   [paginator]="true"
+                   [showCurrentPageReport]="true"
+                   currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} despachos"
+                   [filterDelay]="0"
+                   [globalFilterFields]="['WorkOrderNumber', 'ItemNumber', 'Status', 'CreatedByName']"
+                   stripedRows
+                   [scrollable]="true"
+                   [scrollHeight]="scrollHeight"
+                   rowGroupMode="rowspan"
+                   groupRowsBy="WorkOrderNumber"
+                   sortField="WorkOrderNumber"
+                   [sortOrder]="1">
+
+            <ng-template #caption>
+              <div class="table-caption-container">
+                <div class="left-section">
+                  <p-button [outlined]="true" icon="pi pi-filter-slash" label="Limpiar"
+                            (click)="ClearHistoryFilter(dtHistory)"/>
+                  <span style="font-size: 17px;">Historial de Despachos</span>
+                </div>
+                <div class="right-section">
+                  <p-button icon="pi pi-refresh" [outlined]="true" [rounded]="true"
+                            (click)="LoadHistory()" pTooltip="Actualizar"/>
+                  <p-iconField iconPosition="left">
+                    <p-inputIcon><i class="fas fa-search"></i></p-inputIcon>
+                    <input pInputText type="text" [(ngModel)]="searchValueHistory"
+                           (input)="OnFilterGlobal($event, dtHistory)" placeholder="Buscar..."/>
+                  </p-iconField>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="min-width: 7rem" class="td-center">OT</th>
+                <th style="min-width: 9rem">Producto</th>
+                <th pSortableColumn="CreatedDate" style="min-width: 9rem">
+                  Fecha <p-sortIcon field="CreatedDate"/>
+                </th>
+                <th pSortableColumn="DispatchedQuantity" style="min-width: 7rem" class="td-center">
+                  Cantidad <p-sortIcon field="DispatchedQuantity"/>
+                </th>
+                <th pSortableColumn="Status" style="min-width: 9rem" class="td-center">
+                  <div class="flex justify-between items-center">
+                    Status <p-sortIcon field="Status"/>
+                    <p-columnFilter field="Status" matchMode="equals" display="menu" class="ml-auto">
+                      <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                        <p-select [options]="['SUCCESS','PARTIAL_ERROR','ERROR']"
+                                  [ngModel]="value" (ngModelChange)="filter($event)"
+                                  placeholder="Todos" appendTo="body"/>
+                      </ng-template>
+                    </p-columnFilter>
+                  </div>
+                </th>
+                <th pSortableColumn="ErrorsCount" style="min-width: 6rem" class="td-center">
+                  Errores <p-sortIcon field="ErrorsCount"/>
+                </th>
+                <th style="min-width: 8rem">Usuario</th>
+                <th style="min-width: 5rem" class="td-center">Ver</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-row let-rowgroup="rowgroup" let-rowspan="rowspan">
+              <tr>
+                <td *ngIf="rowgroup" [attr.rowspan]="rowspan" class="td-center resource-column">
+                  <strong>{{ row.WorkOrderNumber }}</strong>
+                </td>
+                <td *ngIf="rowgroup" [attr.rowspan]="rowspan">
+                  <div>
+                    <div><strong>{{ row.ItemNumber }}</strong></div>
+                    <div style="font-size: 11px; color: #888;">{{ row.Description }}</div>
+                  </div>
+                </td>
+                <td>{{ row.CreatedDate | date:'dd/MM/yy HH:mm' }}</td>
+                <td class="td-center">{{ Truncate(row.DispatchedQuantity) }} {{ row.UoM }}</td>
+                <td class="td-center">
+                  <p-tag [value]="row.Status" [severity]="StatusSeverity(row.Status)"/>
+                </td>
+                <td class="td-center">
+                  <span [style.color]="row.ErrorsCount > 0 ? 'red' : 'inherit'">{{ row.ErrorsCount }}</span>
+                </td>
+                <td>{{ row.CreatedByName || '—' }}</td>
+                <td class="td-center">
+                  <p-button icon="pi pi-arrow-right" [rounded]="true" [outlined]="true"
+                            size="small" severity="secondary" (click)="OpenDispatchDetail(row)"/>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="8" class="td-center" style="padding: 2rem;">
+                  Sin despachos para el período seleccionado.
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+  </ion-grid>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Modal de DESPACHO (activo)
+  ════════════════════════════════════════════════════════════════════════ -->
+  <p-dialog [modal]="true" [(visible)]="isModalOpen"
+            [style]="{ height: '95vh', 'max-height': '90vh' }"
+            [draggable]="true" [resizable]="true" [maximizable]="true"
+            appendTo="body" (onHide)="ResetAll()">
+
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <span>OT <strong>{{ selectedWorkOrder?.WorkOrderNumber || 'N/A' }}</strong></span>
+        <span style="color: #0078a8">
+          Avance: <strong>
+            {{ (selectedWorkOrder?.CompletedQuantity || 0) + ' / ' + (selectedWorkOrder?.PlannedQuantity || 0) }}
+          </strong>
+        </span>
+      </div>
+    </ng-template>
+
+    <div class="dialog-content-wrapper">
+      <div *ngFor="let operation of Operations(); trackBy: trackByOperation">
+        <ion-grid [fixed]="true">
+
+          <ion-row class="section-header">
+            <ion-col size="12" size-sm="3"></ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>FALTANTE</span><br>
+              <span class="text-red">[ {{ operation.ReadyQuantity }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>DESPERDICIO</span><br>
+              <span class="text-orange">[ {{ operation.ScrappedQuantity || 0 }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>RECHAZO</span><br>
+              <span class="text-purple">[ {{ operation.RejectedQuantity || 0 }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <span>COMPLETO</span><br>
+              <span class="text-green">[ {{ operation.CompletedQuantity || 0 }} ]</span>
+            </ion-col>
+            <ion-col size="12" size-sm="1"></ion-col>
+          </ion-row>
+
+          <ion-row class="operation-row">
+            <ion-col size="12" size-sm="3">
+              <strong>OPERACION {{ operation.OperationSequenceNumber }}</strong>
+            </ion-col>
+            <ion-col size="12" size-sm="2" class="data-center">
+              <strong class="text-opname">{{ operation.OperationName }}</strong>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="number" [(ngModel)]="scrapGlobal"
+                     pSize="small" class="input-operation" title="Desperdicio"/>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="number" [(ngModel)]="rejectGlobal"
+                     pSize="small" class="input-operation" title="Rechazo"/>
+            </ion-col>
+            <ion-col size="12" size-sm="2">
+              <input pInputText type="number" [(ngModel)]="completeGlobal"
+                     pSize="small" class="input-operation input-complete"
+                     title="Cantidad a completar"/>
+            </ion-col>
+            <ion-col size="12" size-sm="1">
+              <strong>{{ operation.UnitOfMeasure }}</strong>
+            </ion-col>
+          </ion-row>
+
+          <ng-container *ngIf="OutputsForOperation(operation.OperationSequenceNumber).length > 0">
+            <ion-row class="data-row">
+              <ion-col><br><strong class="section-title">SALIDAS</strong></ion-col>
+            </ion-row>
+            <ion-row class="data-row"
+                     *ngFor="let output of OutputsForOperation(operation.OperationSequenceNumber); trackBy: trackByItem">
+              <ion-col size="12" size-sm="4" class="text-list" [title]="output.ItemDescription">{{ output.ItemNumber }}</ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <span class="std-consume">[ {{ Truncate(output.Standard) }} ]</span>
+              </ion-col>
+              <ion-col size="12" size-sm="2">
+                <p-floatlabel variant="on">
+                  <input pInputText type="text" [value]="Truncate(output.StandardReal)" pSize="small" class="input-standard"/>
+                  <label>{{ Truncate(output.StandardReal) || 0 }}</label>
+                </p-floatlabel>
+              </ion-col>
+              <ion-col size="12" size-sm="1">{{ output.UOMCode }}</ion-col>
+              <ion-col size="12" size-sm="3" class="data-center">
+                <span class="text-blue">[ {{ Truncate(output.CompletedQuantity) }} / {{ Truncate(output.OutputQuantity) }} ]</span>
+              </ion-col>
+            </ion-row>
+          </ng-container>
+
+          <div class="line-divider"></div>
+
+          <ng-container *ngIf="MaterialsForOperation(operation.OperationSequenceNumber).length > 0">
+            <ion-row class="data-row">
+              <ion-col size="12" size-md="2"><br><strong class="section-title">MATERIALES</strong></ion-col>
+              <ion-col size="12" size-md="8" class="text-red text-list" *ngIf="hasInsufficientStock">
+                <br>Sin stock suficiente en algunos materiales
+              </ion-col>
+            </ion-row>
+            <ion-row class="data-row"
+                     *ngFor="let material of MaterialsForOperation(operation.OperationSequenceNumber); trackBy: trackByItem">
+              <ion-col size="12" size-sm="4" class="text-list" [title]="material.ItemDescription">{{ material.ItemNumber }}</ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <span class="std-consume" [ngClass]="material.AvailableToTransact > 0 ? 'text-green' : 'text-red'">
+                  [ {{ Truncate(material.AvailableToTransact) }} / {{ Truncate(material.Standard) }} ]
+                </span>
+              </ion-col>
+              <ion-col size="12" size-sm="2">
+                <p-floatlabel variant="on">
+                  <input pInputText type="text" [value]="Truncate(material.StandardReal)" pSize="small" class="input-standard"/>
+                  <label>{{ Truncate(material.StandardReal) || 0 }}</label>
+                </p-floatlabel>
+              </ion-col>
+              <ion-col size="12" size-sm="1">{{ material.UOMCode }}</ion-col>
+              <ion-col size="12" size-sm="3" class="data-center">
+                <span class="text-blue">[ {{ Truncate(material.IssuedQuantity) }} / {{ Truncate(material.Quantity) }} ]</span>
+              </ion-col>
+            </ion-row>
+          </ng-container>
+
+          <div class="line-divider"></div>
+
+          <ng-container *ngIf="EquipmentResourcesForOperation(operation.OperationSequenceNumber).length > 0">
+            <ion-row class="data-row">
+              <ion-col size="12" size-sm="3"><br><strong class="section-title">EQUIPOS</strong></ion-col>
+            </ion-row>
+            <ion-row class="data-row"
+                     *ngFor="let equipment of EquipmentResourcesForOperation(operation.OperationSequenceNumber); trackBy: trackByItem">
+              <ion-col size="12" size-sm="4" class="text-list" [title]="equipment.ResourceCode">{{ equipment.ResourceName }}</ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <span class="std-consume">[ {{ Truncate(equipment.Standard) }} ]</span>
+              </ion-col>
+              <ion-col size="12" size-sm="2">
+                <p-floatlabel variant="on">
+                  <input pInputText type="text" [value]="Truncate(equipment.StandardReal)" pSize="small" class="input-standard"/>
+                  <label>{{ Truncate(equipment.StandardReal) || 0 }}</label>
+                </p-floatlabel>
+              </ion-col>
+              <ion-col size="12" size-sm="1">{{ equipment.UOMCode }}</ion-col>
+              <ion-col size="12" size-sm="3" class="data-center">
+                <span class="text-blue">[ {{ Truncate(equipment.ActualResourceUsage) }} / {{ Truncate(equipment.RequiredUsage) }} ]</span>
+              </ion-col>
+            </ion-row>
+          </ng-container>
+
+          <div class="line-divider"></div>
+
+          <ng-container *ngIf="LaborResourcesForOperation(operation.OperationSequenceNumber).length > 0">
+            <ion-row class="data-row">
+              <ion-col size="12" size-sm="3"><br><strong class="section-title">PERSONAL</strong></ion-col>
+            </ion-row>
+            <ion-row class="data-row"
+                     *ngFor="let labor of LaborResourcesForOperation(operation.OperationSequenceNumber); trackBy: trackByItem">
+              <ion-col size="12" size-sm="4" class="text-list" [title]="labor.ResourceCode">{{ labor.ResourceName }}</ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <span class="std-consume">[ {{ Truncate(labor.Standard) }} ]</span>
+              </ion-col>
+              <ion-col size="12" size-sm="2">
+                <p-floatlabel variant="on">
+                  <input pInputText type="text" [value]="Truncate(labor.StandardReal)" pSize="small" class="input-standard"/>
+                  <label>{{ Truncate(labor.StandardReal) || 0 }}</label>
+                </p-floatlabel>
+              </ion-col>
+              <ion-col size="12" size-sm="1">{{ labor.UOMCode }}</ion-col>
+              <ion-col size="12" size-sm="3" class="data-center">
+                <span class="text-blue">[ {{ Truncate(labor.ActualResourceUsage) }} / {{ Truncate(labor.RequiredUsage) }} ]</span>
+              </ion-col>
+            </ion-row>
+          </ng-container>
+
+        </ion-grid>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button label="Cancelar" severity="danger" (click)="isModalOpen = false"/>
+      <p-button label="Confirmar Despacho" severity="success" icon="pi pi-check"
+                (click)="ConfirmDispatch()"
+                [disabled]="hasInsufficientStock || !completeGlobal || completeGlobal <= 0"/>
+    </ng-template>
+  </p-dialog>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Modal de DETALLE — solo lectura, agrupado por operación
+       Sigue el mismo layout que el modal de despacho: operation-row + data-row
+  ════════════════════════════════════════════════════════════════════════ -->
+  <p-dialog [modal]="true" [(visible)]="isDetailOpen"
+            [style]="{ height: '90vh', 'max-height': '85vh' }"
+            [draggable]="true" [resizable]="true" [maximizable]="true"
+            appendTo="body">
+
+    <ng-template pTemplate="header">
+      <div class="dialog-header">
+        <span>
+          OT <strong>{{ detailDispatch?.WorkOrderNumber }}</strong>
+          &nbsp;&mdash;&nbsp;
+          {{ detailDispatch?.CreatedDate | date:'dd/MM/yy HH:mm' }}
+        </span>
+        <p-tag [value]="detailDispatch?.Status"
+               [severity]="StatusSeverity(detailDispatch?.Status)"/>
+      </div>
+    </ng-template>
+
+    <div class="dialog-content-wrapper" *ngIf="detailPayload">
+
+      <!-- Banner de errores -->
+      <ion-grid [fixed]="true" *ngIf="detailDispatch?.ErrorsCount > 0">
+        <ion-row style="border-left:4px solid red; background:rgba(220,53,69,0.07); border-radius:4px; margin-bottom:6px;">
+          <ion-col size="12" style="padding:8px 12px;">
+            <span class="text-red">
+              <i class="pi pi-exclamation-triangle"></i>
+              &nbsp;{{ detailDispatch.ErrorsCount }} error(es) — secciones: <strong>{{ ErroredSections().join(', ') }}</strong>
+            </span>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <!-- Una sección por cada secuencia de operación presente en el payload -->
+      <div *ngFor="let seq of DetailSequences()">
+        <ion-grid [fixed]="true">
+
+          <!-- ── Encabezado de operación ── -->
+          <ion-row class="operation-row">
+            <ion-col size="12" size-sm="6">
+              <strong>OPERACION {{ seq }}</strong>
+            </ion-col>
+            <ion-col size="12" size-sm="6" class="data-center">
+              <span class="detail-op-status"
+                    [style.color]="SectionHasError('Operations') ? 'red' : '#f3dd8b'">
+                {{ SectionHasError('Operations') ? 'Con errores' : 'Operación completada' }}
+              </span>
+            </ion-col>
+          </ion-row>
+
+          <!-- Filas de operación: una por cada ToDispatchState (COMPLETE / SCRAP / REJECT) -->
+          <!-- Columnas: Etiqueta | ✔✘ | [cantidad] | UoM | READY→STATE | tipo o mensaje de error -->
+          <ion-row class="data-row" *ngFor="let op of DetailOpsForSeq(seq)"
+                   [style.background]="op.Error ? 'rgba(220,53,69,0.06)' : ''">
+            <ion-col size="12" size-sm="3" class="text-list">
+              {{ DispatchLabel(op.ToDispatchState) }}
+            </ion-col>
+            <ion-col size="12" size-sm="1" class="data-center">
+              <span [class]="op.Error ? 'text-red' : 'text-green'">{{ op.Error ? '✘' : '✔' }}</span>
+            </ion-col>
+            <ion-col size="12" size-sm="2" class="data-center">
+              <input pInputText [value]="op.TransactionQuantity" [readOnly]="true"
+                     pSize="small" class="input-operation"
+                     [class.input-complete]="op.ToDispatchState === 'COMPLETE' && !op.Error"/>
+            </ion-col>
+            <ion-col size="12" size-sm="1">{{ op.TransactionUnitOfMeasure }}</ion-col>
+            <ion-col size="12" size-sm="2" class="data-center">
+              <span class="std-consume">{{ op.FromDispatchState }} → {{ op.ToDispatchState }}</span>
+            </ion-col>
+            <!-- Error inline: mensaje directamente en la misma fila -->
+            <ion-col size="12" size-sm="3" class="data-center">
+              <span *ngIf="!op.Error" class="std-consume">—</span>
+              <span *ngIf="op.Error" class="text-red" style="font-size:11px;">
+                {{ op.Error.ErrorMessages }}
+              </span>
+            </ion-col>
+          </ion-row>
+
+          <!-- ── SALIDAS (Outputs[]) ── -->
+          <ng-container *ngIf="DetailOutputsForSeq(seq).length > 0">
+            <ion-row class="data-row">
+              <ion-col><br><strong class="section-title">SALIDAS</strong></ion-col>
+            </ion-row>
+            <ion-row class="data-row" *ngFor="let out of DetailOutputsForSeq(seq)"
+                     [style.background]="out.Error ? 'rgba(220,53,69,0.06)' : ''">
+              <ion-col size="12" size-sm="3" class="text-list">{{ out.InventoryItemNumber }}</ion-col>
+              <ion-col size="12" size-sm="1" class="data-center">
+                <span [class]="out.Error ? 'text-red' : 'text-green'">{{ out.Error ? '✘' : '✔' }}</span>
+              </ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <input pInputText [value]="out.TransactionQuantity" [readOnly]="true"
+                       pSize="small" class="input-standard"/>
+              </ion-col>
+              <ion-col size="12" size-sm="1">{{ out.TransactionUnitOfMeasure }}</ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <span *ngIf="LotLabel(out.TransactionLot)" class="lot-tag">
+                  <p-tag [value]="LotLabel(out.TransactionLot)" severity="secondary"/>
+                </span>
+              </ion-col>
+              <ion-col size="12" size-sm="3" class="data-center">
+                <span *ngIf="!out.Error" class="std-consume text-green">PRODUCT_COMPLETION</span>
+                <span *ngIf="out.Error" class="text-red" style="font-size:11px;">
+                  {{ out.Error.ErrorMessages }}
+                </span>
+              </ion-col>
+            </ion-row>
+          </ng-container>
+
+          <div class="line-divider"></div>
+
+          <!-- ── MATERIALES ── -->
+          <ng-container *ngIf="DetailMaterialsForSeq(seq).length > 0">
+            <ion-row class="data-row">
+              <ion-col>
+                <br>
+                <strong class="section-title" [style.color]="SectionHasError('Materials') ? 'red' : ''">
+                  MATERIALES
+                </strong>
+              </ion-col>
+            </ion-row>
+            <ion-row class="data-row" *ngFor="let mat of DetailMaterialsForSeq(seq)"
+                     [style.background]="mat.Error ? 'rgba(220,53,69,0.06)' : ''">
+              <ion-col size="12" size-sm="3" class="text-list">{{ mat.InventoryItemNumber }}</ion-col>
+              <ion-col size="12" size-sm="1" class="data-center">
+                <span [class]="mat.Error ? 'text-red' : 'text-green'">{{ mat.Error ? '✘' : '✔' }}</span>
+              </ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <input pInputText [value]="mat.TransactionQuantity" [readOnly]="true"
+                       pSize="small" class="input-standard"/>
+              </ion-col>
+              <ion-col size="12" size-sm="1">{{ mat.TransactionUnitOfMeasure }}</ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <!-- Subinventario y lote en la misma celda -->
+                <p-tag *ngIf="mat.SubinventoryCode" [value]="mat.SubinventoryCode" severity="info"/>
+                <span *ngIf="LotLabel(mat.TransactionLot)" class="lot-tag std-consume">
+                  {{ LotLabel(mat.TransactionLot) }}
+                </span>
+              </ion-col>
+              <ion-col size="12" size-sm="3" class="data-center">
+                <span *ngIf="!mat.Error" class="std-consume">MATERIAL_ISSUE</span>
+                <span *ngIf="mat.Error" class="text-red" style="font-size:11px;">
+                  {{ mat.Error.ErrorMessages }}
+                </span>
+              </ion-col>
+            </ion-row>
+          </ng-container>
+
+          <div class="line-divider"></div>
+
+          <!-- ── RECURSOS ── -->
+          <ng-container *ngIf="DetailResourcesForSeq(seq).length > 0">
+            <ion-row class="data-row">
+              <ion-col>
+                <br>
+                <strong class="section-title" [style.color]="SectionHasError('Resources') ? 'red' : ''">
+                  RECURSOS
+                </strong>
+              </ion-col>
+            </ion-row>
+            <ion-row class="data-row" *ngFor="let res of DetailResourcesForSeq(seq)"
+                     [style.background]="res.Error ? 'rgba(220,53,69,0.06)' : ''">
+              <ion-col size="12" size-sm="3" class="text-list">{{ res.ResourceCode }}</ion-col>
+              <ion-col size="12" size-sm="1" class="data-center">
+                <span [class]="res.Error ? 'text-red' : 'text-green'">{{ res.Error ? '✘' : '✔' }}</span>
+              </ion-col>
+              <ion-col size="12" size-sm="2" class="data-center">
+                <input pInputText [value]="res.TransactionQuantity" [readOnly]="true"
+                       pSize="small" class="input-standard"/>
+              </ion-col>
+              <ion-col size="12" size-sm="1">{{ res.TransactionUnitOfMeasure }}</ion-col>
+              <ion-col size="12" size-sm="2" class="data-center"></ion-col>
+              <ion-col size="12" size-sm="3" class="data-center">
+                <span *ngIf="!res.Error" class="std-consume">{{ res.TransactionTypeCode }}</span>
+                <span *ngIf="res.Error" class="text-red" style="font-size:11px;">
+                  {{ res.Error.ErrorMessages }}
+                </span>
+              </ion-col>
+            </ion-row>
+          </ng-container>
+
+        </ion-grid>
+      </div>
+
+    </div>
+
+    <div *ngIf="!detailPayload" style="text-align:center; padding:2rem; color:#888;">
+      <i class="pi pi-info-circle"></i> No hay datos de payload disponibles.
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button label="CERRAR" severity="secondary" (click)="isDetailOpen = false"/>
+    </ng-template>
+  </p-dialog>
+
+</ion-content>
