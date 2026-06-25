@@ -207,6 +207,10 @@ export class MovilPage implements OnInit, AfterViewInit {
     if (!this.organizationSelected?.OrganizationId) return;
     const orgId = this.organizationSelected.OrganizationId;
 
+    // getTimezoneOffset() devuelve minutos al oeste de UTC (ej. UTC-6 → 360).
+    // El backend lo usa para convertir timestamps UTC a hora local antes de filtrar.
+    const tz = new Date().getTimezoneOffset();
+
     let endpoint: string;
     if (this.historyInterval === 'custom') {
       if (!this.historyStartDate || !this.historyEndDate) return;
@@ -214,7 +218,7 @@ export class MovilPage implements OnInit, AfterViewInit {
       const end = this.FormatDateParam(this.historyEndDate);
       endpoint = `workDispatch/history/${orgId}/between/${start}/${end}`;
     } else {
-      endpoint = `workDispatch/history/${orgId}/interval/${this.historyInterval}`;
+      endpoint = `workDispatch/history/${orgId}/interval/${this.historyInterval}?tzOffset=${tz}`;
     }
 
     const response: any = await this.apiService.GetRequestRender(endpoint, false);

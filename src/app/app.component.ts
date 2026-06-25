@@ -47,7 +47,7 @@ import {
   gitNetworkOutline, closeOutline, barChartOutline, pieChartOutline, addOutline, checkmark, pencilOutline, trashOutline,
   reorderThreeOutline, reorderTwoOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline,
   cashOutline, notificationsOutline, calendarOutline, buildOutline, addCircleOutline, createOutline, albumsOutline,
-  layersOutline, cloudUploadOutline
+  layersOutline, cloudUploadOutline, barcodeOutline
 } from 'ionicons/icons';
 
 import { FormsModule } from '@angular/forms';
@@ -105,7 +105,7 @@ export class AppComponent implements OnInit {
       reorderTwoOutline, trashOutline, addOutline, cubeOutline, hardwareChipOutline, hammerOutline, warningOutline, podiumOutline,
       timeOutline, peopleOutline, gitNetworkOutline, checkmark, reorderThreeOutline, personOutline, barChartOutline,
       person, homeOutline, analyticsOutline, radioOutline, trendingUpOutline, documentTextOutline, cashOutline, notificationsOutline, calendarOutline,
-      buildOutline, addCircleOutline, createOutline, albumsOutline, layersOutline, cloudUploadOutline
+      buildOutline, addCircleOutline, createOutline, albumsOutline, layersOutline, cloudUploadOutline, barcodeOutline
     });
 
     const isLogged = localStorage.getItem('isLogged') == 'true' ? true : false
